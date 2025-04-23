@@ -40,12 +40,19 @@ const App = () => (
           {/* Patient Routes */}
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
           <Route path="/patient/chat" element={<PatientChat />} />
+          <Route path="/patient/tasks" element={<PatientTasks />} />
+          <Route path="/patient/sessions" element={<PatientSessions />} />
+          <Route path="/patient/insights" element={<PatientInsights />} />
+          <Route path="/patient/settings" element={<PatientSettings />} />
+          <Route path="/patient/profile" element={<PatientProfile />} />
           
           {/* Clinician Routes */}
           <Route path="/clinician/dashboard" element={<ClinicianDashboard />} />
           <Route path="/clinician/sessions" element={<ClinicianSessions />} />
           <Route path="/clinician/tasks" element={<ClinicianTasks />} />
           <Route path="/clinician/reports" element={<ClinicianReports />} />
+          <Route path="/clinician/settings" element={<ClinicianSettings />} />
+          <Route path="/clinician/profile" element={<ClinicianProfile />} />
           
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
