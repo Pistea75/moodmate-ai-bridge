@@ -52,6 +52,24 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// MoodMate custom colors
+                mood: {
+                    purple: {
+                        DEFAULT: '#9b87f5',
+                        secondary: '#7E69AB',
+                        tertiary: '#6E59A5',
+                        light: '#E5DEFF',
+                    },
+                    blue: {
+                        light: '#D3E4FD',
+                    },
+                    neutral: {
+                        DEFAULT: '#8E9196',
+                        light: '#F1F0FB',
+                        medium: '#8A898C',
+                        dark: '#1A1F2C',
+                    },
+                },
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
