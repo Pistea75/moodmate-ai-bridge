@@ -18,6 +18,9 @@ import PatientChat from "./pages/patient/PatientChat";
 
 // Clinician pages
 import ClinicianDashboard from "./pages/clinician/ClinicianDashboard";
+import ClinicianSessions from "./pages/clinician/Sessions";
+import ClinicianTasks from "./pages/clinician/Tasks";
+import ClinicianReports from "./pages/clinician/Reports";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +43,9 @@ const App = () => (
           
           {/* Clinician Routes */}
           <Route path="/clinician/dashboard" element={<ClinicianDashboard />} />
+          <Route path="/clinician/sessions" element={<ClinicianSessions />} />
+          <Route path="/clinician/tasks" element={<ClinicianTasks />} />
+          <Route path="/clinician/reports" element={<ClinicianReports />} />
           
           {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
