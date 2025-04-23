@@ -15,12 +15,19 @@ import NotFound from "./pages/NotFound";
 // Patient pages
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import PatientChat from "./pages/patient/PatientChat";
+import PatientTasks from "./pages/patient/PatientTasks";
+import PatientSessions from "./pages/patient/PatientSessions";
+import PatientInsights from "./pages/patient/PatientInsights";
+import PatientSettings from "./pages/patient/PatientSettings";
+import PatientProfile from "./pages/patient/PatientProfile";
 
 // Clinician pages
 import ClinicianDashboard from "./pages/clinician/ClinicianDashboard";
 import ClinicianSessions from "./pages/clinician/Sessions";
 import ClinicianTasks from "./pages/clinician/Tasks";
 import ClinicianReports from "./pages/clinician/Reports";
+import ClinicianSettings from "./pages/clinician/ClinicianSettings";
+import ClinicianProfile from "./pages/clinician/ClinicianProfile";
 
 const queryClient = new QueryClient();
 

@@ -3,6 +3,7 @@ import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Bell, Moon, User } from "lucide-react";
 
 export default function ClinicianSettings() {
   return (
@@ -12,22 +13,31 @@ export default function ClinicianSettings() {
         
         <div className="grid gap-6">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Practice Settings</h2>
+            <h2 className="text-xl font-semibold mb-4">Notifications</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="font-medium">Online Booking</div>
+                  <div className="font-medium">Patient Updates</div>
                   <div className="text-sm text-muted-foreground">
-                    Allow patients to book sessions online
+                    Get notified about patient activity and updates
                   </div>
                 </div>
                 <Switch />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="font-medium">Automatic Reminders</div>
+                  <div className="font-medium">Session Reminders</div>
                   <div className="text-sm text-muted-foreground">
-                    Send automated session reminders to patients
+                    Receive reminders about upcoming sessions
+                  </div>
+                </div>
+                <Switch />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="font-medium">AI Report Notifications</div>
+                  <div className="text-sm text-muted-foreground">
+                    Get notified when new AI reports are generated
                   </div>
                 </div>
                 <Switch />
@@ -36,60 +46,76 @@ export default function ClinicianSettings() {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Availability</h2>
+            <h2 className="text-xl font-semibold mb-4">Preferences</h2>
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Working Hours</label>
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <input
-                    type="time"
-                    value="09:00"
-                    className="px-3 py-2 border rounded-md"
-                  />
-                  <input
-                    type="time"
-                    value="17:00"
-                    className="px-3 py-2 border rounded-md"
-                  />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="font-medium">Dark Mode</div>
+                  <div className="text-sm text-muted-foreground">
+                    Toggle dark mode theme
+                  </div>
                 </div>
+                <Switch />
               </div>
-              <div>
-                <label className="text-sm font-medium">Working Days</label>
-                <div className="grid grid-cols-7 gap-2 mt-2">
-                  {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day) => (
-                    <Button
-                      key={day}
-                      variant={day !== 'S' ? "default" : "outline"}
-                      className="h-10 w-10"
-                    >
-                      {day}
-                    </Button>
-                  ))}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="font-medium">Language</div>
+                  <div className="text-sm text-muted-foreground">
+                    Choose your preferred language
+                  </div>
                 </div>
+                <select className="border rounded-md px-2 py-1">
+                  <option>English</option>
+                  <option>Spanish</option>
+                  <option>French</option>
+                </select>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="font-medium">Session Duration Default</div>
+                  <div className="text-sm text-muted-foreground">
+                    Set your default session length
+                  </div>
+                </div>
+                <select className="border rounded-md px-2 py-1">
+                  <option>30 minutes</option>
+                  <option>45 minutes</option>
+                  <option>50 minutes</option>
+                  <option>60 minutes</option>
+                </select>
               </div>
             </div>
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">AI Assistant Settings</h2>
+            <h2 className="text-xl font-semibold mb-4">AI Chat Settings</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="font-medium">AI Report Generation</div>
+                  <div className="font-medium">AI Tone</div>
                   <div className="text-sm text-muted-foreground">
-                    Automatically generate session reports using AI
+                    Customize the AI's communication style
                   </div>
                 </div>
-                <Switch />
+                <select className="border rounded-md px-2 py-1">
+                  <option>Professional</option>
+                  <option>Friendly</option>
+                  <option>Supportive</option>
+                  <option>Direct</option>
+                </select>
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="font-medium">AI Chat Analysis</div>
+                  <div className="font-medium">AI Visibility for Patients</div>
                   <div className="text-sm text-muted-foreground">
-                    Analyze patient chat interactions for insights
+                    Control how much AI support your patients receive
                   </div>
                 </div>
-                <Switch />
+                <select className="border rounded-md px-2 py-1">
+                  <option>Full Access</option>
+                  <option>Limited Access</option>
+                  <option>Minimal Access</option>
+                </select>
               </div>
             </div>
           </Card>
