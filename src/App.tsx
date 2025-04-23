@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,6 +27,7 @@ import ClinicianTasks from "./pages/clinician/Tasks";
 import ClinicianReports from "./pages/clinician/Reports";
 import ClinicianSettings from "./pages/clinician/ClinicianSettings";
 import ClinicianProfile from "./pages/clinician/ClinicianProfile";
+import Patients from "./pages/clinician/Patients";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +55,7 @@ const App = () => (
           
           {/* Clinician Routes */}
           <Route path="/clinician/dashboard" element={<ClinicianDashboard />} />
+          <Route path="/clinician/patients" element={<Patients />} />
           <Route path="/clinician/sessions" element={<ClinicianSessions />} />
           <Route path="/clinician/tasks" element={<ClinicianTasks />} />
           <Route path="/clinician/reports" element={<ClinicianReports />} />
