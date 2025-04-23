@@ -1,14 +1,15 @@
 
-import { Calendar, Clock, Search, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, Video } from "lucide-react";
 
 export default function Sessions() {
-  const upcomingSessions = [
+  const sessions = [
     {
       id: 1,
-      patientName: "Sarah Johnson",
+      type: "Weekly Therapy",
+      patient: "Sarah Johnson",
       date: "2025-04-24",
       time: "10:00 AM",
       duration: "50 min",
@@ -16,43 +17,37 @@ export default function Sessions() {
     },
     {
       id: 2,
-      patientName: "Michael Chen",
-      date: "2025-04-24",
+      type: "Follow-up Session",
+      patient: "Michael Chen",
+      date: "2025-05-01",
       time: "11:30 AM",
-      duration: "50 min",
+      duration: "30 min",
       status: "upcoming"
-    },
-    // Add more sessions as needed
+    }
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Sessions</h1>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search sessions..."
-              className="w-[250px] pl-9"
-            />
+    <ClinicianLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Sessions</h1>
+            <p className="text-muted-foreground">Manage your therapy sessions</p>
           </div>
           <Button className="bg-mood-purple hover:bg-mood-purple/90">
             Schedule Session
           </Button>
         </div>
-      </div>
 
-      <div className="grid gap-4">
-        {upcomingSessions.map((session) => (
-          <Card key={session.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                  <User className="h-6 w-6 text-muted-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-medium">{session.patientName}</h3>
+        <div className="grid gap-4">
+          {sessions.map((session) => (
+            <Card key={session.id} className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h3 className="font-medium">{session.type}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    with {session.patient}
+                  </p>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
@@ -64,14 +59,16 @@ export default function Sessions() {
                     </span>
                   </div>
                 </div>
+                <Button className="gap-2">
+                  <Video className="h-4 w-4" />
+                  Join Session
+                </Button>
               </div>
-              <Button variant="outline" className="min-w-[100px]">
-                Join Session
-              </Button>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
+    </ClinicianLayout>
   );
 }
+

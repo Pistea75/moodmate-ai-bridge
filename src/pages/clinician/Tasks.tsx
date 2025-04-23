@@ -1,73 +1,71 @@
 
-import { Plus, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar, Clock } from "lucide-react";
 
 export default function Tasks() {
   const tasks = [
     {
       id: 1,
-      title: "Review Sarah's weekly mood chart",
-      patient: "Sarah Johnson",
-      dueDate: "2025-04-25",
+      title: "Review Sarah's weekly progress report",
+      description: "Complete weekly assessment and update treatment plan",
+      dueDate: "2025-04-24",
       completed: false,
+      patient: "Sarah Johnson"
     },
     {
       id: 2,
       title: "Prepare session notes for Michael",
-      patient: "Michael Chen",
+      description: "Document observations and update treatment goals",
       dueDate: "2025-04-24",
       completed: true,
-    },
-    // Add more tasks as needed
+      patient: "Michael Chen"
+    }
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Tasks</h1>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search tasks..."
-              className="w-[250px] pl-9"
-            />
-          </div>
-          <Button className="bg-mood-purple hover:bg-mood-purple/90">
-            <Plus className="h-4 w-4 mr-2" />
-            New Task
+    <ClinicianLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Tasks</h1>
+          <Button variant="outline" className="gap-2">
+            <Calendar className="h-4 w-4" />
+            View Calendar
           </Button>
         </div>
-      </div>
 
-      <div className="grid gap-4">
-        {tasks.map((task) => (
-          <Card key={task.id} className="p-4">
-            <div className="flex items-center gap-4">
-              <Checkbox 
-                checked={task.completed}
-                className="h-5 w-5"
-              />
-              <div className="flex-1">
-                <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-                  {task.title}
-                </h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>Patient: {task.patient}</span>
-                  <span>•</span>
-                  <span>Due: {task.dueDate}</span>
+        <div className="grid gap-4">
+          {tasks.map((task) => (
+            <Card key={task.id} className="p-4">
+              <div className="flex items-start gap-4">
+                <Checkbox checked={task.completed} className="mt-1" />
+                <div className="flex-1">
+                  <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                    {task.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {task.description}
+                  </p>
+                  <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      Due: {task.dueDate}
+                    </span>
+                    <span>•</span>
+                    <span>Patient: {task.patient}</span>
+                  </div>
                 </div>
+                <Button variant="ghost" size="sm">
+                  Details
+                </Button>
               </div>
-              <Button variant="outline" size="sm">
-                Edit
-              </Button>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
+    </ClinicianLayout>
   );
 }
+
