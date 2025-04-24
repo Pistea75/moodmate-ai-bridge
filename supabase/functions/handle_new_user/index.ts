@@ -45,11 +45,15 @@ serve(async (req) => {
     const lastName = nameParts.slice(1).join(' ') || '';
     
     // Check if profile already exists
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile, error: profileCheckError } = await supabase
       .from('profiles')
       .select('id')
       .eq('id', body.id)
       .maybeSingle();
+      
+    if (profileCheckError) {
+      console.error('Error checking existing profile:', profileCheckError);
+    }
     
     if (!existingProfile) {
       console.log('Creating new profile for user:', body.id);
@@ -62,7 +66,7 @@ serve(async (req) => {
         referral_code: referralCode 
       });
       
-      // Insert user profile
+      // Insert user profile with service role to bypass RLS
       const { error } = await supabase
         .from('profiles')
         .insert({

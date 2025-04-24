@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -91,15 +92,21 @@ export default function SignupPatient() {
     } catch (err: any) {
       console.error("Signup error:", err);
       
-      if (!err.message?.includes('Database error')) {
-        return;
+      // Show a specific error message for database errors
+      if (err.message?.includes('Database error')) {
+        toast({
+          title: "Registration Error",
+          description: "There was a problem creating your account. Please try again later or contact support.",
+          variant: "destructive"
+        });
+      } else {
+        // Show the actual error message for other types of errors
+        toast({
+          title: "Registration Error",
+          description: err.message || "An unexpected error occurred during signup",
+          variant: "destructive"
+        });
       }
-      
-      toast({
-        title: "Registration Error",
-        description: "There was a problem creating your account. Please try again later.",
-        variant: "destructive"
-      });
     }
   };
 
