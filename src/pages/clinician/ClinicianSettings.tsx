@@ -18,7 +18,8 @@ export default function ClinicianSettings() {
     { id: "roger", name: "Roger (Male)" },
     { id: "sarah", name: "Sarah (Female)" },
     { id: "george", name: "George (Male)" },
-    { id: "charlie", name: "Charlie (Neutral)" }
+    { id: "charlie", name: "Charlie (Neutral)" },
+    { id: "custom", name: "Custom Voice" }
   ];
 
   const handleVoiceChange = (value: string) => {
