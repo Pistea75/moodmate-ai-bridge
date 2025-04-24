@@ -5,6 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { User } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -38,10 +40,55 @@ interface ProfileFormProps {
 export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<ProfileFormData>({
     defaultValues: initialData,
   });
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    try {
+      setIsUploading(true);
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError, data } = await supabase.storage
+        .from('profile-pictures')
+        .upload(filePath, file, {
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-pictures')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl }
+      });
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "Profile picture updated successfully.",
+      });
+
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update profile picture",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) return;
@@ -79,7 +126,34 @@ export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="flex flex-col items-center gap-4 mb-6">
+          <Avatar className="h-24 w-24">
+            <AvatarImage src={user?.user_metadata?.avatar_url} />
+            <AvatarFallback>
+              <User className="h-12 w-12 text-muted-foreground" />
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex items-center gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isUploading}
+              onClick={() => document.getElementById('profile-picture-input')?.click()}
+            >
+              {isUploading ? 'Uploading...' : 'Change Profile Picture'}
+            </Button>
+            <input
+              id="profile-picture-input"
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+          </div>
+        </div>
+
         <FormField
           control={form.control}
           name="first_name"
