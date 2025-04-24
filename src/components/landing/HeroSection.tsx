@@ -1,8 +1,11 @@
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Brain } from 'lucide-react';
+import { DemoModal } from './DemoModal';
 
 export function HeroSection() {
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 px-4">
       <div className="container mx-auto flex flex-col md:flex-row gap-8 md:gap-16 items-center">
@@ -27,8 +30,15 @@ export function HeroSection() {
             >
               Join as Clinician
             </Link>
+            <button
+              onClick={() => setIsDemoModalOpen(true)}
+              className="px-6 py-3 bg-mood-neutral-light text-mood-purple hover:bg-mood-purple/10 font-medium rounded-full text-center border border-mood-purple/30"
+            >
+              Try Demo
+            </button>
           </div>
         </div>
+        
         <div className="flex-1 flex justify-center">
           <div className="relative">
             <div className="absolute -top-4 -left-4 w-24 h-24 bg-mood-purple/20 rounded-full animate-pulse" />
@@ -41,6 +51,11 @@ export function HeroSection() {
           </div>
         </div>
       </div>
+      
+      <DemoModal 
+        isOpen={isDemoModalOpen} 
+        onClose={() => setIsDemoModalOpen(false)} 
+      />
     </section>
   );
 }
