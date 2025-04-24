@@ -34,31 +34,18 @@ export function ReferralCodeInput() {
           description: "Please check the code and try again",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
-      // Create relationship
-      const { error: relationshipError } = await supabase
-        .from('patient_clinician_relationships')
-        .insert([
-          { patient_id: user.id, clinician_id: clinician.id }
-        ]);
-
-      if (relationshipError) {
-        if (relationshipError.code === '23505') { // Unique violation
-          toast({
-            title: "Already connected",
-            description: "You're already connected to this clinician",
-            variant: "destructive",
-          });
-          return;
-        }
-        throw relationshipError;
-      }
-
-      // Update auth metadata
+      // Instead of directly inserting into patient_clinician_relationships,
+      // we'll update the user's metadata to include the clinician's information
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { referral_code: referralCode.toUpperCase() }
+        data: { 
+          referral_code: referralCode.toUpperCase(),
+          connected_clinician_id: clinician.id,
+          connected_clinician_name: `${clinician.first_name || ''} ${clinician.last_name || ''}`.trim()
+        }
       });
 
       if (updateError) throw updateError;
