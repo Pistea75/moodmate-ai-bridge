@@ -1,3 +1,4 @@
+
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,14 +8,13 @@ import { Volume2, Bell, Moon, Palette } from "lucide-react";
 import { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from '@/providers/ThemeProvider';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/AuthContext'; // Fixed the import path
 
 export default function ClinicianSettings() {
   const { toast } = useToast();
   const { theme, themeColor, setTheme, setThemeColor } = useTheme();
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [selectedVoice, setSelectedVoice] = useState("aria");
-  const clinicianName = "Dr. Sarah Johnson"; // This would come from your auth context
   const { user } = useAuth();
 
   const voices = [
