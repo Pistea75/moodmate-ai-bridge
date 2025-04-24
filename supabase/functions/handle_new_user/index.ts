@@ -22,15 +22,20 @@ serve(async (req) => {
     console.log('Processing user creation for user ID:', body.id)
     console.log('User metadata received:', body.raw_user_meta_data)
     
-    // Insert user profile with both id and user_id fields
+    // Get the full name from metadata
+    const fullName = body.raw_user_meta_data?.full_name || 'Unknown User';
+    const language = body.raw_user_meta_data?.language || 'en';
+    const role = body.raw_user_meta_data?.role || 'patient';
+    
+    // Insert user profile with correct field names matching the database schema
     const { data, error } = await supabase
       .from('profiles')
       .insert({
         id: body.id,
-        user_id: body.id, // Set user_id equal to the auth.users id
-        full_name: body.raw_user_meta_data?.full_name || 'Unknown User',
-        language: body.raw_user_meta_data?.language || 'en',
-        role: body.raw_user_meta_data?.role || 'patient'
+        user_id: body.id,
+        full_name: fullName,
+        language: language,
+        role: role
       })
     
     if (error) {
