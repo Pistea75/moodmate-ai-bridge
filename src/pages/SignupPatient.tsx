@@ -10,8 +10,7 @@ import { toast } from '@/components/ui/use-toast';
 export default function SignupPatient() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -64,8 +63,7 @@ export default function SignupPatient() {
     try {
       console.log("Starting patient signup with data:", {
         email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        fullName: formData.fullName,
         language: formData.language,
         referralCode: formData.referralCode
       });
@@ -75,7 +73,7 @@ export default function SignupPatient() {
         password: formData.password,
         options: {
           data: {
-            "full name": `${formData.firstName} ${formData.lastName}`,
+            "full name": formData.fullName,
             language: formData.language,
             role: 'patient',
             referral_code: formData.referralCode || null
