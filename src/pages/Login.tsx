@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useAuthFlow } from '../hooks/useAuthFlow';
 import MainLayout from '../layouts/MainLayout';
-import { toast } from '@/components/ui/use-toast';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -12,15 +11,12 @@ import { Input } from '@/components/ui/input';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const { signIn, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const { isLoading, error, signIn, clearError } = useAuthFlow();
   
   useEffect(() => {
-    // Redirect if user is already logged in
     if (user) {
-      // Redirect based on user role
       if (user.user_metadata?.role === 'clinician') {
         navigate('/clinician/dashboard');
       } else {
@@ -31,23 +27,7 @@ export default function Login() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-    
-    try {
-      await signIn(email, password);
-      toast({
-        title: "Success",
-        description: "You have successfully logged in.",
-      });
-      
-      // The redirect will happen automatically in the useEffect
-    } catch (error: any) {
-      setError(error.message || "Failed to sign in");
-      console.error('Login error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    await signIn(email, password);
   };
   
   return (
@@ -65,11 +45,11 @@ export default function Login() {
             {error && (
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{error.message}</AlertDescription>
               </Alert>
             )}
             
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} onChange={clearError}>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-1">
@@ -83,6 +63,7 @@ export default function Login() {
                     required
                     className="w-full"
                     placeholder="you@example.com"
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -103,18 +84,17 @@ export default function Login() {
                     required
                     className="w-full"
                     placeholder="••••••••"
+                    disabled={isLoading}
                   />
                 </div>
                 
-                <div>
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full bg-mood-purple hover:bg-mood-purple-secondary"
-                  >
-                    {isLoading ? 'Signing in...' : 'Sign In'}
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-mood-purple hover:bg-mood-purple-secondary"
+                >
+                  {isLoading ? 'Signing in...' : 'Sign In'}
+                </Button>
               </div>
             </form>
             
