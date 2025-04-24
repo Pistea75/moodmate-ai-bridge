@@ -4,14 +4,17 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Volume2, Bell, Moon } from "lucide-react";
+import { Volume2, Bell, Moon, Palette } from "lucide-react";
 import { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from '@/providers/ThemeProvider';
 
 export default function ClinicianSettings() {
   const { toast } = useToast();
+  const { theme, themeColor, setTheme, setThemeColor } = useTheme();
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [selectedVoice, setSelectedVoice] = useState("aria");
+  const clinicianName = "Dr. Sarah Johnson"; // This would come from your auth context
 
   const voices = [
     { id: "aria", name: "Aria (Female)" },
@@ -20,6 +23,13 @@ export default function ClinicianSettings() {
     { id: "george", name: "George (Male)" },
     { id: "charlie", name: "Charlie (Neutral)" },
     { id: "custom", name: "Custom Voice" }
+  ];
+
+  const themeColors = [
+    { id: "purple", name: "Soft Purple", class: "bg-[#E5DEFF]" },
+    { id: "green", name: "Soft Green", class: "bg-[#F2FCE2]" },
+    { id: "peach", name: "Soft Peach", class: "bg-[#FDE1D3]" },
+    { id: "blue", name: "Soft Blue", class: "bg-[#D3E4FD]" }
   ];
 
   const handleVoiceChange = (value: string) => {
@@ -33,29 +43,43 @@ export default function ClinicianSettings() {
   return (
     <ClinicianLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-2xl font-bold">Welcome, {clinicianName}</h1>
         
         <div className="grid gap-6">
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Notifications</h2>
+            <h2 className="text-lg font-semibold mb-4">Appearance</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="font-medium">Session Reminders</div>
+                  <div className="font-medium">Dark Mode</div>
                   <div className="text-sm text-muted-foreground">
-                    Receive notifications about upcoming sessions
+                    Toggle dark mode theme
                   </div>
                 </div>
-                <Switch />
+                <Switch 
+                  checked={theme === "dark"}
+                  onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="space-y-3">
                 <div className="space-y-0.5">
-                  <div className="font-medium">Patient Updates</div>
+                  <div className="font-medium">Theme Color</div>
                   <div className="text-sm text-muted-foreground">
-                    Get notified about patient activity
+                    Choose your preferred theme color
                   </div>
                 </div>
-                <Switch />
+                <div className="flex gap-2">
+                  {themeColors.map((color) => (
+                    <button
+                      key={color.id}
+                      onClick={() => setThemeColor(color.id as any)}
+                      className={`w-8 h-8 rounded-full ${color.class} ${
+                        themeColor === color.id ? 'ring-2 ring-offset-2 ring-mood-purple' : ''
+                      }`}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </Card>
@@ -102,29 +126,25 @@ export default function ClinicianSettings() {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Preferences</h2>
+            <h2 className="text-lg font-semibold mb-4">Notifications</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="font-medium">Dark Mode</div>
+                  <div className="font-medium">Session Reminders</div>
                   <div className="text-sm text-muted-foreground">
-                    Toggle dark mode theme
+                    Receive notifications about upcoming sessions
                   </div>
                 </div>
-                <Switch />
+                <Switch defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="font-medium">Language</div>
+                  <div className="font-medium">Patient Updates</div>
                   <div className="text-sm text-muted-foreground">
-                    Choose your preferred language
+                    Get notified about patient activity
                   </div>
                 </div>
-                <select className="border rounded-md px-2 py-1">
-                  <option>English</option>
-                  <option>Spanish</option>
-                  <option>French</option>
-                </select>
+                <Switch defaultChecked />
               </div>
             </div>
           </Card>

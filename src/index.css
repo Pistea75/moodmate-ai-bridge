@@ -48,6 +48,30 @@
     --sidebar-ring: 252 86% 75%;
   }
 
+  :root[data-theme-color="purple"] {
+    --primary: 252 86% 75%;
+    --primary-foreground: 0 0% 100%;
+    --mood-accent: 252 100% 95%;
+  }
+
+  :root[data-theme-color="green"] {
+    --primary: 142 76% 75%;
+    --primary-foreground: 0 0% 100%;
+    --mood-accent: 142 100% 95%;
+  }
+
+  :root[data-theme-color="peach"] {
+    --primary: 22 86% 75%;
+    --primary-foreground: 0 0% 100%;
+    --mood-accent: 22 100% 95%;
+  }
+
+  :root[data-theme-color="blue"] {
+    --primary: 212 86% 75%;
+    --primary-foreground: 0 0% 100%;
+    --mood-accent: 212 100% 95%;
+  }
+
   .dark {
     /* Base */
     --background: 240 22% 13%;

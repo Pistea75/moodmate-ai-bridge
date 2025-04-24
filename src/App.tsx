@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import { ThemeProvider } from './providers/ThemeProvider';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import SignupPatient from './pages/SignupPatient';
@@ -23,7 +24,7 @@ import { Toaster } from './components/ui/toaster';
 
 function App() {
   return (
-    <>
+    <ThemeProvider>
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Landing />} />
@@ -54,7 +55,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
-    </>
+    </ThemeProvider>
   );
 }
 
