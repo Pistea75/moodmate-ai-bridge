@@ -27,7 +27,7 @@
     --muted-foreground: 240 3% 57%;
 
     --accent: hsl(var(--accent));
-    --accent-foreground: var(--secondary);
+    --accent-foreground: 240 10% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -62,7 +62,7 @@
     --muted-foreground: 240 10% 70%;
 
     --accent: hsl(var(--accent));
-    --accent-foreground: var(--primary);
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 40.6%;
     --destructive-foreground: 0 0% 98%;
@@ -99,5 +99,15 @@
     opacity: 0.05;
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, transparent 100%);
     z-index: -1;
+  }
+
+  /* Ensure cards and buttons are styled properly with theme colors */
+  .card, .card-highlighted {
+    @apply bg-card border-border;
+  }
+
+  /* Enhance switch visibility */
+  .switch-thumb {
+    @apply bg-white shadow-md;
   }
 }
