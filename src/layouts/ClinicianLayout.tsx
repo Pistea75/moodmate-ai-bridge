@@ -6,9 +6,10 @@ import {
   Users, 
   Calendar, 
   ListCheck, 
-  MessageCircle, 
+  MessageCircle,
   Settings,
-  User
+  User,
+  Bot
 } from 'lucide-react';
 
 type ClinicianLayoutProps = {
@@ -24,6 +25,7 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
     { name: 'Sessions', path: '/clinician/sessions', icon: Calendar },
     { name: 'Tasks', path: '/clinician/tasks', icon: ListCheck },
     { name: 'AI Chat Reports', path: '/clinician/reports', icon: MessageCircle },
+    { name: 'Train AI', path: '/clinician/train-ai', icon: Bot },
     { name: 'Settings', path: '/clinician/settings', icon: Settings },
   ];
   

@@ -1,4 +1,3 @@
-
 import { Route, Routes } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -19,6 +18,7 @@ import ClinicianTasks from './pages/clinician/Tasks';
 import ClinicianReports from './pages/clinician/Reports';
 import ClinicianSettings from './pages/clinician/ClinicianSettings';
 import ClinicianProfile from './pages/clinician/ClinicianProfile';
+import TrainAI from './pages/clinician/TrainAI';
 import { Toaster } from './components/ui/toaster';
 
 function App() {
@@ -48,6 +48,7 @@ function App() {
         <Route path="/clinician/reports" element={<ClinicianReports />} />
         <Route path="/clinician/settings" element={<ClinicianSettings />} />
         <Route path="/clinician/profile" element={<ClinicianProfile />} />
+        <Route path="/clinician/train-ai" element={<TrainAI />} />
         
         {/* Catch all */}
         <Route path="*" element={<NotFound />} />
