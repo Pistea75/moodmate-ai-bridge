@@ -44,7 +44,7 @@ export function SignupForm({
   };
   
   const passwordError = validatePassword();
-  const showPasswordError = formData.password && formData.confirmPassword && passwordError;
+  const showPasswordError = Boolean(formData.password && formData.confirmPassword && passwordError);
   
   return (
     <div className="bg-white rounded-xl shadow-sm border p-6">
