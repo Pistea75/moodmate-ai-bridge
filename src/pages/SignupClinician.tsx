@@ -65,7 +65,7 @@ export default function SignupClinician() {
     
     try {
       // Sign up the user with Supabase
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -81,10 +81,15 @@ export default function SignupClinician() {
         }
       });
       
-      if (error) throw error;
+      if (signUpError) {
+        console.error('Supabase signup error:', signUpError);
+        throw signUpError;
+      }
       
       // Check if the user was created successfully
       if (data && data.user) {
+        console.log('User created successfully:', data.user);
+        
         // Success message
         toast({
           title: "Account created successfully",
