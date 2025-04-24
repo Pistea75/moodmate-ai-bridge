@@ -1,5 +1,7 @@
 
 import { Link } from 'react-router-dom';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface SignupFormData {
   name: string;
@@ -16,9 +18,10 @@ interface SignupFormProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
   step: number;
-  setStep: (step: number) => void; // Added the setStep function to the props
+  setStep: (step: number) => void;
   isLoading: boolean;
   renderStep2Fields: () => JSX.Element;
+  error?: string;
 }
 
 export function SignupForm({ 
@@ -26,12 +29,35 @@ export function SignupForm({
   handleChange, 
   handleSubmit, 
   step,
-  setStep,  // Added setStep to the destructuring
+  setStep,
   isLoading,
-  renderStep2Fields 
+  renderStep2Fields,
+  error
 }: SignupFormProps) {
+  
+  // Password validation function
+  const validatePassword = () => {
+    if (formData.password !== formData.confirmPassword) {
+      return 'Passwords do not match';
+    }
+    if (formData.password && formData.password.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return '';
+  };
+  
+  const passwordError = validatePassword();
+  const showPasswordError = formData.password && formData.confirmPassword && passwordError;
+  
   return (
     <div className="bg-white rounded-xl shadow-sm border p-6">
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
       <form onSubmit={handleSubmit}>
         {step === 1 ? (
           <div className="space-y-4">
@@ -78,9 +104,12 @@ export function SignupForm({
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple ${showPasswordError ? 'border-red-500' : ''}`}
                 placeholder="Create a password"
               />
+              {formData.password && formData.password.length < 6 && (
+                <p className="text-red-500 text-xs mt-1">Password must be at least 6 characters</p>
+              )}
             </div>
             
             <div>
@@ -94,9 +123,12 @@ export function SignupForm({
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple ${showPasswordError ? 'border-red-500' : ''}`}
                 placeholder="Confirm password"
               />
+              {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
+              )}
             </div>
             
             <div>
@@ -133,10 +165,10 @@ export function SignupForm({
           )}
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || (step === 1 && showPasswordError)}
             className={`
               flex-1 py-2.5 rounded-lg font-medium text-white
-              ${isLoading 
+              ${(isLoading || (step === 1 && showPasswordError))
                 ? 'bg-mood-purple/70 cursor-not-allowed' 
                 : 'bg-mood-purple hover:bg-mood-purple-secondary'
               }

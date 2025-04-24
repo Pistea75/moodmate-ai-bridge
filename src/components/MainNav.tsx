@@ -1,42 +1,29 @@
+
 import { Link, useLocation } from "react-router-dom";
-import { Settings, User, LogOut, Home, Calendar, MessageSquare, BarChart, ListCheck, Users, Bot, Menu } from "lucide-react";
+import { User, Home, Calendar, MessageSquare, BarChart, ListCheck, Users, Bot } from "lucide-react";
 import { Button } from "./ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-} from "./ui/navigation-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "./ui/navigation-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { LogoutButton } from "@/components/LogoutButton";
 
 export function MainNav() {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const isLoggedIn = location.pathname.includes('/patient') || location.pathname.includes('/clinician');
-  const userType = location.pathname.includes('/patient') ? 'patient' : 'clinician';
-
+  const { user, userRole } = useAuth();
+  
+  const isLoggedIn = !!user;
+  
   const patientNavItems = [
     { name: 'Dashboard', path: '/patient/dashboard', icon: Home },
     { name: 'AI Chat', path: '/patient/chat', icon: MessageSquare },
     { name: 'Tasks', path: '/patient/tasks', icon: ListCheck },
     { name: 'Sessions', path: '/patient/sessions', icon: Calendar },
     { name: 'Insights', path: '/patient/insights', icon: BarChart },
-    { name: 'Settings', path: '/patient/settings', icon: Settings },
+    { name: 'Settings', path: '/patient/settings', icon: User },
   ];
 
   const clinicianNavItems = [
@@ -46,10 +33,13 @@ export function MainNav() {
     { name: 'Tasks', path: '/clinician/tasks', icon: ListCheck },
     { name: 'AI Chat Reports', path: '/clinician/reports', icon: MessageSquare },
     { name: 'Train AI', path: '/clinician/train-ai', icon: Bot },
-    { name: 'Settings', path: '/clinician/settings', icon: Settings },
+    { name: 'Settings', path: '/clinician/settings', icon: User },
   ];
 
-  const navItems = userType === 'patient' ? patientNavItems : clinicianNavItems;
+  const navItems = userRole === 'clinician' ? clinicianNavItems : patientNavItems;
+  const profilePath = userRole === 'clinician' ? '/clinician/profile' : '/patient/profile';
+  const dashboardPath = userRole === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
+  const username = user?.user_metadata?.full_name || 'User';
 
   return (
     <div className="flex items-center justify-between py-4 px-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b">
@@ -80,15 +70,12 @@ export function MainNav() {
                   </Link>
                 ))}
                 <div className="border-t mt-4 pt-4">
-                  <Button variant="ghost" className="w-full justify-start text-destructive">
-                    <LogOut className="h-5 w-5 mr-2" />
-                    Log out
-                  </Button>
+                  <LogoutButton variant="ghost" className="w-full justify-start" />
                 </div>
               </nav>
             </SheetContent>
           </Sheet>
-          <Link to="/" className="flex items-center gap-2 ml-auto">
+          <Link to={dashboardPath} className="flex items-center gap-2 ml-auto">
             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
               <span className="font-bold text-white">M</span>
             </div>
@@ -138,11 +125,12 @@ export function MainNav() {
                 <NavigationMenuItem>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" className="flex gap-2">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src="/placeholder-avatar.jpg" />
-                          <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+                          <AvatarFallback>{username.charAt(0)}</AvatarFallback>
                         </Avatar>
+                        <span className="hidden md:inline">{username}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
@@ -157,9 +145,8 @@ export function MainNav() {
                         </DropdownMenuItem>
                       ))}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">
-                        <LogOut className="h-4 w-4 mr-2" />
-                        <span>Log out</span>
+                      <DropdownMenuItem asChild>
+                        <LogoutButton variant="ghost" className="w-full justify-start" />
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

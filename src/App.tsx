@@ -1,3 +1,4 @@
+
 import { Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { AuthProvider } from './contexts/AuthContext';
@@ -54,23 +55,23 @@ function App() {
           <Route path="/signup/clinician" element={<SignupClinician />} />
           
           {/* Protected patient routes */}
-          <Route path="/patient/dashboard" element={<ProtectedRoute><PatientDashboard /></ProtectedRoute>} />
-          <Route path="/patient/chat" element={<ProtectedRoute><PatientChat /></ProtectedRoute>} />
-          <Route path="/patient/tasks" element={<ProtectedRoute><PatientTasks /></ProtectedRoute>} />
-          <Route path="/patient/sessions" element={<ProtectedRoute><PatientSessions /></ProtectedRoute>} />
-          <Route path="/patient/insights" element={<ProtectedRoute><PatientInsights /></ProtectedRoute>} />
-          <Route path="/patient/settings" element={<ProtectedRoute><PatientSettings /></ProtectedRoute>} />
-          <Route path="/patient/profile" element={<ProtectedRoute><PatientProfile /></ProtectedRoute>} />
+          <Route path="/patient/dashboard" element={<ProtectedRoute requiredRole="patient"><PatientDashboard /></ProtectedRoute>} />
+          <Route path="/patient/chat" element={<ProtectedRoute requiredRole="patient"><PatientChat /></ProtectedRoute>} />
+          <Route path="/patient/tasks" element={<ProtectedRoute requiredRole="patient"><PatientTasks /></ProtectedRoute>} />
+          <Route path="/patient/sessions" element={<ProtectedRoute requiredRole="patient"><PatientSessions /></ProtectedRoute>} />
+          <Route path="/patient/insights" element={<ProtectedRoute requiredRole="patient"><PatientInsights /></ProtectedRoute>} />
+          <Route path="/patient/settings" element={<ProtectedRoute requiredRole="patient"><PatientSettings /></ProtectedRoute>} />
+          <Route path="/patient/profile" element={<ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>} />
           
           {/* Protected clinician routes */}
-          <Route path="/clinician/dashboard" element={<ProtectedRoute><ClinicianDashboard /></ProtectedRoute>} />
-          <Route path="/clinician/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
-          <Route path="/clinician/sessions" element={<ProtectedRoute><ClinicianSessions /></ProtectedRoute>} />
-          <Route path="/clinician/tasks" element={<ProtectedRoute><ClinicianTasks /></ProtectedRoute>} />
-          <Route path="/clinician/reports" element={<ProtectedRoute><ClinicianReports /></ProtectedRoute>} />
-          <Route path="/clinician/settings" element={<ProtectedRoute><ClinicianSettings /></ProtectedRoute>} />
-          <Route path="/clinician/profile" element={<ProtectedRoute><ClinicianProfile /></ProtectedRoute>} />
-          <Route path="/clinician/train-ai" element={<ProtectedRoute><TrainAI /></ProtectedRoute>} />
+          <Route path="/clinician/dashboard" element={<ProtectedRoute requiredRole="clinician"><ClinicianDashboard /></ProtectedRoute>} />
+          <Route path="/clinician/patients" element={<ProtectedRoute requiredRole="clinician"><Patients /></ProtectedRoute>} />
+          <Route path="/clinician/sessions" element={<ProtectedRoute requiredRole="clinician"><ClinicianSessions /></ProtectedRoute>} />
+          <Route path="/clinician/tasks" element={<ProtectedRoute requiredRole="clinician"><ClinicianTasks /></ProtectedRoute>} />
+          <Route path="/clinician/reports" element={<ProtectedRoute requiredRole="clinician"><ClinicianReports /></ProtectedRoute>} />
+          <Route path="/clinician/settings" element={<ProtectedRoute requiredRole="clinician"><ClinicianSettings /></ProtectedRoute>} />
+          <Route path="/clinician/profile" element={<ProtectedRoute requiredRole="clinician"><ClinicianProfile /></ProtectedRoute>} />
+          <Route path="/clinician/train-ai" element={<ProtectedRoute requiredRole="clinician"><TrainAI /></ProtectedRoute>} />
           
           {/* Catch all */}
           <Route path="*" element={<NotFound />} />

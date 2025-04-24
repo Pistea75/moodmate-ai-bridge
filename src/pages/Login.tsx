@@ -1,18 +1,37 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import MainLayout from '../layouts/MainLayout';
 import { toast } from '@/components/ui/use-toast';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [error, setError] = useState('');
+  const { signIn, user } = useAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Redirect if user is already logged in
+    if (user) {
+      // Redirect based on user role
+      if (user.user_metadata?.role === 'clinician') {
+        navigate('/clinician/dashboard');
+      } else {
+        navigate('/patient/dashboard');
+      }
+    }
+  }, [user, navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
     
     try {
@@ -21,12 +40,11 @@ export default function Login() {
         title: "Success",
         description: "You have successfully logged in.",
       });
+      
+      // The redirect will happen automatically in the useEffect
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to sign in",
-        variant: "destructive",
-      });
+      setError(error.message || "Failed to sign in");
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -44,19 +62,26 @@ export default function Login() {
           </div>
           
           <div className="bg-white rounded-xl shadow-sm border p-6">
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-1">
                     Email Address
                   </label>
-                  <input
+                  <Input
                     type="email"
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple"
+                    className="w-full"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -70,31 +95,25 @@ export default function Login() {
                       Forgot password?
                     </Link>
                   </div>
-                  <input
+                  <Input
                     type="password"
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple"
+                    className="w-full"
                     placeholder="••••••••"
                   />
                 </div>
                 
                 <div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={isLoading}
-                    className={`
-                      w-full py-2.5 rounded-lg font-medium text-white
-                      ${isLoading 
-                        ? 'bg-mood-purple/70 cursor-not-allowed' 
-                        : 'bg-mood-purple hover:bg-mood-purple-secondary'
-                      }
-                    `}
+                    className="w-full bg-mood-purple hover:bg-mood-purple-secondary"
                   >
                     {isLoading ? 'Signing in...' : 'Sign In'}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </form>
