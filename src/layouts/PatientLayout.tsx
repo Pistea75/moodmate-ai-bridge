@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+
+import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -7,8 +8,23 @@ import {
   Calendar, 
   BarChart, 
   Settings, 
-  User
+  User,
+  Menu
 } from 'lucide-react';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger 
+} from '@/components/ui/sheet';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type PatientLayoutProps = {
   children: ReactNode;
@@ -16,6 +32,7 @@ type PatientLayoutProps = {
 
 export default function PatientLayout({ children }: PatientLayoutProps) {
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
   
   const navItems = [
     { name: 'Dashboard', path: '/patient/dashboard', icon: Home },
@@ -31,24 +48,74 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
       {/* Mobile Top Nav */}
       <header className="fixed top-0 left-0 right-0 h-14 border-b bg-background z-30 md:hidden">
         <div className="container h-full flex items-center justify-between px-4">
-          <Link to="/patient/dashboard" className="flex items-center gap-2">
+          {/* Mobile Menu Trigger */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <button className="flex items-center justify-center">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="/placeholder-avatar.jpg" />
+                  <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+                </Avatar>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 pt-10">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <Accordion type="single" collapsible className="mt-6">
+                <AccordionItem value="navigation">
+                  <AccordionTrigger className="py-2">Navigation</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 pl-2">
+                      {navItems.map((item) => (
+                        <Link 
+                          key={item.path}
+                          to={item.path}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
+                            location.pathname === item.path 
+                              ? 'bg-[var(--mood-primary)] text-white' 
+                              : 'hover:bg-[var(--mood-muted)] text-[var(--mood-foreground)]'
+                          }`}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <item.icon size={18} />
+                          <span>{item.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="profile">
+                  <AccordionTrigger className="py-2">Profile</AccordionTrigger>
+                  <AccordionContent>
+                    <Link 
+                      to="/patient/profile"
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--mood-muted)]"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <User size={18} />
+                      <span>View Profile</span>
+                    </Link>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </SheetContent>
+          </Sheet>
+          
+          {/* Logo (right side on mobile) */}
+          <Link to="/" className="ml-auto flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
               <span className="font-bold text-white">M</span>
             </div>
             <span className="text-lg font-semibold" style={{ color: 'var(--mood-primary)' }}>MoodMate</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/patient/profile" className="rounded-full bg-muted size-8 flex items-center justify-center">
-              <User size={18} className="text-muted-foreground" />
-            </Link>
-          </div>
         </div>
       </header>
       
       {/* Sidebar for Desktop */}
       <aside className="hidden md:flex w-64 flex-col bg-background border-r fixed h-screen">
         <div className="p-4">
-          <Link to="/patient/dashboard" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
               <span className="font-bold text-white">M</span>
             </div>

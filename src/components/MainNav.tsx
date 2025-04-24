@@ -88,7 +88,7 @@ export function MainNav() {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 ml-auto">
             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
               <span className="font-bold text-white">M</span>
             </div>
