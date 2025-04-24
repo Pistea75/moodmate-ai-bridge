@@ -6,11 +6,19 @@ import { toast } from '@/components/ui/use-toast';
 
 type UserRole = 'patient' | 'clinician';
 
+interface UserData {
+  firstName?: string;
+  lastName?: string;
+  language?: string;
+  role?: UserRole;
+  [key: string]: any;
+}
+
 type AuthContextType = {
   user: User | null;
   session: Session | null;
   userRole: UserRole | null;
-  signUp: (email: string, password: string, userData: object) => Promise<void>;
+  signUp: (email: string, password: string, userData: UserData) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
@@ -74,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const signUp = async (email: string, password: string, userData: object) => {
+  const signUp = async (email: string, password: string, userData: UserData) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -113,7 +121,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (!user) throw new Error("No user is currently logged in");
       
-      // 1. First delete user data from related tables to avoid foreign key constraints
       await Promise.all([
         supabase.from('profiles').delete().eq('id', user.id),
         supabase.from('mood_entries').delete().eq('user_id', user.id),
@@ -121,14 +128,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabase.from('session_audio_uploads').delete().eq('user_id', user.id)
       ]);
       
-      // 2. Call the Supabase Auth API to delete the user
       const { error } = await supabase.auth.admin.deleteUser(user.id);
       
       if (error) {
         console.error("Error deleting user through admin API:", error);
         
-        // 3. If admin API fails (expected in client context), use the alternative approach
-        // Send a request to delete user's own account (supported in client context)
         const { error: deleteError } = await supabase.functions.invoke('delete-user', {
           body: { userId: user.id },
         });
@@ -136,12 +140,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (deleteError) {
           console.error("Error in delete-user function:", deleteError);
           
-          // 4. As a last resort, still sign them out even if deletion failed
           await supabase.auth.signOut();
           throw new Error("Could not fully delete account. Please contact support.");
         }
       } else {
-        // If admin deletion worked, still sign out to clear local state
         await supabase.auth.signOut();
       }
     } catch (error: any) {
