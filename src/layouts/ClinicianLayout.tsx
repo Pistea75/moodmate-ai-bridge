@@ -30,6 +30,8 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
     { name: 'Settings', path: '/clinician/settings', icon: Settings },
   ];
   
+  const fullName = user?.user_metadata?.full_name || '';
+  
   return (
     <div className="flex min-h-screen bg-muted/30">
       {/* Sidebar */}
@@ -70,11 +72,11 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
             <div className="rounded-full bg-muted size-9 flex items-center justify-center">
               <User size={20} className="text-muted-foreground" />
             </div>
-            <div className="flex-1 text-sm">
-              <div className="font-medium">Dr. {user?.user_metadata?.full_name}</div>
+            <div className="flex-1">
+              <div className="font-medium">Dr. {fullName}</div>
               {user?.user_metadata?.referral_code && (
-                <div className="text-sm text-muted-foreground font-mono">
-                  Code: <span className="text-gray-500">{user.user_metadata.referral_code}</span>
+                <div className="text-sm text-[#9F9EA1] font-mono">
+                  {user.user_metadata.referral_code}
                 </div>
               )}
             </div>
