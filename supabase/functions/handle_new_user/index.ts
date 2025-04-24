@@ -33,24 +33,33 @@ serve(async (req) => {
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
     
-    // Insert user profile with correct field names matching the database schema
-    const { data, error } = await supabase
+    // Check if profile already exists to avoid duplicates
+    const { data: existingProfile } = await supabase
       .from('profiles')
-      .insert({
-        id: body.id,
-        first_name: firstName,
-        last_name: lastName,
-        language: language,
-        role: role,
-        referral_code: referralCode
-      });
-    
-    if (error) {
-      console.error('Error creating user profile:', error);
-      return new Response(JSON.stringify({ error: error.message }), { 
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      .select('id')
+      .eq('id', body.id)
+      .maybeSingle();
+      
+    if (!existingProfile) {
+      // Insert user profile with correct field names matching the database schema
+      const { error } = await supabase
+        .from('profiles')
+        .insert({
+          id: body.id,
+          first_name: firstName,
+          last_name: lastName,
+          language: language,
+          role: role,
+          referral_code: referralCode
+        });
+      
+      if (error) {
+        console.error('Error creating user profile:', error);
+        return new Response(JSON.stringify({ error: error.message }), { 
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
     }
     
     // If referral code is provided, check for a clinician profile with that code
@@ -63,7 +72,7 @@ serve(async (req) => {
         .select('id, first_name, last_name')
         .eq('role', 'clinician')
         .eq('referral_code', referralCode)
-        .single();
+        .maybeSingle();
       
       if (clinicianError) {
         console.error('Error finding clinician with referral code:', clinicianError);
@@ -88,13 +97,13 @@ serve(async (req) => {
       }
     }
     
-    console.log('Successfully created user profile with id:', body.id);
+    console.log('Successfully processed user profile with id:', body.id);
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (err) {
-    console.error('Unexpected error creating user profile:', err);
+    console.error('Unexpected error processing user profile:', err);
     return new Response(JSON.stringify({ error: err.message }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }

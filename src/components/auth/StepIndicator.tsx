@@ -1,33 +1,32 @@
 
+import React from 'react';
+
 interface StepIndicatorProps {
   currentStep: number;
   totalSteps: number;
 }
 
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
+  const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);
+  
   return (
-    <div className="flex items-center justify-center mb-8">
-      <div className="flex items-center">
-        {Array.from({ length: totalSteps }).map((_, index) => (
-          <>
+    <div className="flex justify-center items-center gap-2 mb-8">
+      {steps.map((step) => (
+        <React.Fragment key={`step-${step}`}>
+          <div
+            className={`h-2 w-2 rounded-full ${
+              step <= currentStep ? 'bg-mood-purple' : 'bg-gray-300'
+            }`}
+          />
+          {step < totalSteps && (
             <div
-              key={`step-${index}`}
-              className={`
-                h-8 w-8 rounded-full flex items-center justify-center font-medium text-sm
-                ${currentStep >= index + 1 ? 'bg-mood-purple text-white' : 'bg-muted text-muted-foreground'}
-              `}
-            >
-              {index + 1}
-            </div>
-            {index < totalSteps - 1 && (
-              <div
-                key={`line-${index}`}
-                className={`w-12 h-1 ${currentStep > index + 1 ? 'bg-mood-purple' : 'bg-muted'}`}
-              />
-            )}
-          </>
-        ))}
-      </div>
+              className={`h-0.5 w-4 ${
+                step < currentStep ? 'bg-mood-purple' : 'bg-gray-300'
+              }`}
+            />
+          )}
+        </React.Fragment>
+      ))}
     </div>
   );
 }

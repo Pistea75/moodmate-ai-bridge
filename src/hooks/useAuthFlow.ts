@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface AuthError {
   message: string;
@@ -16,16 +16,21 @@ export function useAuthFlow() {
     console.error('Auth error:', error);
     let message = 'An unexpected error occurred';
     
-    if (error.message.includes('Email not confirmed')) {
-      message = 'Please check your email and confirm your account before logging in.';
-    } else if (error.message.includes('Invalid login credentials')) {
-      message = 'Invalid email or password.';
-    } else if (error.message.includes('User already registered')) {
-      message = 'This email is already registered. Please try logging in instead.';
-    } else if (error.message.includes('Password should be')) {
-      message = 'Password should be at least 6 characters long.';
-    } else if (error.message.includes('Database error saving new user')) {
-      message = 'Error creating account. Please try again or contact support.';
+    if (typeof error === 'object') {
+      // Handle different error messages for better user feedback
+      if (error.message?.includes('Email not confirmed')) {
+        message = 'Please check your email and confirm your account before logging in.';
+      } else if (error.message?.includes('Invalid login credentials')) {
+        message = 'Invalid email or password.';
+      } else if (error.message?.includes('User already registered')) {
+        message = 'This email is already registered. Please try logging in instead.';
+      } else if (error.message?.includes('Password should be')) {
+        message = 'Password should be at least 6 characters long.';
+      } else if (error.message?.includes('Database error saving new user')) {
+        message = 'Error creating account. This may be due to a server issue. Please try again later or contact support.';
+      } else if (error.message) {
+        message = error.message;
+      }
     }
 
     setError({ message });
@@ -71,7 +76,7 @@ export function useAuthFlow() {
       
       console.log('Signing up with metadata:', metadata);
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -80,6 +85,11 @@ export function useAuthFlow() {
       });
 
       if (error) throw error;
+      
+      // Check if we got user data back
+      if (!data?.user) {
+        throw new Error('Failed to create user account');
+      }
 
       toast({
         title: "Success",

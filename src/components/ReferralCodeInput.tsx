@@ -29,7 +29,7 @@ export function ReferralCodeInput() {
         .select('id, first_name, last_name')
         .eq('role', 'clinician')
         .eq('referral_code', normalizedCode)
-        .single();
+        .maybeSingle(); // Using maybeSingle instead of single to avoid errors when no match is found
 
       if (clinicianError || !clinician) {
         toast({
@@ -37,6 +37,7 @@ export function ReferralCodeInput() {
           description: "Please check the code and try again",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
