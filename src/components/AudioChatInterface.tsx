@@ -96,9 +96,9 @@ export function AudioChatInterface({ isClinicianView }: AudioChatInterfaceProps)
       <div className="flex flex-col mb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">
-              {isClinicianView ? 'Dr. Martinez AI' : 'Dr. Martinez AI'}
-            </h1>
+            {!isClinicianView && (
+              <h1 className="text-2xl font-bold">Dr. Martinez AI</h1>
+            )}
             <p className="text-sm text-muted-foreground mt-1">
               {isClinicianView 
                 ? 'Train your AI to respond like you' 
