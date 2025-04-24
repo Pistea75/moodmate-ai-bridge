@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -11,6 +10,7 @@ import {
   User,
   Bot
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 type ClinicianLayoutProps = {
   children: ReactNode;
@@ -18,6 +18,7 @@ type ClinicianLayoutProps = {
 
 export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
   const location = useLocation();
+  const { user } = useAuth();
   
   const navItems = [
     { name: 'Dashboard', path: '/clinician/dashboard', icon: Home },
@@ -60,6 +61,7 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
             ))}
           </ul>
         </nav>
+        
         <div className="p-4 border-t">
           <Link 
             to="/clinician/profile"
@@ -69,8 +71,12 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
               <User size={20} className="text-muted-foreground" />
             </div>
             <div className="flex-1 text-sm">
-              <div className="font-medium">Dr. Name</div>
-              <div className="text-muted-foreground">View Profile</div>
+              <div className="font-medium">Dr. {user?.user_metadata?.full_name}</div>
+              {user?.user_metadata?.referral_code && (
+                <div className="text-muted-foreground font-mono">
+                  Code: {user.user_metadata.referral_code}
+                </div>
+              )}
             </div>
           </Link>
         </div>

@@ -1,13 +1,13 @@
-
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Moon, Palette } from "lucide-react";
 import { useTheme } from '@/providers/ThemeProvider';
+import { ReferralCodeInput } from '@/components/ReferralCodeInput';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function PatientSettings() {
   const { theme, themeColor, setTheme, setThemeColor } = useTheme();
-  const patientName = "John Smith"; // This would come from your auth context
+  const { user } = useAuth();
 
   const themeColors = [
     { id: "purple", name: "Soft Purple", class: "bg-[#E5DEFF]" },
@@ -19,9 +19,19 @@ export default function PatientSettings() {
   return (
     <PatientLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Welcome, {patientName}</h1>
+        <h1 className="text-2xl font-bold">Settings</h1>
         
         <div className="grid gap-6">
+          {!user?.user_metadata?.referral_code && (
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold mb-4">Connect with Clinician</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Enter your clinician's referral code to connect with them.
+              </p>
+              <ReferralCodeInput />
+            </Card>
+          )}
+
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Appearance</h2>
             <div className="space-y-4">
