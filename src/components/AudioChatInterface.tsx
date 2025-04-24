@@ -5,15 +5,18 @@ import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AIChatBubble } from "./AIChatBubble";
+
 type Message = {
   id: string;
   type: 'user' | 'assistant';
   content: string;
   timestamp: Date;
 };
+
 interface AudioChatInterfaceProps {
   isClinicianView?: boolean;
 }
+
 export function AudioChatInterface({
   isClinicianView
 }: AudioChatInterfaceProps) {
@@ -24,6 +27,7 @@ export function AudioChatInterface({
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
+
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -42,6 +46,7 @@ export function AudioChatInterface({
       });
     }
   };
+
   const handleStopRecording = () => {
     setIsRecording(false);
     // Simulate receiving a response
@@ -64,6 +69,7 @@ export function AudioChatInterface({
       setMessages(prev => [...prev, aiMessage]);
     }, 1000);
   };
+
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
     const userMessage: Message = {
@@ -86,6 +92,7 @@ export function AudioChatInterface({
       setMessages(prev => [...prev, aiMessage]);
     }, 1000);
   };
+
   return <div className="h-[calc(100vh-160px)] md:h-[calc(100vh-32px)] flex flex-col">
       <div className="flex flex-col mb-4">
         <div className="flex items-center justify-between">
