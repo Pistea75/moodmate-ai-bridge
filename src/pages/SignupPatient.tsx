@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -62,6 +63,7 @@ export default function SignupPatient() {
     setError('');
     
     try {
+      // Sign up the user with Supabase
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -79,13 +81,20 @@ export default function SignupPatient() {
       
       if (error) throw error;
       
-      toast({
-        title: "Account created successfully",
-        description: "You can now log in to your account.",
-      });
-      
-      navigate('/patient/dashboard');
-    } catch (err) {
+      // Check if the user was created successfully
+      if (data && data.user) {
+        // Success message
+        toast({
+          title: "Account created successfully",
+          description: "Please check your email to confirm your account.",
+        });
+        
+        // Navigate to login page or dashboard
+        navigate('/login');
+      } else {
+        throw new Error('Failed to create account. Please try again.');
+      }
+    } catch (err: any) {
       console.error('Error signing up:', err);
       setError(err.message || 'Failed to create account. Please try again.');
     } finally {
