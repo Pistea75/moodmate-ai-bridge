@@ -74,7 +74,7 @@ export default function SignupPatient() {
         password: formData.password,
         options: {
           data: {
-            "full name": formData.fullName, // Make sure we're using "full name" with space
+            full_name: formData.fullName, // Updated from "full name" to full_name
             language: formData.language,
             role: 'patient',
             referral_code: formData.referralCode || null

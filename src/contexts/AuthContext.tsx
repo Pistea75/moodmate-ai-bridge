@@ -89,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
       options: {
         data: {
-          "full name": userData.firstName && userData.lastName 
+          full_name: userData.firstName && userData.lastName 
             ? `${userData.firstName} ${userData.lastName}` 
             : userData.firstName || 'Unknown User', // Support both combined and firstName only
           language: userData.language || 'en',

@@ -6,12 +6,12 @@ serve(async (req) => {
   const body = await req.json()
   
   try {
-    // Insert user profile with "full name" field (not "name")
+    // Insert user profile with "full_name" field (not "full name")
     const { data, error } = await supabase
       .from('profiles')
       .insert({
         id: body.id,
-        "full name": body.raw_user_meta_data?.["full name"] || 'Unknown User',
+        full_name: body.raw_user_meta_data?.full_name || 'Unknown User',
         language: body.raw_user_meta_data?.language || 'en',
         role: body.raw_user_meta_data?.role || 'patient'
       })

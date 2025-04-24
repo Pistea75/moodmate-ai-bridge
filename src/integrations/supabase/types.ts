@@ -69,7 +69,7 @@ export type Database = {
       }
       profiles: {
         Row: {
-          "full name": string
+          full_name: string
           id: string
           language: string
           license_number: string | null
@@ -79,7 +79,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          "full name": string
+          full_name: string
           id: string
           language: string
           license_number?: string | null
@@ -89,7 +89,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          "full name"?: string
+          full_name?: string
           id?: string
           language?: string
           license_number?: string | null
