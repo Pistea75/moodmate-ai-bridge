@@ -1,19 +1,21 @@
+
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from '@/providers/ThemeProvider';
 import { ReferralCodeInput } from '@/components/ReferralCodeInput';
 import { useAuth } from '@/contexts/AuthContext';
+import { Moon, Palette } from 'lucide-react';
 
 export default function PatientSettings() {
   const { theme, themeColor, setTheme, setThemeColor } = useTheme();
   const { user } = useAuth();
 
   const themeColors = [
-    { id: "purple", name: "Soft Purple", class: "bg-[#E5DEFF]" },
-    { id: "green", name: "Soft Green", class: "bg-[#F2FCE2]" },
-    { id: "peach", name: "Soft Peach", class: "bg-[#FDE1D3]" },
-    { id: "blue", name: "Soft Blue", class: "bg-[#D3E4FD]" }
+    { id: "purple", name: "Purple Theme", class: "bg-[hsl(252,100%,95%)]" },
+    { id: "green", name: "Green Theme", class: "bg-[hsl(142,76%,95%)]" },
+    { id: "peach", name: "Peach Theme", class: "bg-[hsl(22,100%,95%)]" },
+    { id: "blue", name: "Blue Theme", class: "bg-[hsl(212,100%,95%)]" }
   ];
 
   return (
@@ -33,11 +35,17 @@ export default function PatientSettings() {
           )}
 
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Appearance</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <Palette className="h-5 w-5" />
+              <h2 className="text-lg font-semibold">Appearance</h2>
+            </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="font-medium">Dark Mode</div>
+                  <div className="flex items-center gap-2">
+                    <Moon className="h-4 w-4" />
+                    <div className="font-medium">Dark Mode</div>
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     Toggle dark mode theme
                   </div>
@@ -54,15 +62,16 @@ export default function PatientSettings() {
                     Choose your preferred theme color
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   {themeColors.map((color) => (
                     <button
                       key={color.id}
                       onClick={() => setThemeColor(color.id as any)}
-                      className={`w-8 h-8 rounded-full ${color.class} ${
-                        themeColor === color.id ? 'ring-2 ring-offset-2 ring-mood-purple' : ''
-                      }`}
+                      className={`w-10 h-10 rounded-full ${color.class} ${
+                        themeColor === color.id ? 'ring-2 ring-offset-2 ring-primary' : ''
+                      } transition-all hover:scale-110`}
                       title={color.name}
+                      aria-label={color.name}
                     />
                   ))}
                 </div>

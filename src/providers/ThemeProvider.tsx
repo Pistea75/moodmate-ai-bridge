@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
@@ -39,40 +40,42 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const colors = {
       purple: {
-        primary: "#9b87f5",
-        secondary: "#7E69AB",
-        accent: "#E5DEFF",
-        muted: "#F1F0FB",
-        background: "#F8F7FF",
-        hover: "#8A75F2"
+        primary: "hsl(252, 86%, 75%)",
+        secondary: "hsl(260, 28%, 54%)",
+        accent: "hsl(252, 100%, 95%)",
+        muted: "hsl(248, 50%, 96%)",
+        background: "hsl(252, 100%, 99%)",
+        hover: "hsl(252, 86%, 70%)"
       },
       green: {
-        primary: "#87C987",
-        secondary: "#68B568",
-        accent: "#F2FCE2",
-        muted: "#E8F5E9",
-        background: "#F7FDF2",
-        hover: "#75C275"
+        primary: "hsl(142, 57%, 66%)",
+        secondary: "hsl(142, 27%, 55%)",
+        accent: "hsl(142, 76%, 95%)",
+        muted: "hsl(142, 38%, 95%)",
+        background: "hsl(142, 60%, 99%)",
+        hover: "hsl(142, 57%, 60%)"
       },
       peach: {
-        primary: "#FFAB91",
-        secondary: "#FF8A65",
-        accent: "#FDE1D3",
-        muted: "#FBE9E7",
-        background: "#FFF8F5",
-        hover: "#FF9B7B"
+        primary: "hsl(22, 100%, 78%)",
+        secondary: "hsl(22, 100%, 70%)",
+        accent: "hsl(22, 100%, 95%)",
+        muted: "hsl(22, 100%, 97%)",
+        background: "hsl(22, 100%, 99%)",
+        hover: "hsl(22, 100%, 72%)"
       },
       blue: {
-        primary: "#91B8FF",
-        secondary: "#7DA6F5",
-        accent: "#D3E4FD",
-        muted: "#E3F2FD",
-        background: "#F5F9FF",
-        hover: "#80ABFF"
+        primary: "hsl(212, 100%, 78%)",
+        secondary: "hsl(212, 88%, 72%)",
+        accent: "hsl(212, 100%, 95%)",
+        muted: "hsl(212, 100%, 97%)",
+        background: "hsl(212, 100%, 99%)",
+        hover: "hsl(212, 100%, 72%)"
       },
     };
 
     const selectedColors = colors[themeColor];
+    
+    // Set CSS custom properties as HSL values for Tailwind to use
     root.style.setProperty("--primary", selectedColors.primary);
     root.style.setProperty("--secondary", selectedColors.secondary);
     root.style.setProperty("--accent", selectedColors.accent);

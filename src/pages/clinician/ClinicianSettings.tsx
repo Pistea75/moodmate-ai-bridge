@@ -9,10 +9,10 @@ export default function ClinicianSettings() {
   const { theme, themeColor, setTheme, setThemeColor } = useTheme();
 
   const themeColors = [
-    { id: "purple", name: "Soft Purple", class: "bg-[#E5DEFF]" },
-    { id: "green", name: "Soft Green", class: "bg-[#F2FCE2]" },
-    { id: "peach", name: "Soft Peach", class: "bg-[#FDE1D3]" },
-    { id: "blue", name: "Soft Blue", class: "bg-[#D3E4FD]" }
+    { id: "purple", name: "Purple Theme", class: "bg-[hsl(252,100%,95%)]" },
+    { id: "green", name: "Green Theme", class: "bg-[hsl(142,76%,95%)]" },
+    { id: "peach", name: "Peach Theme", class: "bg-[hsl(22,100%,95%)]" },
+    { id: "blue", name: "Blue Theme", class: "bg-[hsl(212,100%,95%)]" }
   ];
 
   return (
@@ -52,15 +52,18 @@ export default function ClinicianSettings() {
                     Choose your preferred theme color
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   {themeColors.map((color) => (
                     <button
                       key={color.id}
                       onClick={() => setThemeColor(color.id as any)}
-                      className={`w-8 h-8 rounded-full ${color.class} ${
-                        themeColor === color.id ? 'ring-2 ring-offset-2 ring-primary' : ''
+                      className={`w-10 h-10 rounded-full ${color.class} ${
+                        themeColor === color.id 
+                          ? 'ring-2 ring-offset-2 ring-primary' 
+                          : ''
                       } transition-all hover:scale-110`}
                       title={color.name}
+                      aria-label={color.name}
                     />
                   ))}
                 </div>
