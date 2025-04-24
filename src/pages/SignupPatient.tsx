@@ -87,7 +87,7 @@ export default function SignupPatient() {
         throw new Error('Failed to create account. Please try again.');
       }
     } catch (err: any) {
-      console.error('Full error object:', err);
+      console.error('Signup error:', err);
       
       if (err.message.includes('User already registered')) {
         setError('This email is already registered. Please try logging in instead.');

@@ -121,13 +121,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (!user) throw new Error("No user is currently logged in");
       
-      await Promise.all([
-        supabase.from('profiles').delete().eq('id', user.id),
-        supabase.from('mood_entries').delete().eq('user_id', user.id),
-        supabase.from('chat_reports').delete().eq('user_id', user.id),
-        supabase.from('session_audio_uploads').delete().eq('user_id', user.id)
-      ]);
-      
       const { error } = await supabase.auth.admin.deleteUser(user.id);
       
       if (error) {
@@ -139,13 +132,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (deleteError) {
           console.error("Error in delete-user function:", deleteError);
-          
           await supabase.auth.signOut();
           throw new Error("Could not fully delete account. Please contact support.");
         }
-      } else {
-        await supabase.auth.signOut();
       }
+      
+      await supabase.auth.signOut();
     } catch (error: any) {
       throw error;
     }

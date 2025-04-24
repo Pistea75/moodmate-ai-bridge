@@ -14,7 +14,7 @@ export function ReferralCodeInput() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!referralCode) return;
+    if (!referralCode || !user) return;
 
     setIsLoading(true);
     try {
@@ -35,11 +35,10 @@ export function ReferralCodeInput() {
         return;
       }
 
-      // Update patient's profile with the referral
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ referral_code: referralCode.toUpperCase() })
-        .eq('id', user?.id);
+      // Update auth metadata
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { referral_code: referralCode.toUpperCase() }
+      });
 
       if (updateError) throw updateError;
 
