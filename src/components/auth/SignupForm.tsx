@@ -165,10 +165,10 @@ export function SignupForm({
           )}
           <button
             type="submit"
-            disabled={isLoading || (step === 1 && showPasswordError)}
+            disabled={isLoading || (step === 1 && !!showPasswordError)}
             className={`
               flex-1 py-2.5 rounded-lg font-medium text-white
-              ${(isLoading || (step === 1 && showPasswordError))
+              ${(isLoading || (step === 1 && !!showPasswordError))
                 ? 'bg-mood-purple/70 cursor-not-allowed' 
                 : 'bg-mood-purple hover:bg-mood-purple-secondary'
               }
