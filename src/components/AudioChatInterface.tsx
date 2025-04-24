@@ -101,7 +101,7 @@ export function AudioChatInterface({ isClinicianView }: AudioChatInterfaceProps)
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               {isClinicianView 
-                ? 'Here you can train your AI to respond like you' 
+                ? 'Train your AI to respond like you' 
                 : 'Chat with your doctor\'s trained AI'}
             </p>
           </div>
