@@ -132,13 +132,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (deleteError) {
           console.error("Error in delete-user function:", deleteError);
-          await supabase.auth.signOut();
           throw new Error("Could not fully delete account. Please contact support.");
         }
       }
       
       await supabase.auth.signOut();
     } catch (error: any) {
+      toast({
+        title: "Account Deletion Failed",
+        description: error.message || "Unable to delete account. Please try again or contact support.",
+        variant: "destructive"
+      });
       throw error;
     }
   };
