@@ -24,6 +24,8 @@ export function useAuthFlow() {
       message = 'This email is already registered. Please try logging in instead.';
     } else if (error.message.includes('Password should be')) {
       message = 'Password should be at least 6 characters long.';
+    } else if (error.message.includes('Database error saving new user')) {
+      message = 'Error creating account. Please try again or contact support.';
     }
 
     setError({ message });
@@ -52,8 +54,11 @@ export function useAuthFlow() {
         title: "Success",
         description: "You have successfully logged in.",
       });
+      
+      return true;
     } catch (error: any) {
       handleAuthError(error);
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +68,8 @@ export function useAuthFlow() {
     try {
       setIsLoading(true);
       clearError();
+      
+      console.log('Signing up with metadata:', metadata);
       
       const { error } = await supabase.auth.signUp({
         email,

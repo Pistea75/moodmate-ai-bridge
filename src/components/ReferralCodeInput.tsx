@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Check, UserPlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -16,16 +16,19 @@ export function ReferralCodeInput() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!referralCode || !user) return;
+    if (!referralCode.trim() || !user) return;
 
     setIsLoading(true);
     try {
+      // Normalize the referral code to uppercase
+      const normalizedCode = referralCode.trim().toUpperCase();
+      
       // Check if referral code exists in any clinician profile
       const { data: clinician, error: clinicianError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name')
         .eq('role', 'clinician')
-        .eq('referral_code', referralCode.toUpperCase())
+        .eq('referral_code', normalizedCode)
         .single();
 
       if (clinicianError || !clinician) {
@@ -34,26 +37,34 @@ export function ReferralCodeInput() {
           description: "Please check the code and try again",
           variant: "destructive",
         });
-        setIsLoading(false);
         return;
       }
 
-      // Instead of directly inserting into patient_clinician_relationships,
-      // we'll update the user's metadata to include the clinician's information
+      // Update the user's metadata to include the clinician's information
       const { error: updateError } = await supabase.auth.updateUser({
         data: { 
-          referral_code: referralCode.toUpperCase(),
+          referral_code: normalizedCode,
           connected_clinician_id: clinician.id,
           connected_clinician_name: `${clinician.first_name || ''} ${clinician.last_name || ''}`.trim()
         }
       });
 
       if (updateError) throw updateError;
+      
+      // Also update the user's profile in the profiles table
+      const { error: profileUpdateError } = await supabase
+        .from('profiles')
+        .update({ referral_code: normalizedCode })
+        .eq('id', user.id);
+        
+      if (profileUpdateError) {
+        console.error('Error updating profile with referral code:', profileUpdateError);
+      }
 
       setIsConnected(true);
       toast({
         title: "Connected successfully!",
-        description: `You've been connected to ${clinician.first_name} ${clinician.last_name}`,
+        description: `You've been connected to ${clinician.first_name || ''} ${clinician.last_name || ''}`.trim(),
       });
     } catch (error: any) {
       toast({
@@ -78,7 +89,7 @@ export function ReferralCodeInput() {
       />
       <Button 
         type="submit" 
-        disabled={isLoading || !referralCode || isConnected}
+        disabled={isLoading || !referralCode.trim() || isConnected}
         className="min-w-[100px]"
       >
         {isConnected ? (

@@ -70,11 +70,14 @@ export default function SignupPatient() {
       return;
     }
     
+    // Normalize referral code: trim and uppercase
+    const referralCode = formData.referralCode.trim() ? formData.referralCode.trim().toUpperCase() : null;
+    
     const success = await signUp(formData.email, formData.password, {
       full_name: formData.fullName,
       language: formData.language,
       role: 'patient',
-      referral_code: formData.referralCode || null
+      referral_code: referralCode
     });
     
     if (success) {
