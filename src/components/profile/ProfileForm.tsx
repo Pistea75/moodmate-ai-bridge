@@ -1,40 +1,55 @@
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/use-toast';
-import { User } from "lucide-react";
+import { toast } from '@/hooks/use-toast';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+interface ProfileFormData {
+  full_name: string;
+  language: string;
+  specialization?: string;
+  license_number?: string;
+}
 
 interface ProfileFormProps {
-  initialData: {
-    full_name: string;
-    language: string;
-    specialization?: string;
-    license_number?: string;
-  };
+  initialData: ProfileFormData;
   userRole: 'patient' | 'clinician';
 }
 
 export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState(initialData);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const form = useForm<ProfileFormData>({
+    defaultValues: initialData,
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: ProfileFormData) => {
     if (!user) return;
 
     setIsLoading(true);
     try {
       const { error } = await supabase
         .from('profiles')
-        .update(formData)
+        .update(data)
         .eq('id', user.id)
         .single();
 
@@ -56,79 +71,86 @@ export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="full_name" className="block text-sm font-medium mb-1">
-          Full Name
-        </label>
-        <input
-          type="text"
-          id="full_name"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
           name="full_name"
-          value={formData.full_name}
-          onChange={handleChange}
-          required
-          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input {...field} required />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div>
-        <label htmlFor="language" className="block text-sm font-medium mb-1">
-          Preferred Language
-        </label>
-        <select
-          id="language"
+        <FormField
+          control={form.control}
           name="language"
-          value={formData.language}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple"
-        >
-          <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-        </select>
-      </div>
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Preferred Language</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a language" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="de">Deutsch</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      {userRole === 'clinician' && (
-        <>
-          <div>
-            <label htmlFor="specialization" className="block text-sm font-medium mb-1">
-              Specialization
-            </label>
-            <input
-              type="text"
-              id="specialization"
+        {userRole === 'clinician' && (
+          <>
+            <FormField
+              control={form.control}
               name="specialization"
-              value={formData.specialization || ''}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Specialization</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <label htmlFor="license_number" className="block text-sm font-medium mb-1">
-              License Number
-            </label>
-            <input
-              type="text"
-              id="license_number"
+            <FormField
+              control={form.control}
               name="license_number"
-              value={formData.license_number || ''}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-mood-purple"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>License Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      <Button 
-        type="submit" 
-        disabled={isLoading}
-        className="w-full bg-mood-purple hover:bg-mood-purple/90"
-      >
-        {isLoading ? 'Saving...' : 'Save Changes'}
-      </Button>
-    </form>
+        <Button 
+          type="submit" 
+          disabled={isLoading}
+          className="w-full"
+        >
+          {isLoading ? 'Saving...' : 'Save Changes'}
+        </Button>
+      </form>
+    </Form>
   );
 }

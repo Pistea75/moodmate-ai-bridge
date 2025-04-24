@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ClinicianProfile() {
   const { user } = useAuth();
@@ -17,9 +18,12 @@ export default function ClinicianProfile() {
         <div className="grid gap-6">
           <Card className="p-6">
             <div className="flex items-start gap-4">
-              <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center">
-                <User className="h-12 w-12 text-muted-foreground" />
-              </div>
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={user?.user_metadata?.avatar_url} />
+                <AvatarFallback>
+                  <User className="h-12 w-12 text-muted-foreground" />
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1">
                 <h2 className="text-2xl font-semibold">{user?.user_metadata?.full_name}</h2>
                 <p className="text-muted-foreground">{user?.user_metadata?.specialization || 'Clinical Professional'}</p>
