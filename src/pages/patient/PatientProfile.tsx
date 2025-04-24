@@ -1,9 +1,11 @@
+
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
 import { LogoutButton } from '@/components/LogoutButton';
+import { DeleteProfileButton } from '@/components/profile/DeleteProfileButton';
 
 export default function PatientProfile() {
   const { user } = useAuth();
@@ -13,7 +15,10 @@ export default function PatientProfile() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">My Profile</h1>
-          <LogoutButton />
+          <div className="flex gap-2">
+            <LogoutButton />
+            <DeleteProfileButton />
+          </div>
         </div>
         
         <div className="grid gap-6">

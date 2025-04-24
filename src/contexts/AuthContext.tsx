@@ -1,9 +1,8 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 type UserRole = 'patient' | 'clinician';
 
@@ -27,14 +26,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Set user role from metadata
           const role = session.user.user_metadata?.role as UserRole;
           setUserRole(role);
           
@@ -44,7 +41,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               description: "You are now signed in.",
             });
             
-            // Redirect based on role
             if (role === 'clinician') {
               navigate('/clinician/dashboard');
             } else {
@@ -62,13 +58,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        // Set user role from metadata
         const role = session.user.user_metadata?.role as UserRole;
         setUserRole(role);
       }
@@ -101,8 +95,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      if (user) {
+        const { error } = await supabase.auth.admin.deleteUser(user.id);
+        if (error) throw error;
+      }
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   return (
