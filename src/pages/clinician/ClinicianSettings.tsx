@@ -9,10 +9,10 @@ export default function ClinicianSettings() {
   const { theme, themeColor, setTheme, setThemeColor } = useTheme();
 
   const themeColors = [
-    { id: "purple", name: "Purple Theme", class: "bg-[hsl(252,100%,95%)]" },
-    { id: "green", name: "Green Theme", class: "bg-[hsl(142,76%,95%)]" },
-    { id: "peach", name: "Peach Theme", class: "bg-[hsl(22,100%,95%)]" },
-    { id: "blue", name: "Blue Theme", class: "bg-[hsl(212,100%,95%)]" }
+    { id: "purple", name: "Purple Theme", class: "bg-[hsl(252,86%,60%)]" },
+    { id: "green", name: "Green Theme", class: "bg-[hsl(142,57%,55%)]" },
+    { id: "peach", name: "Peach Theme", class: "bg-[hsl(22,100%,65%)]" },
+    { id: "blue", name: "Blue Theme", class: "bg-[hsl(212,100%,65%)]" }
   ];
 
   return (
@@ -81,7 +81,7 @@ export default function ClinicianSettings() {
                     Receive notifications about upcoming sessions
                   </div>
                 </div>
-                <Switch defaultChecked className="bg-primary" />
+                <Switch defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -90,7 +90,7 @@ export default function ClinicianSettings() {
                     Get notified about patient activity
                   </div>
                 </div>
-                <Switch defaultChecked className="bg-primary" />
+                <Switch defaultChecked />
               </div>
             </div>
           </Card>

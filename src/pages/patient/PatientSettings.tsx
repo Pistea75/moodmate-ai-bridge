@@ -12,10 +12,10 @@ export default function PatientSettings() {
   const { user } = useAuth();
 
   const themeColors = [
-    { id: "purple", name: "Purple Theme", class: "bg-[hsl(252,100%,95%)]" },
-    { id: "green", name: "Green Theme", class: "bg-[hsl(142,76%,95%)]" },
-    { id: "peach", name: "Peach Theme", class: "bg-[hsl(22,100%,95%)]" },
-    { id: "blue", name: "Blue Theme", class: "bg-[hsl(212,100%,95%)]" }
+    { id: "purple", name: "Purple Theme", class: "bg-[hsl(252,86%,60%)]" },
+    { id: "green", name: "Green Theme", class: "bg-[hsl(142,57%,55%)]" },
+    { id: "peach", name: "Peach Theme", class: "bg-[hsl(22,100%,65%)]" },
+    { id: "blue", name: "Blue Theme", class: "bg-[hsl(212,100%,65%)]" }
   ];
 
   return (
@@ -68,7 +68,9 @@ export default function PatientSettings() {
                       key={color.id}
                       onClick={() => setThemeColor(color.id as any)}
                       className={`w-10 h-10 rounded-full ${color.class} ${
-                        themeColor === color.id ? 'ring-2 ring-offset-2 ring-primary' : ''
+                        themeColor === color.id 
+                          ? 'ring-2 ring-offset-2 ring-primary' 
+                          : ''
                       } transition-all hover:scale-110`}
                       title={color.name}
                       aria-label={color.name}
@@ -89,7 +91,7 @@ export default function PatientSettings() {
                     Receive notifications about upcoming sessions
                   </div>
                 </div>
-                <Switch defaultChecked className="bg-primary" />
+                <Switch defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -98,7 +100,7 @@ export default function PatientSettings() {
                     Get notified about pending tasks
                   </div>
                 </div>
-                <Switch defaultChecked className="bg-primary" />
+                <Switch defaultChecked />
               </div>
             </div>
           </Card>
