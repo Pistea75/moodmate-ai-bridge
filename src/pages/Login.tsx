@@ -1,32 +1,35 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import MainLayout from '../layouts/MainLayout';
+import { toast } from '@/components/ui/use-toast';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, you'd handle auth logic with your backend
+    try {
+      await signIn(email, password);
+      toast({
+        title: "Success",
+        description: "You have successfully logged in.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign in",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      
-      // For demo purposes, redirect based on email pattern
-      if (email.includes('patient')) {
-        window.location.href = '/patient/dashboard';
-      } else if (email.includes('clinician')) {
-        window.location.href = '/clinician/dashboard';
-      } else {
-        // Default to patient for demo
-        window.location.href = '/patient/dashboard';
-      }
-    }, 1000);
+    }
   };
   
   return (

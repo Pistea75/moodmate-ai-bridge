@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './providers/ThemeProvider';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Features from './pages/Features';
 import About from './pages/About';
@@ -34,45 +36,47 @@ import { Toaster } from './components/ui/toaster';
 function App() {
   return (
     <ThemeProvider>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/features" element={<Features />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/help" element={<HelpCenter />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/security" element={<Security />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup/patient" element={<SignupPatient />} />
-        <Route path="/signup/clinician" element={<SignupClinician />} />
-        
-        {/* Patient routes */}
-        <Route path="/patient/dashboard" element={<PatientDashboard />} />
-        <Route path="/patient/chat" element={<PatientChat />} />
-        <Route path="/patient/tasks" element={<PatientTasks />} />
-        <Route path="/patient/sessions" element={<PatientSessions />} />
-        <Route path="/patient/insights" element={<PatientInsights />} />
-        <Route path="/patient/settings" element={<PatientSettings />} />
-        <Route path="/patient/profile" element={<PatientProfile />} />
-        
-        {/* Clinician routes */}
-        <Route path="/clinician/dashboard" element={<ClinicianDashboard />} />
-        <Route path="/clinician/patients" element={<Patients />} />
-        <Route path="/clinician/sessions" element={<ClinicianSessions />} />
-        <Route path="/clinician/tasks" element={<ClinicianTasks />} />
-        <Route path="/clinician/reports" element={<ClinicianReports />} />
-        <Route path="/clinician/settings" element={<ClinicianSettings />} />
-        <Route path="/clinician/profile" element={<ClinicianProfile />} />
-        <Route path="/clinician/train-ai" element={<TrainAI />} />
-        
-        {/* Catch all */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
+      <AuthProvider>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/security" element={<Security />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup/patient" element={<SignupPatient />} />
+          <Route path="/signup/clinician" element={<SignupClinician />} />
+          
+          {/* Protected patient routes */}
+          <Route path="/patient/dashboard" element={<ProtectedRoute><PatientDashboard /></ProtectedRoute>} />
+          <Route path="/patient/chat" element={<ProtectedRoute><PatientChat /></ProtectedRoute>} />
+          <Route path="/patient/tasks" element={<ProtectedRoute><PatientTasks /></ProtectedRoute>} />
+          <Route path="/patient/sessions" element={<ProtectedRoute><PatientSessions /></ProtectedRoute>} />
+          <Route path="/patient/insights" element={<ProtectedRoute><PatientInsights /></ProtectedRoute>} />
+          <Route path="/patient/settings" element={<ProtectedRoute><PatientSettings /></ProtectedRoute>} />
+          <Route path="/patient/profile" element={<ProtectedRoute><PatientProfile /></ProtectedRoute>} />
+          
+          {/* Protected clinician routes */}
+          <Route path="/clinician/dashboard" element={<ProtectedRoute><ClinicianDashboard /></ProtectedRoute>} />
+          <Route path="/clinician/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
+          <Route path="/clinician/sessions" element={<ProtectedRoute><ClinicianSessions /></ProtectedRoute>} />
+          <Route path="/clinician/tasks" element={<ProtectedRoute><ClinicianTasks /></ProtectedRoute>} />
+          <Route path="/clinician/reports" element={<ProtectedRoute><ClinicianReports /></ProtectedRoute>} />
+          <Route path="/clinician/settings" element={<ProtectedRoute><ClinicianSettings /></ProtectedRoute>} />
+          <Route path="/clinician/profile" element={<ProtectedRoute><ClinicianProfile /></ProtectedRoute>} />
+          <Route path="/clinician/train-ai" element={<ProtectedRoute><TrainAI /></ProtectedRoute>} />
+          
+          {/* Catch all */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

@@ -9,101 +9,96 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      Chat_reports: {
-        Row: {
-          advice: string | null
-          created_at: string
-          id: number
-          summary: string | null
-          user_id: string
-        }
-        Insert: {
-          advice?: string | null
-          created_at: string
-          id?: number
-          summary?: string | null
-          user_id?: string
-        }
-        Update: {
-          advice?: string | null
-          created_at?: string
-          id?: number
-          summary?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Chat_reports_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "Users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      Mood_entries: {
+      chat_reports: {
         Row: {
           created_at: string | null
-          id: string
-          notes: string | null
-          sentiment: string | null
+          id: number
+          report_text: string | null
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
-          id?: string
-          notes?: string | null
-          sentiment?: string | null
+          id?: number
+          report_text?: string | null
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
-          id?: string
-          notes?: string | null
-          sentiment?: string | null
+          id?: number
+          report_text?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "Mood_entries_user_id_fkey"
+            foreignKeyName: "chat_reports_user_id_fkey1"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "Users"
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mood_entries: {
+        Row: {
+          entry_date: string | null
+          id: number
+          mood: string | null
+          user_id: string | null
+        }
+        Insert: {
+          entry_date?: string | null
+          id?: number
+          mood?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          entry_date?: string | null
+          id?: number
+          mood?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mood_entries_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
       }
       session_audio_uploads: {
         Row: {
-          file_path: string | null
-          id: string
+          audio_url: string | null
+          id: number
           uploaded_at: string | null
           user_id: string | null
         }
         Insert: {
-          file_path?: string | null
-          id: string
+          audio_url?: string | null
+          id?: number
           uploaded_at?: string | null
           user_id?: string | null
         }
         Update: {
-          file_path?: string | null
-          id?: string
+          audio_url?: string | null
+          id?: number
           uploaded_at?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "session_audio_uploads_user_id_fkey"
+            foreignKeyName: "session_audio_uploads_user_id_fkey1"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "Users"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
       }
-      Users: {
+      users: {
         Row: {
+          created_at: string | null
           email: string
           id: string
           language: string
@@ -111,6 +106,7 @@ export type Database = {
           role: string
         }
         Insert: {
+          created_at?: string | null
           email: string
           id?: string
           language: string
@@ -118,6 +114,7 @@ export type Database = {
           role: string
         }
         Update: {
+          created_at?: string | null
           email?: string
           id?: string
           language?: string
