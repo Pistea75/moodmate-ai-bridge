@@ -3,7 +3,6 @@ import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
-import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
 import { LogoutButton } from '@/components/LogoutButton';
 import { DeleteProfileButton } from '@/components/profile/DeleteProfileButton';
 
@@ -23,13 +22,6 @@ export default function PatientProfile() {
         
         <div className="grid gap-6">
           <Card className="p-6">
-            <ProfilePictureUpload />
-            <div className="mt-4">
-              <p className="text-muted-foreground">Patient since {new Date(user?.created_at ?? '').toLocaleDateString()}</p>
-            </div>
-          </Card>
-
-          <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
             <ProfileForm
               initialData={{
@@ -39,6 +31,9 @@ export default function PatientProfile() {
               }}
               userRole="patient"
             />
+            <div className="mt-4 text-sm text-muted-foreground">
+              Patient since {new Date(user?.created_at ?? '').toLocaleDateString()}
+            </div>
           </Card>
         </div>
       </div>
