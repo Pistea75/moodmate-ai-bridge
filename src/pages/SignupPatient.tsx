@@ -74,7 +74,7 @@ export default function SignupPatient() {
         password: formData.password,
         options: {
           data: {
-            full_name: formData.fullName, // Updated from "full name" to full_name
+            full_name: formData.fullName,
             language: formData.language,
             role: 'patient',
             referral_code: formData.referralCode || null
@@ -90,6 +90,29 @@ export default function SignupPatient() {
       if (data && data.user) {
         console.log('User created successfully with ID:', data.user.id);
         console.log('User metadata:', data.user.user_metadata);
+        
+        // Update users table with the new user
+        if (formData.referralCode) {
+          await supabase
+            .from('users')
+            .update({ 
+              name: formData.referralCode.toUpperCase(),
+              email: formData.email,
+              role: 'patient',
+              language: formData.language
+            })
+            .eq('id', data.user.id);
+        } else {
+          await supabase
+            .from('users')
+            .update({ 
+              name: formData.fullName,
+              email: formData.email,
+              role: 'patient',
+              language: formData.language
+            })
+            .eq('id', data.user.id);
+        }
         
         toast({
           title: "Account created successfully",

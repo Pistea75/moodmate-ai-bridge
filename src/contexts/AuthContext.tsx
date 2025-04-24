@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!user) throw new Error("No user is currently logged in");
       
       await Promise.all([
-        supabase.from('profiles').delete().eq('id', user.id),
+        supabase.from('users').delete().eq('id', user.id),
         supabase.from('mood_entries').delete().eq('user_id', user.id),
         supabase.from('chat_reports').delete().eq('user_id', user.id),
         supabase.from('session_audio_uploads').delete().eq('user_id', user.id)
