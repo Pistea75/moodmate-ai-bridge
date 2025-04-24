@@ -67,6 +67,39 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          full_name: string
+          id: string
+          language: string
+          license_number: string | null
+          referral_code: string | null
+          role: string
+          specialization: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          full_name: string
+          id: string
+          language: string
+          license_number?: string | null
+          referral_code?: string | null
+          role: string
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          full_name?: string
+          id?: string
+          language?: string
+          license_number?: string | null
+          referral_code?: string | null
+          role?: string
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       session_audio_uploads: {
         Row: {
           audio_url: string | null

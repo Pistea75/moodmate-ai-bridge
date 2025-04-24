@@ -3,8 +3,12 @@ import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
+import { ProfileForm } from '@/components/profile/ProfileForm';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function PatientProfile() {
+  const { user } = useAuth();
+  
   return (
     <PatientLayout>
       <div className="space-y-6">
@@ -17,8 +21,8 @@ export default function PatientProfile() {
                 <User className="h-10 w-10 text-muted-foreground" />
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-semibold">Alex Smith</h2>
-                <p className="text-muted-foreground">Patient since April 2025</p>
+                <h2 className="text-xl font-semibold">{user?.user_metadata?.full_name}</h2>
+                <p className="text-muted-foreground">Patient since {new Date(user?.created_at ?? '').toLocaleDateString()}</p>
                 <Button variant="outline" className="mt-4">
                   Change Profile Picture
                 </Button>
@@ -28,35 +32,13 @@ export default function PatientProfile() {
 
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Full Name</label>
-                <input
-                  type="text"
-                  value="Alex Smith"
-                  className="w-full mt-1 px-3 py-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <input
-                  type="email"
-                  value="alex.smith@example.com"
-                  className="w-full mt-1 px-3 py-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Phone</label>
-                <input
-                  type="tel"
-                  value="+1 (555) 123-4567"
-                  className="w-full mt-1 px-3 py-2 border rounded-md"
-                />
-              </div>
-              <Button className="bg-mood-purple hover:bg-mood-purple/90">
-                Save Changes
-              </Button>
-            </div>
+            <ProfileForm
+              initialData={{
+                full_name: user?.user_metadata?.full_name || '',
+                language: user?.user_metadata?.language || 'en'
+              }}
+              userRole="patient"
+            />
           </Card>
         </div>
       </div>
