@@ -50,7 +50,7 @@
     --popover: 240 22% 16%;
     --popover-foreground: 0 0% 95%;
 
-    /* Theme colors will still use the dynamic values */
+    /* Theme colors will use the dynamic values but slightly darker/desaturated for dark mode */
     --primary: hsl(var(--primary));
     --primary-foreground: 0 0% 100%;
 
@@ -106,7 +106,16 @@
     @apply bg-card border-border;
   }
 
-  /* Enhance switch visibility */
+  /* Apply theme colors to sidebar navigation */
+  [data-sidebar="sidebar"] {
+    @apply bg-background border-border;
+  }
+  
+  [data-sidebar="menu-button"][data-active="true"] {
+    @apply bg-primary text-primary-foreground;
+  }
+  
+  /* Enhanced switch visibility */
   .switch-thumb {
     @apply bg-white shadow-md;
   }

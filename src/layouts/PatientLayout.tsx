@@ -1,3 +1,4 @@
+
 import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -21,6 +22,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useTheme } from '@/providers/ThemeProvider';
 
 type PatientLayoutProps = {
   children: ReactNode;
@@ -29,6 +31,7 @@ type PatientLayoutProps = {
 export default function PatientLayout({ children }: PatientLayoutProps) {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { themeColor } = useTheme();
   
   const navItems = [
     { name: 'Dashboard', path: '/patient/dashboard', icon: Home },
@@ -40,7 +43,7 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
   ];
   
   return (
-    <div className="flex min-h-screen bg-[var(--mood-accent)]">
+    <div className="flex min-h-screen bg-background">
       {/* Mobile Top Nav */}
       <header className="fixed top-0 left-0 right-0 h-14 border-b bg-background z-30 md:hidden">
         <div className="container h-full flex items-center justify-between px-4">
@@ -71,8 +74,8 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
                         to={item.path}
                         className={`flex items-center gap-3 px-4 py-2 text-sm ${
                           location.pathname === item.path 
-                            ? 'bg-[var(--mood-primary)] text-white' 
-                            : 'hover:bg-[var(--mood-muted)] text-[var(--mood-foreground)]'
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'hover:bg-accent text-foreground'
                         }`}
                         onClick={() => setIsOpen(false)}
                       >
@@ -85,7 +88,7 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
                 <div className="border-t p-4">
                   <Link 
                     to="/patient/profile"
-                    className="flex items-center gap-2 text-sm text-[var(--mood-foreground)]"
+                    className="flex items-center gap-2 text-sm text-foreground"
                     onClick={() => setIsOpen(false)}
                   >
                     <User size={18} />
@@ -98,10 +101,10 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
           
           {/* Centered Logo */}
           <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
-              <span className="font-bold text-white">M</span>
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+              <span className="font-bold text-primary-foreground">M</span>
             </div>
-            <span className="text-lg font-semibold" style={{ color: 'var(--mood-primary)' }}>MoodMate</span>
+            <span className="text-lg font-semibold text-primary">MoodMate</span>
           </Link>
           
           {/* Empty div to maintain flex spacing */}
@@ -113,10 +116,10 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
       <aside className="hidden md:flex w-64 flex-col bg-background border-r fixed h-screen">
         <div className="p-4">
           <Link to="/" className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
-              <span className="font-bold text-white">M</span>
+            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+              <span className="font-bold text-primary-foreground">M</span>
             </div>
-            <span className="text-xl font-semibold" style={{ color: 'var(--mood-primary)' }}>MoodMate</span>
+            <span className="text-xl font-semibold text-primary">MoodMate</span>
           </Link>
         </div>
         <nav className="flex-1 px-2 py-4">
@@ -127,8 +130,8 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
                   to={item.path}
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
                     location.pathname === item.path 
-                      ? 'bg-[var(--mood-primary)] text-white' 
-                      : 'hover:bg-[var(--mood-muted)] text-[var(--mood-foreground)]'
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'hover:bg-accent text-foreground'
                   }`}
                 >
                   <item.icon size={18} />
@@ -141,13 +144,13 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
         <div className="p-4 border-t">
           <Link 
             to="/patient/profile"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--mood-muted)]"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent"
           >
             <div className="rounded-full bg-muted size-9 flex items-center justify-center">
-              <User size={20} className="text-[var(--mood-foreground)]" />
+              <User size={20} className="text-foreground" />
             </div>
             <div className="flex-1 text-sm">
-              <div className="font-medium text-[var(--mood-foreground)]">Patient Name</div>
+              <div className="font-medium text-foreground">Patient Name</div>
               <div className="text-muted-foreground">View Profile</div>
             </div>
           </Link>

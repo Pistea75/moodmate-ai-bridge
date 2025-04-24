@@ -9,11 +9,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogoutButton } from "@/components/LogoutButton";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export function MainNav() {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { user, userRole } = useAuth();
+  const { themeColor } = useTheme();
   
   const isLoggedIn = !!user;
   
@@ -37,7 +39,6 @@ export function MainNav() {
   ];
 
   const navItems = userRole === 'clinician' ? clinicianNavItems : patientNavItems;
-  const profilePath = userRole === 'clinician' ? '/clinician/profile' : '/patient/profile';
   const dashboardPath = userRole === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
   const username = user?.user_metadata?.full_name || 'User';
 
@@ -63,7 +64,11 @@ export function MainNav() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent"
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
+                      location.pathname === item.path 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'hover:bg-accent'
+                    }`}
                   >
                     <item.icon className="h-5 w-5" />
                     <span>{item.name}</span>
@@ -75,20 +80,21 @@ export function MainNav() {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link to={dashboardPath} className="flex items-center gap-2 ml-auto">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
-              <span className="font-bold text-white">M</span>
+          <Link to={dashboardPath} className="flex items-center gap-2 mx-auto">
+            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+              <span className="font-bold text-primary-foreground">M</span>
             </div>
-            <span className="text-xl font-semibold" style={{ color: 'var(--mood-primary)' }}>MoodMate</span>
+            <span className="text-xl font-semibold text-primary">MoodMate</span>
           </Link>
+          <div className="w-8"></div>
         </>
       ) : (
         <>
           <Link to="/" className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
-              <span className="font-bold text-white">M</span>
+            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+              <span className="font-bold text-primary-foreground">M</span>
             </div>
-            <span className="text-xl font-semibold" style={{ color: 'var(--mood-primary)' }}>MoodMate</span>
+            <span className="text-xl font-semibold text-primary">MoodMate</span>
           </Link>
 
           <NavigationMenu>
@@ -117,7 +123,7 @@ export function MainNav() {
                   </NavigationMenuItem>
                   <NavigationMenuItem>
                     <Link to="/signup/patient">
-                      <Button className="text-sm bg-[var(--mood-primary)] hover:bg-[var(--mood-primary)]/90">Sign up</Button>
+                      <Button className="text-sm">Sign up</Button>
                     </Link>
                   </NavigationMenuItem>
                 </>

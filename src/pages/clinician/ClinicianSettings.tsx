@@ -9,10 +9,10 @@ export default function ClinicianSettings() {
   const { theme, themeColor, setTheme, setThemeColor } = useTheme();
 
   const themeColors = [
-    { id: "purple", name: "Purple Theme", class: "bg-[hsl(252,86%,60%)]" },
-    { id: "green", name: "Green Theme", class: "bg-[hsl(142,57%,55%)]" },
-    { id: "peach", name: "Peach Theme", class: "bg-[hsl(22,100%,65%)]" },
-    { id: "blue", name: "Blue Theme", class: "bg-[hsl(212,100%,65%)]" }
+    { id: "purple", name: "Purple Theme", class: "bg-[hsl(252,76%,65%)]" },
+    { id: "green", name: "Green Theme", class: "bg-[hsl(142,52%,65%)]" },
+    { id: "peach", name: "Peach Theme", class: "bg-[hsl(22,80%,72%)]" },
+    { id: "blue", name: "Blue Theme", class: "bg-[hsl(212,70%,70%)]" }
   ];
 
   return (

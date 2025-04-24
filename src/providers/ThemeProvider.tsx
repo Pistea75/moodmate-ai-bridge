@@ -38,35 +38,35 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.dataset.themeColor = themeColor;
     localStorage?.setItem("themeColor", themeColor);
 
-    // Create color schemes with light background tones and consistent button colors
+    // Create color schemes with lighter, more subtle tones
     const colors = {
       purple: {
-        primary: "252, 86%, 60%", // Button color
-        secondary: "260, 28%, 54%",
-        accent: "252, 100%, 95%", // Light accent color for backgrounds
-        muted: "248, 50%, 96%",
-        background: "252, 100%, 99%", // Very light background
+        primary: "252, 76%, 65%", // Lighter purple
+        secondary: "260, 28%, 60%", 
+        accent: "252, 60%, 97%", // Very light accent for backgrounds
+        muted: "248, 30%, 96%",
+        background: "252, 30%, 99%", // Very light background
       },
       green: {
-        primary: "142, 57%, 55%", // Button color
-        secondary: "142, 27%, 55%",
-        accent: "142, 76%, 95%", // Light accent color
-        muted: "142, 38%, 95%",
-        background: "142, 60%, 99%", // Very light background
+        primary: "142, 52%, 65%", // Lighter green
+        secondary: "142, 30%, 60%",
+        accent: "142, 40%, 97%", // Very light accent
+        muted: "142, 25%, 96%",
+        background: "142, 25%, 99%", // Very light background
       },
       peach: {
-        primary: "22, 100%, 65%", // Button color
-        secondary: "22, 100%, 60%",
-        accent: "22, 100%, 95%", // Light accent color
-        muted: "22, 100%, 97%",
-        background: "22, 100%, 99%", // Very light background
+        primary: "22, 80%, 72%", // Lighter peach
+        secondary: "22, 70%, 67%",
+        accent: "22, 30%, 97%", // Very light accent
+        muted: "22, 20%, 97%",
+        background: "22, 15%, 99%", // Very light background
       },
       blue: {
-        primary: "212, 100%, 65%", // Button color
-        secondary: "212, 88%, 60%",
-        accent: "212, 100%, 95%", // Light accent color
-        muted: "212, 100%, 97%",
-        background: "212, 100%, 99%", // Very light background
+        primary: "212, 70%, 70%", // Lighter blue
+        secondary: "212, 60%, 65%",
+        accent: "212, 30%, 97%", // Very light accent
+        muted: "212, 20%, 97%",
+        background: "212, 15%, 99%", // Very light background
       },
     };
 
