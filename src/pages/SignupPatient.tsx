@@ -63,6 +63,8 @@ export default function SignupPatient() {
     setError('');
     
     try {
+      console.log("Starting patient signup process...");
+      
       // Sign up the user with Supabase
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
@@ -86,7 +88,7 @@ export default function SignupPatient() {
       
       // Check if the user was created successfully
       if (data && data.user) {
-        console.log('User created successfully:', data.user);
+        console.log('User created successfully:', data.user.id);
         
         // Success message
         toast({
@@ -97,11 +99,20 @@ export default function SignupPatient() {
         // Navigate to login page or dashboard
         navigate('/login');
       } else {
+        console.error('No user data returned from signup');
         throw new Error('Failed to create account. Please try again.');
       }
     } catch (err: any) {
       console.error('Error signing up:', err);
-      setError(err.message || 'Failed to create account. Please try again.');
+      
+      // Provide more specific error messages based on common issues
+      if (err.message.includes('User already registered')) {
+        setError('This email is already registered. Please try logging in instead.');
+      } else if (err.message.includes('Email not confirmed')) {
+        setError('Please check your email and confirm your account before logging in.');
+      } else {
+        setError(err.message || 'Failed to create account. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

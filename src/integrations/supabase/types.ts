@@ -72,33 +72,33 @@ export type Database = {
           id: string
           language: string
           license_number: string | null
-          Name: string
+          name: string
           referral_code: string | null
           role: string
           specialization: string | null
-          Surname: string | null
+          surname: string | null
           updated_at: string | null
         }
         Insert: {
           id: string
           language: string
           license_number?: string | null
-          Name: string
+          name: string
           referral_code?: string | null
           role: string
           specialization?: string | null
-          Surname?: string | null
+          surname?: string | null
           updated_at?: string | null
         }
         Update: {
           id?: string
           language?: string
           license_number?: string | null
-          Name?: string
+          name?: string
           referral_code?: string | null
           role?: string
           specialization?: string | null
-          Surname?: string | null
+          surname?: string | null
           updated_at?: string | null
         }
         Relationships: []
