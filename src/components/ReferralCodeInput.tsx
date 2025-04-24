@@ -20,10 +20,10 @@ export function ReferralCodeInput() {
     try {
       // Check if referral code exists in any clinician profile
       const { data: clinician } = await supabase
-        .from('users')
+        .from('profiles')
         .select('id')
         .eq('role', 'clinician')
-        .eq('name', referralCode.toUpperCase())
+        .eq('referral_code', referralCode.toUpperCase())
         .single();
 
       if (!clinician) {
@@ -35,10 +35,10 @@ export function ReferralCodeInput() {
         return;
       }
 
-      // Update patient's record with the referral
+      // Update patient's profile with the referral
       const { error: updateError } = await supabase
-        .from('users')
-        .update({ name: referralCode.toUpperCase() })
+        .from('profiles')
+        .update({ referral_code: referralCode.toUpperCase() })
         .eq('id', user?.id);
 
       if (updateError) throw updateError;

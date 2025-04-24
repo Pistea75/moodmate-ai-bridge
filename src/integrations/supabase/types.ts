@@ -80,6 +80,36 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string
+          language: string | null
+          last_name: string | null
+          referral_code: string | null
+          role: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id: string
+          language?: string | null
+          last_name?: string | null
+          referral_code?: string | null
+          role?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          language?: string | null
+          last_name?: string | null
+          referral_code?: string | null
+          role?: string | null
+        }
+        Relationships: []
+      }
       session_audio_uploads: {
         Row: {
           file_path: string | null

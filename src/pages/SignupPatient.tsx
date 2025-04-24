@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -62,13 +61,6 @@ export default function SignupPatient() {
     setError('');
     
     try {
-      console.log("Starting patient signup with data:", {
-        email: formData.email,
-        fullName: formData.fullName,
-        language: formData.language,
-        referralCode: formData.referralCode
-      });
-      
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -82,38 +74,9 @@ export default function SignupPatient() {
         }
       });
       
-      if (signUpError) {
-        console.error('Supabase signup error:', signUpError);
-        throw signUpError;
-      }
+      if (signUpError) throw signUpError;
       
       if (data && data.user) {
-        console.log('User created successfully with ID:', data.user.id);
-        console.log('User metadata:', data.user.user_metadata);
-        
-        // Update users table with the new user
-        if (formData.referralCode) {
-          await supabase
-            .from('users')
-            .update({ 
-              name: formData.referralCode.toUpperCase(),
-              email: formData.email,
-              role: 'patient',
-              language: formData.language
-            })
-            .eq('id', data.user.id);
-        } else {
-          await supabase
-            .from('users')
-            .update({ 
-              name: formData.fullName,
-              email: formData.email,
-              role: 'patient',
-              language: formData.language
-            })
-            .eq('id', data.user.id);
-        }
-        
         toast({
           title: "Account created successfully",
           description: "Please check your email to confirm your account.",
@@ -121,7 +84,6 @@ export default function SignupPatient() {
         
         navigate('/login');
       } else {
-        console.error('No user data returned from signup');
         throw new Error('Failed to create account. Please try again.');
       }
     } catch (err: any) {

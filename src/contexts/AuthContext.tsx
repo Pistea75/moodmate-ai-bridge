@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
@@ -91,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         data: {
           full_name: userData.firstName && userData.lastName 
             ? `${userData.firstName} ${userData.lastName}` 
-            : userData.firstName || 'Unknown User', // Support both combined and firstName only
+            : userData.firstName || 'Unknown User',
           language: userData.language || 'en',
           role: userData.role || 'patient'
         }
@@ -123,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!user) throw new Error("No user is currently logged in");
       
       await Promise.all([
-        supabase.from('users').delete().eq('id', user.id),
+        supabase.from('profiles').delete().eq('id', user.id),
         supabase.from('mood_entries').delete().eq('user_id', user.id),
         supabase.from('chat_reports').delete().eq('user_id', user.id),
         supabase.from('session_audio_uploads').delete().eq('user_id', user.id)
