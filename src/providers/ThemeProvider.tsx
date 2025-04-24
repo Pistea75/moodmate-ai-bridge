@@ -35,8 +35,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = window.document.documentElement;
-    root.setAttribute("data-theme-color", themeColor);
+    root.dataset.themeColor = themeColor;
     localStorage?.setItem("themeColor", themeColor);
+
+    // Update CSS variables based on theme color
+    const colors = {
+      purple: { primary: "#9b87f5", secondary: "#7E69AB" },
+      green: { primary: "#4CAF50", secondary: "#388E3C" },
+      peach: { primary: "#FFAB91", secondary: "#FF8A65" },
+      blue: { primary: "#64B5F6", secondary: "#42A5F5" },
+    };
+
+    root.style.setProperty("--mood-primary", colors[themeColor].primary);
+    root.style.setProperty("--mood-secondary", colors[themeColor].secondary);
   }, [themeColor]);
 
   return (
