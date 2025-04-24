@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -75,11 +74,10 @@ export default function SignupPatient() {
         full_name: formData.fullName.trim(),
         language: formData.language,
         role: 'patient',
-        // Only include referral_code if it's not empty
         ...(formData.referralCode.trim() ? { referral_code: formData.referralCode.trim().toUpperCase() } : {})
       };
       
-      console.log("Signing up with metadata:", metadata);
+      console.log("Attempting signup with metadata:", metadata);
       
       const success = await signUp(formData.email.trim(), formData.password, metadata);
       
@@ -91,7 +89,17 @@ export default function SignupPatient() {
         navigate('/login');
       }
     } catch (err: any) {
-      console.error("Error during signup:", err);
+      console.error("Signup error:", err);
+      
+      if (!err.message?.includes('Database error')) {
+        return;
+      }
+      
+      toast({
+        title: "Registration Error",
+        description: "There was a problem creating your account. Please try again later.",
+        variant: "destructive"
+      });
     }
   };
 
