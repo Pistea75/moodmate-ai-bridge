@@ -1,9 +1,8 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 type UserRole = 'patient' | 'clinician';
 
@@ -80,8 +79,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
       options: {
-        data: userData,
-      },
+        data: {
+          "full name": userData.firstName && userData.lastName 
+            ? `${userData.firstName} ${userData.lastName}` 
+            : 'Unknown User',
+          language: userData.language || 'en',
+          role: userData.role || 'patient'
+        }
+      }
     });
     
     if (error) throw error;
