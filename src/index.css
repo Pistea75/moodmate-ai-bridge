@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -36,16 +37,6 @@
     --ring: 252 86% 75%;
 
     --radius: 1rem;
-
-    /* Sidebar */
-    --sidebar-background: 252 100% 99%;
-    --sidebar-foreground: 240 25% 15%;
-    --sidebar-primary: 252 86% 75%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 252 100% 95%;
-    --sidebar-accent-foreground: 260 28% 54%;
-    --sidebar-border: 248 30% 95%;
-    --sidebar-ring: 252 86% 75%;
   }
 
   :root[data-theme-color="purple"] {
@@ -103,16 +94,6 @@
     --border: 240 20% 25%;
     --input: 240 20% 25%;
     --ring: 252 86% 65%;
-
-    /* Sidebar */
-    --sidebar-background: 240 22% 10%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 252 86% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 20% 20%;
-    --sidebar-accent-foreground: 252 86% 75%;
-    --sidebar-border: 240 20% 25%;
-    --sidebar-ring: 252 86% 65%;
   }
 }
 
@@ -120,7 +101,7 @@
   * {
     @apply border-border;
   }
-
+  
   body {
     @apply bg-background text-foreground;
   }

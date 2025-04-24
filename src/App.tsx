@@ -1,6 +1,15 @@
 import { Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './providers/ThemeProvider';
 import Landing from './pages/Landing';
+import Features from './pages/Features';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Pricing from './pages/Pricing';
+import HelpCenter from './pages/HelpCenter';
+import FAQ from './pages/FAQ';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Security from './pages/Security';
 import Login from './pages/Login';
 import SignupPatient from './pages/SignupPatient';
 import SignupClinician from './pages/SignupClinician';
@@ -28,6 +37,15 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Landing />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/security" element={<Security />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup/patient" element={<SignupPatient />} />
         <Route path="/signup/clinician" element={<SignupClinician />} />
