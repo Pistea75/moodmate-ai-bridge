@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -11,7 +10,8 @@ import { toast } from '@/components/ui/use-toast';
 export default function SignupClinician() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -33,7 +33,6 @@ export default function SignupClinician() {
       [name]: type === 'checkbox' ? checked : value
     });
     
-    // Clear error when user starts typing again
     if (error) setError('');
   };
   
@@ -41,7 +40,6 @@ export default function SignupClinician() {
     e.preventDefault();
     
     if (step === 1) {
-      // Validate passwords
       if (formData.password !== formData.confirmPassword) {
         setError('Passwords do not match');
         return;
@@ -56,19 +54,8 @@ export default function SignupClinician() {
       return;
     }
     
-    // Step 2 submission - create account
     if (!formData.acceptTerms) {
       setError('You must accept the Terms of Service and Privacy Policy');
-      return;
-    }
-    
-    if (!formData.specialization) {
-      setError('Please select your specialization');
-      return;
-    }
-    
-    if (!formData.licenseNumber) {
-      setError('Please enter your license number');
       return;
     }
     
@@ -76,13 +63,14 @@ export default function SignupClinician() {
     setError('');
     
     try {
-      // Sign up with Supabase
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: {
-            full_name: formData.name,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            full_name: `${formData.firstName} ${formData.lastName}`,
             language: formData.language,
             role: 'clinician',
             specialization: formData.specialization,
@@ -93,15 +81,13 @@ export default function SignupClinician() {
       
       if (error) throw error;
       
-      // Success
       toast({
         title: "Account created successfully",
         description: "You can now log in to your account.",
       });
       
-      // Redirect to dashboard or confirmation page
       navigate('/clinician/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error signing up:', err);
       setError(err.message || 'Failed to create account. Please try again.');
     } finally {
