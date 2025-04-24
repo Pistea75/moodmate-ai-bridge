@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -63,9 +62,14 @@ export default function SignupPatient() {
     setError('');
     
     try {
-      console.log("Starting patient signup process...");
+      console.log("Starting patient signup with data:", {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        language: formData.language,
+        referralCode: formData.referralCode
+      });
       
-      // Sign up the user with Supabase
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -73,7 +77,6 @@ export default function SignupPatient() {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            full_name: `${formData.firstName} ${formData.lastName}`,
             language: formData.language,
             role: 'patient',
             referral_code: formData.referralCode || null
@@ -86,26 +89,23 @@ export default function SignupPatient() {
         throw signUpError;
       }
       
-      // Check if the user was created successfully
       if (data && data.user) {
-        console.log('User created successfully:', data.user.id);
+        console.log('User created successfully with ID:', data.user.id);
+        console.log('User metadata:', data.user.user_metadata);
         
-        // Success message
         toast({
           title: "Account created successfully",
           description: "Please check your email to confirm your account.",
         });
         
-        // Navigate to login page or dashboard
         navigate('/login');
       } else {
         console.error('No user data returned from signup');
         throw new Error('Failed to create account. Please try again.');
       }
     } catch (err: any) {
-      console.error('Error signing up:', err);
+      console.error('Full error object:', err);
       
-      // Provide more specific error messages based on common issues
       if (err.message.includes('User already registered')) {
         setError('This email is already registered. Please try logging in instead.');
       } else if (err.message.includes('Email not confirmed')) {
