@@ -165,9 +165,7 @@ export type Database = {
     }
     Functions: {
       generate_unique_referral_code: {
-        Args:
-          | Record<PropertyKey, never>
-          | { first_name: string; last_name: string }
+        Args: Record<PropertyKey, never>
         Returns: string
       }
     }
