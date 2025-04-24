@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Mic, Mic as MicIcon, Send, Volume2 } from "lucide-react";
 import { useState } from "react";
@@ -92,19 +93,28 @@ export function AudioChatInterface({ isClinicianView }: AudioChatInterfaceProps)
 
   return (
     <div className="h-[calc(100vh-160px)] md:h-[calc(100vh-32px)] flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">
-          {isClinicianView ? 'Dr. Martinez AI' : 'AI Companion'}
-        </h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsVoiceMode(!isVoiceMode)}
-          className="gap-2"
-        >
-          {isVoiceMode ? <Volume2 className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-          {isVoiceMode ? 'Text Mode' : 'Voice Mode'}
-        </Button>
+      <div className="flex flex-col mb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">
+              {isClinicianView ? 'Dr. Martinez AI' : 'Dr. Martinez AI'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isClinicianView 
+                ? 'Here you can train your AI to respond like you' 
+                : 'Chat with your doctor\'s trained AI'}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsVoiceMode(!isVoiceMode)}
+            className="gap-2"
+          >
+            {isVoiceMode ? <Volume2 className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {isVoiceMode ? 'Text Mode' : 'Voice Mode'}
+          </Button>
+        </div>
       </div>
       
       <Card className="flex-1 p-4 mb-4 overflow-y-auto">
