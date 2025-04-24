@@ -20,23 +20,23 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem("theme") as Theme) || "light"
+    () => (localStorage?.getItem("theme") as Theme) || "light"
   );
   const [themeColor, setThemeColor] = useState<ThemeColor>(
-    () => (localStorage.getItem("themeColor") as ThemeColor) || "purple"
+    () => (localStorage?.getItem("themeColor") as ThemeColor) || "purple"
   );
 
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
     root.classList.add(theme);
-    localStorage.setItem("theme", theme);
+    localStorage?.setItem("theme", theme);
   }, [theme]);
 
   useEffect(() => {
     const root = window.document.documentElement;
     root.setAttribute("data-theme-color", themeColor);
-    localStorage.setItem("themeColor", themeColor);
+    localStorage?.setItem("themeColor", themeColor);
   }, [themeColor]);
 
   return (
