@@ -1,1 +1,23 @@
+
 project_id = "wbcwhoegxzrlzghvzzqh"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+
+[db]
+port = 54322
+
+[studio]
+port = 54323
+
+[inbucket]
+port = 54324
+
+[auth]
+enabled = true
+
+[functions]
+[functions.delete-user]
+verify_jwt = true

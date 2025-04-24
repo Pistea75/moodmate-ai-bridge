@@ -106,26 +106,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const deleteAccount = async () => {
     try {
-      if (user) {
-        // First delete user data from any related tables
-        // We'll use a direct query instead of the RPC function to work around the TypeScript error
-        await supabase.from('profiles').delete().eq('id', user.id);
-        await supabase.from('mood_entries').delete().eq('user_id', user.id);
-        await supabase.from('chat_reports').delete().eq('user_id', user.id);
-        await supabase.from('session_audio_uploads').delete().eq('user_id', user.id);
+      if (!user) throw new Error("No user is currently logged in");
+      
+      // 1. First delete user data from related tables to avoid foreign key constraints
+      await Promise.all([
+        supabase.from('profiles').delete().eq('id', user.id),
+        supabase.from('mood_entries').delete().eq('user_id', user.id),
+        supabase.from('chat_reports').delete().eq('user_id', user.id),
+        supabase.from('session_audio_uploads').delete().eq('user_id', user.id)
+      ]);
+      
+      // 2. Call the Supabase Auth API to delete the user
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (error) {
+        console.error("Error deleting user through admin API:", error);
         
-        // Then call the admin API to delete the user's authentication account
-        // This is a workaround since we can't directly use the RPC due to TypeScript limitations
-        const { error } = await supabase.auth.admin.deleteUser(user.id);
+        // 3. If admin API fails (expected in client context), use the alternative approach
+        // Send a request to delete user's own account (supported in client context)
+        const { error: deleteError } = await supabase.functions.invoke('delete-user', {
+          body: { userId: user.id },
+        });
         
-        if (error) {
-          // If admin API fails (which it likely will in the browser context),
-          // we'll consider the account "deleted" from the user's perspective
-          // but actually just log them out
-          console.error("Could not fully delete user account:", error);
+        if (deleteError) {
+          console.error("Error in delete-user function:", deleteError);
+          
+          // 4. As a last resort, still sign them out even if deletion failed
+          await supabase.auth.signOut();
+          throw new Error("Could not fully delete account. Please contact support.");
         }
-        
-        // Sign out after account cleanup
+      } else {
+        // If admin deletion worked, still sign out to clear local state
         await supabase.auth.signOut();
       }
     } catch (error: any) {

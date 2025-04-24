@@ -25,7 +25,7 @@ export function DeleteProfileButton() {
   const handleDeleteProfile = async () => {
     try {
       setIsLoading(true);
-      await deleteAccount(); // Use the new deleteAccount function instead of signOut
+      await deleteAccount();
       toast({
         title: "Account deleted",
         description: "Your account has been successfully deleted.",
@@ -34,7 +34,7 @@ export function DeleteProfileButton() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to delete account",
+        description: error.message || "Failed to delete account. Please try again later or contact support.",
         variant: "destructive",
       });
     } finally {
