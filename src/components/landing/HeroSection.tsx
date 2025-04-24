@@ -1,13 +1,9 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DemoModal } from './DemoModal';
-
 export function HeroSection() {
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
-
-  return (
-    <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 px-4">
+  return <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 px-4">
       <div className="container mx-auto flex flex-col md:flex-row gap-8 md:gap-16 items-center">
         <div className="flex-1 space-y-6">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground">
@@ -18,22 +14,13 @@ export function HeroSection() {
             providing continuous support and insights for better mental health outcomes.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link 
-              to="/signup/patient" 
-              className="px-6 py-3 bg-mood-purple hover:bg-mood-purple/90 text-white font-medium rounded-full text-center"
-            >
+            <Link to="/signup/patient" className="px-6 py-3 bg-mood-purple hover:bg-mood-purple/90 text-white font-medium rounded-full text-center">
               Start Your Journey
             </Link>
-            <Link 
-              to="/signup/clinician" 
-              className="px-6 py-3 bg-white border border-mood-purple text-mood-purple hover:bg-mood-purple/10 font-medium rounded-full text-center"
-            >
+            <Link to="/signup/clinician" className="px-6 py-3 bg-white border border-mood-purple text-mood-purple hover:bg-mood-purple/10 font-medium rounded-full text-center">
               Join as Clinician
             </Link>
-            <button
-              onClick={() => setIsDemoModalOpen(true)}
-              className="px-6 py-3 bg-mood-neutral-light text-mood-purple hover:bg-mood-purple/10 font-medium rounded-full text-center border border-mood-purple/30"
-            >
+            <button onClick={() => setIsDemoModalOpen(true)} className="px-6 py-3 bg-mood-neutral-light text-mood-purple hover:bg-mood-purple/10 font-medium rounded-full text-center border border-mood-purple/30">
               Try Demo
             </button>
           </div>
@@ -41,21 +28,13 @@ export function HeroSection() {
         
         <div className="flex-1 flex justify-center">
           <div className="relative">
-            <div className="absolute -top-4 -left-4 w-24 h-24 bg-mood-purple/20 rounded-full animate-pulse" />
-            <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-mood-purple/10 rounded-full animate-pulse delay-150" />
-            <img 
-              src="https://placehold.co/600x400/E5DEFF/9b87f5?text=Mental+Health+Support" 
-              alt="MoodMate Platform" 
-              className="relative z-10 rounded-2xl shadow-lg w-full max-w-lg"
-            />
+            
+            
+            <img alt="MoodMate Platform" className="relative z-10 rounded-2xl shadow-lg w-full max-w-lg" src="/lovable-uploads/f49385ce-797f-420f-913f-d89d2b9b664a.jpg" />
           </div>
         </div>
       </div>
       
-      <DemoModal 
-        isOpen={isDemoModalOpen} 
-        onClose={() => setIsDemoModalOpen(false)} 
-      />
-    </section>
-  );
+      <DemoModal isOpen={isDemoModalOpen} onClose={() => setIsDemoModalOpen(false)} />
+    </section>;
 }
