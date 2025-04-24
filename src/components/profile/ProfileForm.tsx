@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/select';
 
 interface ProfileFormData {
-  full_name: string;
+  first_name: string;
+  last_name: string;
   language: string;
   specialization?: string;
   license_number?: string;
@@ -47,11 +48,17 @@ export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(data)
-        .eq('id', user.id)
-        .single();
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          language: data.language,
+          ...(userRole === 'clinician' && {
+            specialization: data.specialization,
+            license_number: data.license_number,
+          }),
+        },
+      });
 
       if (error) throw error;
 
@@ -75,10 +82,24 @@ export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="full_name"
+          name="first_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Full Name</FormLabel>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input {...field} required />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="last_name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Surname</FormLabel>
               <FormControl>
                 <Input {...field} required />
               </FormControl>

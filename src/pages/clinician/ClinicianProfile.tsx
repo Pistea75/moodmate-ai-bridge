@@ -26,7 +26,8 @@ export default function ClinicianProfile() {
             <h2 className="text-xl font-semibold mb-4">Professional Information</h2>
             <ProfileForm
               initialData={{
-                full_name: user?.user_metadata?.full_name || '',
+                first_name: user?.user_metadata?.first_name || '',
+                last_name: user?.user_metadata?.last_name || '',
                 language: user?.user_metadata?.language || 'en',
                 specialization: user?.user_metadata?.specialization || '',
                 license_number: user?.user_metadata?.license_number || ''

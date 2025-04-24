@@ -25,7 +25,8 @@ export default function PatientProfile() {
             <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
             <ProfileForm
               initialData={{
-                full_name: user?.user_metadata?.full_name || '',
+                first_name: user?.user_metadata?.first_name || '',
+                last_name: user?.user_metadata?.last_name || '',
                 language: user?.user_metadata?.language || 'en'
               }}
               userRole="patient"
