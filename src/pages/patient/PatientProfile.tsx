@@ -1,11 +1,9 @@
 
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { User } from "lucide-react";
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
 
 export default function PatientProfile() {
   const { user } = useAuth();
@@ -17,20 +15,9 @@ export default function PatientProfile() {
         
         <div className="grid gap-6">
           <Card className="p-6">
-            <div className="flex items-start gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={user?.user_metadata?.avatar_url} />
-                <AvatarFallback>
-                  <User className="h-10 w-10 text-muted-foreground" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h2 className="text-xl font-semibold">{user?.user_metadata?.full_name}</h2>
-                <p className="text-muted-foreground">Patient since {new Date(user?.created_at ?? '').toLocaleDateString()}</p>
-                <Button variant="outline" className="mt-4">
-                  Change Profile Picture
-                </Button>
-              </div>
+            <ProfilePictureUpload />
+            <div className="mt-4">
+              <p className="text-muted-foreground">Patient since {new Date(user?.created_at ?? '').toLocaleDateString()}</p>
             </div>
           </Card>
 
