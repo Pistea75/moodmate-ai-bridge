@@ -1,9 +1,9 @@
-
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
+import { LogoutButton } from '@/components/LogoutButton';
 
 export default function ClinicianProfile() {
   const { user } = useAuth();
@@ -11,7 +11,10 @@ export default function ClinicianProfile() {
   return (
     <ClinicianLayout>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">My Profile</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">My Profile</h1>
+          <LogoutButton />
+        </div>
         
         <div className="grid gap-6">
           <Card className="p-6">
