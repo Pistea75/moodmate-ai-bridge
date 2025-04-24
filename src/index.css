@@ -6,7 +6,7 @@
 @layer base {
   :root {
     /* Base */
-    --background: 240 30% 99%;
+    --background: var(--page-background);
     --foreground: 240 25% 15%;
 
     --card: 0 0% 100%;
@@ -15,52 +15,28 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 25% 15%;
 
-    /* MoodMate theme - purples */
-    --primary: 252 86% 75%;
+    /* Theme colors will be set dynamically */
+    --primary: var(--primary);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 28% 54%;
+    --secondary: var(--secondary);
     --secondary-foreground: 0 0% 100%;
 
     /* Neutrals */
-    --muted: 248 50% 96%;
+    --muted: var(--muted);
     --muted-foreground: 240 3% 57%;
 
-    --accent: 252 100% 95%;
-    --accent-foreground: 260 28% 54%;
+    --accent: var(--accent);
+    --accent-foreground: var(--secondary);
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 248 30% 95%;
     --input: 248 30% 95%;
-    --ring: 252 86% 75%;
+    --ring: var(--primary);
 
     --radius: 1rem;
-  }
-
-  :root[data-theme-color="purple"] {
-    --primary: 252 86% 75%;
-    --primary-foreground: 0 0% 100%;
-    --mood-accent: 252 100% 95%;
-  }
-
-  :root[data-theme-color="green"] {
-    --primary: 142 76% 75%;
-    --primary-foreground: 0 0% 100%;
-    --mood-accent: 142 100% 95%;
-  }
-
-  :root[data-theme-color="peach"] {
-    --primary: 22 86% 75%;
-    --primary-foreground: 0 0% 100%;
-    --mood-accent: 22 100% 95%;
-  }
-
-  :root[data-theme-color="blue"] {
-    --primary: 212 86% 75%;
-    --primary-foreground: 0 0% 100%;
-    --mood-accent: 212 100% 95%;
   }
 
   .dark {
@@ -74,26 +50,26 @@
     --popover: 240 22% 16%;
     --popover-foreground: 0 0% 95%;
 
-    /* MoodMate theme - purples */
-    --primary: 252 86% 65%;
+    /* Theme colors will still use the dynamic values */
+    --primary: var(--primary);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 28% 44%;
+    --secondary: var(--secondary);
     --secondary-foreground: 0 0% 100%;
 
     /* Neutrals */
     --muted: 240 20% 22%;
     --muted-foreground: 240 10% 70%;
 
-    --accent: 252 30% 25%;
-    --accent-foreground: 252 86% 75%;
+    --accent: var(--accent);
+    --accent-foreground: var(--primary);
 
     --destructive: 0 62.8% 40.6%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 240 20% 25%;
     --input: 240 20% 25%;
-    --ring: 252 86% 65%;
+    --ring: var(--primary);
   }
 }
 
@@ -103,6 +79,6 @@
   }
   
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
 }

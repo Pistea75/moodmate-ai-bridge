@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
@@ -38,43 +37,48 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.dataset.themeColor = themeColor;
     localStorage?.setItem("themeColor", themeColor);
 
-    // Update CSS variables based on theme color
     const colors = {
       purple: {
         primary: "#9b87f5",
         secondary: "#7E69AB",
         accent: "#E5DEFF",
         muted: "#F1F0FB",
-        foreground: "#1A1F2C"
+        background: "#F8F7FF",
+        hover: "#8A75F2"
       },
       green: {
-        primary: "#4CAF50",
-        secondary: "#388E3C",
+        primary: "#87C987",
+        secondary: "#68B568",
         accent: "#F2FCE2",
         muted: "#E8F5E9",
-        foreground: "#1B5E20"
+        background: "#F7FDF2",
+        hover: "#75C275"
       },
       peach: {
         primary: "#FFAB91",
         secondary: "#FF8A65",
         accent: "#FDE1D3",
         muted: "#FBE9E7",
-        foreground: "#BF360C"
+        background: "#FFF8F5",
+        hover: "#FF9B7B"
       },
       blue: {
-        primary: "#64B5F6",
-        secondary: "#42A5F5",
+        primary: "#91B8FF",
+        secondary: "#7DA6F5",
         accent: "#D3E4FD",
         muted: "#E3F2FD",
-        foreground: "#0D47A1"
+        background: "#F5F9FF",
+        hover: "#80ABFF"
       },
     };
 
-    root.style.setProperty("--mood-primary", colors[themeColor].primary);
-    root.style.setProperty("--mood-secondary", colors[themeColor].secondary);
-    root.style.setProperty("--mood-accent", colors[themeColor].accent);
-    root.style.setProperty("--mood-muted", colors[themeColor].muted);
-    root.style.setProperty("--mood-foreground", colors[themeColor].foreground);
+    const selectedColors = colors[themeColor];
+    root.style.setProperty("--primary", selectedColors.primary);
+    root.style.setProperty("--secondary", selectedColors.secondary);
+    root.style.setProperty("--accent", selectedColors.accent);
+    root.style.setProperty("--muted", selectedColors.muted);
+    root.style.setProperty("--page-background", selectedColors.background);
+    root.style.setProperty("--hover", selectedColors.hover);
   }, [themeColor]);
 
   return (
