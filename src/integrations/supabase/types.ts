@@ -94,7 +94,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           first_name?: string | null
-          id: string
+          id?: string
           language?: string | null
           last_name?: string | null
           referral_code?: string | null

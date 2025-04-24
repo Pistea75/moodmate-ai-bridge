@@ -26,7 +26,9 @@ export function useAuthFlow() {
         message = 'This email is already registered. Please try logging in instead.';
       } else if (error.message?.includes('Password should be')) {
         message = 'Password should be at least 6 characters long.';
-      } else if (error.message?.includes('Database error saving new user')) {
+      } else if (error.message?.includes('Database error saving new user') || 
+                error.message?.includes('Database error') ||
+                error.message?.includes('error in Supabase function')) {
         message = 'There was a technical issue during registration. Please try again with a different email or contact support.';
       } else if (error.message) {
         message = error.message;
@@ -74,22 +76,20 @@ export function useAuthFlow() {
       setIsLoading(true);
       clearError();
       
-      // Ensure all metadata values are properly formatted
+      // Create a new cleaned metadata object rather than modifying the original
       const cleanedMetadata = { ...metadata };
       
-      // Only process referral_code if it exists and is not empty
-      if (cleanedMetadata.referral_code && typeof cleanedMetadata.referral_code === 'string') {
-        cleanedMetadata.referral_code = cleanedMetadata.referral_code.trim().toUpperCase();
-        // If it's empty after trimming, set to null
-        if (cleanedMetadata.referral_code === '') {
+      // Process referral code if it exists
+      if (cleanedMetadata.referral_code) {
+        if (typeof cleanedMetadata.referral_code === 'string' && cleanedMetadata.referral_code.trim() !== '') {
+          cleanedMetadata.referral_code = cleanedMetadata.referral_code.trim().toUpperCase();
+        } else {
+          // Remove invalid referral code
           delete cleanedMetadata.referral_code;
         }
-      } else {
-        // Remove if not provided or empty
-        delete cleanedMetadata.referral_code;
       }
       
-      console.log('Signing up with metadata:', cleanedMetadata);
+      console.log('Signing up with cleaned metadata:', cleanedMetadata);
       
       const { data, error } = await supabase.auth.signUp({
         email,
