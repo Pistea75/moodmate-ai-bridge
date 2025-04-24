@@ -46,7 +46,7 @@ serve(async (req) => {
     const lastName = nameParts.slice(1).join(' ') || '';
     
     try {
-      // Check if profile already exists
+      // Check if profile already exists to prevent duplicate inserts
       const { data: existingProfile, error: profileCheckError } = await supabase
         .from('profiles')
         .select('id')
@@ -60,31 +60,36 @@ serve(async (req) => {
       
       if (!existingProfile) {
         console.log('Creating new profile for user:', body.id);
-        console.log('Profile data:', { 
+        
+        // Prepare profile data, ensuring proper format for all fields
+        const profileData = {
           id: body.id,
           first_name: firstName,
           last_name: lastName,
-          language,
-          role,
-          referral_code: referralCode 
-        });
+          language: language,
+          role: role
+        };
+        
+        // Only add referral_code if it exists and is not empty
+        if (referralCode) {
+          profileData.referral_code = referralCode;
+        }
+        
+        console.log('Profile data to be inserted:', profileData);
         
         // Insert user profile with service role to bypass RLS
         const { error: insertError } = await supabase
           .from('profiles')
-          .insert({
-            id: body.id,
-            first_name: firstName,
-            last_name: lastName,
-            language: language,
-            role: role,
-            referral_code: referralCode
-          });
+          .insert(profileData);
         
         if (insertError) {
           console.error('Error creating user profile:', insertError);
           throw insertError;
         }
+        
+        console.log('Successfully created profile for user:', body.id);
+      } else {
+        console.log('Profile already exists for user:', body.id);
       }
       
       // If referral code is provided, check for a clinician profile with that code

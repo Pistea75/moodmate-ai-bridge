@@ -71,12 +71,17 @@ export default function SignupPatient() {
     }
     
     try {
-      const metadata = {
+      // Create metadata object for user signup
+      const metadata: Record<string, any> = {
         full_name: formData.fullName.trim(),
         language: formData.language,
         role: 'patient',
-        ...(formData.referralCode.trim() ? { referral_code: formData.referralCode.trim().toUpperCase() } : {})
       };
+      
+      // Only add referral code if it's not empty
+      if (formData.referralCode.trim()) {
+        metadata.referral_code = formData.referralCode.trim();
+      }
       
       console.log("Attempting signup with metadata:", metadata);
       
