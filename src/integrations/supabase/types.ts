@@ -11,26 +11,29 @@ export type Database = {
     Tables: {
       chat_reports: {
         Row: {
+          advice: string | null
           created_at: string | null
-          id: number
-          report_text: string | null
+          id: string
+          summary: string | null
           user_id: string | null
         }
         Insert: {
+          advice?: string | null
           created_at?: string | null
-          id?: number
-          report_text?: string | null
+          id?: string
+          summary?: string | null
           user_id?: string | null
         }
         Update: {
+          advice?: string | null
           created_at?: string | null
-          id?: number
-          report_text?: string | null
+          id?: string
+          summary?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "chat_reports_user_id_fkey1"
+            foreignKeyName: "chat_reports_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -40,24 +43,34 @@ export type Database = {
       }
       mood_entries: {
         Row: {
-          entry_date: string | null
-          id: number
-          mood: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          sentiment: string | null
           user_id: string | null
         }
         Insert: {
-          entry_date?: string | null
-          id?: number
-          mood?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          sentiment?: string | null
           user_id?: string | null
         }
         Update: {
-          entry_date?: string | null
-          id?: number
-          mood?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          sentiment?: string | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "mood_entries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "mood_entries_user_id_fkey1"
             columns: ["user_id"]
@@ -67,64 +80,28 @@ export type Database = {
           },
         ]
       }
-      profiles: {
-        Row: {
-          full_name: string
-          id: string
-          language: string
-          license_number: string | null
-          referral_code: string | null
-          role: string
-          specialization: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          full_name: string
-          id: string
-          language: string
-          license_number?: string | null
-          referral_code?: string | null
-          role: string
-          specialization?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Update: {
-          full_name?: string
-          id?: string
-          language?: string
-          license_number?: string | null
-          referral_code?: string | null
-          role?: string
-          specialization?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       session_audio_uploads: {
         Row: {
-          audio_url: string | null
-          id: number
+          file_path: string | null
+          id: string
           uploaded_at: string | null
           user_id: string | null
         }
         Insert: {
-          audio_url?: string | null
-          id?: number
+          file_path?: string | null
+          id?: string
           uploaded_at?: string | null
           user_id?: string | null
         }
         Update: {
-          audio_url?: string | null
-          id?: number
+          file_path?: string | null
+          id?: string
           uploaded_at?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "session_audio_uploads_user_id_fkey1"
+            foreignKeyName: "session_audio_uploads_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -134,28 +111,25 @@ export type Database = {
       }
       users: {
         Row: {
-          created_at: string | null
-          email: string
+          email: string | null
           id: string
-          language: string
-          name: string
-          role: string
+          language: string | null
+          name: string | null
+          role: string | null
         }
         Insert: {
-          created_at?: string | null
-          email: string
+          email?: string | null
           id?: string
-          language: string
-          name: string
-          role: string
+          language?: string | null
+          name?: string | null
+          role?: string | null
         }
         Update: {
-          created_at?: string | null
-          email?: string
+          email?: string | null
           id?: string
-          language?: string
-          name?: string
-          role?: string
+          language?: string | null
+          name?: string | null
+          role?: string | null
         }
         Relationships: []
       }
@@ -164,10 +138,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      generate_unique_referral_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
