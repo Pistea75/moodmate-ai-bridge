@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ProfilePictureUpload } from '@/components/profile/ProfilePictureUpload';
 import { LogoutButton } from '@/components/LogoutButton';
 import { DeleteProfileButton } from '@/components/profile/DeleteProfileButton';
+import { ReferralCodeDisplay } from '@/components/clinician/ReferralCodeDisplay';
 
 export default function ClinicianProfile() {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export default function ClinicianProfile() {
     <ClinicianLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">My Profile</h1>
+          <h1 className="text-2xl font-bold">My Profile</h1>
           <div className="flex gap-2">
             <LogoutButton />
             <DeleteProfileButton />
@@ -30,8 +31,10 @@ export default function ClinicianProfile() {
             </div>
           </Card>
 
+          <ReferralCodeDisplay />
+
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Professional Information</h2>
+            <h2 className="text-lg font-semibold mb-4">Professional Information</h2>
             <ProfileForm
               initialData={{
                 first_name: user?.user_metadata?.first_name || '',
