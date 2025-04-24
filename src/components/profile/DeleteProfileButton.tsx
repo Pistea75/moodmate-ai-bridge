@@ -19,13 +19,13 @@ import { Trash2 } from 'lucide-react';
 
 export function DeleteProfileButton() {
   const [isLoading, setIsLoading] = useState(false);
-  const { signOut } = useAuth();
+  const { deleteAccount } = useAuth();
   const navigate = useNavigate();
 
   const handleDeleteProfile = async () => {
     try {
       setIsLoading(true);
-      await signOut(); // This will trigger the auth state change and redirect to login
+      await deleteAccount(); // Use the new deleteAccount function instead of signOut
       toast({
         title: "Account deleted",
         description: "Your account has been successfully deleted.",

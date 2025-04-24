@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +13,7 @@ type AuthContextType = {
   signUp: (email: string, password: string, userData: object) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   isLoading: boolean;
 };
 
@@ -97,9 +97,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // First delete the user
+      await supabase.auth.signOut();
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
       if (user) {
-        // Using standard signOut will automatically sign the user out
+        // First delete user data from any related tables if needed
+        
+        // Then delete the user authentication account
+        // Note: This uses the client-side delete functionality which marks the account for deletion
+        const { error } = await supabase.rpc('delete_user');
+        
+        if (error) throw error;
+        
+        // Sign out after account deletion
         await supabase.auth.signOut();
       }
     } catch (error: any) {
@@ -115,6 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp, 
       signIn, 
       signOut,
+      deleteAccount,
       isLoading
     }}>
       {children}
