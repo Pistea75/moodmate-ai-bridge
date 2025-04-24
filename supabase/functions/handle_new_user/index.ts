@@ -24,11 +24,12 @@ serve(async (req) => {
     console.log('Processing user creation for user ID:', body.id)
     console.log('User metadata received:', body.raw_user_meta_data)
     
-    // Insert user profile with "full_name" field
+    // Insert user profile with "full_name" field and user_id referencing auth.users
     const { data, error } = await supabase
       .from('profiles')
       .insert({
         id: body.id,
+        user_id: body.id, // Set user_id equal to the auth.users id
         full_name: body.raw_user_meta_data?.full_name || 'Unknown User',
         language: body.raw_user_meta_data?.language || 'en',
         role: body.raw_user_meta_data?.role || 'patient'

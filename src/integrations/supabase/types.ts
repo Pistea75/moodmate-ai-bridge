@@ -77,6 +77,7 @@ export type Database = {
           role: string
           specialization: string | null
           updated_at: string | null
+          user_id: string
         }
         Insert: {
           full_name: string
@@ -87,6 +88,7 @@ export type Database = {
           role: string
           specialization?: string | null
           updated_at?: string | null
+          user_id?: string
         }
         Update: {
           full_name?: string
@@ -97,6 +99,7 @@ export type Database = {
           role?: string
           specialization?: string | null
           updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
