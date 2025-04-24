@@ -71,20 +71,23 @@ export default function SignupPatient() {
     }
     
     try {
-      // Normalize referral code: trim and uppercase if provided
       const metadata = {
-        full_name: formData.fullName,
+        full_name: formData.fullName.trim(),
         language: formData.language,
         role: 'patient',
-        referral_code: formData.referralCode.trim() ? formData.referralCode.trim().toUpperCase() : null
+        // Only include referral_code if it's not empty
+        ...(formData.referralCode.trim() ? { referral_code: formData.referralCode.trim().toUpperCase() } : {})
       };
       
-      // Log metadata being sent to help debug
       console.log("Signing up with metadata:", metadata);
       
-      const success = await signUp(formData.email, formData.password, metadata);
+      const success = await signUp(formData.email.trim(), formData.password, metadata);
       
       if (success) {
+        toast({
+          title: "Account Created",
+          description: "Please check your email to verify your account."
+        });
         navigate('/login');
       }
     } catch (err: any) {

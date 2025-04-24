@@ -27,7 +27,7 @@ export function useAuthFlow() {
       } else if (error.message?.includes('Password should be')) {
         message = 'Password should be at least 6 characters long.';
       } else if (error.message?.includes('Database error saving new user')) {
-        message = 'Error creating account. Please try again or contact support if the issue persists.';
+        message = 'Server error during registration. Please try again or contact support.';
       } else if (error.message) {
         message = error.message;
       }
@@ -76,8 +76,17 @@ export function useAuthFlow() {
       
       // Ensure all metadata values are properly formatted
       const cleanedMetadata = { ...metadata };
-      if (cleanedMetadata.referral_code) {
+      
+      // Only process referral_code if it exists and is not empty
+      if (cleanedMetadata.referral_code && typeof cleanedMetadata.referral_code === 'string') {
         cleanedMetadata.referral_code = cleanedMetadata.referral_code.trim().toUpperCase();
+        // If it's empty after trimming, set to null
+        if (cleanedMetadata.referral_code === '') {
+          cleanedMetadata.referral_code = null;
+        }
+      } else {
+        // Ensure null if not provided or empty
+        cleanedMetadata.referral_code = null;
       }
       
       console.log('Signing up with metadata:', cleanedMetadata);
@@ -86,7 +95,8 @@ export function useAuthFlow() {
         email,
         password,
         options: {
-          data: cleanedMetadata
+          data: cleanedMetadata,
+          emailRedirectTo: window.location.origin + '/login'
         }
       });
 

@@ -16,6 +16,9 @@ serve(async (req) => {
   const body = await req.json()
   
   try {
+    console.log('Processing user creation for user ID:', body.id)
+    console.log('User metadata received:', body.raw_user_meta_data)
+    
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     
@@ -29,9 +32,6 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
-    console.log('Processing user creation for user ID:', body.id)
-    console.log('User metadata received:', body.raw_user_meta_data)
-    
     // Get user data from metadata
     const fullName = body.raw_user_meta_data?.full_name || '';
     const language = body.raw_user_meta_data?.language || 'en';
@@ -40,19 +40,29 @@ serve(async (req) => {
       body.raw_user_meta_data.referral_code.trim().toUpperCase() : null;
     
     // Split full name into first and last name
-    const nameParts = fullName.split(' ');
+    const nameParts = fullName.trim().split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
     
-    // Check if profile already exists to avoid duplicates
+    // Check if profile already exists
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id')
       .eq('id', body.id)
       .maybeSingle();
-      
+    
     if (!existingProfile) {
-      // Insert user profile with correct field names matching the database schema
+      console.log('Creating new profile for user:', body.id);
+      console.log('Profile data:', { 
+        id: body.id,
+        first_name: firstName,
+        last_name: lastName,
+        language,
+        role,
+        referral_code: referralCode 
+      });
+      
+      // Insert user profile
       const { error } = await supabase
         .from('profiles')
         .insert({
@@ -89,6 +99,8 @@ serve(async (req) => {
         console.error('Error finding clinician with referral code:', clinicianError);
         // We still want to continue even if referral code connection fails
       } else if (clinicianData) {
+        console.log('Found clinician for referral code:', clinicianData);
+        
         // Update the user's metadata to include the clinician's information
         const { error: updateError } = await supabase.auth.admin.updateUserById(
           body.id,
@@ -105,6 +117,8 @@ serve(async (req) => {
         } else {
           console.log('Successfully connected user to clinician via referral code');
         }
+      } else {
+        console.log('No clinician found with referral code:', referralCode);
       }
     }
     

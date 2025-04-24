@@ -23,6 +23,8 @@ export function ReferralCodeInput() {
       // Normalize the referral code to uppercase
       const normalizedCode = referralCode.trim().toUpperCase();
       
+      console.log('Attempting to connect with referral code:', normalizedCode);
+      
       // Check if referral code exists in any clinician profile
       const { data: clinician, error: clinicianError } = await supabase
         .from('profiles')
@@ -31,15 +33,28 @@ export function ReferralCodeInput() {
         .eq('referral_code', normalizedCode)
         .maybeSingle();
 
-      if (clinicianError || !clinician) {
+      if (clinicianError) {
+        console.error('Error finding clinician with referral code:', clinicianError);
         toast({
-          title: "Invalid referral code",
-          description: "Please check the code and try again",
+          title: "Error",
+          description: "Could not verify the referral code. Please try again.",
           variant: "destructive",
         });
         setIsLoading(false);
         return;
       }
+      
+      if (!clinician) {
+        toast({
+          title: "Invalid referral code",
+          description: "No clinician found with this code. Please check and try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('Found clinician:', clinician);
 
       // Update the user's metadata to include the clinician's information
       const { error: updateError } = await supabase.auth.updateUser({
@@ -50,7 +65,10 @@ export function ReferralCodeInput() {
         }
       });
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Error updating user with clinician info:', updateError);
+        throw updateError;
+      }
       
       // Also update the user's profile in the profiles table
       const { error: profileUpdateError } = await supabase
@@ -68,6 +86,7 @@ export function ReferralCodeInput() {
         description: `You've been connected to ${clinician.first_name || ''} ${clinician.last_name || ''}`.trim(),
       });
     } catch (error: any) {
+      console.error('Error connecting with referral code:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to connect with clinician",
