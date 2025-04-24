@@ -70,24 +70,19 @@ export default function SignupPatient() {
       return;
     }
     
-    // Normalize referral code: trim and uppercase if provided
-    const referralCode = formData.referralCode.trim() ? formData.referralCode.trim().toUpperCase() : null;
-    
     try {
-      // Log metadata being sent to help debug
-      console.log("Signing up with metadata:", {
+      // Normalize referral code: trim and uppercase if provided
+      const metadata = {
         full_name: formData.fullName,
         language: formData.language,
         role: 'patient',
-        referral_code: referralCode
-      });
+        referral_code: formData.referralCode.trim() ? formData.referralCode.trim().toUpperCase() : null
+      };
       
-      const success = await signUp(formData.email, formData.password, {
-        full_name: formData.fullName,
-        language: formData.language,
-        role: 'patient',
-        referral_code: referralCode
-      });
+      // Log metadata being sent to help debug
+      console.log("Signing up with metadata:", metadata);
+      
+      const success = await signUp(formData.email, formData.password, metadata);
       
       if (success) {
         navigate('/login');

@@ -27,7 +27,7 @@ export function useAuthFlow() {
       } else if (error.message?.includes('Password should be')) {
         message = 'Password should be at least 6 characters long.';
       } else if (error.message?.includes('Database error saving new user')) {
-        message = 'Error creating account. This may be due to a server issue. Please try again later or contact support.';
+        message = 'Error creating account. Please try again or contact support if the issue persists.';
       } else if (error.message) {
         message = error.message;
       }
@@ -74,13 +74,19 @@ export function useAuthFlow() {
       setIsLoading(true);
       clearError();
       
-      console.log('Signing up with metadata:', metadata);
+      // Ensure all metadata values are properly formatted
+      const cleanedMetadata = { ...metadata };
+      if (cleanedMetadata.referral_code) {
+        cleanedMetadata.referral_code = cleanedMetadata.referral_code.trim().toUpperCase();
+      }
+      
+      console.log('Signing up with metadata:', cleanedMetadata);
       
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: metadata,
+          data: cleanedMetadata
         }
       });
 

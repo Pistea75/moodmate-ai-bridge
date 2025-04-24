@@ -29,7 +29,7 @@ export function ReferralCodeInput() {
         .select('id, first_name, last_name')
         .eq('role', 'clinician')
         .eq('referral_code', normalizedCode)
-        .maybeSingle(); // Using maybeSingle instead of single to avoid errors when no match is found
+        .maybeSingle();
 
       if (clinicianError || !clinician) {
         toast({
