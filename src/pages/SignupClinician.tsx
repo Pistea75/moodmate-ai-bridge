@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -85,7 +86,7 @@ export default function SignupClinician() {
         password: formData.password,
         options: {
           data: {
-            "full name": formData.fullName,
+            "full name": formData.fullName, // Make sure we're using "full name" with space
             language: formData.language,
             role: 'clinician',
             specialization: formData.specialization,

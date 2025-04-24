@@ -2,30 +2,38 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 serve(async (req) => {
-  // Implement the function to handle new user creation
-  // Align with the new database structure using "full name"
+  // This function handles new user creation
   const body = await req.json()
   
-  // Insert user profile with the new "full name" field
-  const { data, error } = await supabase
-    .from('profiles')
-    .insert({
-      id: body.id,
-      "full name": body.raw_user_meta_data?.["full name"] || 'Unknown User',
-      language: body.raw_user_meta_data?.language || 'en',
-      role: body.raw_user_meta_data?.role || 'patient'
+  try {
+    // Insert user profile with "full name" field (not "name")
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert({
+        id: body.id,
+        "full name": body.raw_user_meta_data?.["full name"] || 'Unknown User',
+        language: body.raw_user_meta_data?.language || 'en',
+        role: body.raw_user_meta_data?.role || 'patient'
+      })
+    
+    if (error) {
+      console.error('Error creating user profile:', error)
+      return new Response(JSON.stringify({ error: error.message }), { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
+    
+    console.log('Successfully created user profile with id:', body.id)
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     })
-  
-  if (error) {
-    console.error('Error creating user profile:', error)
-    return new Response(JSON.stringify({ error: error.message }), { 
+  } catch (err) {
+    console.error('Unexpected error creating user profile:', err)
+    return new Response(JSON.stringify({ error: err.message }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })
   }
-  
-  return new Response(JSON.stringify({ success: true }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' }
-  })
 })
