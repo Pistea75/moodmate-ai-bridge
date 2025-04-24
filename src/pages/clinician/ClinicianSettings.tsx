@@ -1,4 +1,3 @@
-
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Volume2, Bell, Moon, Palette } from "lucide-react";
 import { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from '@/providers/ThemeProvider';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function ClinicianSettings() {
   const { toast } = useToast();
@@ -15,6 +15,7 @@ export default function ClinicianSettings() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [selectedVoice, setSelectedVoice] = useState("aria");
   const clinicianName = "Dr. Sarah Johnson"; // This would come from your auth context
+  const { user } = useAuth();
 
   const voices = [
     { id: "aria", name: "Aria (Female)" },
@@ -43,9 +44,23 @@ export default function ClinicianSettings() {
   return (
     <ClinicianLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Welcome, {clinicianName}</h1>
+        <h1 className="text-2xl font-bold">Settings</h1>
         
         <div className="grid gap-6">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Your Referral Code</h2>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Share this code with your patients to connect with them on MoodMate.
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="font-mono text-xl bg-muted p-3 rounded-md">
+                  {user?.user_metadata?.referral_code}
+                </div>
+              </div>
+            </div>
+          </Card>
+
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Appearance</h2>
             <div className="space-y-4">

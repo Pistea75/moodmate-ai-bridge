@@ -73,8 +73,8 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
             <div className="flex-1 text-sm">
               <div className="font-medium">Dr. {user?.user_metadata?.full_name}</div>
               {user?.user_metadata?.referral_code && (
-                <div className="text-muted-foreground font-mono">
-                  Code: {user.user_metadata.referral_code}
+                <div className="text-sm text-muted-foreground font-mono">
+                  Code: <span className="text-gray-500">{user.user_metadata.referral_code}</span>
                 </div>
               )}
             </div>
