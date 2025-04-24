@@ -40,14 +40,41 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // Update CSS variables based on theme color
     const colors = {
-      purple: { primary: "#9b87f5", secondary: "#7E69AB" },
-      green: { primary: "#4CAF50", secondary: "#388E3C" },
-      peach: { primary: "#FFAB91", secondary: "#FF8A65" },
-      blue: { primary: "#64B5F6", secondary: "#42A5F5" },
+      purple: {
+        primary: "#9b87f5",
+        secondary: "#7E69AB",
+        accent: "#E5DEFF",
+        muted: "#F1F0FB",
+        foreground: "#1A1F2C"
+      },
+      green: {
+        primary: "#4CAF50",
+        secondary: "#388E3C",
+        accent: "#F2FCE2",
+        muted: "#E8F5E9",
+        foreground: "#1B5E20"
+      },
+      peach: {
+        primary: "#FFAB91",
+        secondary: "#FF8A65",
+        accent: "#FDE1D3",
+        muted: "#FBE9E7",
+        foreground: "#BF360C"
+      },
+      blue: {
+        primary: "#64B5F6",
+        secondary: "#42A5F5",
+        accent: "#D3E4FD",
+        muted: "#E3F2FD",
+        foreground: "#0D47A1"
+      },
     };
 
     root.style.setProperty("--mood-primary", colors[themeColor].primary);
     root.style.setProperty("--mood-secondary", colors[themeColor].secondary);
+    root.style.setProperty("--mood-accent", colors[themeColor].accent);
+    root.style.setProperty("--mood-muted", colors[themeColor].muted);
+    root.style.setProperty("--mood-foreground", colors[themeColor].foreground);
   }, [themeColor]);
 
   return (
