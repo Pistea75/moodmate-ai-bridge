@@ -1,5 +1,5 @@
 
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, Mic, MicOff } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export type Session = {
@@ -21,6 +21,8 @@ interface SessionCardProps {
 export function SessionCard({ session, variant }: SessionCardProps) {
   const [canJoin, setCanJoin] = useState(false);
   const [timeToSession, setTimeToSession] = useState<string>('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
   
   // Format session time
   const formatSessionTime = (dateTimeString: string) => {
@@ -39,6 +41,13 @@ export function SessionCard({ session, variant }: SessionCardProps) {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  // Format recording time
+  const formatRecordingTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
   
   // Check if user can join session (within 5 minutes of start time)
@@ -75,6 +84,37 @@ export function SessionCard({ session, variant }: SessionCardProps) {
     
     return () => clearInterval(timer);
   }, [session]);
+
+  // Recording timer
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      setRecordingTime(0);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRecording]);
+
+  const handleRecordToggle = () => {
+    if (isRecording) {
+      // Stop recording
+      setIsRecording(false);
+      // In a real app, save the recording here
+      console.log('Recording stopped after:', formatRecordingTime(recordingTime));
+      // Show toast notification in a real implementation
+    } else {
+      // Start recording
+      setIsRecording(true);
+      console.log('Recording started');
+    }
+  };
   
   return (
     <div className={`
@@ -117,9 +157,16 @@ export function SessionCard({ session, variant }: SessionCardProps) {
             </div>
           )}
           
-          {!canJoin && timeToSession && (
+          {!canJoin && timeToSession && !isRecording && (
             <div className="mt-3 text-xs inline-block px-2 py-1 bg-muted rounded">
               Starts in {timeToSession}
+            </div>
+          )}
+
+          {isRecording && (
+            <div className="mt-3 text-xs font-medium inline-flex items-center gap-1.5 px-2 py-1 bg-red-100 text-red-800 rounded">
+              <span className="animate-pulse h-2 w-2 bg-red-600 rounded-full"></span>
+              Recording: {formatRecordingTime(recordingTime)}
             </div>
           )}
         </div>
@@ -128,15 +175,28 @@ export function SessionCard({ session, variant }: SessionCardProps) {
           {session.status === 'upcoming' && (
             <button 
               disabled={!canJoin} 
+              onClick={handleRecordToggle}
               className={`
-                px-4 py-1.5 rounded-lg text-sm font-medium transition-colors
-                ${canJoin 
-                  ? 'bg-mood-purple text-white hover:bg-mood-purple-secondary' 
-                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+                px-4 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5
+                ${isRecording 
+                  ? 'bg-red-500 text-white hover:bg-red-600' 
+                  : canJoin
+                    ? 'bg-mood-purple text-white hover:bg-mood-purple-secondary' 
+                    : 'bg-muted text-muted-foreground cursor-not-allowed'
                 }
               `}
             >
-              {canJoin ? 'Join Session' : 'Not Yet Available'}
+              {isRecording ? (
+                <>
+                  <MicOff size={14} />
+                  Stop Recording
+                </>
+              ) : (
+                <>
+                  <Mic size={14} />
+                  Record Session
+                </>
+              )}
             </button>
           )}
           

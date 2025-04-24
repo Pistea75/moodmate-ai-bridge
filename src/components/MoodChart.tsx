@@ -7,10 +7,13 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  TooltipProps
+  TooltipProps,
+  Area,
+  AreaChart
 } from 'recharts';
-import { AreaChart, Area } from 'recharts';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Search, ZoomIn, ZoomOut } from 'lucide-react';
 
 // Mood levels from 1-5
 const MOOD_LEVELS = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
@@ -37,7 +40,23 @@ const dailyData = [
   { hour: '8 PM', mood: 5 },
 ];
 
-type ChartView = 'weekly' | 'daily';
+// Hourly data for zoom-in view
+const hourlyData = [
+  { time: '9:00 AM', mood: 3 },
+  { time: '9:15 AM', mood: 3 },
+  { time: '9:30 AM', mood: 4 },
+  { time: '9:45 AM', mood: 4 },
+  { time: '10:00 AM', mood: 4 },
+  { time: '10:15 AM', mood: 5 },
+  { time: '10:30 AM', mood: 4 },
+  { time: '10:45 AM', mood: 4 },
+  { time: '11:00 AM', mood: 3 },
+  { time: '11:15 AM', mood: 3 },
+  { time: '11:30 AM', mood: 2 },
+  { time: '11:45 AM', mood: 3 },
+];
+
+type ChartView = 'weekly' | 'daily' | 'hourly';
 
 // Custom tooltip component
 const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
@@ -65,35 +84,93 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 
 export function MoodChart() {
   const [view, setView] = useState<ChartView>('weekly');
+  const [previousView, setPreviousView] = useState<ChartView | null>(null);
   
-  const data = view === 'weekly' ? weeklyData : dailyData;
-  const dataKey = view === 'weekly' ? 'day' : 'hour';
+  const data = 
+    view === 'weekly' ? weeklyData : 
+    view === 'daily' ? dailyData : hourlyData;
+    
+  const dataKey = 
+    view === 'weekly' ? 'day' : 
+    view === 'daily' ? 'hour' : 'time';
+  
+  const handleZoomIn = () => {
+    if (view === 'weekly') {
+      setPreviousView('weekly');
+      setView('daily');
+    } else if (view === 'daily') {
+      setPreviousView('daily');
+      setView('hourly');
+    }
+  };
+  
+  const handleZoomOut = () => {
+    if (view === 'hourly') {
+      setView('daily');
+    } else if (view === 'daily') {
+      setView('weekly');
+    }
+  };
   
   return (
     <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">Mood Timeline</h3>
         <div className="flex gap-2">
-          <button 
-            className={`px-3 py-1 text-sm rounded-md ${
-              view === 'weekly' 
-                ? 'bg-mood-purple text-white' 
-                : 'bg-muted text-muted-foreground'
-            }`}
-            onClick={() => setView('weekly')}
-          >
-            Weekly
-          </button>
-          <button 
-            className={`px-3 py-1 text-sm rounded-md ${
-              view === 'daily' 
-                ? 'bg-mood-purple text-white' 
-                : 'bg-muted text-muted-foreground'
-            }`}
-            onClick={() => setView('daily')}
-          >
-            Daily
-          </button>
+          <div className="flex">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleZoomOut}
+              disabled={view === 'weekly'}
+              className="rounded-r-none border-r-0"
+            >
+              <ZoomOut size={16} />
+              <span className="sr-only">Zoom Out</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleZoomIn}
+              disabled={view === 'hourly'}
+              className="rounded-l-none"
+            >
+              <ZoomIn size={16} />
+              <span className="sr-only">Zoom In</span>
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <button 
+              className={`px-3 py-1 text-sm rounded-md ${
+                view === 'weekly' 
+                  ? 'bg-mood-purple text-white' 
+                  : 'bg-muted text-muted-foreground'
+              }`}
+              onClick={() => setView('weekly')}
+            >
+              Weekly
+            </button>
+            <button 
+              className={`px-3 py-1 text-sm rounded-md ${
+                view === 'daily' 
+                  ? 'bg-mood-purple text-white' 
+                  : 'bg-muted text-muted-foreground'
+              }`}
+              onClick={() => setView('daily')}
+            >
+              Daily
+            </button>
+            <button 
+              className={`px-3 py-1 text-sm rounded-md ${
+                view === 'hourly' 
+                  ? 'bg-mood-purple text-white' 
+                  : 'bg-muted text-muted-foreground'
+              }`}
+              onClick={() => setView('hourly')}
+            >
+              Hourly
+            </button>
+          </div>
         </div>
       </div>
       
@@ -163,6 +240,12 @@ export function MoodChart() {
           )}
         </ResponsiveContainer>
       </div>
+      
+      {(view === 'daily' || view === 'hourly') && (
+        <div className="mt-3 text-xs text-center text-muted-foreground">
+          {view === 'hourly' ? 'Hourly zoom view (15-minute intervals)' : 'Daily view (2-hour intervals)'}
+        </div>
+      )}
     </div>
   );
 }
