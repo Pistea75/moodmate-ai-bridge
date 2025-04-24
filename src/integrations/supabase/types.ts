@@ -69,36 +69,33 @@ export type Database = {
       }
       profiles: {
         Row: {
+          "full name": string
           id: string
           language: string
           license_number: string | null
-          name: string
           referral_code: string | null
           role: string
           specialization: string | null
-          surname: string | null
           updated_at: string | null
         }
         Insert: {
+          "full name": string
           id: string
           language: string
           license_number?: string | null
-          name: string
           referral_code?: string | null
           role: string
           specialization?: string | null
-          surname?: string | null
           updated_at?: string | null
         }
         Update: {
+          "full name"?: string
           id?: string
           language?: string
           license_number?: string | null
-          name?: string
           referral_code?: string | null
           role?: string
           specialization?: string | null
-          surname?: string | null
           updated_at?: string | null
         }
         Relationships: []

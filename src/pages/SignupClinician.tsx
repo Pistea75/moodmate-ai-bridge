@@ -87,8 +87,7 @@ export default function SignupClinician() {
         password: formData.password,
         options: {
           data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
+            "full name": `${formData.firstName} ${formData.lastName}`,
             language: formData.language,
             role: 'clinician',
             specialization: formData.specialization,

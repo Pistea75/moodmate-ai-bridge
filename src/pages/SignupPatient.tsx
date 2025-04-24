@@ -75,8 +75,7 @@ export default function SignupPatient() {
         password: formData.password,
         options: {
           data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
+            "full name": `${formData.firstName} ${formData.lastName}`,
             language: formData.language,
             role: 'patient',
             referral_code: formData.referralCode || null
