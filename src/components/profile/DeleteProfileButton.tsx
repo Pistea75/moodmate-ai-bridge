@@ -15,7 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { trash } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 export function DeleteProfileButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +46,7 @@ export function DeleteProfileButton() {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" className="gap-2">
-          <trash className="h-4 w-4" />
+          <Trash2 className="h-4 w-4" />
           Delete Account
         </Button>
       </AlertDialogTrigger>

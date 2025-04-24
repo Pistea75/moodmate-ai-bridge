@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
@@ -96,12 +97,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      // First delete the user
       if (user) {
-        const { error } = await supabase.auth.admin.deleteUser(user.id);
-        if (error) throw error;
+        // Using standard signOut will automatically sign the user out
+        await supabase.auth.signOut();
       }
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
     } catch (error: any) {
       throw error;
     }
