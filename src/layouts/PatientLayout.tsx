@@ -1,4 +1,3 @@
-
 import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -8,14 +7,11 @@ import {
   Calendar, 
   BarChart, 
   Settings, 
-  User,
-  Menu
+  User
 } from 'lucide-react';
 import { 
   Sheet, 
   SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
   SheetTrigger 
 } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -58,57 +54,58 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
                 </Avatar>
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 pt-10">
-              <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
-              </SheetHeader>
-              <Accordion type="single" collapsible className="mt-6">
-                <AccordionItem value="navigation">
-                  <AccordionTrigger className="py-2">Navigation</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pl-2">
-                      {navItems.map((item) => (
-                        <Link 
-                          key={item.path}
-                          to={item.path}
-                          className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
-                            location.pathname === item.path 
-                              ? 'bg-[var(--mood-primary)] text-white' 
-                              : 'hover:bg-[var(--mood-muted)] text-[var(--mood-foreground)]'
-                          }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <item.icon size={18} />
-                          <span>{item.name}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="profile">
-                  <AccordionTrigger className="py-2">Profile</AccordionTrigger>
-                  <AccordionContent>
-                    <Link 
-                      to="/patient/profile"
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--mood-muted)]"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <User size={18} />
-                      <span>View Profile</span>
-                    </Link>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+            <SheetContent side="left" className="w-64 p-0">
+              <nav className="flex flex-col h-full bg-background">
+                <div className="p-4 border-b">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src="/placeholder-avatar.jpg" />
+                    <AvatarFallback><User className="h-6 w-6" /></AvatarFallback>
+                  </Avatar>
+                  <div className="mt-2 font-medium">Patient Name</div>
+                </div>
+                <div className="flex-1 overflow-auto py-2">
+                  <div className="space-y-1">
+                    {navItems.map((item) => (
+                      <Link 
+                        key={item.path}
+                        to={item.path}
+                        className={`flex items-center gap-3 px-4 py-2 text-sm ${
+                          location.pathname === item.path 
+                            ? 'bg-[var(--mood-primary)] text-white' 
+                            : 'hover:bg-[var(--mood-muted)] text-[var(--mood-foreground)]'
+                        }`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <item.icon size={18} />
+                        <span>{item.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-t p-4">
+                  <Link 
+                    to="/patient/profile"
+                    className="flex items-center gap-2 text-sm text-[var(--mood-foreground)]"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <User size={18} />
+                    <span>View Profile</span>
+                  </Link>
+                </div>
+              </nav>
             </SheetContent>
           </Sheet>
           
-          {/* Logo (right side on mobile) */}
-          <Link to="/" className="ml-auto flex items-center gap-2">
+          {/* Centered Logo */}
+          <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[var(--mood-primary)] to-[var(--mood-secondary)] flex items-center justify-center">
               <span className="font-bold text-white">M</span>
             </div>
             <span className="text-lg font-semibold" style={{ color: 'var(--mood-primary)' }}>MoodMate</span>
           </Link>
+          
+          {/* Empty div to maintain flex spacing */}
+          <div className="w-8"></div>
         </div>
       </header>
       
