@@ -56,6 +56,7 @@ export default function SignupPatient() {
         handleChange={handleChange}
         handleSubmit={handleSubmit}
         step={step}
+        setStep={setStep} // Pass setStep to SignupForm
         isLoading={isLoading}
         renderStep2Fields={() => (
           <PatientSignupStep2 

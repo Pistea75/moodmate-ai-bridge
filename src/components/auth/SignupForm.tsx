@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface SignupFormData {
@@ -17,6 +16,7 @@ interface SignupFormProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
   step: number;
+  setStep: (step: number) => void; // Added the setStep function to the props
   isLoading: boolean;
   renderStep2Fields: () => JSX.Element;
 }
@@ -25,7 +25,8 @@ export function SignupForm({
   formData, 
   handleChange, 
   handleSubmit, 
-  step, 
+  step,
+  setStep,  // Added setStep to the destructuring
   isLoading,
   renderStep2Fields 
 }: SignupFormProps) {
