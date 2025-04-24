@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Mic, Mic as MicIcon, Send, Volume2 } from "lucide-react";
 import { useState } from "react";
@@ -100,7 +101,7 @@ export function AudioChatInterface({
             {!isClinicianView && <h1 className="text-2xl font-bold -mb-1">Dr. Martinez AI</h1>}
             
           </div>
-          <Button variant="outline" size="sm" onClick={() => setIsVoiceMode(!isVoiceMode)} className="gap-2">
+          <Button variant="outline" size="sm" onClick={() => setIsVoiceMode(!isVoiceMode)} className="gap-2 self-end">
             {isVoiceMode ? <Volume2 className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             {isVoiceMode ? 'Text Mode' : 'Voice Mode'}
           </Button>
