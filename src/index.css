@@ -6,7 +6,7 @@
 @layer base {
   :root {
     /* Base */
-    --background: var(--page-background);
+    --background: hsl(var(--page-background));
     --foreground: 240 25% 15%;
 
     --card: 0 0% 100%;
@@ -16,17 +16,17 @@
     --popover-foreground: 240 25% 15%;
 
     /* Theme colors will be set dynamically */
-    --primary: var(--primary);
+    --primary: hsl(var(--primary));
     --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--secondary);
+    --secondary: hsl(var(--secondary));
     --secondary-foreground: 0 0% 100%;
 
     /* Neutrals */
-    --muted: var(--muted);
+    --muted: hsl(var(--muted));
     --muted-foreground: 240 3% 57%;
 
-    --accent: var(--accent);
+    --accent: hsl(var(--accent));
     --accent-foreground: var(--secondary);
 
     --destructive: 0 84.2% 60.2%;
@@ -51,17 +51,17 @@
     --popover-foreground: 0 0% 95%;
 
     /* Theme colors will still use the dynamic values */
-    --primary: var(--primary);
+    --primary: hsl(var(--primary));
     --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--secondary);
+    --secondary: hsl(var(--secondary));
     --secondary-foreground: 0 0% 100%;
 
     /* Neutrals */
     --muted: 240 20% 22%;
     --muted-foreground: 240 10% 70%;
 
-    --accent: var(--accent);
+    --accent: hsl(var(--accent));
     --accent-foreground: var(--primary);
 
     --destructive: 0 62.8% 40.6%;

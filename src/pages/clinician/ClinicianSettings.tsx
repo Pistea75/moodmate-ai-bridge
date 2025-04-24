@@ -81,7 +81,7 @@ export default function ClinicianSettings() {
                     Receive notifications about upcoming sessions
                   </div>
                 </div>
-                <Switch defaultChecked />
+                <Switch defaultChecked className="bg-primary" />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -90,7 +90,7 @@ export default function ClinicianSettings() {
                     Get notified about patient activity
                   </div>
                 </div>
-                <Switch defaultChecked />
+                <Switch defaultChecked className="bg-primary" />
               </div>
             </div>
           </Card>

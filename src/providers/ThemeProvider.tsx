@@ -38,44 +38,45 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.dataset.themeColor = themeColor;
     localStorage?.setItem("themeColor", themeColor);
 
+    // Create color schemes with light background tones and consistent button colors
     const colors = {
       purple: {
-        primary: "hsl(252, 86%, 75%)",
-        secondary: "hsl(260, 28%, 54%)",
-        accent: "hsl(252, 100%, 95%)",
-        muted: "hsl(248, 50%, 96%)",
-        background: "hsl(252, 100%, 99%)",
-        hover: "hsl(252, 86%, 70%)"
+        primary: "252, 86%, 75%", // Button color
+        secondary: "260, 28%, 54%",
+        accent: "252, 100%, 95%", // Light accent color
+        muted: "248, 50%, 96%",
+        background: "252, 100%, 99%", // Very light background
+        hover: "252, 86%, 70%"
       },
       green: {
-        primary: "hsl(142, 57%, 66%)",
-        secondary: "hsl(142, 27%, 55%)",
-        accent: "hsl(142, 76%, 95%)",
-        muted: "hsl(142, 38%, 95%)",
-        background: "hsl(142, 60%, 99%)",
-        hover: "hsl(142, 57%, 60%)"
+        primary: "142, 57%, 66%", // Button color
+        secondary: "142, 27%, 55%",
+        accent: "142, 76%, 95%", // Light accent color
+        muted: "142, 38%, 95%",
+        background: "142, 60%, 99%", // Very light background
+        hover: "142, 57%, 60%"
       },
       peach: {
-        primary: "hsl(22, 100%, 78%)",
-        secondary: "hsl(22, 100%, 70%)",
-        accent: "hsl(22, 100%, 95%)",
-        muted: "hsl(22, 100%, 97%)",
-        background: "hsl(22, 100%, 99%)",
-        hover: "hsl(22, 100%, 72%)"
+        primary: "22, 100%, 78%", // Button color
+        secondary: "22, 100%, 70%",
+        accent: "22, 100%, 95%", // Light accent color
+        muted: "22, 100%, 97%",
+        background: "22, 100%, 99%", // Very light background
+        hover: "22, 100%, 72%"
       },
       blue: {
-        primary: "hsl(212, 100%, 78%)",
-        secondary: "hsl(212, 88%, 72%)",
-        accent: "hsl(212, 100%, 95%)",
-        muted: "hsl(212, 100%, 97%)",
-        background: "hsl(212, 100%, 99%)",
-        hover: "hsl(212, 100%, 72%)"
+        primary: "212, 100%, 78%", // Button color
+        secondary: "212, 88%, 72%",
+        accent: "212, 100%, 95%", // Light accent color
+        muted: "212, 100%, 97%",
+        background: "212, 100%, 99%", // Very light background
+        hover: "212, 100%, 72%"
       },
     };
 
     const selectedColors = colors[themeColor];
     
-    // Set CSS custom properties as HSL values for Tailwind to use
+    // Set CSS custom properties with HSL values
     root.style.setProperty("--primary", selectedColors.primary);
     root.style.setProperty("--secondary", selectedColors.secondary);
     root.style.setProperty("--accent", selectedColors.accent);

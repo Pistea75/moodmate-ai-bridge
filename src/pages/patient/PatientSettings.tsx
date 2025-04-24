@@ -89,7 +89,7 @@ export default function PatientSettings() {
                     Receive notifications about upcoming sessions
                   </div>
                 </div>
-                <Switch defaultChecked />
+                <Switch defaultChecked className="bg-primary" />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -98,7 +98,7 @@ export default function PatientSettings() {
                     Get notified about pending tasks
                   </div>
                 </div>
-                <Switch defaultChecked />
+                <Switch defaultChecked className="bg-primary" />
               </div>
             </div>
           </Card>
