@@ -4,13 +4,22 @@ import { useAuthFlow } from '@/hooks/useAuthFlow';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function TestSignup() {
   const [email, setEmail] = useState('test-user@example.com');
   const [password, setPassword] = useState('12345678');
+  const [error, setError] = useState<string | null>(null);
   const { signUp, isLoading } = useAuthFlow();
 
   const handleTestSignup = async () => {
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setError(null);
     const metadata = {
       full_name: 'Test User',
       role: 'patient',
@@ -24,11 +33,12 @@ export function TestSignup() {
       if (success) {
         toast({
           title: "Test Signup Successful",
-          description: "Test user created successfully"
+          description: "Test user created successfully. Check email for verification."
         });
       }
     } catch (error: any) {
       console.error("Test signup error:", error);
+      setError(error.message || "An error occurred during test signup");
       toast({
         title: "Test Signup Failed",
         description: error.message || "An error occurred during test signup",
@@ -49,6 +59,13 @@ export function TestSignup() {
         </ul>
       </div>
       
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
       <Input 
         value={email} 
         onChange={(e) => setEmail(e.target.value)} 
@@ -59,6 +76,7 @@ export function TestSignup() {
         value={password} 
         onChange={(e) => setPassword(e.target.value)} 
         placeholder="Password"
+        minLength={6}
       />
       <Button 
         onClick={handleTestSignup} 

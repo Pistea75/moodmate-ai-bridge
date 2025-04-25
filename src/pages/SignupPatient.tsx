@@ -72,7 +72,7 @@ export default function SignupPatient() {
     
     try {
       // Create metadata object for user signup
-      const metadata: Record<string, any> = {
+      const metadata = {
         full_name: formData.fullName.trim(),
         language: formData.language,
         role: 'patient',
@@ -83,7 +83,7 @@ export default function SignupPatient() {
         metadata.referral_code = formData.referralCode.trim();
       }
       
-      console.log("Attempting signup with metadata:", metadata);
+      console.log("Attempting patient signup with metadata:", metadata);
       
       const success = await signUp(formData.email.trim(), formData.password, metadata);
       

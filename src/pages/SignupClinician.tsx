@@ -5,8 +5,8 @@ import { AuthFormLayout } from '../components/auth/AuthFormLayout';
 import { StepIndicator } from '../components/auth/StepIndicator';
 import { SignupForm } from '../components/auth/SignupForm';
 import { ClinicianSignupStep2 } from '../components/auth/clinician/ClinicianSignupStep2';
-import { supabase } from '../integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { useAuthFlow } from '../hooks/useAuthFlow';
+import { toast } from '@/hooks/use-toast';
 
 export default function SignupClinician() {
   const [step, setStep] = useState(1);
@@ -20,9 +20,9 @@ export default function SignupClinician() {
     licenseNumber: '',
     acceptTerms: false
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>('');
+  
   const navigate = useNavigate();
+  const { isLoading, error, signUp, clearError } = useAuthFlow();
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -33,7 +33,7 @@ export default function SignupClinician() {
       [name]: type === 'checkbox' ? checked : value
     });
     
-    if (error) setError('');
+    if (error) clearError();
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,12 +41,20 @@ export default function SignupClinician() {
     
     if (step === 1) {
       if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match');
+        toast({
+          title: "Error",
+          description: "Passwords do not match",
+          variant: "destructive"
+        });
         return;
       }
       
       if (formData.password.length < 6) {
-        setError('Password must be at least 6 characters');
+        toast({
+          title: "Error",
+          description: "Password must be at least 6 characters",
+          variant: "destructive"
+        });
         return;
       }
       
@@ -55,77 +63,55 @@ export default function SignupClinician() {
     }
     
     if (!formData.acceptTerms) {
-      setError('You must accept the Terms of Service and Privacy Policy');
+      toast({
+        title: "Error",
+        description: "You must accept the Terms of Service and Privacy Policy",
+        variant: "destructive"
+      });
       return;
     }
 
     if (!formData.specialization) {
-      setError('Please select your specialization');
+      toast({
+        title: "Error",
+        description: "Please select your specialization",
+        variant: "destructive"
+      });
       return;
     }
     
     if (!formData.licenseNumber) {
-      setError('Please enter your license number');
+      toast({
+        title: "Error",
+        description: "Please enter your license number",
+        variant: "destructive"
+      });
       return;
     }
     
-    setIsLoading(true);
-    setError('');
-    
     try {
-      console.log("Starting clinician signup with data:", {
-        email: formData.email,
-        fullName: formData.fullName,
+      // Create metadata object for clinician signup
+      const metadata = {
+        full_name: formData.fullName.trim(),
         language: formData.language,
+        role: 'clinician',
         specialization: formData.specialization,
-        licenseNumber: formData.licenseNumber
-      });
+        license_number: formData.licenseNumber.trim()
+      };
       
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName, // Updated from "full name" to full_name
-            language: formData.language,
-            role: 'clinician',
-            specialization: formData.specialization,
-            license_number: formData.licenseNumber
-          }
-        }
-      });
+      console.log("Attempting clinician signup with metadata:", metadata);
       
-      if (signUpError) {
-        console.error('Supabase signup error:', signUpError);
-        throw signUpError;
-      }
+      const success = await signUp(formData.email.trim(), formData.password, metadata);
       
-      if (data && data.user) {
-        console.log('User created successfully with ID:', data.user.id);
-        console.log('User metadata:', data.user.user_metadata);
-        
+      if (success) {
         toast({
-          title: "Account created successfully",
-          description: "Please check your email to confirm your account.",
+          title: "Account Created",
+          description: "Please check your email to verify your account."
         });
-        
         navigate('/login');
-      } else {
-        console.error('No user data returned from signup');
-        throw new Error('Failed to create account. Please try again.');
       }
     } catch (err: any) {
-      console.error('Full error object:', err);
-      
-      if (err.message.includes('User already registered')) {
-        setError('This email is already registered. Please try logging in instead.');
-      } else if (err.message.includes('Email not confirmed')) {
-        setError('Please check your email and confirm your account before logging in.');
-      } else {
-        setError(err.message || 'Failed to create account. Please try again.');
-      }
-    } finally {
-      setIsLoading(false);
+      console.error("Signup error:", err);
     }
   };
 
@@ -142,7 +128,7 @@ export default function SignupClinician() {
         step={step}
         setStep={setStep}
         isLoading={isLoading}
-        error={error}
+        error={error?.message}
         renderStep2Fields={() => (
           <ClinicianSignupStep2 
             formData={formData} 

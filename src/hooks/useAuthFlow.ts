@@ -89,7 +89,7 @@ export function useAuthFlow() {
         }
       }
       
-      console.log('Signing up with cleaned metadata:', cleanedMetadata);
+      console.log('Signing up with metadata:', cleanedMetadata);
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -101,6 +101,8 @@ export function useAuthFlow() {
       });
 
       if (error) throw error;
+      
+      console.log('Signup response data:', data);
       
       // Check if we got user data back
       if (!data?.user) {
@@ -114,6 +116,7 @@ export function useAuthFlow() {
       
       return true;
     } catch (error: any) {
+      console.error('Full signup error:', error);
       handleAuthError(error);
       return false;
     } finally {
