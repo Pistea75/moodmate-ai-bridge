@@ -93,7 +93,6 @@ const { data: clinician, error } = await supabase
 console.log('✅ Full raw response:', clinician);
 console.log('❌ error:', error);
 
-
         if (error || !clinician) {
           toast({
             title: "Invalid Referral Code",
