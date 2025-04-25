@@ -81,7 +81,7 @@ export default function SignupPatient() {
       let referralCodeInput: string | null = null;
 
       if (formData.referralCode?.trim()) {
-         const referralCodeInput = formData.referralCode.trim().toUpperCase();
+          referralCodeInput = formData.referralCode.trim().toUpperCase();
 
         const { data: clinician, error } = await supabase
             .from('profiles')
