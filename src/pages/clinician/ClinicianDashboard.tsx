@@ -1,4 +1,5 @@
-
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { MoodChart } from '../../components/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard, Session } from '../../components/SessionCard';
