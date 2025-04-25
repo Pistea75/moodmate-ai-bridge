@@ -71,8 +71,16 @@ export default function SignupPatient() {
     }
     
     try {
+      // Define the metadata type with optional referral_code
+      interface UserMetadata {
+        full_name: string;
+        language: string;
+        role: string;
+        referral_code?: string;
+      }
+      
       // Create metadata object for user signup
-      const metadata = {
+      const metadata: UserMetadata = {
         full_name: formData.fullName.trim(),
         language: formData.language,
         role: 'patient',
