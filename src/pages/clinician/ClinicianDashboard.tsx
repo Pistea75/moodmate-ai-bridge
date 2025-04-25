@@ -5,7 +5,6 @@ import { TaskList } from '../../components/TaskList';
 import { SessionCard, Session } from '../../components/SessionCard';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 
-// Sample upcoming sessions
 const upcomingSessions: Session[] = [
   {
     id: '1',
@@ -34,6 +33,25 @@ const upcomingSessions: Session[] = [
 ];
 
 export default function ClinicianDashboard() {
+  const [patients, setPatients] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'patient');
+
+      if (!error) {
+        setPatients(data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchPatients();
+  }, []);
+
   return (
     <ClinicianLayout>
       <div className="space-y-6">
@@ -41,11 +59,13 @@ export default function ClinicianDashboard() {
           <h1 className="text-2xl font-bold">Welcome, Dr. Johnson</h1>
           <p className="text-muted-foreground">Here's your practice overview for today</p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Total Patients</div>
-            <div className="text-2xl font-bold mt-1">24</div>
+            <div className="text-2xl font-bold mt-1">
+              {loading ? '...' : patients.length}
+            </div>
           </div>
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Sessions Today</div>
@@ -56,7 +76,7 @@ export default function ClinicianDashboard() {
             <div className="text-2xl font-bold mt-1">5</div>
           </div>
         </div>
-        
+
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
@@ -64,7 +84,7 @@ export default function ClinicianDashboard() {
               View All
             </a>
           </div>
-          
+
           <div className="space-y-4">
             {upcomingSessions.map(session => (
               <SessionCard 
@@ -75,7 +95,7 @@ export default function ClinicianDashboard() {
             ))}
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <div className="flex items-center justify-between mb-4">
@@ -95,7 +115,7 @@ export default function ClinicianDashboard() {
             <TaskList variant="clinician" patientName="Alex Smith" />
           </div>
         </div>
-        
+
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Recent Reports</h2>
@@ -103,7 +123,7 @@ export default function ClinicianDashboard() {
               View All
             </a>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {['Alex Smith', 'Jamie Wilson', 'Taylor Brown'].map((patient) => (
               <div key={patient} className="bg-white rounded-xl border p-4">
