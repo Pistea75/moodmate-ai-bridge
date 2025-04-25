@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -80,19 +79,23 @@ export default function SignupClinician() {
       return;
     }
     
-    if (!formData.licenseNumber) {
-      toast({
-        title: "Error",
-        description: "Please enter your license number",
-        variant: "destructive"
-      });
-      return;
-    }
-    
     try {
-      // Create metadata object for clinician signup
-      const metadata = {
-        full_name: formData.fullName.trim(),
+      const nameParts = formData.fullName.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
+
+      interface UserMetadata {
+        first_name: string;
+        last_name: string;
+        language: string;
+        role: string;
+        specialization: string;
+        license_number: string;
+      }
+      
+      const metadata: UserMetadata = {
+        first_name: firstName,
+        last_name: lastName || '',
         language: formData.language,
         role: 'clinician',
         specialization: formData.specialization,
