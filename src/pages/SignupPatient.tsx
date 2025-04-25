@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -72,11 +71,15 @@ export default function SignupPatient() {
     }
     
     try {
-      if (formData.referralCode.trim()) {
-        // Clean the referral code input
-        const referralCodeInput = formData.referralCode.trim().toUpperCase();
+      const nameParts = formData.fullName.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
 
-        // Validate the referral code before signup
+      let referralCodeInput: string | null = null;
+
+      if (formData.referralCode?.trim()) {
+        referralCodeInput = formData.referralCode.trim().toUpperCase();
+
         const { data: clinician, error } = await supabase
           .from('profiles')
           .select('user_id')
@@ -92,36 +95,32 @@ export default function SignupPatient() {
           });
           return;
         }
-
-        const nameParts = formData.fullName.trim().split(' ');
-        const firstName = nameParts[0];
-        const lastName = nameParts.slice(1).join(' ');
-
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            data: {
-              first_name: firstName,
-              last_name: lastName || '',
-              role: 'patient',
-              referral_code: referralCodeInput,
-              language: 'en'
-            }
-          }
-        });
-
-        if (signUpError) {
-          console.error('Signup error:', signUpError);
-          toast({
-            title: "Error",
-            description: signUpError.message,
-            variant: "destructive"
-          });
-          return;
-        }
       }
-      
+
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName || '',
+            role: 'patient',
+            referral_code: referralCodeInput,
+            language: 'en'
+          }
+        }
+      });
+
+      if (signUpError) {
+        console.error('Signup error:', signUpError);
+        toast({
+          title: "Error",
+          description: signUpError.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
       toast({
         title: "Account Created",
         description: "Please check your email to verify your account."
