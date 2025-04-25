@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -7,6 +6,7 @@ import { SignupForm } from '../components/auth/SignupForm';
 import { PatientSignupStep2 } from '../components/auth/patient/PatientSignupStep2';
 import { useAuthFlow } from '../hooks/useAuthFlow';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function SignupPatient() {
   const [step, setStep] = useState(1);
@@ -71,6 +71,24 @@ export default function SignupPatient() {
     }
     
     try {
+      if (formData.referralCode.trim()) {
+        const { data: clinician, error: validationError } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('referral_code', formData.referralCode.trim().toUpperCase())
+          .eq('role', 'clinician')
+          .maybeSingle();
+
+        if (!clinician || validationError) {
+          toast({
+            title: "Invalid Referral Code",
+            description: "Please check the code with your clinician",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ');
