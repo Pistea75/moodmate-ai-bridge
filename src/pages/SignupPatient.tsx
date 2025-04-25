@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -71,22 +70,25 @@ export default function SignupPatient() {
     }
     
     try {
-      // Define the metadata type with optional referral_code
+      const nameParts = formData.fullName.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
+
       interface UserMetadata {
-        full_name: string;
+        first_name: string;
+        last_name: string;
         language: string;
         role: string;
         referral_code?: string;
       }
       
-      // Create metadata object for user signup
       const metadata: UserMetadata = {
-        full_name: formData.fullName.trim(),
+        first_name: firstName,
+        last_name: lastName || '',
         language: formData.language,
         role: 'patient',
       };
       
-      // Only add referral code if it's not empty
       if (formData.referralCode.trim()) {
         metadata.referral_code = formData.referralCode.trim();
       }
