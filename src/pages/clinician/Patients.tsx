@@ -1,38 +1,32 @@
-
+import { useEffect, useState } from 'react';
 import { Search, Plus, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { supabase } from '@/integrations/supabase/client';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 
-const patients = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    lastSession: "2025-04-20",
-    nextSession: "2025-04-27",
-    status: "Active",
-    progress: "Improving"
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    lastSession: "2025-04-19",
-    nextSession: "2025-04-26",
-    status: "Active",
-    progress: "Stable"
-  },
-  {
-    id: 3,
-    name: "Emily Wilson",
-    lastSession: "2025-04-18",
-    nextSession: "2025-04-25",
-    status: "Active",
-    progress: "Needs Attention"
-  }
-];
-
 export default function Patients() {
+  const [patients, setPatients] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'patient');
+
+      if (!error) {
+        setPatients(data || []);
+      }
+
+      setLoading(false);
+    };
+
+    fetchPatients();
+  }, []);
+
   return (
     <ClinicianLayout>
       <div className="space-y-6">
@@ -54,6 +48,8 @@ export default function Patients() {
         </div>
 
         <div className="grid gap-4">
+          {loading && <p>Loading patients...</p>}
+          {!loading && patients.length === 0 && <p>No patients found.</p>}
           {patients.map((patient) => (
             <Card key={patient.id} className="p-4">
               <div className="flex items-center gap-4">
@@ -61,13 +57,13 @@ export default function Patients() {
                   <User className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium">{patient.name}</h3>
+                  <h3 className="font-medium">
+                    {patient.first_name} {patient.last_name}
+                  </h3>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>Last Session: {patient.lastSession}</span>
+                    <span>Email: {patient.email}</span>
                     <span>•</span>
-                    <span>Next Session: {patient.nextSession}</span>
-                    <span>•</span>
-                    <span>Progress: {patient.progress}</span>
+                    <span>Language: {patient.language || 'N/A'}</span>
                   </div>
                 </div>
                 <Button variant="outline">View Profile</Button>
@@ -79,3 +75,4 @@ export default function Patients() {
     </ClinicianLayout>
   );
 }
+
