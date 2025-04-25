@@ -71,9 +71,12 @@ export default function SignupPatient() {
     }
     
     try {
+      
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ');
+
+      console.log('🚨 Referral code from form:', formData.referralCode);
 
       let referralCodeInput: string | null = null;
 
