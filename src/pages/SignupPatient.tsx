@@ -83,12 +83,16 @@ export default function SignupPatient() {
       if (formData.referralCode?.trim()) {
         referralCodeInput = formData.referralCode.trim().toUpperCase();
 
-        const { data: clinician, error } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .ilike('referral_code', referralCodeInput)
-          .eq('role', 'clinician')
-          .single();
+const { data: clinician, error } = await supabase
+  .from('profiles')
+  .select('*') // ⬅️ Select EVERYTHING so we can see the raw match
+  .ilike('referral_code', referralCodeInput)
+  .eq('role', 'clinician')
+  .maybeSingle();
+
+console.log('✅ Full raw response:', clinician);
+console.log('❌ error:', error);
+
 
         if (error || !clinician) {
           toast({
