@@ -37,6 +37,9 @@ export default function SignupPatient() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ✅ Add it right here after preventDefault
+  console.log('🌈 REFERRAL CHECK LOGIC IS RUNNING 🌈');
     
     if (step === 1) {
       if (formData.password !== formData.confirmPassword) {
@@ -83,15 +86,12 @@ export default function SignupPatient() {
       if (formData.referralCode?.trim()) {
         referralCodeInput = formData.referralCode.trim().toUpperCase();
 
-const { data: clinician, error } = await supabase
-  .from('profiles')
-  .select('*') // ⬅️ Select EVERYTHING so we can see the raw match
-  .ilike('referral_code', referralCodeInput)
-  .eq('role', 'clinician')
-  .maybeSingle();
-
-console.log('✅ Full raw response:', clinician);
-console.log('❌ error:', error);
+        const { data: clinician, error } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('referral_code', referralCodeInput)
+          .eq('role', 'clinician')
+          .single();
 
         if (error || !clinician) {
           toast({
