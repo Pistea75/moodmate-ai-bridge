@@ -78,28 +78,30 @@ export default function SignupPatient() {
 
       console.log('🚨 Referral code from form:', formData.referralCode);
 
-      let referralCodeInput: string | null = null;
+let referralCodeInput: string | null = null;
 
-      if (formData.referralCode?.trim()) {
-          referralCodeInput = formData.referralCode.trim().toUpperCase();
+if (formData.referralCode?.trim()) {
+  referralCodeInput = formData.referralCode.trim().toUpperCase();
 
-        const { data: clinician, error } = await supabase
-            .from('profiles')
-            .select('user_id')
-            .ilike('referral_code', referralCodeInput)
-            .eq('role', 'clinician')
-            .maybeSingle();
+  const { data: clinician, error } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .ilike('referral_code', referralCodeInput)
+    .eq('role', 'clinician')
+    .maybeSingle();
 
+  console.log('✅ Full raw response:', clinician);
+  console.log('❌ error:', error);
 
-        if (error || !clinician) {
-          toast({
-            title: "Invalid Referral Code",
-            description: "Please check the referral code with your clinician",
-            variant: "destructive"
-          });
-          return;
-        }
-      }
+  if (error || !clinician) {
+    toast({
+      title: "Invalid Referral Code",
+      description: "Please check the referral code with your clinician",
+      variant: "destructive"
+    });
+    return;
+  }
+}
 
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
