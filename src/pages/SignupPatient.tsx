@@ -88,7 +88,7 @@ export default function SignupPatient() {
           .select('user_id')
           .eq('referral_code', referralCodeInput)
           .eq('role', 'clinician')
-          .single();
+          .maybeSingle();
 
         if (error || !clinician) {
           toast({
