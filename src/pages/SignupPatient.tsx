@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -74,38 +75,42 @@ export default function SignupPatient() {
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ');
 
-      interface UserMetadata {
-        first_name: string;
-        last_name: string;
-        language: string;
-        role: string;
-        referral_code?: string;
-      }
-      
-      const metadata: UserMetadata = {
-        first_name: firstName,
-        last_name: lastName || '',
-        language: formData.language,
-        role: 'patient',
-      };
-      
-      if (formData.referralCode.trim()) {
-        metadata.referral_code = formData.referralCode.trim();
-      }
-      
-      console.log("Attempting patient signup with metadata:", metadata);
-      
-      const success = await signUp(formData.email.trim(), formData.password, metadata);
-      
-      if (success) {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName || '',
+            role: 'patient',
+            referral_code: formData.referralCode ? formData.referralCode.toUpperCase().trim() : null,
+            language: 'en'
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Signup error:', error);
         toast({
-          title: "Account Created",
-          description: "Please check your email to verify your account."
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
         });
-        navigate('/login');
+        return;
       }
+      
+      toast({
+        title: "Account Created",
+        description: "Please check your email to verify your account."
+      });
+      navigate('/login');
     } catch (err: any) {
       console.error("Signup error:", err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred during signup",
+        variant: "destructive"
+      });
     }
   };
 
