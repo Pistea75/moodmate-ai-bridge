@@ -88,7 +88,20 @@ export default function SignupPatient() {
           .select('user_id')
           .eq('referral_code', referralCodeInput)
           .eq('role', 'clinician')
-          .maybeSingle();
+          .single();
+
+// 🧪 Debug what Supabase is giving us
+console.log('👀 clinician:', clinician);
+console.log('❌ error:', error);
+
+if (error || !clinician) {
+  toast({
+    title: "Invalid Referral Code",
+    description: "Please check the referral code with your clinician",
+    variant: "destructive"
+  });
+  return;
+}
 
         if (error || !clinician) {
           toast({
