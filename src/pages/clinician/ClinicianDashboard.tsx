@@ -40,10 +40,13 @@ export default function ClinicianDashboard() {
     const fetchPatients = async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, first_name, last_name')
         .eq('role', 'patient');
 
-      if (!error) {
+      if (error) {
+        console.error('❌ Error fetching patients:', error);
+      } else {
+        console.log('✅ Visible patients:', data);
         setPatients(data || []);
       }
       setLoading(false);
@@ -54,33 +57,6 @@ export default function ClinicianDashboard() {
 
   return (
     <ClinicianLayout>
-
-      {/* 🔥 DEBUG BUTTON START */}
-      <button 
-        onClick={async () => {
-          const { data: userData } = await supabase.auth.getUser();
-          console.log('🧠 Logged in as:', userData?.user?.id);
-
-          const { data: profiles, error } = await supabase
-            .from('profiles')
-            .select('*');
-
-          console.log('👀 Visible profiles:', profiles);
-          console.log('❌ Error:', error);
-        }}
-        style={{
-          padding: '10px',
-          backgroundColor: '#a855f7',
-          color: 'white',
-          borderRadius: '6px',
-          margin: '20px 0',
-          display: 'block'
-        }}
-      >
-        DEBUG: Check Patient Connection
-      </button>
-      {/* 🔥 DEBUG BUTTON END */}
-
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Welcome, Dr. Johnson</h1>
@@ -128,9 +104,11 @@ export default function ClinicianDashboard() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Patient Spotlight</h2>
               <select className="border rounded-md px-3 py-1 text-sm">
-                <option>Alex Smith</option>
-                <option>Jamie Wilson</option>
-                <option>Taylor Brown</option>
+                {patients.map((patient) => (
+                  <option key={patient.id}>
+                    {patient.first_name} {patient.last_name}
+                  </option>
+                ))}
               </select>
             </div>
             <MoodChart />
@@ -152,14 +130,14 @@ export default function ClinicianDashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {['Alex Smith', 'Jamie Wilson', 'Taylor Brown'].map((patient) => (
-              <div key={patient} className="bg-white rounded-xl border p-4">
+            {patients.map((patient) => (
+              <div key={patient.id} className="bg-white rounded-xl border p-4">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                    {patient.charAt(0)}
+                    {patient.first_name?.charAt(0)}
                   </div>
                   <div>
-                    <h3 className="font-medium">{patient}</h3>
+                    <h3 className="font-medium">{patient.first_name} {patient.last_name}</h3>
                     <p className="text-xs text-muted-foreground">Latest report: Apr 20, 2025</p>
                   </div>
                 </div>
@@ -167,7 +145,7 @@ export default function ClinicianDashboard() {
                   Patient has shown improvement in managing anxiety symptoms through consistent practice of mindfulness techniques. Sleep patterns have stabilized...
                 </p>
                 <a 
-                  href={`/clinician/reports/${patient.toLowerCase().replace(' ', '-')}`}
+                  href={`/clinician/reports/${patient.first_name?.toLowerCase()}-${patient.last_name?.toLowerCase()}`}
                   className="text-mood-purple text-sm font-medium mt-3 inline-block hover:underline"
                 >
                   View Full Report
@@ -177,7 +155,6 @@ export default function ClinicianDashboard() {
           </div>
         </div>
       </div>
-
     </ClinicianLayout>
   );
 }
