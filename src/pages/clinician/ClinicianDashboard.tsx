@@ -4,6 +4,7 @@ import { MoodChart } from '../../components/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard, Session } from '../../components/SessionCard';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
+import { startOfDay, endOfDay } from 'date-fns'; // 📅 added for cleaner date filtering
 
 const upcomingSessions: Session[] = [
   {
@@ -35,6 +36,7 @@ const upcomingSessions: Session[] = [
 export default function ClinicianDashboard() {
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sessionsToday, setSessionsToday] = useState<number>(0);
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -52,7 +54,23 @@ export default function ClinicianDashboard() {
       setLoading(false);
     };
 
+    const fetchSessionsToday = async () => {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('*')
+        .gte('scheduled_time', startOfDay(new Date()).toISOString())
+        .lte('scheduled_time', endOfDay(new Date()).toISOString());
+
+      if (error) {
+        console.error('❌ Error fetching sessions today:', error);
+      } else {
+        console.log('✅ Sessions Today:', data);
+        setSessionsToday(data.length);
+      }
+    };
+
     fetchPatients();
+    fetchSessionsToday();
   }, []);
 
   return (
@@ -72,11 +90,13 @@ export default function ClinicianDashboard() {
           </div>
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Sessions Today</div>
-            <div className="text-2xl font-bold mt-1">3</div>
+            <div className="text-2xl font-bold mt-1">
+              {loading ? '...' : sessionsToday}
+            </div>
           </div>
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Pending Tasks</div>
-            <div className="text-2xl font-bold mt-1">5</div>
+            <div className="text-2xl font-bold mt-1">5</div> {/* we'll update this after sessions */}
           </div>
         </div>
 
@@ -158,3 +178,4 @@ export default function ClinicianDashboard() {
     </ClinicianLayout>
   );
 }
+
