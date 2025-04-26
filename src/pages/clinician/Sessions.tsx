@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react';
+
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Mic } from "lucide-react";
-import { SessionCard, Session } from "@/components/SessionCard";
+import { Mic } from "lucide-react";
+import { SessionCard } from "@/components/SessionCard";
+import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Sessions() {
   const { toast } = useToast();
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,27 +21,16 @@ export default function Sessions() {
           id,
           scheduled_time,
           duration_minutes,
-          status,
-          patient:patient_id (
-            first_name,
-            last_name
-          )
+          profiles!sessions_patient_id_fkey (first_name, last_name)
         `)
+        .gte('scheduled_time', new Date().toISOString())
         .order('scheduled_time', { ascending: true });
 
       if (error) {
         console.error('❌ Error fetching sessions:', error);
       } else {
-        const mappedSessions: Session[] = (data || []).map((session: any) => ({
-          id: session.id,
-          title: 'Therapy Session',
-          dateTime: session.scheduled_time,
-          duration: session.duration_minutes ?? 50,
-          patientName: session.patient ? `${session.patient.first_name} ${session.patient.last_name}` : 'Unknown',
-          status: session.status,
-        }));
-
-        setSessions(mappedSessions);
+        console.log('✅ Upcoming Sessions:', data);
+        setSessions(data || []);
       }
       setLoading(false);
     };
@@ -90,17 +80,24 @@ export default function Sessions() {
 
         <div className="grid gap-4">
           {loading ? (
-            <div>Loading sessions...</div>
+            <p>Loading sessions...</p>
           ) : sessions.length > 0 ? (
             sessions.map((session) => (
               <SessionCard
                 key={session.id}
-                session={session}
+                session={{
+                  id: session.id,
+                  title: "Therapy Session",
+                  dateTime: session.scheduled_time,
+                  duration: session.duration_minutes,
+                  patientName: `${session.profiles.first_name} ${session.profiles.last_name}`,
+                  status: "upcoming",
+                }}
                 variant="clinician"
               />
             ))
           ) : (
-            <div className="text-muted-foreground text-sm">No sessions scheduled yet.</div>
+            <p>No upcoming sessions scheduled.</p>
           )}
         </div>
       </div>
