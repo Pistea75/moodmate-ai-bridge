@@ -54,6 +54,33 @@ export default function ClinicianDashboard() {
 
   return (
     <ClinicianLayout>
+
+      {/* 🔥 DEBUG BUTTON START */}
+      <button 
+        onClick={async () => {
+          const { data: userData } = await supabase.auth.getUser();
+          console.log('🧠 Logged in as:', userData?.user?.id);
+
+          const { data: profiles, error } = await supabase
+            .from('profiles')
+            .select('*');
+
+          console.log('👀 Visible profiles:', profiles);
+          console.log('❌ Error:', error);
+        }}
+        style={{
+          padding: '10px',
+          backgroundColor: '#a855f7',
+          color: 'white',
+          borderRadius: '6px',
+          margin: '20px 0',
+          display: 'block'
+        }}
+      >
+        DEBUG: Check Patient Connection
+      </button>
+      {/* 🔥 DEBUG BUTTON END */}
+
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Welcome, Dr. Johnson</h1>
@@ -150,6 +177,7 @@ export default function ClinicianDashboard() {
           </div>
         </div>
       </div>
+
     </ClinicianLayout>
   );
 }
