@@ -80,6 +80,27 @@ export type Database = {
           },
         ]
       }
+      patient_clinician_links: {
+        Row: {
+          clinician_id: string | null
+          created_at: string | null
+          id: string
+          patient_id: string | null
+        }
+        Insert: {
+          clinician_id?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string | null
+        }
+        Update: {
+          clinician_id?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -145,6 +166,51 @@ export type Database = {
           },
         ]
       }
+      sessions: {
+        Row: {
+          clinician_id: string | null
+          created_at: string | null
+          duration_minutes: number
+          id: string
+          patient_id: string | null
+          scheduled_time: string
+          status: string | null
+        }
+        Insert: {
+          clinician_id?: string | null
+          created_at?: string | null
+          duration_minutes: number
+          id?: string
+          patient_id?: string | null
+          scheduled_time: string
+          status?: string | null
+        }
+        Update: {
+          clinician_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number
+          id?: string
+          patient_id?: string | null
+          scheduled_time?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "sessions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       users: {
         Row: {
           email: string | null
@@ -171,7 +237,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      clinician_referral_codes: {
+        Row: {
+          clinician_id: string | null
+          referral_code: string | null
+        }
+        Insert: {
+          clinician_id?: string | null
+          referral_code?: string | null
+        }
+        Update: {
+          clinician_id?: string | null
+          referral_code?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
