@@ -1,65 +1,56 @@
 
+import { useEffect, useState } from 'react';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mic } from "lucide-react";
 import { SessionCard } from "@/components/SessionCard";
-import { useEffect, useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from "@/components/ui/skeleton"; // 🦴 Import Skeleton
+import { supabase } from "@/integrations/supabase/client";
+import { startOfDay } from 'date-fns'; // 📅 We'll only show upcoming sessions
 
 export default function Sessions() {
-  const { toast } = useToast();
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSessions = async () => {
-      const now = new Date();
-
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('sessions')
         .select(`
           id,
           scheduled_time,
           duration_minutes,
-          profiles!sessions_patient_id_fkey (first_name, last_name)
+          patient:patient_id (
+            id,
+            first_name,
+            last_name
+          )
         `)
-        .gte('scheduled_time', now.toISOString())
-        .order('scheduled_time', { ascending: true });
+        .gte('scheduled_time', startOfDay(new Date()).toISOString());
 
-      if (error) {
-        console.error('❌ Error fetching sessions:', error);
-      } else {
-        console.log('✅ Upcoming Sessions:', data);
-        setSessions(data || []);
-      }
+      setSessions(data || []);
       setLoading(false);
     };
 
     fetchSessions();
   }, []);
 
-  const handleScheduleSession = () => {
-    toast({
-      title: "Session Scheduled",
-      description: "New session has been scheduled successfully.",
-    });
-  };
-
   return (
     <ClinicianLayout>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Sessions</h1>
             <p className="text-muted-foreground">Manage your therapy sessions</p>
           </div>
-          <Button className="bg-mood-purple hover:bg-mood-purple/90" onClick={handleScheduleSession}>
+          <Button className="bg-mood-purple hover:bg-mood-purple/90">
             Schedule Session
           </Button>
         </div>
 
+        {/* Recording Info */}
         <Card className="p-4 mb-4 bg-muted/30">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-1">
             <div className="flex-shrink-0 bg-mood-purple/10 p-3 rounded-full">
@@ -80,27 +71,32 @@ export default function Sessions() {
           </div>
         </Card>
 
+        {/* Sessions List */}
         {loading ? (
-          <p>Loading sessions...</p>
-        ) : sessions.length === 0 ? (
-          <p className="text-center text-muted-foreground mt-6">No upcoming sessions.</p>
-        ) : (
           <div className="grid gap-4">
-            {sessions.map((session) => (
+            {[...Array(2)].map((_, idx) => (
+              <Skeleton key={idx} className="h-24 w-full rounded-lg" />
+            ))}
+          </div>
+        ) : sessions.length > 0 ? (
+          <div className="grid gap-4">
+            {sessions.map((session: any) => (
               <SessionCard
                 key={session.id}
                 session={{
                   id: session.id,
-                  title: "Therapy Session",
+                  title: 'Therapy Session',
                   dateTime: session.scheduled_time,
                   duration: session.duration_minutes,
-                  patientName: `${session.profiles.first_name} ${session.profiles.last_name}`,
-                  status: "upcoming",
+                  patientName: `${session.patient.first_name} ${session.patient.last_name}`,
+                  status: 'upcoming'
                 }}
                 variant="clinician"
               />
             ))}
           </div>
+        ) : (
+          <div className="text-muted-foreground text-sm">No upcoming sessions scheduled.</div>
         )}
       </div>
     </ClinicianLayout>
