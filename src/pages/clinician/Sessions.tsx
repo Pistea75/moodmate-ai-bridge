@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mic } from "lucide-react";
 import { SessionCard } from "@/components/SessionCard";
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 
@@ -15,6 +15,8 @@ export default function Sessions() {
 
   useEffect(() => {
     const fetchSessions = async () => {
+      const now = new Date();
+
       const { data, error } = await supabase
         .from('sessions')
         .select(`
@@ -23,7 +25,7 @@ export default function Sessions() {
           duration_minutes,
           profiles!sessions_patient_id_fkey (first_name, last_name)
         `)
-        .gte('scheduled_time', new Date().toISOString())
+        .gte('scheduled_time', now.toISOString())
         .order('scheduled_time', { ascending: true });
 
       if (error) {
@@ -78,11 +80,13 @@ export default function Sessions() {
           </div>
         </Card>
 
-        <div className="grid gap-4">
-          {loading ? (
-            <p>Loading sessions...</p>
-          ) : sessions.length > 0 ? (
-            sessions.map((session) => (
+        {loading ? (
+          <p>Loading sessions...</p>
+        ) : sessions.length === 0 ? (
+          <p className="text-center text-muted-foreground mt-6">No upcoming sessions.</p>
+        ) : (
+          <div className="grid gap-4">
+            {sessions.map((session) => (
               <SessionCard
                 key={session.id}
                 session={{
@@ -95,11 +99,9 @@ export default function Sessions() {
                 }}
                 variant="clinician"
               />
-            ))
-          ) : (
-            <p>No upcoming sessions scheduled.</p>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </ClinicianLayout>
   );
