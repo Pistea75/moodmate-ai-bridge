@@ -1,34 +1,52 @@
-
+import { useEffect, useState } from 'react';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Mic } from "lucide-react";
-import { SessionCard } from "@/components/SessionCard";
-import { useState } from 'react';
+import { SessionCard, Session } from "@/components/SessionCard";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Sessions() {
   const { toast } = useToast();
-  const [sessions, setSessions] = useState([
-    {
-      id: "1",
-      title: "Weekly Therapy",
-      dateTime: "2025-04-24T10:00:00",
-      duration: 50,
-      patientName: "Sarah Johnson",
-      notes: "Focus on anxiety management techniques",
-      status: "upcoming" as const
-    },
-    {
-      id: "2",
-      title: "Follow-up Session",
-      dateTime: "2025-05-01T11:30:00",
-      duration: 30,
-      patientName: "Michael Chen",
-      notes: "Review progress on sleep habits",
-      status: "upcoming" as const
-    }
-  ]);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select(`
+          id,
+          scheduled_time,
+          duration_minutes,
+          status,
+          patient:patient_id (
+            first_name,
+            last_name
+          )
+        `)
+        .order('scheduled_time', { ascending: true });
+
+      if (error) {
+        console.error('❌ Error fetching sessions:', error);
+      } else {
+        const mappedSessions: Session[] = (data || []).map((session: any) => ({
+          id: session.id,
+          title: 'Therapy Session',
+          dateTime: session.scheduled_time,
+          duration: session.duration_minutes ?? 50,
+          patientName: session.patient ? `${session.patient.first_name} ${session.patient.last_name}` : 'Unknown',
+          status: session.status,
+        }));
+
+        setSessions(mappedSessions);
+      }
+      setLoading(false);
+    };
+
+    fetchSessions();
+  }, []);
 
   const handleScheduleSession = () => {
     toast({
@@ -71,13 +89,19 @@ export default function Sessions() {
         </Card>
 
         <div className="grid gap-4">
-          {sessions.map((session) => (
-            <SessionCard
-              key={session.id}
-              session={session}
-              variant="clinician"
-            />
-          ))}
+          {loading ? (
+            <div>Loading sessions...</div>
+          ) : sessions.length > 0 ? (
+            sessions.map((session) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                variant="clinician"
+              />
+            ))
+          ) : (
+            <div className="text-muted-foreground text-sm">No sessions scheduled yet.</div>
+          )}
         </div>
       </div>
     </ClinicianLayout>
