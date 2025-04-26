@@ -2,15 +2,14 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MoodChart } from '../../components/MoodChart';
 import { TaskList } from '../../components/TaskList';
-import { SessionCard, Session } from '../../components/SessionCard';
+import { SessionCard } from '../../components/SessionCard';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
-import { startOfDay, endOfDay, isAfter } from 'date-fns'; // 🗓️ for date handling
+import { startOfDay, endOfDay, isAfter } from 'date-fns'; // 📅
 
 export default function ClinicianDashboard() {
   const [patients, setPatients] = useState<any[]>([]);
+  const [sessionsToday, setSessionsToday] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sessionsToday, setSessionsToday] = useState<number>(0);
-  const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -22,79 +21,72 @@ export default function ClinicianDashboard() {
       if (error) {
         console.error('❌ Error fetching patients:', error);
       } else {
-        console.log('✅ Patients:', data);
         setPatients(data || []);
       }
     };
 
-    const fetchSessions = async () => {
+    const fetchSessionsToday = async () => {
       const { data, error } = await supabase
         .from('sessions')
-        .select('id, scheduled_time, duration_minutes, status, patient_id');
+        .select(`
+          id,
+          scheduled_time,
+          duration_minutes,
+          patient:patient_id (
+            id,
+            first_name,
+            last_name
+          )
+        `)
+        .gte('scheduled_time', startOfDay(new Date()).toISOString())
+        .lte('scheduled_time', endOfDay(new Date()).toISOString());
 
       if (error) {
         console.error('❌ Error fetching sessions:', error);
-        return;
+      } else {
+        setSessionsToday(data || []);
       }
-
-      const now = new Date();
-      const upcoming = (data || [])
-        .filter((session: any) => isAfter(new Date(session.scheduled_time), now))
-        .map((session: any) => {
-          const patient = patients.find((p) => p.id === session.patient_id);
-          return {
-            id: session.id,
-            title: 'Therapy Session', // You can customize title later
-            dateTime: session.scheduled_time,
-            duration: session.duration_minutes,
-            patientName: patient ? `${patient.first_name} ${patient.last_name}` : 'Unknown Patient',
-            status: session.status,
-          } as Session;
-        });
-
-      setUpcomingSessions(upcoming);
-
-      const todaySessions = (data || []).filter((session: any) => {
-        const scheduled = new Date(session.scheduled_time);
-        return scheduled >= startOfDay(now) && scheduled <= endOfDay(now);
-      });
-
-      setSessionsToday(todaySessions.length);
     };
 
-    const loadDashboardData = async () => {
-      setLoading(true);
-      await fetchPatients();
-      await fetchSessions();
-      setLoading(false);
-    };
-
-    loadDashboardData();
+    fetchPatients();
+    fetchSessionsToday();
+    setLoading(false);
   }, []);
+
+  const upcomingSessions = sessionsToday.filter(
+    (session: any) => isAfter(new Date(session.scheduled_time), new Date())
+  );
 
   return (
     <ClinicianLayout>
       <div className="space-y-6">
+        {/* Welcome Section */}
         <div>
           <h1 className="text-2xl font-bold">Welcome, Dr. Johnson</h1>
           <p className="text-muted-foreground">Here's your practice overview for today</p>
         </div>
 
+        {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Total Patients</div>
-            <div className="text-2xl font-bold mt-1">{loading ? '...' : patients.length}</div>
+            <div className="text-2xl font-bold mt-1">
+              {loading ? '...' : patients.length}
+            </div>
           </div>
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Sessions Today</div>
-            <div className="text-2xl font-bold mt-1">{loading ? '...' : sessionsToday}</div>
+            <div className="text-2xl font-bold mt-1">
+              {loading ? '...' : sessionsToday.length}
+            </div>
           </div>
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Pending Tasks</div>
-            <div className="text-2xl font-bold mt-1">5</div> {/* 🔥 Will update dynamically later */}
+            <div className="text-2xl font-bold mt-1">5</div> {/* You can later fetch real tasks */}
           </div>
         </div>
 
+        {/* Upcoming Sessions */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
@@ -103,20 +95,31 @@ export default function ClinicianDashboard() {
             </a>
           </div>
 
-          <div className="space-y-4">
-            {loading ? (
-              <p>Loading sessions...</p>
-            ) : upcomingSessions.length > 0 ? (
-              upcomingSessions.map((session) => (
-                <SessionCard key={session.id} session={session} variant="clinician" />
-              ))
-            ) : (
-              <p className="text-muted-foreground">No upcoming sessions.</p>
-            )}
-          </div>
+          {upcomingSessions.length > 0 ? (
+            <div className="space-y-4">
+              {upcomingSessions.map((session: any) => (
+                <SessionCard
+                  key={session.id}
+                  session={{
+                    id: session.id,
+                    title: 'Therapy Session',
+                    dateTime: session.scheduled_time,
+                    duration: session.duration_minutes,
+                    patientName: `${session.patient.first_name} ${session.patient.last_name}`,
+                    status: 'upcoming'
+                  }}
+                  variant="clinician"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground text-sm">No upcoming sessions.</div>
+          )}
         </div>
 
+        {/* Spotlight and Tasks */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Patient Spotlight */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Patient Spotlight</h2>
@@ -131,6 +134,7 @@ export default function ClinicianDashboard() {
             <MoodChart />
           </div>
 
+          {/* Tasks */}
           <div>
             <div className="mb-4">
               <h2 className="text-xl font-semibold">Tasks This Week</h2>
@@ -139,6 +143,7 @@ export default function ClinicianDashboard() {
           </div>
         </div>
 
+        {/* Recent Reports */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Recent Reports</h2>
@@ -176,4 +181,5 @@ export default function ClinicianDashboard() {
     </ClinicianLayout>
   );
 }
+
 
