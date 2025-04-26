@@ -4,39 +4,24 @@ import { MoodChart } from '../../components/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard, Session } from '../../components/SessionCard';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
-import { startOfDay, endOfDay } from 'date-fns'; // 📅 added for cleaner date filtering
+import { startOfDay, endOfDay, isAfter } from 'date-fns';
 
-const upcomingSessions: Session[] = [
-  {
-    id: '1',
-    title: 'Weekly Therapy Session',
-    dateTime: '2025-04-27T10:00:00',
-    duration: 50,
-    patientName: 'Alex Smith',
-    status: 'upcoming'
-  },
-  {
-    id: '2',
-    title: 'Initial Assessment',
-    dateTime: '2025-04-27T13:30:00',
-    duration: 60,
-    patientName: 'Jamie Wilson',
-    status: 'upcoming'
-  },
-  {
-    id: '3',
-    title: 'Follow-up Discussion',
-    dateTime: '2025-04-28T11:00:00',
-    duration: 30,
-    patientName: 'Taylor Brown',
-    status: 'upcoming'
-  }
-];
+interface DatabaseSession {
+  id: string;
+  scheduled_time: string;
+  duration_minutes: number;
+  status: string;
+  patient: {
+    first_name: string;
+    last_name: string;
+  } | null;
+}
 
 export default function ClinicianDashboard() {
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sessionsToday, setSessionsToday] = useState<number>(0);
+  const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -54,23 +39,52 @@ export default function ClinicianDashboard() {
       setLoading(false);
     };
 
-    const fetchSessionsToday = async () => {
+    const fetchSessions = async () => {
       const { data, error } = await supabase
         .from('sessions')
-        .select('*')
-        .gte('scheduled_time', startOfDay(new Date()).toISOString())
-        .lte('scheduled_time', endOfDay(new Date()).toISOString());
+        .select(`
+          id,
+          scheduled_time,
+          duration_minutes,
+          status,
+          patient:patient_id (first_name, last_name)
+        `);
 
       if (error) {
-        console.error('❌ Error fetching sessions today:', error);
-      } else {
-        console.log('✅ Sessions Today:', data);
-        setSessionsToday(data.length);
+        console.error('❌ Error fetching sessions:', error);
+        return;
       }
+
+      const today = new Date();
+      const startToday = startOfDay(today);
+      const endToday = endOfDay(today);
+
+      const todaySessions = data?.filter((session: DatabaseSession) => {
+        const sessionDate = new Date(session.scheduled_time);
+        return sessionDate >= startToday && sessionDate <= endToday;
+      }) ?? [];
+
+      const upcoming = data?.filter((session: DatabaseSession) => {
+        const sessionDate = new Date(session.scheduled_time);
+        return isAfter(sessionDate, today);
+      }) ?? [];
+
+      setSessionsToday(todaySessions.length);
+
+      const formattedSessions: Session[] = upcoming.map((session: DatabaseSession) => ({
+        id: session.id,
+        title: "Therapy Session",
+        dateTime: session.scheduled_time,
+        duration: session.duration_minutes,
+        patientName: session.patient ? `${session.patient.first_name} ${session.patient.last_name}` : 'Unknown',
+        status: session.status as Session["status"],
+      }));
+
+      setUpcomingSessions(formattedSessions);
     };
 
     fetchPatients();
-    fetchSessionsToday();
+    fetchSessions();
   }, []);
 
   return (
@@ -96,7 +110,7 @@ export default function ClinicianDashboard() {
           </div>
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Pending Tasks</div>
-            <div className="text-2xl font-bold mt-1">5</div> {/* we'll update this after sessions */}
+            <div className="text-2xl font-bold mt-1">5</div> {/* todo later */}
           </div>
         </div>
 
@@ -178,4 +192,5 @@ export default function ClinicianDashboard() {
     </ClinicianLayout>
   );
 }
+
 
