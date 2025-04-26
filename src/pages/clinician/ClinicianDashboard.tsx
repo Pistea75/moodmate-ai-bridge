@@ -3,30 +3,29 @@ import { supabase } from '@/integrations/supabase/client';
 import { MoodChart } from '../../components/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard } from '../../components/SessionCard';
+import { Skeleton } from "@/components/ui/skeleton"; // 🦴 Import Skeleton
 import ClinicianLayout from '../../layouts/ClinicianLayout';
-import { startOfDay, endOfDay, isAfter } from 'date-fns'; // 📅
+import { startOfDay, endOfDay, isAfter } from 'date-fns'; 
 
 export default function ClinicianDashboard() {
   const [patients, setPatients] = useState<any[]>([]);
   const [sessionsToday, setSessionsToday] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingPatients, setLoadingPatients] = useState(true);
+  const [loadingSessions, setLoadingSessions] = useState(true);
 
   useEffect(() => {
     const fetchPatients = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('id, first_name, last_name')
         .eq('role', 'patient');
-
-      if (error) {
-        console.error('❌ Error fetching patients:', error);
-      } else {
-        setPatients(data || []);
-      }
+      
+      setPatients(data || []);
+      setLoadingPatients(false);
     };
 
     const fetchSessionsToday = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('sessions')
         .select(`
           id,
@@ -40,17 +39,13 @@ export default function ClinicianDashboard() {
         `)
         .gte('scheduled_time', startOfDay(new Date()).toISOString())
         .lte('scheduled_time', endOfDay(new Date()).toISOString());
-
-      if (error) {
-        console.error('❌ Error fetching sessions:', error);
-      } else {
-        setSessionsToday(data || []);
-      }
+      
+      setSessionsToday(data || []);
+      setLoadingSessions(false);
     };
 
     fetchPatients();
     fetchSessionsToday();
-    setLoading(false);
   }, []);
 
   const upcomingSessions = sessionsToday.filter(
@@ -60,7 +55,8 @@ export default function ClinicianDashboard() {
   return (
     <ClinicianLayout>
       <div className="space-y-6">
-        {/* Welcome Section */}
+
+        {/* Welcome */}
         <div>
           <h1 className="text-2xl font-bold">Welcome, Dr. Johnson</h1>
           <p className="text-muted-foreground">Here's your practice overview for today</p>
@@ -71,18 +67,18 @@ export default function ClinicianDashboard() {
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Total Patients</div>
             <div className="text-2xl font-bold mt-1">
-              {loading ? '...' : patients.length}
+              {loadingPatients ? <Skeleton className="h-8 w-16" /> : patients.length}
             </div>
           </div>
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Sessions Today</div>
             <div className="text-2xl font-bold mt-1">
-              {loading ? '...' : sessionsToday.length}
+              {loadingSessions ? <Skeleton className="h-8 w-16" /> : sessionsToday.length}
             </div>
           </div>
           <div className="bg-white p-4 rounded-xl border">
             <div className="text-sm text-muted-foreground">Pending Tasks</div>
-            <div className="text-2xl font-bold mt-1">5</div> {/* You can later fetch real tasks */}
+            <div className="text-2xl font-bold mt-1">5</div>
           </div>
         </div>
 
@@ -90,12 +86,16 @@ export default function ClinicianDashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
-            <a href="/clinician/sessions" className="text-sm text-mood-purple hover:underline">
-              View All
-            </a>
+            <a href="/clinician/sessions" className="text-sm text-mood-purple hover:underline">View All</a>
           </div>
 
-          {upcomingSessions.length > 0 ? (
+          {loadingSessions ? (
+            <div className="space-y-4">
+              {[...Array(2)].map((_, idx) => (
+                <Skeleton key={idx} className="h-24 w-full rounded-lg" />
+              ))}
+            </div>
+          ) : upcomingSessions.length > 0 ? (
             <div className="space-y-4">
               {upcomingSessions.map((session: any) => (
                 <SessionCard
@@ -119,7 +119,6 @@ export default function ClinicianDashboard() {
 
         {/* Spotlight and Tasks */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Patient Spotlight */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Patient Spotlight</h2>
@@ -133,8 +132,6 @@ export default function ClinicianDashboard() {
             </div>
             <MoodChart />
           </div>
-
-          {/* Tasks */}
           <div>
             <div className="mb-4">
               <h2 className="text-xl font-semibold">Tasks This Week</h2>
@@ -147,9 +144,7 @@ export default function ClinicianDashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Recent Reports</h2>
-            <a href="/clinician/reports" className="text-sm text-mood-purple hover:underline">
-              View All
-            </a>
+            <a href="/clinician/reports" className="text-sm text-mood-purple hover:underline">View All</a>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -165,7 +160,7 @@ export default function ClinicianDashboard() {
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-3">
-                  Patient has shown improvement in managing anxiety symptoms through consistent practice of mindfulness techniques. Sleep patterns have stabilized...
+                  Patient has shown improvement in managing anxiety symptoms through consistent practice of mindfulness techniques.
                 </p>
                 <a
                   href={`/clinician/reports/${patient.first_name?.toLowerCase()}-${patient.last_name?.toLowerCase()}`}
@@ -177,9 +172,9 @@ export default function ClinicianDashboard() {
             ))}
           </div>
         </div>
+
       </div>
     </ClinicianLayout>
   );
 }
-
 
