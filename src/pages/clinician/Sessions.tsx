@@ -55,17 +55,9 @@ export default function Sessions() {
     all: sessions,
   };
 
-  // Helper function to render session count indicators for each date
-  const getTileContent = (date: Date) => {
-    const sessionsOnDate = sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
-    if (sessionsOnDate.length > 0) {
-      return (
-        <div className="text-[10px] text-center mt-1 text-mood-purple font-semibold">
-          {sessionsOnDate.length}x
-        </div>
-      );
-    }
-    return null;
+  // Helper function to get session count for a specific date
+  const getSessionsForDate = (date: Date) => {
+    return sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
   };
 
   return (
@@ -121,12 +113,21 @@ export default function Sessions() {
                       initialFocus
                       className="pointer-events-auto"
                       components={{
-                        DayContent: ({ date, ...props }) => (
-                          <div className="relative flex h-8 w-8 items-center justify-center p-0">
-                            <div {...props} />
-                            {getTileContent(date)}
-                          </div>
-                        ),
+                        DayContent: (props) => {
+                          const date = props.date;
+                          const sessionsOnDate = getSessionsForDate(date);
+                          
+                          return (
+                            <div className="relative flex h-8 w-8 items-center justify-center p-0">
+                              <props.Component {...props} />
+                              {sessionsOnDate.length > 0 && (
+                                <div className="text-[10px] text-center mt-1 absolute bottom-0 text-mood-purple font-semibold">
+                                  {sessionsOnDate.length}x
+                                </div>
+                              )}
+                            </div>
+                          );
+                        },
                       }}
                     />
                   </PopoverContent>
