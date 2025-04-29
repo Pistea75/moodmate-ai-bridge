@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SessionCard } from "@/components/SessionCard";
 import { useToast } from "@/hooks/use-toast";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import { Calendar } from "@/components/ui/calendar";
 import { supabase } from "@/integrations/supabase/client";
-import { isSameDay, isBefore, isAfter } from "date-fns";
+import { isSameDay, isBefore } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Sessions() {
   const { toast } = useToast();
@@ -53,6 +55,19 @@ export default function Sessions() {
     all: sessions,
   };
 
+  // Helper function to render session count indicators for each date
+  const getTileContent = (date: Date) => {
+    const sessionsOnDate = sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
+    if (sessionsOnDate.length > 0) {
+      return (
+        <div className="text-[10px] text-center mt-1 text-mood-purple font-semibold">
+          {sessionsOnDate.length}x
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <ClinicianLayout>
       <div className="space-y-6">
@@ -76,23 +91,47 @@ export default function Sessions() {
           {/* UPCOMING */}
           <TabsContent value="upcoming">
             <Card className="p-4">
-              <Calendar
-                onChange={(date: Date) => setSelectedDate(date)}
-                value={selectedDate}
-                tileContent={({ date, view }) => {
-                  if (
-                    view === "month" &&
-                    sessions.some((s) => isSameDay(new Date(s.scheduled_time), date))
-                  ) {
-                    return (
-                      <div className="text-[10px] text-center mt-1 text-mood-purple font-semibold">
-                        {sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date)).length}x
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
+              <div className="flex justify-center mb-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[280px] justify-start text-left font-normal",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? (
+                        selectedDate.toLocaleDateString('en-US', { 
+                          month: 'long', 
+                          day: 'numeric',
+                          year: 'numeric'
+                        })
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => setSelectedDate(date || new Date())}
+                      initialFocus
+                      className="pointer-events-auto"
+                      components={{
+                        DayContent: ({ date, ...props }) => (
+                          <div className="relative flex h-8 w-8 items-center justify-center p-0">
+                            <div {...props} />
+                            {getTileContent(date)}
+                          </div>
+                        ),
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </Card>
 
             <div className="grid gap-4 mt-6">
