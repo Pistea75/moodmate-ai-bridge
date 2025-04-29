@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import ClinicianLayout from "../../layouts/ClinicianLayout";
 import { Card } from "@/components/ui/card";
@@ -162,4 +163,3 @@ export default function Sessions() {
     </ClinicianLayout>
   );
 }
-
