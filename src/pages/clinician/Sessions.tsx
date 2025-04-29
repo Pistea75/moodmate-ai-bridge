@@ -113,12 +113,15 @@ export default function Sessions() {
                       initialFocus
                       className="pointer-events-auto"
                       components={{
-                        DayContent: ({ date, ...props }) => {
+                        DayContent: (props) => {
+                          // Extract the date from props
+                          const { date } = props;
                           const sessionsOnDate = getSessionsForDate(date);
                           
                           return (
                             <div className="relative flex h-8 w-8 items-center justify-center p-0">
-                              <div {...props} />
+                              {/* Use a standard div without passing the active modifiers */}
+                              <div className="h-8 w-8 flex items-center justify-center">{date.getDate()}</div>
                               {sessionsOnDate.length > 0 && (
                                 <div className="text-[10px] text-center mt-1 absolute bottom-0 text-mood-purple font-semibold">
                                   {sessionsOnDate.length}x
