@@ -8,35 +8,38 @@ import { SessionTabs } from "@/components/SessionTabs";
 import { SessionHeader } from "@/components/SessionHeader";
 import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
 
+// ✅ Custom Type
+interface SessionWithPatient {
+  id: string;
+  scheduled_time: string;
+  duration_minutes: number;
+  status?: string;
+  notes?: string;
+  patient_id: string;
+  patient: {
+    first_name: string;
+    last_name: string;
+  };
+}
+
 export default function Sessions() {
   const { toast } = useToast();
-
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<SessionWithPatient[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
 
-  const today = new Date();
-
-  // Fetch all sessions with patient name
   const fetchSessions = async () => {
     setLoading(true);
-
     const { data, error } = await supabase
       .from("sessions")
-      .select(`
-        *,
-        patient:patient_id (
-          first_name,
-          last_name
-        )
-      `)
+      .select("*, patient:patient_id(first_name, last_name)")
       .order("scheduled_time", { ascending: true });
 
     if (error) {
       console.error("❌ Error fetching sessions:", error);
     } else {
-      setSessions(data || []);
+      setSessions((data || []) as SessionWithPatient[]);
     }
 
     setLoading(false);
@@ -46,38 +49,35 @@ export default function Sessions() {
     fetchSessions();
   }, []);
 
-  // Tabs filtering
+  const today = new Date();
+
   const filtered = {
     upcoming: sessions.filter((s) => isSameDay(new Date(s.scheduled_time), selectedDate)),
     past: sessions.filter((s) => isBefore(new Date(s.scheduled_time), today)),
     all: sessions,
   };
 
-  // Calendar marker count
-  const getSessionsForDate = (date: Date) =>
-    sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
+  const getSessionsForDate = (date: Date) => {
+    return sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
+  };
 
   return (
     <ClinicianLayout>
       <div className="space-y-6">
-
-        {/* Header + Calendar + Schedule Button */}
-        <SessionHeader
+        <SessionHeader 
           onScheduleSession={() => setOpenModal(true)}
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           getSessionsForDate={getSessionsForDate}
         />
 
-        {/* Session Tabs (Upcoming / Past / All) */}
-        <SessionTabs
+        <SessionTabs 
           loading={loading}
           filtered={filtered}
           selectedDate={selectedDate}
         />
 
-        {/* Modal for scheduling session */}
-        <ScheduleSessionModal
+        <ScheduleSessionModal 
           open={openModal}
           onClose={() => setOpenModal(false)}
           onScheduled={() => {
@@ -86,7 +86,7 @@ export default function Sessions() {
               description: "The session was successfully created.",
             });
             setOpenModal(false);
-            fetchSessions(); // Refresh the list
+            fetchSessions();
           }}
         />
       </div>
