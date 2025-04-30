@@ -12,10 +12,9 @@ interface SessionTabsProps {
     all: any[];
   };
   selectedDate: Date;
-  SessionCalendarComponent: React.ReactNode;
 }
 
-export function SessionTabs({ loading, filtered, selectedDate, SessionCalendarComponent }: SessionTabsProps) {
+export function SessionTabs({ loading, filtered, selectedDate }: SessionTabsProps) {
   return (
     <Tabs defaultValue="upcoming" className="space-y-6">
       <TabsList className="grid w-full grid-cols-3">
@@ -26,13 +25,7 @@ export function SessionTabs({ loading, filtered, selectedDate, SessionCalendarCo
 
       {/* UPCOMING */}
       <TabsContent value="upcoming">
-        <Card className="p-4">
-          <div className="flex justify-center mb-4">
-            {SessionCalendarComponent}
-          </div>
-        </Card>
-
-        <div className="grid gap-4 mt-6">
+        <div className="grid gap-4">
           {loading ? (
             <Skeleton className="h-24 w-full" />
           ) : filtered.upcoming.length === 0 ? (

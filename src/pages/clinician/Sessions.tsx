@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { isSameDay, isBefore } from "date-fns";
 import { SessionHeader } from "@/components/SessionHeader";
 import { SessionTabs } from "@/components/SessionTabs";
-import { SessionCalendar } from "@/components/SessionCalendar";
 
 export default function Sessions() {
   const { toast } = useToast();
@@ -58,19 +57,17 @@ export default function Sessions() {
   return (
     <ClinicianLayout>
       <div className="space-y-6">
-        <SessionHeader onScheduleSession={handleScheduleSession} />
+        <SessionHeader 
+          onScheduleSession={handleScheduleSession}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          getSessionsForDate={getSessionsForDate}
+        />
         
         <SessionTabs 
           loading={loading} 
           filtered={filtered}
           selectedDate={selectedDate}
-          SessionCalendarComponent={
-            <SessionCalendar 
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
-              getSessionsForDate={getSessionsForDate}
-            />
-          }
         />
       </div>
     </ClinicianLayout>
