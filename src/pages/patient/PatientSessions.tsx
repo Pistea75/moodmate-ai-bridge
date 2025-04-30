@@ -1,65 +1,66 @@
+import { useState, useEffect } from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Calendar, Clock } from "lucide-react";
-import { useState } from 'react';
+import { CalendarIcon, Calendar, Clock } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, isBefore, isSameDay } from "date-fns";
 import { cn } from '@/lib/utils';
-import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from "@/components/ui/skeleton";
+
+type Session = {
+  id: string;
+  scheduled_time: string;
+  duration_minutes: number;
+  clinician_name: string;
+};
 
 export default function PatientSessions() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [openModal, setOpenModal] = useState(false);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [date, setDate] = useState<Date>(new Date());
+  const [loading, setLoading] = useState(true);
 
-  const today = new Date();
+  useEffect(() => {
+    const fetchSessions = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("sessions")
+        .select(`
+          id,
+          scheduled_time,
+          duration_minutes,
+          clinician:clinician_id (
+            first_name,
+            last_name
+          )
+        `)
+        .order("scheduled_time", { ascending: true });
 
-  const sessions = [
-    {
-      id: 1,
-      type: "Weekly Therapy",
-      clinician: "Dr. Sarah Johnson",
-      date: "2025-04-22",
-      time: "10:00 AM",
-      duration: "50 min",
-      status: "completed"
-    },
-    {
-      id: 2,
-      type: "Follow-up Session",
-      clinician: "Dr. Sarah Johnson",
-      date: "2025-04-24",
-      time: "11:30 AM",
-      duration: "30 min",
-      status: "upcoming"
-    },
-    {
-      id: 3,
-      type: "Medication Review",
-      clinician: "Dr. Robert Chen",
-      date: "2025-04-30",
-      time: "09:15 AM",
-      duration: "25 min",
-      status: "upcoming"
-    }
-  ];
+      if (error) {
+        console.error("❌ Error fetching sessions:", error);
+      } else {
+        const parsed = (data || []).map((s: any) => ({
+          id: s.id,
+          scheduled_time: s.scheduled_time,
+          duration_minutes: s.duration_minutes,
+          clinician_name: `${s.clinician?.first_name || "Unknown"} ${s.clinician?.last_name || ""}`
+        }));
+        setSessions(parsed);
+      }
 
-  // Filter sessions based on selected date
-  const filteredSessions = date 
-    ? sessions.filter(session => {
-        const sessionDate = new Date(session.date);
-        return sessionDate.getDate() === date.getDate() && 
-               sessionDate.getMonth() === date.getMonth() && 
-               sessionDate.getFullYear() === date.getFullYear();
-      }) 
-    : sessions;
+      setLoading(false);
+    };
 
-  // Check if a session is in the past
-  const isPastSession = (sessionDate: string) => {
-    const session = new Date(sessionDate);
-    return session < today;
-  };
+    fetchSessions();
+  }, []);
+
+  const filteredSessions = sessions.filter((session) =>
+    isSameDay(new Date(session.scheduled_time), date)
+  );
+
+  const isPast = (sessionDate: string) => isBefore(new Date(sessionDate), new Date());
 
   return (
     <PatientLayout>
@@ -69,14 +70,11 @@ export default function PatientSessions() {
             <h1 className="text-2xl font-bold">My Sessions</h1>
             <p className="text-muted-foreground">Manage your therapy sessions</p>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
+                <Button variant="outline" className="flex items-center gap-2">
                   <CalendarIcon className="h-4 w-4" />
                   {date ? format(date, "PPP") : "Select date"}
                 </Button>
@@ -90,54 +88,53 @@ export default function PatientSessions() {
                 />
               </PopoverContent>
             </Popover>
-            
-            <Button 
-              className="bg-mood-purple hover:bg-mood-purple/90"
-              onClick={() => setOpenModal(true)}
-            >
+
+            <Button className="bg-mood-purple hover:bg-mood-purple/90">
               Schedule Session
             </Button>
           </div>
         </div>
 
-        {filteredSessions.length > 0 ? (
+        {loading ? (
+          <div className="space-y-4">
+            {[...Array(2)].map((_, idx) => (
+              <Skeleton key={idx} className="h-24 w-full rounded-lg" />
+            ))}
+          </div>
+        ) : filteredSessions.length > 0 ? (
           <div className="grid gap-4">
             {filteredSessions.map((session) => (
-              <Card 
-                key={session.id} 
+              <Card
+                key={session.id}
                 className={cn(
                   "p-4",
-                  isPastSession(session.date) || session.status === "completed" ? 
-                  "bg-muted/50" : ""
+                  isPast(session.scheduled_time) ? "bg-muted/50" : ""
                 )}
               >
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{session.type}</h3>
-                      {(isPastSession(session.date) || session.status === "completed") && (
+                      <h3 className="font-medium">Therapy Session</h3>
+                      {isPast(session.scheduled_time) && (
                         <span className="text-xs bg-muted px-2 py-0.5 rounded">Completed</span>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      with {session.clinician}
+                      with {session.clinician_name}
                     </p>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        {session.date}
+                        {format(new Date(session.scheduled_time), "PPP")}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {session.time} ({session.duration})
+                        {format(new Date(session.scheduled_time), "p")} ({session.duration_minutes} min)
                       </span>
                     </div>
                   </div>
-                  
-                  {!(isPastSession(session.date) || session.status === "completed") && (
-                    <Button variant="outline">
-                      View Details
-                    </Button>
+                  {!isPast(session.scheduled_time) && (
+                    <Button variant="outline">View Details</Button>
                   )}
                 </div>
               </Card>
@@ -146,25 +143,11 @@ export default function PatientSessions() {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No sessions scheduled for this date.</p>
-            <Button 
-              className="mt-4 bg-mood-purple hover:bg-mood-purple/90"
-              onClick={() => setOpenModal(true)}
-            >
+            <Button className="mt-4 bg-mood-purple hover:bg-mood-purple/90">
               Schedule Session
             </Button>
           </div>
         )}
-
-        {/* Modal */}
-        <ScheduleSessionModal 
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-          onScheduled={() => {
-            setOpenModal(false);
-            setDate(new Date()); // Optionally refresh session list here if needed
-          }}
-          isPatientView
-        />
       </div>
     </PatientLayout>
   );
