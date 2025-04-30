@@ -4,7 +4,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CalendarDayContent } from "./session/CalendarDayContent";
 
 interface SessionCalendarProps {
   selectedDate: Date;
@@ -44,9 +43,21 @@ export function SessionCalendar({ selectedDate, onDateChange, getSessionsForDate
           className="pointer-events-auto"
           components={{
             DayContent: (props) => {
+              // Extract the date from props
               const { date } = props;
               const sessionsOnDate = getSessionsForDate(date);
-              return <CalendarDayContent date={date} sessionsCount={sessionsOnDate.length} />;
+              
+              return (
+                <div className="relative flex h-8 w-8 items-center justify-center p-0">
+                  {/* Use a standard div without passing the active modifiers */}
+                  <div className="h-8 w-8 flex items-center justify-center">{date.getDate()}</div>
+                  {sessionsOnDate.length > 0 && (
+                    <div className="text-[10px] text-center mt-1 absolute bottom-0 text-mood-purple font-semibold">
+                      {sessionsOnDate.length}x
+                    </div>
+                  )}
+                </div>
+              );
             },
           }}
         />

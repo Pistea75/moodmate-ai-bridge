@@ -1,4 +1,3 @@
-
 interface CalendarDayContentProps {
   date: Date;
   sessionsCount: number;
