@@ -1,11 +1,12 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { X } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -61,18 +62,21 @@ export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white border-0 shadow-lg">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold text-gray-900">Schedule New Session</DialogTitle>
+      <DialogContent className="max-w-md bg-white border-0 shadow-xl rounded-lg p-0 overflow-hidden">
+        <DialogHeader className="bg-white p-6 border-b">
+          <DialogTitle className="text-xl font-semibold text-gray-900">Schedule New Session</DialogTitle>
+          <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-1">
+            <X className="h-5 w-5" />
+          </DialogClose>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-5 p-6">
           {/* Select Patient */}
           {!isPatientView && (
             <div>
-              <Label className="text-gray-700">Patient</Label>
+              <Label className="text-gray-700 font-medium mb-1 block">Patient</Label>
               <select
-                className="w-full border rounded px-3 py-2 bg-white text-gray-800"
+                className="w-full border rounded-md px-3 py-2 bg-white text-gray-800 focus:ring-2 focus:ring-mood-purple focus:border-mood-purple outline-none"
                 value={selectedPatientId}
                 onChange={(e) => setSelectedPatientId(e.target.value)}
               >
@@ -88,14 +92,14 @@ export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView
 
           {/* Pick Date */}
           <div>
-            <Label className="text-gray-700">Date</Label>
-            <div className="bg-white rounded border p-1">
+            <Label className="text-gray-700 font-medium mb-1 block">Date</Label>
+            <div className="bg-white rounded-md border p-1 mx-auto">
               <Calendar
                 mode="single"
                 selected={date}
                 onSelect={setDate}
                 initialFocus
-                className="bg-white pointer-events-auto"
+                className="bg-white pointer-events-auto mx-auto"
               />
             </div>
           </div>
@@ -103,34 +107,34 @@ export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView
           {/* Time & Duration */}
           <div className="flex gap-4">
             <div className="flex-1">
-              <Label className="text-gray-700">Time</Label>
+              <Label className="text-gray-700 font-medium mb-1 block">Time</Label>
               <Input
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="bg-white text-gray-800"
+                className="bg-white text-gray-800 border-gray-300 focus:ring-2 focus:ring-mood-purple focus:border-mood-purple"
               />
             </div>
             <div className="flex-1">
-              <Label className="text-gray-700">Duration (min)</Label>
+              <Label className="text-gray-700 font-medium mb-1 block">Duration (min)</Label>
               <Input
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
-                className="bg-white text-gray-800"
+                className="bg-white text-gray-800 border-gray-300 focus:ring-2 focus:ring-mood-purple focus:border-mood-purple"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <Label className="text-gray-700">Notes</Label>
+            <Label className="text-gray-700 font-medium mb-1 block">Notes</Label>
             <Input
               type="text"
               placeholder="Optional"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="bg-white text-gray-800"
+              className="bg-white text-gray-800 border-gray-300 focus:ring-2 focus:ring-mood-purple focus:border-mood-purple"
             />
           </div>
 
