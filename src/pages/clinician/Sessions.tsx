@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isSameDay, isBefore } from "date-fns";
 import { SessionTabs } from "@/components/SessionTabs";
 import { SessionHeader } from "@/components/SessionHeader";
-import { ScheduleSessionModal } from "@/components/ScheduleSessionModal";
+import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
 
 export default function Sessions() {
   const { toast } = useToast();
