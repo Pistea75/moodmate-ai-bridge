@@ -62,7 +62,7 @@ export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white border-0 shadow-xl rounded-lg p-0 overflow-hidden">
+      <DialogContent className="max-w-md bg-white border-0 shadow-xl rounded-lg p-0 overflow-hidden m-4 my-8">
         <DialogHeader className="bg-white p-6 border-b">
           <DialogTitle className="text-xl font-semibold text-gray-900">Schedule New Session</DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-1">
@@ -70,7 +70,7 @@ export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView
           </DialogClose>
         </DialogHeader>
 
-        <div className="space-y-5 p-6">
+        <div className="space-y-5 px-6 py-6">
           {/* Select Patient */}
           {!isPatientView && (
             <div>

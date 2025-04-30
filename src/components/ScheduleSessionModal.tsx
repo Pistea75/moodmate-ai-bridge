@@ -86,7 +86,7 @@ export function ScheduleSessionModal({ open, onClose, onScheduled }: ScheduleSes
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0">
+      <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0 m-4 my-8">
         <DialogHeader className="border-b px-6 py-4 bg-white">
           <DialogTitle className="text-xl font-semibold text-gray-900">Schedule New Session</DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-1">
@@ -94,7 +94,7 @@ export function ScheduleSessionModal({ open, onClose, onScheduled }: ScheduleSes
           </DialogClose>
         </DialogHeader>
         
-        <div className="space-y-4 p-6">
+        <div className="space-y-4 px-6 py-5">
           <div className="space-y-2">
             <Label htmlFor="patient" className="text-gray-700 font-medium">Select Patient</Label>
             <Select
