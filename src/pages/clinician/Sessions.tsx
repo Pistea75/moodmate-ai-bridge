@@ -10,16 +10,27 @@ import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal"
 
 export default function Sessions() {
   const { toast } = useToast();
+
   const [sessions, setSessions] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
 
+  const today = new Date();
+
+  // Fetch all sessions with patient name
   const fetchSessions = async () => {
     setLoading(true);
+
     const { data, error } = await supabase
       .from("sessions")
-      .select("*, patient:patient_id(first_name, last_name)")
+      .select(`
+        *,
+        patient:patient_id (
+          first_name,
+          last_name
+        )
+      `)
       .order("scheduled_time", { ascending: true });
 
     if (error) {
@@ -35,36 +46,38 @@ export default function Sessions() {
     fetchSessions();
   }, []);
 
-  const today = new Date();
-
+  // Tabs filtering
   const filtered = {
     upcoming: sessions.filter((s) => isSameDay(new Date(s.scheduled_time), selectedDate)),
     past: sessions.filter((s) => isBefore(new Date(s.scheduled_time), today)),
     all: sessions,
   };
 
-  const getSessionsForDate = (date: Date) => {
-    return sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
-  };
+  // Calendar marker count
+  const getSessionsForDate = (date: Date) =>
+    sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
 
   return (
     <ClinicianLayout>
       <div className="space-y-6">
-        <SessionHeader 
+
+        {/* Header + Calendar + Schedule Button */}
+        <SessionHeader
           onScheduleSession={() => setOpenModal(true)}
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           getSessionsForDate={getSessionsForDate}
         />
 
-        <SessionTabs 
+        {/* Session Tabs (Upcoming / Past / All) */}
+        <SessionTabs
           loading={loading}
           filtered={filtered}
           selectedDate={selectedDate}
         />
 
         {/* Modal for scheduling session */}
-        <ScheduleSessionModal 
+        <ScheduleSessionModal
           open={openModal}
           onClose={() => setOpenModal(false)}
           onScheduled={() => {
