@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
-import { format, parse } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -12,9 +11,10 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onScheduled: () => void;
+  isPatientView?: boolean;
 }
 
-export function ScheduleSessionModal({ open, onClose, onScheduled }: Props) {
+export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView }: Props) {
   const [patients, setPatients] = useState<any[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -61,74 +61,85 @@ export function ScheduleSessionModal({ open, onClose, onScheduled }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md bg-white border-0 shadow-lg">
         <DialogHeader>
-          <DialogTitle>Schedule New Session</DialogTitle>
+          <DialogTitle className="text-lg font-semibold text-gray-900">Schedule New Session</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Select Patient */}
-          <div>
-            <Label>Patient</Label>
-            <select
-              className="w-full border rounded px-3 py-2"
-              value={selectedPatientId}
-              onChange={(e) => setSelectedPatientId(e.target.value)}
-            >
-              <option value="">Select a patient</option>
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.first_name} {p.last_name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {!isPatientView && (
+            <div>
+              <Label className="text-gray-700">Patient</Label>
+              <select
+                className="w-full border rounded px-3 py-2 bg-white text-gray-800"
+                value={selectedPatientId}
+                onChange={(e) => setSelectedPatientId(e.target.value)}
+              >
+                <option value="">Select a patient</option>
+                {patients.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.first_name} {p.last_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Pick Date */}
           <div>
-            <Label>Date</Label>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              initialFocus
-            />
+            <Label className="text-gray-700">Date</Label>
+            <div className="bg-white rounded border p-1">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+                className="bg-white pointer-events-auto"
+              />
+            </div>
           </div>
 
           {/* Time & Duration */}
           <div className="flex gap-4">
             <div className="flex-1">
-              <Label>Time</Label>
+              <Label className="text-gray-700">Time</Label>
               <Input
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
+                className="bg-white text-gray-800"
               />
             </div>
             <div className="flex-1">
-              <Label>Duration (min)</Label>
+              <Label className="text-gray-700">Duration (min)</Label>
               <Input
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
+                className="bg-white text-gray-800"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <Label>Notes</Label>
+            <Label className="text-gray-700">Notes</Label>
             <Input
               type="text"
               placeholder="Optional"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
+              className="bg-white text-gray-800"
             />
           </div>
 
           {/* Actions */}
           <div className="flex justify-end pt-4">
-            <Button onClick={handleSchedule} className="bg-mood-purple hover:bg-mood-purple/90">
+            <Button 
+              onClick={handleSchedule} 
+              className="bg-mood-purple hover:bg-mood-purple/90 text-white"
+            >
               Schedule
             </Button>
           </div>
