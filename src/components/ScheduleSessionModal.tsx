@@ -86,15 +86,15 @@ export function ScheduleSessionModal({ open, onClose, onScheduled }: ScheduleSes
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] bg-white rounded-lg shadow-xl overflow-hidden p-0">
-        <DialogHeader className="bg-white p-6 border-b">
+      <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0">
+        <DialogHeader className="border-b px-6 py-4 bg-white">
           <DialogTitle className="text-xl font-semibold text-gray-900">Schedule New Session</DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-1">
             <X className="h-5 w-5" />
           </DialogClose>
         </DialogHeader>
         
-        <div className="space-y-4 py-6 px-6">
+        <div className="space-y-4 p-6">
           <div className="space-y-2">
             <Label htmlFor="patient" className="text-gray-700 font-medium">Select Patient</Label>
             <Select
@@ -145,7 +145,7 @@ export function ScheduleSessionModal({ open, onClose, onScheduled }: ScheduleSes
           </div>
         </div>
         
-        <DialogFooter className="bg-gray-50 p-4 border-t">
+        <DialogFooter className="bg-gray-50 px-6 py-4 border-t">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
