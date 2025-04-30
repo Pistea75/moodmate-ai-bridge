@@ -17,21 +17,9 @@ export function SessionCalendar({ selectedDate, onDateChange, getSessionsForDate
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
-          className={cn(
-            "w-[280px] justify-start text-left font-normal",
-            !selectedDate && "text-muted-foreground"
-          )}
+          className="w-10 h-10 p-0"
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {selectedDate ? (
-            selectedDate.toLocaleDateString('en-US', { 
-              month: 'long', 
-              day: 'numeric',
-              year: 'numeric'
-            })
-          ) : (
-            <span>Pick a date</span>
-          )}
+          <CalendarIcon className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="center">
