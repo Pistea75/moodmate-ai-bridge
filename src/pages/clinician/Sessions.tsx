@@ -33,7 +33,10 @@ export default function Sessions() {
     setLoading(true);
     const { data, error } = await supabase
       .from("sessions")
-      .select("*, patient:patient_id(first_name, last_name)")
+      .select(`
+        *,
+        patient:profiles!sessions_patient_id_fkey(first_name, last_name)
+      `)
       .order("scheduled_time", { ascending: true });
 
     if (error) {
