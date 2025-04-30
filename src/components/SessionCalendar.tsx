@@ -4,6 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface SessionCalendarProps {
   selectedDate: Date;
@@ -17,9 +18,10 @@ export function SessionCalendar({ selectedDate, onDateChange, getSessionsForDate
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
-          className="w-10 h-10 p-0"
+          className="flex items-center gap-2"
         >
           <CalendarIcon className="h-4 w-4" />
+          {format(selectedDate, "PPP")}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="center">
