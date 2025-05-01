@@ -1,18 +1,16 @@
+
 import { useState, useEffect } from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Calendar, Clock, X } from "lucide-react";
+import { CalendarIcon, Calendar, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format, isBefore, isSameDay } from "date-fns";
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { SessionCalendar } from "@/components/SessionCalendar";
+import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
 
 type Session = {
   id: string;
@@ -26,41 +24,38 @@ export default function PatientSessions() {
   const [date, setDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [scheduleTime, setScheduleTime] = useState("09:00");
-  const [scheduleDate, setScheduleDate] = useState<Date>(new Date());
-  const [scheduling, setScheduling] = useState(false);
+
+  const fetchSessions = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("sessions")
+      .select(`
+        id,
+        scheduled_time,
+        duration_minutes,
+        clinician:clinician_id (
+          first_name,
+          last_name
+        )
+      `)
+      .order("scheduled_time", { ascending: true });
+
+    if (error) {
+      console.error("❌ Error fetching sessions:", error);
+    } else {
+      const parsed = (data || []).map((s: any) => ({
+        id: s.id,
+        scheduled_time: s.scheduled_time,
+        duration_minutes: s.duration_minutes,
+        clinician_name: `${s.clinician?.first_name || "Unknown"} ${s.clinician?.last_name || ""}`
+      }));
+      setSessions(parsed);
+    }
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchSessions = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("sessions")
-        .select(`
-          id,
-          scheduled_time,
-          duration_minutes,
-          clinician:clinician_id (
-            first_name,
-            last_name
-          )
-        `)
-        .order("scheduled_time", { ascending: true });
-
-      if (error) {
-        console.error("❌ Error fetching sessions:", error);
-      } else {
-        const parsed = (data || []).map((s: any) => ({
-          id: s.id,
-          scheduled_time: s.scheduled_time,
-          duration_minutes: s.duration_minutes,
-          clinician_name: `${s.clinician?.first_name || "Unknown"} ${s.clinician?.last_name || ""}`
-        }));
-        setSessions(parsed);
-      }
-
-      setLoading(false);
-    };
-
     fetchSessions();
   }, []);
 
@@ -70,69 +65,15 @@ export default function PatientSessions() {
 
   const isPast = (sessionDate: string) => isBefore(new Date(sessionDate), new Date());
 
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 8; hour < 18; hour++) {
-      slots.push(`${hour.toString().padStart(2, "0")}:00`);
-      slots.push(`${hour.toString().padStart(2, "0")}:30`);
-    }
-    return slots;
+  const getSessionsForDate = (date: Date) => {
+    return sessions.filter((session) =>
+      isSameDay(new Date(session.scheduled_time), date)
+    );
   };
 
-  const handleScheduleSession = async () => {
-    setScheduling(true);
-
-    const user = (await supabase.auth.getUser()).data.user;
-    if (!user) {
-      toast.error("Not logged in.");
-      setScheduling(false);
-      return;
-    }
-
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("referral_code")
-      .eq("user_id", user.id)
-      .single();
-
-    if (profileError || !profile?.referral_code) {
-      toast.error("Unable to find your referral code.");
-      setScheduling(false);
-      return;
-    }
-
-    const { data: clinician, error: clinicianError } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("referral_code", profile.referral_code)
-      .eq("role", "clinician")
-      .single();
-
-    if (clinicianError || !clinician?.id) {
-      toast.error("No clinician found for your referral code.");
-      setScheduling(false);
-      return;
-    }
-
-    const [hour, minute] = scheduleTime.split(":").map(Number);
-    const scheduled = new Date(scheduleDate);
-    scheduled.setHours(hour, minute, 0, 0);
-
-    const { error: insertError } = await supabase.from("sessions").insert({
-      patient_id: user.id,
-      clinician_id: clinician.id,
-      scheduled_time: scheduled.toISOString(),
-      status: "scheduled",
-      duration_minutes: 50
-    });
-
-    setScheduling(false);
-    if (insertError) {
-      toast.error("Failed to schedule session.");
-    } else {
-      toast.success("Session scheduled!");
-      setModalOpen(false);
-    }
+  const handleScheduleComplete = () => {
+    toast.success("Session scheduled!");
+    fetchSessions();
   };
 
   return (
@@ -146,22 +87,11 @@ export default function PatientSessions() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <CalendarIcon className="h-4 w-4" />
-                  {date ? format(date, "PPP") : "Select date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <CalendarComponent
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <SessionCalendar 
+              selectedDate={date}
+              onDateChange={setDate}
+              getSessionsForDate={getSessionsForDate}
+            />
 
             <Button className="bg-mood-purple hover:bg-mood-purple/90" onClick={() => setModalOpen(true)}>
               Schedule Session
@@ -226,59 +156,12 @@ export default function PatientSessions() {
       </div>
 
       {/* Schedule Session Modal */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0 m-4 my-8">
-          <DialogHeader className="border-b px-6 py-4 bg-white">
-            <DialogTitle className="text-xl font-semibold text-gray-900">Schedule Session</DialogTitle>
-            <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-1">
-              <X className="h-5 w-5" />
-            </DialogClose>
-          </DialogHeader>
-
-          <div className="space-y-4 px-6 py-5">
-            <div className="space-y-2">
-              <Label>Select Date</Label>
-              <CalendarComponent
-                mode="single"
-                selected={scheduleDate}
-                onSelect={(d) => setScheduleDate(d || new Date())}
-                disabled={(d) => d < new Date()}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Select Time</Label>
-              <Select value={scheduleTime} onValueChange={setScheduleTime}>
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Choose time" />
-                </SelectTrigger>
-                <SelectContent>
-                  {generateTimeSlots().map((slot) => (
-                    <SelectItem key={slot} value={slot}>
-                      {slot}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <DialogFooter className="bg-gray-50 px-6 py-4 border-t">
-            <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              className="bg-mood-purple hover:bg-mood-purple/90 text-white"
-              onClick={handleScheduleSession}
-              disabled={scheduling}
-            >
-              {scheduling ? "Scheduling..." : "Schedule Session"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ScheduleSessionModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onScheduled={handleScheduleComplete}
+        isPatientView={true}
+      />
     </PatientLayout>
   );
 }
-
-
