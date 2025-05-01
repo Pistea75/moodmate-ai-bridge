@@ -1,101 +1,157 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { X, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-interface Props {
+interface ScheduleSessionModalProps {
   open: boolean;
   onClose: () => void;
   onScheduled: () => void;
-  isPatientView?: boolean;
 }
 
-export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView }: Props) {
-  const [patients, setPatients] = useState<any[]>([]);
-  const [selectedPatientId, setSelectedPatientId] = useState("");
+export function ScheduleSessionModal({
+  open,
+  onClose,
+  onScheduled,
+}: ScheduleSessionModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [time, setTime] = useState("");
-  const [duration, setDuration] = useState("50");
-  const [notes, setNotes] = useState("");
+  const [time, setTime] = useState("09:00");
+  const [patientId, setPatientId] = useState<string>("");
+  const [patients, setPatients] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingPatients, setLoadingPatients] = useState(true);
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name")
-        .eq("role", "patient");
-
-      if (error) console.error(error);
-      else setPatients(data || []);
-    };
-
-    if (open) fetchPatients();
+    if (open) {
+      fetchPatients();
+    }
   }, [open]);
 
+  const fetchPatients = async () => {
+    setLoadingPatients(true);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, first_name, last_name")
+      .eq("role", "patient");
+
+    if (!error && data) {
+      setPatients(data);
+    } else {
+      console.error("Error fetching patients:", error);
+    }
+    setLoadingPatients(false);
+  };
+
   const handleSchedule = async () => {
-    if (!selectedPatientId || !date || !time || !duration) return;
+    if (!date || !time || !patientId) return;
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      console.error("❌ Cannot get clinician user:", userError);
+      return;
+    }
 
     const [hours, minutes] = time.split(":").map(Number);
-    const combinedDate = new Date(date);
-    combinedDate.setHours(hours);
-    combinedDate.setMinutes(minutes);
+    const scheduledTime = new Date(date);
+    scheduledTime.setHours(hours, minutes, 0, 0);
+
+    setLoading(true);
 
     const { error } = await supabase.from("sessions").insert({
-      patient_id: selectedPatientId,
-      scheduled_time: combinedDate.toISOString(),
-      duration_minutes: parseInt(duration),
-      notes,
-      status: "upcoming"
+      patient_id: patientId,
+      clinician_id: user.id, // ✅ Associate session with current clinician
+      scheduled_time: scheduledTime.toISOString(),
+      status: "scheduled",
+      duration_minutes: 50,
     });
 
+    setLoading(false);
+
     if (error) {
-      console.error("Failed to schedule session", error);
+      console.error("❌ Error scheduling session:", error);
     } else {
       onScheduled();
     }
   };
 
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 8; hour < 18; hour++) {
+      const hourStr = hour.toString().padStart(2, "0");
+      slots.push(`${hourStr}:00`);
+      slots.push(`${hourStr}:30`);
+    }
+    return slots;
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white border-0 shadow-xl rounded-lg p-0 overflow-hidden m-4 my-8">
-        <DialogHeader className="bg-white p-6 border-b">
-          <DialogTitle className="text-xl font-semibold text-gray-900">Schedule New Session</DialogTitle>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0 m-4 my-8">
+        <DialogHeader className="border-b px-6 py-4 bg-white">
+          <DialogTitle className="text-xl font-semibold text-gray-900">
+            Schedule New Session
+          </DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-1">
             <X className="h-5 w-5" />
           </DialogClose>
         </DialogHeader>
 
-        <div className="space-y-5 px-6 py-6">
-          {/* Select Patient */}
-          {!isPatientView && (
-            <div>
-              <Label className="text-gray-700 font-medium mb-1 block">Patient</Label>
-              <select
-                className="w-full border rounded-md px-3 py-2 bg-white text-gray-800 focus:ring-2 focus:ring-mood-purple focus:border-mood-purple outline-none"
-                value={selectedPatientId}
-                onChange={(e) => setSelectedPatientId(e.target.value)}
-              >
-                <option value="">Select a patient</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.first_name} {p.last_name}
-                  </option>
+        <div className="space-y-4 px-6 py-5">
+          {/* Patient Select */}
+          <div className="space-y-2">
+            <Label htmlFor="patient" className="text-gray-700 font-medium">
+              Select Patient
+            </Label>
+            <Select
+              value={patientId}
+              onValueChange={setPatientId}
+              disabled={loadingPatients}
+            >
+              <SelectTrigger id="patient" className="bg-white">
+                <SelectValue placeholder="Select patient" />
+              </SelectTrigger>
+              <SelectContent>
+                {patients.map((patient) => (
+                  <SelectItem key={patient.id} value={patient.id}>
+                    {patient.first_name} {patient.last_name}
+                  </SelectItem>
                 ))}
-              </select>
-            </div>
-          )}
+              </SelectContent>
+            </Select>
+          </div>
 
-          {/* Pick Date */}
-          <div>
-            <Label className="text-gray-700 font-medium mb-1 block">Date</Label>
+          {/* Date Picker */}
+          <div className="space-y-2">
+            <Label className="text-gray-700 font-medium">Select Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -114,6 +170,7 @@ export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView
                   mode="single"
                   selected={date}
                   onSelect={setDate}
+                  disabled={(date) => date < new Date()}
                   initialFocus
                   className="pointer-events-auto"
                 />
@@ -121,51 +178,40 @@ export function ScheduleSessionModal({ open, onClose, onScheduled, isPatientView
             </Popover>
           </div>
 
-          {/* Time & Duration */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <Label className="text-gray-700 font-medium mb-1 block">Time</Label>
-              <Input
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="bg-white text-gray-800 border-gray-300 focus:ring-2 focus:ring-mood-purple focus:border-mood-purple"
-              />
-            </div>
-            <div className="flex-1">
-              <Label className="text-gray-700 font-medium mb-1 block">Duration (min)</Label>
-              <Input
-                type="number"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                className="bg-white text-gray-800 border-gray-300 focus:ring-2 focus:ring-mood-purple focus:border-mood-purple"
-              />
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <Label className="text-gray-700 font-medium mb-1 block">Notes</Label>
-            <Input
-              type="text"
-              placeholder="Optional"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="bg-white text-gray-800 border-gray-300 focus:ring-2 focus:ring-mood-purple focus:border-mood-purple"
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-end pt-4">
-            <Button 
-              onClick={handleSchedule} 
-              className="bg-mood-purple hover:bg-mood-purple/90 text-white"
-            >
-              Schedule
-            </Button>
+          {/* Time Picker */}
+          <div className="space-y-2">
+            <Label htmlFor="time" className="text-gray-700 font-medium">
+              Select Time
+            </Label>
+            <Select value={time} onValueChange={setTime}>
+              <SelectTrigger id="time" className="bg-white">
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent>
+                {generateTimeSlots().map((slot) => (
+                  <SelectItem key={slot} value={slot}>
+                    {slot}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
+
+        <DialogFooter className="bg-gray-50 px-6 py-4 border-t">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSchedule}
+            disabled={loading || !date || !patientId}
+            className="bg-mood-purple hover:bg-mood-purple/90 text-white"
+          >
+            {loading ? "Scheduling..." : "Schedule Session"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
