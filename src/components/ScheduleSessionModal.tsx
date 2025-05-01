@@ -21,47 +21,29 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { X, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-
-interface Patient {
-  id: string;
-  first_name: string;
-  last_name: string;
-}
 
 interface ScheduleSessionModalProps {
   open: boolean;
   onClose: () => void;
   onScheduled: () => void;
-  isPatientView?: boolean; // ✅ optional for patient version
 }
 
 export function ScheduleSessionModal({
   open,
   onClose,
   onScheduled,
-  isPatientView = false,
 }: ScheduleSessionModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [time, setTime] = useState("09:00");
   const [patientId, setPatientId] = useState<string>("");
-  const [patients, setPatients] = useState<Patient[]>([]);
+  const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(true);
 
   useEffect(() => {
-    if (open) {
-      if (!isPatientView) {
-        fetchPatients();
-      } else {
-        fetchCurrentPatientId();
-      }
-    }
+    if (open) fetchPatients();
   }, [open]);
 
   const fetchPatients = async () => {
@@ -76,18 +58,7 @@ export function ScheduleSessionModal({
     } else {
       console.error("❌ Error fetching patients:", error);
     }
-
     setLoadingPatients(false);
-  };
-
-  const fetchCurrentPatientId = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (user) {
-      setPatientId(user.id); // 👤 use current patient user ID
-    }
   };
 
   const handleSchedule = async () => {
@@ -97,16 +68,26 @@ export function ScheduleSessionModal({
     const scheduledTime = new Date(date);
     scheduledTime.setHours(hours, minutes, 0, 0);
 
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      console.error("❌ Could not get current clinician user:", userError);
+      return;
+    }
+
     setLoading(true);
     const { error } = await supabase.from("sessions").insert({
       patient_id: patientId,
+      clinician_id: user.id, // ✅ include clinician's user ID
       scheduled_time: scheduledTime.toISOString(),
       status: "scheduled",
       duration_minutes: 50,
     });
 
     setLoading(false);
-
     if (error) {
       console.error("❌ Error scheduling session:", error);
     } else {
@@ -115,17 +96,18 @@ export function ScheduleSessionModal({
   };
 
   const generateTimeSlots = () => {
-    const slots: string[] = [];
+    const slots = [];
     for (let hour = 8; hour < 18; hour++) {
-      slots.push(`${hour.toString().padStart(2, "0")}:00`);
-      slots.push(`${hour.toString().padStart(2, "0")}:30`);
+      const hourStr = hour.toString().padStart(2, "0");
+      slots.push(`${hourStr}:00`);
+      slots.push(`${hourStr}:30`);
     }
     return slots;
   };
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl p-0 border-0 m-4 my-8">
+      <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0 m-4 my-8">
         <DialogHeader className="border-b px-6 py-4 bg-white">
           <DialogTitle className="text-xl font-semibold text-gray-900">
             Schedule New Session
@@ -136,30 +118,30 @@ export function ScheduleSessionModal({
         </DialogHeader>
 
         <div className="space-y-4 px-6 py-5">
-          {!isPatientView && (
-            <div className="space-y-2">
-              <Label htmlFor="patient" className="text-gray-700 font-medium">
-                Select Patient
-              </Label>
-              <Select
-                value={patientId}
-                onValueChange={setPatientId}
-                disabled={loadingPatients}
-              >
-                <SelectTrigger id="patient" className="bg-white">
-                  <SelectValue placeholder="Select patient" />
-                </SelectTrigger>
-                <SelectContent>
-                  {patients.map((patient) => (
-                    <SelectItem key={patient.id} value={patient.id}>
-                      {patient.first_name} {patient.last_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          {/* Patient Select */}
+          <div className="space-y-2">
+            <Label htmlFor="patient" className="text-gray-700 font-medium">
+              Select Patient
+            </Label>
+            <Select
+              value={patientId}
+              onValueChange={setPatientId}
+              disabled={loadingPatients}
+            >
+              <SelectTrigger id="patient" className="bg-white">
+                <SelectValue placeholder="Select patient" />
+              </SelectTrigger>
+              <SelectContent>
+                {patients.map((patient) => (
+                  <SelectItem key={patient.id} value={patient.id}>
+                    {patient.first_name} {patient.last_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
+          {/* Date Select */}
           <div className="space-y-2">
             <Label className="text-gray-700 font-medium">Select Date</Label>
             <Popover>
@@ -180,13 +162,14 @@ export function ScheduleSessionModal({
                   mode="single"
                   selected={date}
                   onSelect={setDate}
-                  disabled={(d) => d < new Date()}
+                  disabled={(date) => date < new Date()}
                   initialFocus
                 />
               </PopoverContent>
             </Popover>
           </div>
 
+          {/* Time Select */}
           <div className="space-y-2">
             <Label htmlFor="time" className="text-gray-700 font-medium">
               Select Time
