@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { SessionCalendar } from "@/components/SessionCalendar";
-import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
+import { PatientScheduleModal } from "@/components/session/PatientScheduleModal";
 
 type Session = {
   id: string;
@@ -156,11 +156,10 @@ export default function PatientSessions() {
       </div>
 
       {/* Schedule Session Modal */}
-      <ScheduleSessionModal
+      <PatientScheduleModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onScheduled={handleScheduleComplete}
-        isPatientView={true}
       />
     </PatientLayout>
   );
