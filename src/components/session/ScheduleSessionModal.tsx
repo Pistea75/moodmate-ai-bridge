@@ -47,9 +47,7 @@ export function ScheduleSessionModal({
   const [loadingPatients, setLoadingPatients] = useState(true);
 
   useEffect(() => {
-    if (open) {
-      fetchPatients();
-    }
+    if (open) fetchPatients();
   }, [open]);
 
   const fetchPatients = async () => {
@@ -62,13 +60,18 @@ export function ScheduleSessionModal({
     if (!error && data) {
       setPatients(data);
     } else {
-      console.error("Error fetching patients:", error);
+      console.error("❌ Error fetching patients:", error);
     }
+
     setLoadingPatients(false);
   };
 
   const handleSchedule = async () => {
     if (!date || !time || !patientId) return;
+
+    const [hours, minutes] = time.split(":").map(Number);
+    const scheduledTime = new Date(date);
+    scheduledTime.setHours(hours, minutes, 0, 0);
 
     const {
       data: { user },
@@ -76,19 +79,21 @@ export function ScheduleSessionModal({
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      console.error("❌ Cannot get clinician user:", userError);
+      console.error("❌ Could not get current clinician user:", userError);
       return;
     }
 
-    const [hours, minutes] = time.split(":").map(Number);
-    const scheduledTime = new Date(date);
-    scheduledTime.setHours(hours, minutes, 0, 0);
+    // 🪵 Debug
+    console.log("Scheduling session with:", {
+      patientId,
+      clinicianId: user.id,
+      scheduledTime: scheduledTime.toISOString(),
+    });
 
     setLoading(true);
-
     const { error } = await supabase.from("sessions").insert({
       patient_id: patientId,
-      clinician_id: user.id, // ✅ Associate session with current clinician
+      clinician_id: user.id,
       scheduled_time: scheduledTime.toISOString(),
       status: "scheduled",
       duration_minutes: 50,
@@ -98,9 +103,11 @@ export function ScheduleSessionModal({
 
     if (error) {
       console.error("❌ Error scheduling session:", error);
-    } else {
-      onScheduled();
+      alert("Failed to schedule session: " + error.message);
+      return;
     }
+
+    onScheduled(); // Refresh session list
   };
 
   const generateTimeSlots = () => {
@@ -172,13 +179,12 @@ export function ScheduleSessionModal({
                   onSelect={setDate}
                   disabled={(date) => date < new Date()}
                   initialFocus
-                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
           </div>
 
-          {/* Time Picker */}
+          {/* Time Select */}
           <div className="space-y-2">
             <Label htmlFor="time" className="text-gray-700 font-medium">
               Select Time
@@ -214,4 +220,5 @@ export function ScheduleSessionModal({
     </Dialog>
   );
 }
+
 
