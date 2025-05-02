@@ -47,13 +47,13 @@ export function ScheduleSessionModal({
   }, [open]);
 
   const fetchPatients = async () => {
-    setLoadingPatients(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, first_name, last_name")
+      .select("id, first_name, last_name") // ✅ updated to use `id` not `user_id`
       .eq("role", "patient");
 
     if (!error && data) {
+      console.log("✅ Patients loaded from Supabase:", data);
       setPatients(data);
     } else {
       console.error("❌ Error fetching patients:", error);
@@ -93,6 +93,7 @@ export function ScheduleSessionModal({
     });
 
     setLoading(false);
+
     if (error) {
       console.error("❌ Error scheduling session:", error);
     } else {
@@ -166,7 +167,7 @@ export function ScheduleSessionModal({
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(d) => d && setDate(d)} // ✅ FIXED
+                  onSelect={setDate}
                   disabled={(date) => date < new Date()}
                   initialFocus
                 />
@@ -210,6 +211,7 @@ export function ScheduleSessionModal({
     </Dialog>
   );
 }
+
 
 
 
