@@ -21,11 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { X, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 interface ScheduleSessionModalProps {
@@ -62,7 +58,6 @@ export function ScheduleSessionModal({
     } else {
       console.error("❌ Error fetching patients:", error);
     }
-
     setLoadingPatients(false);
   };
 
@@ -83,12 +78,10 @@ export function ScheduleSessionModal({
       return;
     }
 
-    // 🪵 Debug
-    console.log("Scheduling session with:", {
-      patientId,
-      clinicianId: user.id,
-      scheduledTime: scheduledTime.toISOString(),
-    });
+    // 🔍 Log for debugging
+    console.log("🧪 patientId selected:", patientId);
+    console.log("🧪 all patients:", patients);
+    console.log("🧪 clinicianId:", user.id);
 
     setLoading(true);
     const { error } = await supabase.from("sessions").insert({
@@ -100,14 +93,11 @@ export function ScheduleSessionModal({
     });
 
     setLoading(false);
-
     if (error) {
       console.error("❌ Error scheduling session:", error);
-      alert("Failed to schedule session: " + error.message);
-      return;
+    } else {
+      onScheduled();
     }
-
-    onScheduled(); // Refresh session list
   };
 
   const generateTimeSlots = () => {
@@ -156,7 +146,7 @@ export function ScheduleSessionModal({
             </Select>
           </div>
 
-          {/* Date Picker */}
+          {/* Date Select */}
           <div className="space-y-2">
             <Label className="text-gray-700 font-medium">Select Date</Label>
             <Popover>
@@ -220,5 +210,6 @@ export function ScheduleSessionModal({
     </Dialog>
   );
 }
+
 
 
