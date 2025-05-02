@@ -46,7 +46,6 @@ export function ScheduleSessionModal({
   const [loading, setLoading] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(true);
 
-  // 🔄 Fetch patients from profiles
   useEffect(() => {
     if (open) fetchPatients();
   }, [open]);
@@ -55,7 +54,7 @@ export function ScheduleSessionModal({
     setLoadingPatients(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, first_name, last_name")
+      .select("user_id, first_name, last_name")
       .eq("role", "patient");
 
     if (!error && data) {
@@ -75,7 +74,6 @@ export function ScheduleSessionModal({
     const scheduledTime = new Date(date);
     scheduledTime.setHours(hours, minutes, 0, 0);
 
-    // 🧠 Get the current clinician's user ID
     const {
       data: { user },
       error: userError,
@@ -86,13 +84,13 @@ export function ScheduleSessionModal({
       return;
     }
 
+    console.log("🟣 Selected patient ID:", patientId);
     console.log("🟢 Scheduling session with:");
     console.log("📅 Date/Time:", scheduledTime.toISOString());
     console.log("👩‍⚕️ Clinician ID:", user.id);
     console.log("🧑‍ Patient ID:", patientId);
 
     setLoading(true);
-
     const { error } = await supabase.from("sessions").insert({
       patient_id: patientId,
       clinician_id: user.id,
@@ -113,9 +111,8 @@ export function ScheduleSessionModal({
   const generateTimeSlots = () => {
     const slots = [];
     for (let hour = 8; hour < 18; hour++) {
-      const hourStr = hour.toString().padStart(2, "0");
-      slots.push(`${hourStr}:00`);
-      slots.push(`${hourStr}:30`);
+      slots.push(`${hour.toString().padStart(2, "0")}:00`);
+      slots.push(`${hour.toString().padStart(2, "0")}:30`);
     }
     return slots;
   };
@@ -140,10 +137,7 @@ export function ScheduleSessionModal({
             </Label>
             <Select
               value={patientId}
-              onValueChange={(val) => {
-                console.log("🟣 Selected patient ID:", val);
-                setPatientId(val);
-              }}
+              onValueChange={setPatientId}
               disabled={loadingPatients}
             >
               <SelectTrigger id="patient" className="bg-white">
@@ -151,7 +145,7 @@ export function ScheduleSessionModal({
               </SelectTrigger>
               <SelectContent>
                 {patients.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id}>
+                  <SelectItem key={patient.user_id} value={patient.user_id}>
                     {patient.first_name} {patient.last_name}
                   </SelectItem>
                 ))}
@@ -165,7 +159,7 @@ export function ScheduleSessionModal({
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant={"outline"}
+                  variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
                     !date && "text-muted-foreground"
@@ -179,8 +173,10 @@ export function ScheduleSessionModal({
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
-                  disabled={(date) => date < new Date()}
+                  onSelect={(d) => {
+                    if (d) setDate(d);
+                  }}
+                  disabled={(d) => d < new Date()}
                   initialFocus
                 />
               </PopoverContent>
@@ -223,6 +219,7 @@ export function ScheduleSessionModal({
     </Dialog>
   );
 }
+
 
 
 
