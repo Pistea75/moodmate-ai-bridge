@@ -21,7 +21,11 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { X, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 interface ScheduleSessionModalProps {
@@ -42,6 +46,7 @@ export function ScheduleSessionModal({
   const [loading, setLoading] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(true);
 
+  // 🔄 Fetch patients from profiles
   useEffect(() => {
     if (open) fetchPatients();
   }, [open]);
@@ -54,10 +59,12 @@ export function ScheduleSessionModal({
       .eq("role", "patient");
 
     if (!error && data) {
+      console.log("✅ Patients loaded from Supabase:", data);
       setPatients(data);
     } else {
       console.error("❌ Error fetching patients:", error);
     }
+
     setLoadingPatients(false);
   };
 
@@ -68,6 +75,7 @@ export function ScheduleSessionModal({
     const scheduledTime = new Date(date);
     scheduledTime.setHours(hours, minutes, 0, 0);
 
+    // 🧠 Get the current clinician's user ID
     const {
       data: { user },
       error: userError,
@@ -78,12 +86,13 @@ export function ScheduleSessionModal({
       return;
     }
 
-    // 🔍 Log for debugging
-    console.log("🧪 patientId selected:", patientId);
-    console.log("🧪 all patients:", patients);
-    console.log("🧪 clinicianId:", user.id);
+    console.log("🟢 Scheduling session with:");
+    console.log("📅 Date/Time:", scheduledTime.toISOString());
+    console.log("👩‍⚕️ Clinician ID:", user.id);
+    console.log("🧑‍ Patient ID:", patientId);
 
     setLoading(true);
+
     const { error } = await supabase.from("sessions").insert({
       patient_id: patientId,
       clinician_id: user.id,
@@ -93,6 +102,7 @@ export function ScheduleSessionModal({
     });
 
     setLoading(false);
+
     if (error) {
       console.error("❌ Error scheduling session:", error);
     } else {
@@ -130,7 +140,10 @@ export function ScheduleSessionModal({
             </Label>
             <Select
               value={patientId}
-              onValueChange={setPatientId}
+              onValueChange={(val) => {
+                console.log("🟣 Selected patient ID:", val);
+                setPatientId(val);
+              }}
               disabled={loadingPatients}
             >
               <SelectTrigger id="patient" className="bg-white">
