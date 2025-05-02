@@ -21,11 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { X, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 interface ScheduleSessionModalProps {
@@ -54,16 +50,14 @@ export function ScheduleSessionModal({
     setLoadingPatients(true);
     const { data, error } = await supabase
       .from("profiles")
-      .select("user_id, first_name, last_name")
+      .select("id, first_name, last_name")
       .eq("role", "patient");
 
     if (!error && data) {
-      console.log("✅ Patients loaded from Supabase:", data);
       setPatients(data);
     } else {
       console.error("❌ Error fetching patients:", error);
     }
-
     setLoadingPatients(false);
   };
 
@@ -84,7 +78,6 @@ export function ScheduleSessionModal({
       return;
     }
 
-    console.log("🟣 Selected patient ID:", patientId);
     console.log("🟢 Scheduling session with:");
     console.log("📅 Date/Time:", scheduledTime.toISOString());
     console.log("👩‍⚕️ Clinician ID:", user.id);
@@ -100,7 +93,6 @@ export function ScheduleSessionModal({
     });
 
     setLoading(false);
-
     if (error) {
       console.error("❌ Error scheduling session:", error);
     } else {
@@ -111,8 +103,9 @@ export function ScheduleSessionModal({
   const generateTimeSlots = () => {
     const slots = [];
     for (let hour = 8; hour < 18; hour++) {
-      slots.push(`${hour.toString().padStart(2, "0")}:00`);
-      slots.push(`${hour.toString().padStart(2, "0")}:30`);
+      const hourStr = hour.toString().padStart(2, "0");
+      slots.push(`${hourStr}:00`);
+      slots.push(`${hourStr}:30`);
     }
     return slots;
   };
@@ -145,7 +138,7 @@ export function ScheduleSessionModal({
               </SelectTrigger>
               <SelectContent>
                 {patients.map((patient) => (
-                  <SelectItem key={patient.user_id} value={patient.user_id}>
+                  <SelectItem key={patient.id} value={patient.id}>
                     {patient.first_name} {patient.last_name}
                   </SelectItem>
                 ))}
@@ -159,7 +152,7 @@ export function ScheduleSessionModal({
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant={"outline"}
                   className={cn(
                     "w-full justify-start text-left font-normal",
                     !date && "text-muted-foreground"
@@ -173,10 +166,8 @@ export function ScheduleSessionModal({
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(d) => {
-                    if (d) setDate(d);
-                  }}
-                  disabled={(d) => d < new Date()}
+                  onSelect={(d) => d && setDate(d)} // ✅ FIXED
+                  disabled={(date) => date < new Date()}
                   initialFocus
                 />
               </PopoverContent>
