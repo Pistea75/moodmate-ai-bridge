@@ -10,16 +10,27 @@ interface SessionMetadataProps {
   variant: 'patient' | 'clinician';
 }
 
-// Utility functions inlined for simplicity.
-// You can move these to dateTimeUtils if you'd prefer.
-function formatSessionDate(dateTime: string): string {
-  const date = parseISO(dateTime);
-  return isValid(date) ? format(date, 'MMMM d, yyyy') : 'Invalid Date';
+// Utility functions with proper null/undefined checks
+function formatSessionDate(dateTime: string | undefined | null): string {
+  if (!dateTime) return 'No date';
+  try {
+    const date = parseISO(dateTime);
+    return isValid(date) ? format(date, 'MMMM d, yyyy') : 'Invalid Date';
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid Date';
+  }
 }
 
-function formatSessionTime(dateTime: string): string {
-  const date = parseISO(dateTime);
-  return isValid(date) ? format(date, 'h:mm a') : 'Invalid Time';
+function formatSessionTime(dateTime: string | undefined | null): string {
+  if (!dateTime) return 'No time';
+  try {
+    const date = parseISO(dateTime);
+    return isValid(date) ? format(date, 'h:mm a') : 'Invalid Time';
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return 'Invalid Time';
+  }
 }
 
 export function SessionMetadata({

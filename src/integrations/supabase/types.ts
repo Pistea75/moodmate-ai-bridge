@@ -172,6 +172,7 @@ export type Database = {
           patient_id: string | null
           scheduled_time: string
           status: string | null
+          timezone: string | null
         }
         Insert: {
           clinician_id?: string | null
@@ -181,6 +182,7 @@ export type Database = {
           patient_id?: string | null
           scheduled_time: string
           status?: string | null
+          timezone?: string | null
         }
         Update: {
           clinician_id?: string | null
@@ -190,6 +192,7 @@ export type Database = {
           patient_id?: string | null
           scheduled_time?: string
           status?: string | null
+          timezone?: string | null
         }
         Relationships: [
           {

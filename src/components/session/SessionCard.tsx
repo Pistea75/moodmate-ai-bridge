@@ -30,10 +30,18 @@ export function SessionCard({ session, variant }: SessionCardProps) {
     handleRecordToggle
   } = useSessionCard(session);
   
+  // Ensure session data is valid
+  const validSession = {
+    ...session,
+    dateTime: session.dateTime || '',
+    duration: session.duration || 50,
+    status: session.status || 'upcoming'
+  };
+  
   return (
     <div className={`
       border rounded-xl p-4 ${
-        session.status === 'cancelled' 
+        validSession.status === 'cancelled' 
           ? 'bg-muted/50'
           : 'bg-white'
       }
@@ -41,16 +49,16 @@ export function SessionCard({ session, variant }: SessionCardProps) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className={`font-medium ${
-            session.status === 'cancelled' ? 'text-muted-foreground' : ''
+            validSession.status === 'cancelled' ? 'text-muted-foreground' : ''
           }`}>
-            {session.title}
+            {validSession.title}
           </h3>
           
           <SessionMetadata
-            dateTime={session.dateTime}
-            duration={session.duration}
-            patientName={session.patientName}
-            clinicianName={session.clinicianName}
+            dateTime={validSession.dateTime}
+            duration={validSession.duration}
+            patientName={validSession.patientName}
+            clinicianName={validSession.clinicianName}
             variant={variant}
           />
           
@@ -62,7 +70,7 @@ export function SessionCard({ session, variant }: SessionCardProps) {
         </div>
         
         <SessionStatusIndicator 
-          status={session.status}
+          status={validSession.status}
           isRecording={isRecording}
           recordingTime={recordingTime}
           timeToSession={timeToSession}
@@ -71,9 +79,9 @@ export function SessionCard({ session, variant }: SessionCardProps) {
         />
       </div>
       
-      {session.notes && (
+      {validSession.notes && (
         <div className="mt-3 pt-3 border-t text-sm">
-          <p className="text-muted-foreground">{session.notes}</p>
+          <p className="text-muted-foreground">{validSession.notes}</p>
         </div>
       )}
     </div>

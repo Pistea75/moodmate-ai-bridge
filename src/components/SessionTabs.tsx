@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SessionCard } from "@/components/SessionCard";
@@ -36,8 +37,15 @@ export function SessionTabs({ loading, filtered }: SessionTabsProps) {
                 <SessionCard
                   key={session.id}
                   session={{
-                    ...session,
-                    patientName: `${session.patient?.first_name} ${session.patient?.last_name}`,
+                    id: session.id,
+                    title: `Session with ${session.patient?.first_name || 'Patient'}`,
+                    dateTime: session.scheduled_time || '',
+                    duration: session.duration_minutes || 50,
+                    patientName: session.patient ? 
+                      `${session.patient.first_name || ''} ${session.patient.last_name || ''}`.trim() : 
+                      'Unknown Patient',
+                    status: session.status || 'upcoming',
+                    notes: session.notes
                   }}
                   variant="clinician"
                 />
