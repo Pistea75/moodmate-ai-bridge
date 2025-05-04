@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -102,7 +101,7 @@ export const scheduleSession = async ({
   timezone,
   isPatientView 
 }: {
-  date: Date;
+  date: string;  // Changed from Date to string to accept ISO string
   time: string;
   patientId?: string;
   clinicianId?: string;
@@ -113,9 +112,8 @@ export const scheduleSession = async ({
     throw new Error("Missing required fields");
   }
   
-  const [hours, minutes] = time.split(":").map(Number);
+  // Parse the ISO string back to a Date object
   const scheduledTime = new Date(date);
-  scheduledTime.setHours(hours, minutes, 0, 0);
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   

@@ -33,7 +33,11 @@ export function ScheduleSessionModal({
       setLoading(true);
 
       // 🧠 Combine selected date + time into a proper UTC datetime
-      const selectedDate = new Date(formData.date!);
+      if (!formData.date) {
+        throw new Error("Please select a date");
+      }
+      
+      const selectedDate = formData.date;
       const [hours, minutes] = formData.time.split(":").map(Number);
 
       // Create a new UTC datetime
@@ -97,4 +101,3 @@ export function ScheduleSessionModal({
     </Dialog>
   );
 }
-
