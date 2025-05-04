@@ -5,16 +5,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { DateTimePicker } from "./DateTimePicker";
-import { TimezoneSelector } from "./TimezoneSelector";
-import { PatientSelector } from "./PatientSelector";
-import { getCurrentTimezone, scheduleSession } from "@/utils/sessionUtils";
+import { scheduleSession } from "@/utils/sessionUtils";
 import { useToast } from "@/hooks/use-toast";
+import { SessionScheduleForm, SessionFormData } from "./SessionScheduleForm";
 
 interface ScheduleSessionModalProps {
   open: boolean;
@@ -30,46 +26,22 @@ export function ScheduleSessionModal({
   isPatientView = false,
 }: ScheduleSessionModalProps) {
   const { toast } = useToast();
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [time, setTime] = useState("09:00");
-  const [patientId, setPatientId] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [timezone, setTimezone] = useState<string>(getCurrentTimezone());
 
-  const handleSchedule = async () => {
-    if (!date) {
-      toast({
-        title: "Missing information",
-        description: "Please select a date",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!isPatientView && !patientId) {
-      toast({
-        title: "Missing information",
-        description: "Please select a patient",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleSchedule = async (formData: SessionFormData) => {
     try {
       setLoading(true);
       
       await scheduleSession({
-        date,
-        time,
-        patientId,
-        timezone,
+        date: formData.date!,
+        time: formData.time,
+        patientId: formData.patientId,
+        timezone: formData.timezone,
         isPatientView,
       });
       
       onScheduled();
-      if (isPatientView) {
-        onClose();
-      }
+      onClose();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -94,36 +66,14 @@ export function ScheduleSessionModal({
           </DialogClose>
         </DialogHeader>
 
-        <div className="space-y-4 px-6 py-5">
-          {/* Patient Selector - Only for clinician view */}
-          {!isPatientView && (
-            <PatientSelector value={patientId} onChange={setPatientId} />
-          )}
-
-          {/* Date and Time Selection */}
-          <DateTimePicker
-            date={date}
-            time={time}
-            onDateChange={setDate}
-            onTimeChange={setTime}
+        <div className="px-6 py-5">
+          <SessionScheduleForm 
+            onSubmit={handleSchedule}
+            onCancel={onClose}
+            isPatientView={isPatientView}
+            isSubmitting={loading}
           />
-
-          {/* Timezone Selection */}
-          <TimezoneSelector value={timezone} onChange={setTimezone} />
         </div>
-
-        <DialogFooter className="bg-gray-50 px-6 py-4 border-t">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSchedule}
-            disabled={loading || !date || (!isPatientView && !patientId)}
-            className="bg-mood-purple hover:bg-mood-purple/90 text-white"
-          >
-            {loading ? "Scheduling..." : "Schedule Session"}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
