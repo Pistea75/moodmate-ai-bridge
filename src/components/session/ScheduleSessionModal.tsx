@@ -27,10 +27,12 @@ export function ScheduleSessionModal({
 }: ScheduleSessionModalProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSchedule = async (formData: SessionFormData) => {
     try {
       setLoading(true);
+      setError(null);
 
       // 🧠 Combine selected date + time into a proper UTC datetime
       if (!formData.date) {
@@ -72,12 +74,14 @@ export function ScheduleSessionModal({
       onScheduled();
       onClose();
     } catch (error: any) {
+      console.error("❌ Error scheduling session:", error);
+      setError(error.message || "Failed to schedule session");
+      
       toast({
         title: "Error",
         description: error.message || "Failed to schedule session",
         variant: "destructive",
       });
-      console.error("❌ Error scheduling session:", error);
     } finally {
       setLoading(false);
     }
@@ -96,6 +100,11 @@ export function ScheduleSessionModal({
         </DialogHeader>
 
         <div className="px-6 py-5">
+          {error && (
+            <div className="bg-red-50 text-red-800 p-3 rounded-md mb-4 text-sm">
+              {error}
+            </div>
+          )}
           <SessionScheduleForm 
             onSubmit={handleSchedule}
             onCancel={onClose}
