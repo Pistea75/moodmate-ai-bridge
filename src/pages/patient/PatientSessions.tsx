@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ export default function PatientSessions() {
         id: s.id,
         scheduled_time: s.scheduled_time,
         duration_minutes: s.duration_minutes,
-        clinician_name: `${s.clinician?.first_name || "Unknown"} ${s.clinician?.last_name || ""}`
+        clinician_name: `${s.clinician?.first_name || "Doctor"} ${s.clinician?.last_name || ""}`
       }));
       setSessions(parsed);
     }
