@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import ClinicianLayout from "../../layouts/ClinicianLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { isSameDay, isBefore } from "date-fns";
+import { isSameDay, isBefore, addMinutes } from "date-fns";
 import { SessionTabs } from "@/components/SessionTabs";
 import { SessionHeader } from "@/components/SessionHeader";
 import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
@@ -50,13 +50,41 @@ export default function Sessions() {
 
   useEffect(() => {
     fetchSessions();
+    
+    // Set up an interval to refresh session status every minute
+    const intervalId = setInterval(() => {
+      fetchSessions();
+    }, 60000); // Check every minute
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   const today = new Date();
 
+  // Helper function to determine if a session is past
+  const isSessionPast = (session: SessionWithPatient) => {
+    try {
+      const sessionTime = new Date(session.scheduled_time);
+      const sessionEndTime = addMinutes(sessionTime, session.duration_minutes || 30);
+      return isBefore(sessionEndTime, today);
+    } catch (error) {
+      console.error("Error checking session time:", error);
+      return false;
+    }
+  };
+
+  // Filter sessions based on the criteria including end time
   const filtered = {
-    upcoming: sessions.filter((s) => isSameDay(new Date(s.scheduled_time), selectedDate)),
-    past: sessions.filter((s) => isBefore(new Date(s.scheduled_time), today)),
+    // Only show upcoming sessions that are for the selected date AND haven't ended yet
+    upcoming: sessions.filter((s) => 
+      isSameDay(new Date(s.scheduled_time), selectedDate) && 
+      !isSessionPast(s)
+    ),
+    
+    // Show past sessions (ones that have ended)
+    past: sessions.filter((s) => isSessionPast(s)),
+    
+    // All sessions
     all: sessions,
   };
 

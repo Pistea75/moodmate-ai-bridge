@@ -3,7 +3,7 @@ import PatientLayout from '../../layouts/PatientLayout';
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, Calendar, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { format, isBefore, isSameDay } from "date-fns";
+import { format, isBefore, isSameDay, addMinutes } from "date-fns";
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,13 +56,25 @@ export default function PatientSessions() {
 
   useEffect(() => {
     fetchSessions();
+    
+    // Set up an interval to refresh session status every minute
+    const intervalId = setInterval(() => {
+      fetchSessions();
+    }, 60000); // Check every minute
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   const filteredSessions = sessions.filter((session) =>
     isSameDay(new Date(session.scheduled_time), date)
   );
 
-  const isPast = (sessionDate: string) => isBefore(new Date(sessionDate), new Date());
+  // More accurate method to determine if a session is past (includes session duration)
+  const isPast = (sessionDate: string, durationMinutes: number = 30) => {
+    const sessionTime = new Date(sessionDate);
+    const sessionEndTime = addMinutes(sessionTime, durationMinutes);
+    return isBefore(sessionEndTime, new Date());
+  };
 
   const getSessionsForDate = (date: Date) => {
     return sessions.filter((session) =>
@@ -112,14 +124,14 @@ export default function PatientSessions() {
                 key={session.id}
                 className={cn(
                   "p-4",
-                  isPast(session.scheduled_time) ? "bg-muted/50" : ""
+                  isPast(session.scheduled_time, session.duration_minutes) ? "bg-muted/50" : ""
                 )}
               >
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium">Therapy Session</h3>
-                      {isPast(session.scheduled_time) && (
+                      {isPast(session.scheduled_time, session.duration_minutes) && (
                         <span className="text-xs bg-muted px-2 py-0.5 rounded">Completed</span>
                       )}
                     </div>
@@ -137,7 +149,7 @@ export default function PatientSessions() {
                       </span>
                     </div>
                   </div>
-                  {!isPast(session.scheduled_time) && (
+                  {!isPast(session.scheduled_time, session.duration_minutes) && (
                     <Button variant="outline">View Details</Button>
                   )}
                 </div>
