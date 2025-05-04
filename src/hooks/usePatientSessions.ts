@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 import { PatientSession } from '@/components/session/SessionList';
+import { isSameDay } from 'date-fns';
 
 export const usePatientSessions = () => {
   const [sessions, setSessions] = useState<PatientSession[]>([]);
