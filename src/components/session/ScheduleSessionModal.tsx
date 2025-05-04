@@ -31,15 +31,34 @@ export function ScheduleSessionModal({
   const handleSchedule = async (formData: SessionFormData) => {
     try {
       setLoading(true);
-      
+
+      // 🧠 Combine selected date + time into a proper UTC datetime
+      const selectedDate = new Date(formData.date!);
+      const [hours, minutes] = formData.time.split(":").map(Number);
+
+      // Create a new UTC datetime
+      const scheduledUTC = new Date(
+        Date.UTC(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          selectedDate.getDate(),
+          hours,
+          minutes,
+          0,
+          0
+        )
+      );
+
+      console.log("📅 Final UTC ISO Date:", scheduledUTC.toISOString());
+
       await scheduleSession({
-        date: formData.date!,
+        date: scheduledUTC.toISOString(), // UTC datetime
         time: formData.time,
         patientId: formData.patientId,
         timezone: formData.timezone,
         isPatientView,
       });
-      
+
       onScheduled();
       onClose();
     } catch (error: any) {
@@ -78,3 +97,4 @@ export function ScheduleSessionModal({
     </Dialog>
   );
 }
+
