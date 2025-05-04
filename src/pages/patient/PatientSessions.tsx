@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { SessionCalendar } from "@/components/SessionCalendar";
-import { PatientScheduleModal } from "@/components/session/PatientScheduleModal";
+import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
 
 type Session = {
   id: string;
@@ -155,11 +154,12 @@ export default function PatientSessions() {
         )}
       </div>
 
-      {/* Schedule Session Modal */}
-      <PatientScheduleModal
+      {/* Schedule Session Modal - using the unified component with isPatientView=true */}
+      <ScheduleSessionModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onScheduled={handleScheduleComplete}
+        isPatientView={true}
       />
     </PatientLayout>
   );
