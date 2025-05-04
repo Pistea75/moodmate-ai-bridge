@@ -1,3 +1,4 @@
+
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -108,7 +109,7 @@ export const scheduleSession = async ({
   timezone: string;
   isPatientView: boolean;
 }) => {
-  if (!date || !time || (!isPatientView && !patientId)) {
+  if (!date || !time) {
     throw new Error("Missing required fields");
   }
   
@@ -126,9 +127,20 @@ export const scheduleSession = async ({
   
   // For patient view, we need to find the clinician based on referral code
   if (isPatientView) {
-    const result = await resolvePatientSessionDetails(user.id);
-    finalClinicianId = result.clinicianId;
-    finalPatientId = user.id;
+    console.log("Patient view detected, resolving clinician ID...");
+    try {
+      const result = await resolvePatientSessionDetails(user.id);
+      finalClinicianId = result.clinicianId;
+      finalPatientId = user.id;
+      console.log("Resolved clinician ID:", finalClinicianId);
+    } catch (error) {
+      console.error("Error resolving clinician:", error);
+      throw new Error("No clinician found with referral code. Please connect to a clinician first.");
+    }
+  }
+  
+  if (!finalClinicianId || !finalPatientId) {
+    throw new Error("Missing clinician or patient information");
   }
   
   const { error } = await supabase.from("sessions").insert({
@@ -141,6 +153,7 @@ export const scheduleSession = async ({
   });
   
   if (error) {
+    console.error("Error creating session:", error);
     throw new Error(`Error scheduling session: ${error.message}`);
   }
   
@@ -149,19 +162,42 @@ export const scheduleSession = async ({
 
 // Helper function to resolve patient-clinician relationship
 async function resolvePatientSessionDetails(patientId: string) {
-  // Step 1: find patient's referral_code
+  console.log("Resolving patient-clinician relationship for patient:", patientId);
+  
+  // Step 1: Check user metadata first (faster and more direct)
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  
+  if (userError) {
+    console.error("Error getting user:", userError);
+    throw new Error("Could not get user information");
+  }
+  
+  // If the connected_clinician_id is in user metadata, use it
+  if (user?.user_metadata?.connected_clinician_id) {
+    console.log("Found clinician ID in user metadata:", user.user_metadata.connected_clinician_id);
+    return { clinicianId: user.user_metadata.connected_clinician_id };
+  }
+  
+  // Step 2: If not in metadata, check the profiles table
+  console.log("Checking profiles table for referral code...");
   const { data: patientProfile, error: profileError } = await supabase
     .from("profiles")
     .select("referral_code")
     .eq("id", patientId)
-    .eq("role", "patient")
     .single();
 
   if (!patientProfile || profileError) {
+    console.error("Error getting patient profile:", profileError);
     throw new Error("Could not get patient's referral code");
   }
 
-  // Step 2: find the clinician with matching referral_code
+  if (!patientProfile.referral_code) {
+    console.error("No referral code found for patient");
+    throw new Error("No referral code found. Please connect to a clinician first.");
+  }
+
+  // Step 3: Get clinician by referral code
+  console.log("Finding clinician with referral code:", patientProfile.referral_code);
   const { data: clinician, error: clinicianError } = await supabase
     .from("profiles")
     .select("id")
@@ -170,8 +206,10 @@ async function resolvePatientSessionDetails(patientId: string) {
     .single();
 
   if (!clinician || clinicianError) {
+    console.error("Error finding clinician:", clinicianError);
     throw new Error("No clinician found with referral code");
   }
 
+  console.log("Found clinician:", clinician.id);
   return { clinicianId: clinician.id };
 }

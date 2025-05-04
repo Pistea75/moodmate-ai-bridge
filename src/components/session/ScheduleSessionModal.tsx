@@ -54,15 +54,21 @@ export function ScheduleSessionModal({
       );
 
       console.log("📅 Final UTC ISO Date:", scheduledUTC.toISOString());
+      console.log("🔄 Scheduling session with isPatientView:", isPatientView);
 
       await scheduleSession({
         date: scheduledUTC.toISOString(), // UTC datetime
         time: formData.time,
-        patientId: formData.patientId,
+        patientId: isPatientView ? undefined : formData.patientId,
         timezone: formData.timezone,
         isPatientView,
       });
 
+      toast({
+        title: "Success",
+        description: "Session scheduled successfully",
+      });
+      
       onScheduled();
       onClose();
     } catch (error: any) {
@@ -71,7 +77,7 @@ export function ScheduleSessionModal({
         description: error.message || "Failed to schedule session",
         variant: "destructive",
       });
-      console.error("❌ Error:", error);
+      console.error("❌ Error scheduling session:", error);
     } finally {
       setLoading(false);
     }

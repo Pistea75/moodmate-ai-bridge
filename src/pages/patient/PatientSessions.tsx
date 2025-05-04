@@ -24,6 +24,28 @@ export default function PatientSessions() {
   const [date, setDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [hasConnectedClinician, setHasConnectedClinician] = useState<boolean | null>(null);
+
+  // Check if the patient has connected to a clinician
+  const checkClinicianConnection = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return false;
+    
+    // Check user metadata first (faster)
+    if (user.user_metadata?.connected_clinician_id) {
+      return true;
+    }
+    
+    // If not in metadata, check profile
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("referral_code")
+      .eq("id", user.id)
+      .single();
+      
+    return Boolean(profile?.referral_code);
+  };
 
   const fetchSessions = async () => {
     setLoading(true);
@@ -63,6 +85,9 @@ export default function PatientSessions() {
       fetchSessions();
     }, 60000); // Check every minute
     
+    // Check if the patient has a connected clinician
+    checkClinicianConnection().then(setHasConnectedClinician);
+    
     return () => clearInterval(intervalId);
   }, []);
 
@@ -81,6 +106,15 @@ export default function PatientSessions() {
     return sessions.filter((session) =>
       isSameDay(new Date(session.scheduled_time), date)
     );
+  };
+
+  const handleScheduleClick = () => {
+    if (!hasConnectedClinician) {
+      toast.error("You need to connect to a clinician first. Please add a referral code in your settings.");
+      return;
+    }
+    
+    setModalOpen(true);
   };
 
   const handleScheduleComplete = () => {
@@ -105,7 +139,10 @@ export default function PatientSessions() {
               getSessionsForDate={getSessionsForDate}
             />
 
-            <Button className="bg-mood-purple hover:bg-mood-purple/90" onClick={() => setModalOpen(true)}>
+            <Button 
+              className="bg-mood-purple hover:bg-mood-purple/90" 
+              onClick={handleScheduleClick}
+            >
               Schedule Session
             </Button>
           </div>
@@ -160,7 +197,10 @@ export default function PatientSessions() {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No sessions scheduled for this date.</p>
-            <Button className="mt-4 bg-mood-purple hover:bg-mood-purple/90" onClick={() => setModalOpen(true)}>
+            <Button 
+              className="mt-4 bg-mood-purple hover:bg-mood-purple/90" 
+              onClick={handleScheduleClick}
+            >
               Schedule Session
             </Button>
           </div>
