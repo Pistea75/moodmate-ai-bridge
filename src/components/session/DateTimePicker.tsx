@@ -5,6 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -64,11 +65,13 @@ export function DateTimePicker({ date, time, onDateChange, onTimeChange }: DateT
             <SelectValue placeholder="Select time" />
           </SelectTrigger>
           <SelectContent className="h-[200px]">
-            {generateTimeSlots().map((slot) => (
-              <SelectItem key={slot} value={slot}>
-                {slot}
-              </SelectItem>
-            ))}
+            <ScrollArea className="h-[200px]">
+              {generateTimeSlots().map((slot) => (
+                <SelectItem key={slot} value={slot}>
+                  {slot}
+                </SelectItem>
+              ))}
+            </ScrollArea>
           </SelectContent>
         </Select>
       </div>

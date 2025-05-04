@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { getCommonTimezones, getCurrentTimezone } from "@/utils/sessionUtils";
 
 interface TimezoneSelectorProps {
@@ -29,14 +30,16 @@ export function TimezoneSelector({ value, onChange }: TimezoneSelectorProps) {
           <SelectValue placeholder="Select time zone" />
         </SelectTrigger>
         <SelectContent className="max-h-[200px]">
-          <SelectItem value={currentTimezone}>
-            Current: {currentTimezone.replace(/_/g, " ")}
-          </SelectItem>
-          {timezones.map((zone) => (
-            <SelectItem key={zone} value={zone}>
-              {zone.replace(/_/g, " ")}
+          <ScrollArea className="h-[200px]">
+            <SelectItem value={currentTimezone}>
+              Current: {currentTimezone}
             </SelectItem>
-          ))}
+            {timezones.map((zone) => (
+              <SelectItem key={zone.value} value={zone.value}>
+                {zone.label}
+              </SelectItem>
+            ))}
+          </ScrollArea>
         </SelectContent>
       </Select>
     </div>

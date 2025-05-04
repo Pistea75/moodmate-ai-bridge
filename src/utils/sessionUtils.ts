@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -12,20 +11,43 @@ export const generateTimeSlots = () => {
   return slots;
 };
 
-export const getCommonTimezones = () => [
-  "America/New_York",
-  "America/Chicago", 
-  "America/Denver",
-  "America/Los_Angeles",
-  "Europe/London",
-  "Europe/Paris",
-  "Asia/Tokyo", 
-  "Australia/Sydney",
-  "Pacific/Auckland"
-];
+// Generate GMT-style time zone options
+export const getCommonTimezones = () => {
+  // Define common GMT offsets with descriptive names
+  return [
+    { value: "GMT+0", label: "GMT+0000 (London, Lisbon)" },
+    { value: "GMT-5", label: "GMT-0500 (New York, Eastern Time)" },
+    { value: "GMT-6", label: "GMT-0600 (Chicago, Central Time)" },
+    { value: "GMT-7", label: "GMT-0700 (Denver, Mountain Time)" },
+    { value: "GMT-8", label: "GMT-0800 (Los Angeles, Pacific Time)" },
+    { value: "GMT+1", label: "GMT+0100 (Berlin, Paris, Rome)" },
+    { value: "GMT+2", label: "GMT+0200 (Athens, Cairo)" },
+    { value: "GMT+3", label: "GMT+0300 (Moscow, Istanbul)" },
+    { value: "GMT+5:30", label: "GMT+0530 (New Delhi, Mumbai)" },
+    { value: "GMT+8", label: "GMT+0800 (Beijing, Singapore)" },
+    { value: "GMT+9", label: "GMT+0900 (Tokyo, Seoul)" },
+    { value: "GMT+10", label: "GMT+1000 (Sydney, Melbourne)" },
+    { value: "GMT+12", label: "GMT+1200 (Auckland, Fiji)" },
+  ];
+};
 
 export const getCurrentTimezone = () => {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Get the local timezone offset in minutes
+  const offsetMinutes = new Date().getTimezoneOffset();
+  // Convert to hours (timezone offsets are inverted, so we negate)
+  const offsetHours = -offsetMinutes / 60;
+  
+  // Format as GMT+/-XX:XX
+  const sign = offsetHours >= 0 ? '+' : '-';
+  const absHours = Math.abs(offsetHours);
+  const hours = Math.floor(absHours);
+  const minutes = Math.round((absHours - hours) * 60);
+  
+  if (minutes === 0) {
+    return `GMT${sign}${hours}`;
+  } else {
+    return `GMT${sign}${hours}:${minutes.toString().padStart(2, '0')}`;
+  }
 };
 
 export const scheduleSession = async ({ 
