@@ -111,7 +111,6 @@ export type Database = {
           referral_code: string | null
           role: string | null
           updated_at: string | null
-          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -122,7 +121,6 @@ export type Database = {
           referral_code?: string | null
           role?: string | null
           updated_at?: string | null
-          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -133,7 +131,6 @@ export type Database = {
           referral_code?: string | null
           role?: string | null
           updated_at?: string | null
-          user_id?: string | null
         }
         Relationships: []
       }
@@ -199,15 +196,29 @@ export type Database = {
             foreignKeyName: "sessions_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["clinician_id"]
+          },
+          {
+            foreignKeyName: "sessions_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["clinician_id"]
           },
           {
             foreignKeyName: "sessions_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
+            referencedColumns: ["id"]
           },
         ]
       }

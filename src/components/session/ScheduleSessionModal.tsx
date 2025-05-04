@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { X, CalendarIcon } from "lucide-react";
+import { X, CalendarIcon, Clock, Globe } from "lucide-react";
 import { format } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -28,12 +28,14 @@ interface ScheduleSessionModalProps {
   open: boolean;
   onClose: () => void;
   onScheduled: () => void;
+  isPatientView?: boolean;
 }
 
 export function ScheduleSessionModal({
   open,
   onClose,
   onScheduled,
+  isPatientView = false,
 }: ScheduleSessionModalProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [time, setTime] = useState("09:00");
@@ -41,6 +43,7 @@ export function ScheduleSessionModal({
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(true);
+  const [timezone, setTimezone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   useEffect(() => {
     if (open) fetchPatients();
@@ -49,7 +52,7 @@ export function ScheduleSessionModal({
   const fetchPatients = async () => {
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, first_name, last_name") // ✅ updated to use `id` not `user_id`
+      .select("id, first_name, last_name")
       .eq("role", "patient");
 
     if (!error && data) {
@@ -62,7 +65,7 @@ export function ScheduleSessionModal({
   };
 
   const handleSchedule = async () => {
-    if (!date || !time || !patientId) return;
+    if (!date || !time || (!isPatientView && !patientId)) return;
 
     const [hours, minutes] = time.split(":").map(Number);
     const scheduledTime = new Date(date);
@@ -74,22 +77,59 @@ export function ScheduleSessionModal({
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      console.error("❌ Could not get current clinician user:", userError);
+      console.error("❌ Could not get current user:", userError);
       return;
     }
 
-    console.log("🟢 Scheduling session with:");
-    console.log("📅 Date/Time:", scheduledTime.toISOString());
-    console.log("👩‍⚕️ Clinician ID:", user.id);
-    console.log("🧑‍ Patient ID:", patientId);
+    let clinicianId = user.id;
+    let targetPatientId = patientId;
+
+    if (isPatientView) {
+      // Logic for patient view
+      // Step 1: find patient's referral_code
+      const { data: patientProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("referral_code")
+        .eq("id", user.id)
+        .eq("role", "patient")
+        .single();
+
+      if (!patientProfile || profileError) {
+        console.error("❌ Could not get patient's referral code:", profileError);
+        return;
+      }
+
+      // Step 2: find the clinician with matching referral_code
+      const { data: clinician, error: clinicianError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("referral_code", patientProfile.referral_code)
+        .eq("role", "clinician")
+        .single();
+
+      if (!clinician || clinicianError) {
+        console.error("❌ No clinician found with referral code", clinicianError);
+        return;
+      }
+
+      clinicianId = clinician.id;
+      targetPatientId = user.id;
+    } else {
+      // Clinician view - log details
+      console.log("🟢 Scheduling session with:");
+      console.log("📅 Date/Time:", scheduledTime.toISOString());
+      console.log("👩‍⚕️ Clinician ID:", user.id);
+      console.log("🧑‍ Patient ID:", patientId);
+    }
 
     setLoading(true);
     const { error } = await supabase.from("sessions").insert({
-      patient_id: patientId,
-      clinician_id: user.id,
+      patient_id: targetPatientId,
+      clinician_id: clinicianId,
       scheduled_time: scheduledTime.toISOString(),
       status: "scheduled",
       duration_minutes: 50,
+      timezone: timezone,
     });
 
     setLoading(false);
@@ -98,12 +138,15 @@ export function ScheduleSessionModal({
       console.error("❌ Error scheduling session:", error);
     } else {
       onScheduled();
+      if (isPatientView) {
+        onClose();
+      }
     }
   };
 
   const generateTimeSlots = () => {
     const slots = [];
-    for (let hour = 8; hour < 18; hour++) {
+    for (let hour = 6; hour < 22; hour++) {
       const hourStr = hour.toString().padStart(2, "0");
       slots.push(`${hourStr}:00`);
       slots.push(`${hourStr}:30`);
@@ -111,12 +154,24 @@ export function ScheduleSessionModal({
     return slots;
   };
 
+  const timeZones = [
+    "America/New_York",
+    "America/Chicago",
+    "America/Denver",
+    "America/Los_Angeles",
+    "Europe/London",
+    "Europe/Paris",
+    "Asia/Tokyo",
+    "Australia/Sydney",
+    "Pacific/Auckland"
+  ];
+
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0 m-4 my-8">
         <DialogHeader className="border-b px-6 py-4 bg-white">
           <DialogTitle className="text-xl font-semibold text-gray-900">
-            Schedule New Session
+            {isPatientView ? "Schedule Session" : "Schedule New Session"}
           </DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-1">
             <X className="h-5 w-5" />
@@ -124,28 +179,30 @@ export function ScheduleSessionModal({
         </DialogHeader>
 
         <div className="space-y-4 px-6 py-5">
-          {/* Patient Select */}
-          <div className="space-y-2">
-            <Label htmlFor="patient" className="text-gray-700 font-medium">
-              Select Patient
-            </Label>
-            <Select
-              value={patientId}
-              onValueChange={setPatientId}
-              disabled={loadingPatients}
-            >
-              <SelectTrigger id="patient" className="bg-white">
-                <SelectValue placeholder="Select patient" />
-              </SelectTrigger>
-              <SelectContent>
-                {patients.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id}>
-                    {patient.first_name} {patient.last_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Patient Select - Only show for clinician view */}
+          {!isPatientView && (
+            <div className="space-y-2">
+              <Label htmlFor="patient" className="text-gray-700 font-medium">
+                Select Patient
+              </Label>
+              <Select
+                value={patientId}
+                onValueChange={setPatientId}
+                disabled={loadingPatients}
+              >
+                <SelectTrigger id="patient" className="bg-white">
+                  <SelectValue placeholder="Select patient" />
+                </SelectTrigger>
+                <SelectContent>
+                  {patients.map((patient) => (
+                    <SelectItem key={patient.id} value={patient.id}>
+                      {patient.first_name} {patient.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Date Select */}
           <div className="space-y-2">
@@ -170,6 +227,7 @@ export function ScheduleSessionModal({
                   onSelect={setDate}
                   disabled={(date) => date < new Date()}
                   initialFocus
+                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
@@ -184,10 +242,32 @@ export function ScheduleSessionModal({
               <SelectTrigger id="time" className="bg-white">
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="h-[200px]">
                 {generateTimeSlots().map((slot) => (
                   <SelectItem key={slot} value={slot}>
                     {slot}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Time Zone Select */}
+          <div className="space-y-2">
+            <Label htmlFor="timezone" className="text-gray-700 font-medium flex items-center gap-1">
+              <Globe className="h-4 w-4" /> Time Zone
+            </Label>
+            <Select value={timezone} onValueChange={setTimezone}>
+              <SelectTrigger id="timezone" className="bg-white">
+                <SelectValue placeholder="Select time zone" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[200px]">
+                <SelectItem value={Intl.DateTimeFormat().resolvedOptions().timeZone}>
+                  Current: {Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g, " ")}
+                </SelectItem>
+                {timeZones.map((zone) => (
+                  <SelectItem key={zone} value={zone}>
+                    {zone.replace(/_/g, " ")}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -201,7 +281,7 @@ export function ScheduleSessionModal({
           </Button>
           <Button
             onClick={handleSchedule}
-            disabled={loading || !date || !patientId}
+            disabled={loading || !date || (!isPatientView && !patientId)}
             className="bg-mood-purple hover:bg-mood-purple/90 text-white"
           >
             {loading ? "Scheduling..." : "Schedule Session"}
@@ -211,8 +291,3 @@ export function ScheduleSessionModal({
     </Dialog>
   );
 }
-
-
-
-
-
