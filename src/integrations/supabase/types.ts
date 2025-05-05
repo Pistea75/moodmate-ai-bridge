@@ -261,14 +261,28 @@ export type Database = {
             foreignKeyName: "tasks_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["clinician_id"]
+          },
+          {
+            foreignKeyName: "tasks_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "tasks_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["clinician_id"]
+          },
+          {
+            foreignKeyName: "tasks_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
