@@ -32,7 +32,10 @@ export function useTasks() {
 
       const { data, error } = await supabase
         .from('tasks')
-        .select('*, profiles:patient_id(first_name, last_name)')
+        .select(`
+          *,
+          profiles:patient_id(first_name, last_name)
+        `)
         .eq('clinician_id', user.user?.id);
 
       if (error) throw new Error(error.message);
