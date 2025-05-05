@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Task {
   id: string;
@@ -24,9 +25,10 @@ interface TaskListProps {
   tasks: Task[];
   onToggleCompleted: (taskId: string, completed: boolean) => void;
   onEditTask: (task: Task) => void;
+  loading: boolean;
 }
 
-export function TaskList({ tasks, onToggleCompleted, onEditTask }: TaskListProps) {
+export function TaskList({ tasks, onToggleCompleted, onEditTask, loading }: TaskListProps) {
   // Function to check if a task is overdue
   const isOverdue = (dateString: string, completed: boolean) => {
     const today = new Date();
@@ -35,6 +37,30 @@ export function TaskList({ tasks, onToggleCompleted, onEditTask }: TaskListProps
     dueDate.setHours(0, 0, 0, 0);
     return dueDate < today && !completed;
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white border rounded-lg p-4">
+            <div className="flex items-start gap-4">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <div className="flex-1">
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-4/5 mb-2" />
+                <div className="flex items-center gap-4 mt-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-2" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </div>
+              <Skeleton className="h-8 w-8 rounded-md" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4">
