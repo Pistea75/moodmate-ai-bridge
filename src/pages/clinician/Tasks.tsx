@@ -10,9 +10,15 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { TaskForm } from '@/components/clinician/TaskForm';
 import { TaskList } from '@/components/clinician/TaskList';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [formData, setFormData] = useState({
     id: null,
@@ -23,27 +29,59 @@ const TasksPage = () => {
   });
   const [isEdit, setIsEdit] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchTasks();
   }, []);
 
   const fetchTasks = async () => {
-    const { data: user } = await supabase.auth.getUser();
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data: user } = await supabase.auth.getUser();
 
-    const { data, error } = await supabase
-      .from('tasks')
-      .select('*, profiles:patient_id(first_name, last_name)')
-      .eq('clinician_id', user.user?.id);
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*, profiles:patient_id(first_name, last_name)')
+        .eq('clinician_id', user.user?.id);
 
-    if (error) console.error('Error fetching tasks:', error.message);
-    else setTasks(data || []);
+      if (error) throw new Error(error.message);
+      
+      setTasks(data || []);
+    } catch (err: any) {
+      console.error('Error fetching tasks:', err.message);
+      setError('Failed to load tasks. Please try again later.');
+      toast({
+        variant: "destructive",
+        title: "Error loading tasks",
+        description: err.message || 'An unexpected error occurred',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleToggleCompleted = async (taskId: string, newValue: boolean) => {
-    const { error } = await supabase.from('tasks').update({ completed: newValue }).eq('id', taskId);
-    if (error) console.error('Error updating task completion:', error.message);
-    else await fetchTasks();
+    try {
+      const { error } = await supabase.from('tasks').update({ completed: newValue }).eq('id', taskId);
+      
+      if (error) throw new Error(error.message);
+      
+      await fetchTasks();
+      toast({
+        title: `Task marked as ${newValue ? 'completed' : 'incomplete'}`,
+        description: "Task status updated successfully",
+      });
+    } catch (err: any) {
+      console.error('Error updating task completion:', err.message);
+      toast({
+        variant: "destructive",
+        title: "Failed to update task",
+        description: err.message || 'An unexpected error occurred',
+      });
+    }
   };
 
   const openEditModal = (task: any) => {
@@ -108,12 +146,42 @@ const TasksPage = () => {
           </div>
         </div>
 
-        {/* Task List */}
-        <TaskList 
-          tasks={filteredTasks}
-          onToggleCompleted={handleToggleCompleted}
-          onEditTask={openEditModal}
-        />
+        {/* Error state */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Loading state */}
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white border rounded-lg p-4">
+                <div className="flex items-start gap-4">
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-4/5 mb-2" />
+                    <div className="flex items-center gap-4 mt-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-2" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <TaskList 
+            tasks={filteredTasks}
+            onToggleCompleted={handleToggleCompleted}
+            onEditTask={openEditModal}
+          />
+        )}
       </div>
     </ClinicianLayout>
   );
