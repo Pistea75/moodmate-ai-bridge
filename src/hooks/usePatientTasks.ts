@@ -13,37 +13,28 @@ export function usePatientTasks() {
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
-    if (userError || !userData?.user) {
+    if (userError || !userData.user) {
       setError("User not authenticated");
       setLoading(false);
       return;
     }
 
-    // Step 1: Get profile by auth UID
-    const { data: profiles, error: profileError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', userData.user.id) // this assumes profiles.id === auth.user.id
-      .single();
+    const patientId = userData.user.id;
+    console.log("Authenticated patient_id:", patientId);
 
-    if (profileError || !profiles) {
-      setError("Profile not found");
-      setLoading(false);
-      return;
-    }
-
-    // Step 2: Get tasks for this profile ID
     const { data: tasksData, error: taskError } = await supabase
       .from('tasks')
       .select(`
         *,
         profiles:clinician_id(first_name, last_name)
       `)
-      .eq('patient_id', profiles.id);
+      .eq('patient_id', patientId);
 
     if (taskError) {
+      console.error("Error fetching tasks:", taskError.message);
       setError(taskError.message);
     } else {
+      console.log("Fetched tasks from Supabase:", tasksData);
       setTasks(tasksData || []);
     }
 
