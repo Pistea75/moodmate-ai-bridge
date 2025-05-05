@@ -43,8 +43,8 @@ export const scheduleSession = async ({
     throw new Error("Could not get current user");
   }
   
-  let finalClinicianId = clinicianId || user.id;
-  let finalPatientId = patientId;
+  let finalClinicianId = clinicianId;
+  let finalPatientId = patientId || user.id;
   
   // For patient view, we need to find the clinician based on referral code
   if (isPatientView) {
