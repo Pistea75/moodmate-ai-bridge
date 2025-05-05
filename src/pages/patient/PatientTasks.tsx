@@ -9,10 +9,25 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { usePatientTasks } from '@/hooks/usePatientTasks';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function PatientTasks() {
   const { tasks, loading, error, toggleTaskCompletion, deleteTask } = usePatientTasks();
+
+  // 🔍 Debug logs
+  console.log('Tasks from hook:', tasks);
+  console.log('Loading:', loading);
+  console.log('Error:', error);
 
   // Function to check if a task is overdue
   const isOverdue = (dateString: string, completed: boolean) => {
@@ -63,7 +78,7 @@ export default function PatientTasks() {
                 <p className="text-muted-foreground">No tasks assigned yet.</p>
               </div>
             )}
-            
+
             {tasks.map((task) => (
               <Card key={task.id} className={`p-4 ${isOverdue(task.due_date, task.completed) ? 'border-destructive/40' : ''}`}>
                 <div className="flex items-start gap-4">
@@ -73,18 +88,12 @@ export default function PatientTasks() {
                     className="mt-1"
                   />
                   <div className="flex-1">
-                    <h3
-                      className={`font-medium ${
-                        task.completed ? 'line-through text-muted-foreground' : ''
-                      }`}
-                    >
+                    <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
                       {task.title}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
                     <div className="flex items-center gap-4 mt-2 text-sm">
-                      <span className={`flex items-center gap-1 ${
-                        isOverdue(task.due_date, task.completed) ? 'text-destructive font-medium' : 'text-muted-foreground'
-                      }`}>
+                      <span className={`flex items-center gap-1 ${isOverdue(task.due_date, task.completed) ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
                         <Clock className="h-4 w-4" />
                         Due: {format(new Date(task.due_date), 'MMM d, yyyy')}
                         {isOverdue(task.due_date, task.completed) && " (overdue)"}
@@ -111,8 +120,8 @@ export default function PatientTasks() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
-                          onClick={() => deleteTask(task.id)} 
+                        <AlertDialogAction
+                          onClick={() => deleteTask(task.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                           Delete
