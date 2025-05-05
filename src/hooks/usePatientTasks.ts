@@ -13,32 +13,38 @@ export function usePatientTasks() {
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
-    if (userError || !userData.user) {
+    if (userError || !userData?.user) {
       setError("User not authenticated");
       setLoading(false);
       return;
     }
 
-    const userId = userData.user.id;
+    // Step 1: Get profile by auth UID
+    const { data: profiles, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userData.user.id) // this assumes profiles.id === auth.user.id
+      .single();
 
-    const { data, error: taskError } = await supabase
+    if (profileError || !profiles) {
+      setError("Profile not found");
+      setLoading(false);
+      return;
+    }
+
+    // Step 2: Get tasks for this profile ID
+    const { data: tasksData, error: taskError } = await supabase
       .from('tasks')
       .select(`
-        id,
-        title,
-        description,
-        due_date,
-        completed,
-        patient_id,
-        clinician_id,
+        *,
         profiles:clinician_id(first_name, last_name)
       `)
-      .eq('patient_id', userId);
+      .eq('patient_id', profiles.id);
 
     if (taskError) {
       setError(taskError.message);
     } else {
-      setTasks(data || []);
+      setTasks(tasksData || []);
     }
 
     setLoading(false);
@@ -66,5 +72,4 @@ export function usePatientTasks() {
     deleteTask
   };
 }
-
 
