@@ -7,20 +7,28 @@ export function usePatientTasks() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchTasks =import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+export function usePatientTasks() {
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const fetchTasks = async () => {
     setLoading(true);
     setError(null);
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
-    if (userError || !userData.user) {
-      setError("User not authenticated");
+    if (userError || !userData?.user) {
+      setError("User not authenticated.");
       setLoading(false);
       return;
     }
 
     const patientId = userData.user.id;
-    console.log("Authenticated patient_id:", patientId);
+    console.log("Patient ID:", patientId);
 
     const { data: tasksData, error: taskError } = await supabase
       .from('tasks')
@@ -31,11 +39,11 @@ export function usePatientTasks() {
       .eq('patient_id', patientId);
 
     if (taskError) {
-      console.error("Error fetching tasks:", taskError.message);
       setError(taskError.message);
+      console.error("Supabase query error:", taskError);
     } else {
-      console.log("Fetched tasks from Supabase:", tasksData);
-      setTasks(tasksData || []);
+      console.log("Fetched tasks:", tasksData);
+      setTasks(tasksData ?? []);
     }
 
     setLoading(false);
@@ -60,7 +68,7 @@ export function usePatientTasks() {
     loading,
     error,
     toggleTaskCompletion,
-    deleteTask
+    deleteTask,
   };
 }
 
