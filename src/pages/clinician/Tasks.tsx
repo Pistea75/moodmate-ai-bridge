@@ -1,8 +1,7 @@
-
 'use client';
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client"; // Updated import
+import { supabase } from "@/integrations/supabase/client";
 import ClinicianLayout from "@/layouts/ClinicianLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,9 +13,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 
+type Patient = {
+  patient_id: string;
+  profiles: {
+    first_name: string;
+    last_name: string;
+  };
+};
+
+type Task = {
+  id: string;
+  title: string;
+  description: string;
+  due_date: string;
+  completed: boolean;
+  profiles: {
+    first_name: string;
+    last_name: string;
+  };
+};
+
 const TasksPage = () => {
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [patients, setPatients] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
     title: "",
@@ -32,8 +51,11 @@ const TasksPage = () => {
       .select("*, profiles:patient_id(first_name, last_name)")
       .eq("clinician_id", user.user?.id);
 
-    if (error) console.error("Error fetching tasks", error);
-    else setTasks(data || []);
+    if (error) {
+      console.error("Error fetching tasks", error);
+    } else {
+      setTasks(data || []);
+    }
   };
 
   const fetchPatients = async () => {
@@ -43,11 +65,19 @@ const TasksPage = () => {
       .select("patient_id, profiles:patient_id(first_name, last_name)")
       .eq("clinician_id", user.user?.id);
 
-    if (error) console.error("Error fetching patients", error);
-    else setPatients(data || []);
+    if (error) {
+      console.error("Error fetching patients", error);
+    } else {
+      setPatients(data || []);
+    }
   };
 
   const handleCreateTask = async () => {
+    if (!formData.title || !formData.due_date || !formData.patient_id) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
     const { data: user } = await supabase.auth.getUser();
     const { error } = await supabase.from("tasks").insert({
       title: formData.title,
@@ -96,38 +126,50 @@ const TasksPage = () => {
                   New Task
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-md">
                 <div className="space-y-4">
-                  <Label>Title</Label>
-                  <Input
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  />
-                  <Label>Description</Label>
-                  <Textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
-                  <Label>Due Date</Label>
-                  <Input
-                    type="date"
-                    value={formData.due_date}
-                    onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                  />
-                  <Label>Assign to Patient</Label>
-                  <select
-                    className="w-full border rounded px-2 py-1"
-                    value={formData.patient_id}
-                    onChange={(e) => setFormData({ ...formData, patient_id: e.target.value })}
-                  >
-                    <option value="">Select a patient</option>
-                    {patients.map((p) => (
-                      <option key={p.patient_id} value={p.patient_id}>
-                        {p.profiles.first_name} {p.profiles.last_name}
-                      </option>
-                    ))}
-                  </select>
-                  <Button onClick={handleCreateTask}>Create Task</Button>
+                  <div>
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="due_date">Due Date</Label>
+                    <Input
+                      id="due_date"
+                      type="date"
+                      value={formData.due_date}
+                      onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="patient_id">Assign to Patient</Label>
+                    <select
+                      id="patient_id"
+                      className="w-full border rounded px-2 py-1"
+                      value={formData.patient_id}
+                      onChange={(e) => setFormData({ ...formData, patient_id: e.target.value })}
+                    >
+                      <option value="">Select a patient</option>
+                      {patients.map((p) => (
+                        <option key={p.patient_id} value={p.patient_id}>
+                          {p.profiles.first_name} {p.profiles.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <Button onClick={handleCreateTask} className="w-full">Create Task</Button>
                 </div>
               </DialogContent>
             </Dialog>
