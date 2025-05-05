@@ -12,67 +12,38 @@ export function usePatientTasks() {
     setError(null);
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
+
     if (userError || !userData.user) {
-      setError('Unable to retrieve user.');
+      setError("User not authenticated");
       setLoading(false);
       return;
     }
 
-    const userId = userData.user.id;
-
-    // Get the profile.id that maps to this auth.user.id
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', userId)
-      .single();
-
-    if (profileError || !profile) {
-      setError('Profile not found.');
-      setLoading(false);
-      return;
-    }
-
-    const { data, error: tasksError } = await supabase
+    const { data, error: taskError } = await supabase
       .from('tasks')
-      .select('*, profiles:clinician_id(first_name, last_name)')
-      .eq('patient_id', profile.id)
-      .order('due_date', { ascending: true });
+      .select(`
+        *,
+        profiles:clinician_id(first_name, last_name)
+      `)
+      .eq('patient_id', userData.user.id);
 
-    if (tasksError) {
-      setError('Error fetching tasks.');
-      setLoading(false);
-      return;
+    if (taskError) {
+      setError(taskError.message);
+    } else {
+      setTasks(data || []);
     }
 
-    setTasks(data || []);
     setLoading(false);
   };
 
   const toggleTaskCompletion = async (taskId: number, completed: boolean) => {
-    const { error } = await supabase
-      .from('tasks')
-      .update({ completed })
-      .eq('id', taskId);
-
-    if (!error) {
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === taskId ? { ...task, completed } : task
-        )
-      );
-    }
+    await supabase.from('tasks').update({ completed }).eq('id', taskId);
+    fetchTasks();
   };
 
   const deleteTask = async (taskId: number) => {
-    const { error } = await supabase
-      .from('tasks')
-      .delete()
-      .eq('id', taskId);
-
-    if (!error) {
-      setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    }
+    await supabase.from('tasks').delete().eq('id', taskId);
+    fetchTasks();
   };
 
   useEffect(() => {
@@ -84,6 +55,7 @@ export function usePatientTasks() {
     loading,
     error,
     toggleTaskCompletion,
-    deleteTask,
+    deleteTask
   };
 }
+
