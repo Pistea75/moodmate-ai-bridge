@@ -225,6 +225,54 @@ export type Database = {
           },
         ]
       }
+      tasks: {
+        Row: {
+          clinician_id: string | null
+          completed: boolean | null
+          description: string | null
+          due_date: string | null
+          id: string
+          inserted_at: string | null
+          patient_id: string | null
+          title: string
+        }
+        Insert: {
+          clinician_id?: string | null
+          completed?: boolean | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          inserted_at?: string | null
+          patient_id?: string | null
+          title: string
+        }
+        Update: {
+          clinician_id?: string | null
+          completed?: boolean | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          inserted_at?: string | null
+          patient_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           email: string | null

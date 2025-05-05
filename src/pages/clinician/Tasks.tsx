@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/integrations/supabase/client"; // Updated import
 import ClinicianLayout from "@/layouts/ClinicianLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 
 const TasksPage = () => {
-  const supabase = createClientComponentClient();
   const [tasks, setTasks] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -171,4 +170,3 @@ const TasksPage = () => {
 };
 
 export default TasksPage;
-
