@@ -14,7 +14,7 @@ import { AlertCircle } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 
 const TasksPage = () => {
-  const { tasks, loading, error, search, setSearch, fetchTasks, toggleTaskCompletion } = useTasks();
+  const { tasks, loading, error, search, setSearch, fetchTasks, toggleTaskCompletion, deleteTask } = useTasks();
   const [formData, setFormData] = useState({
     id: null as string | null,
     title: '',
@@ -94,6 +94,7 @@ const TasksPage = () => {
           tasks={tasks}
           onToggleCompleted={toggleTaskCompletion}
           onEditTask={openEditModal}
+          onDeleteTask={deleteTask}
           loading={loading}
         />
       </div>

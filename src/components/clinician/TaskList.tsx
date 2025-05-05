@@ -1,12 +1,13 @@
 
 import { format } from 'date-fns';
-import { Clock, Pencil } from 'lucide-react';
+import { Clock, Pencil, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface Task {
   id: string;
@@ -25,10 +26,11 @@ interface TaskListProps {
   tasks: Task[];
   onToggleCompleted: (taskId: string, completed: boolean) => void;
   onEditTask: (task: Task) => void;
+  onDeleteTask: (taskId: string) => void;
   loading: boolean;
 }
 
-export function TaskList({ tasks, onToggleCompleted, onEditTask, loading }: TaskListProps) {
+export function TaskList({ tasks, onToggleCompleted, onEditTask, onDeleteTask, loading }: TaskListProps) {
   // Function to check if a task is overdue
   const isOverdue = (dateString: string, completed: boolean) => {
     const today = new Date();
@@ -101,10 +103,37 @@ export function TaskList({ tasks, onToggleCompleted, onEditTask, loading }: Task
                 </span>
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => onEditTask(task)}>
-              <Pencil className="h-4 w-4" />
-              <span className="sr-only">Edit task</span>
-            </Button>
+            <div className="flex space-x-1">
+              <Button variant="ghost" size="sm" onClick={() => onEditTask(task)}>
+                <Pencil className="h-4 w-4" />
+                <span className="sr-only">Edit task</span>
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete task</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete this task. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={() => onDeleteTask(task.id)} 
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         </Card>
       ))}

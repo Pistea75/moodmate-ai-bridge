@@ -84,6 +84,30 @@ export function usePatientTasks() {
     }
   };
 
+  const deleteTask = async (taskId: string) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+      
+      if (error) throw new Error(error.message);
+      
+      await fetchTasks();
+      toast({
+        title: "Task deleted",
+        description: "Task has been removed successfully",
+      });
+    } catch (err: any) {
+      console.error('Error deleting task:', err.message);
+      toast({
+        variant: "destructive",
+        title: "Failed to delete task",
+        description: err.message || 'An unexpected error occurred',
+      });
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
@@ -93,6 +117,7 @@ export function usePatientTasks() {
     loading,
     error,
     fetchTasks,
-    toggleTaskCompletion
+    toggleTaskCompletion,
+    deleteTask
   };
 }

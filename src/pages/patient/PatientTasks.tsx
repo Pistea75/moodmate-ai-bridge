@@ -1,6 +1,6 @@
 
 import { format } from 'date-fns';
-import { Clock } from 'lucide-react';
+import { Clock, Trash2 } from 'lucide-react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { usePatientTasks } from '@/hooks/usePatientTasks';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export default function PatientTasks() {
-  const { tasks, loading, error, toggleTaskCompletion } = usePatientTasks();
+  const { tasks, loading, error, toggleTaskCompletion, deleteTask } = usePatientTasks();
 
   // Function to check if a task is overdue
   const isOverdue = (dateString: string, completed: boolean) => {
@@ -94,6 +95,31 @@ export default function PatientTasks() {
                       </span>
                     </div>
                   </div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete task</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete this task. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => deleteTask(task.id)} 
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </Card>
             ))}
