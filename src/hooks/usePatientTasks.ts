@@ -42,7 +42,7 @@ export function usePatientTasks() {
       .from('tasks')
       .select(`
         *,
-        profiles!tasks_patient_id_fkey(first_name, last_name)
+        profiles!tasks_clinician_id_fkey(first_name, last_name)
       `)
       .eq('patient_id', patientId);
 

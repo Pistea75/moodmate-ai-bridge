@@ -91,7 +91,9 @@ export default function PatientTasks() {
                     <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
                       {task.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
+                    <p className={`text-sm text-muted-foreground mt-1 ${task.completed ? 'line-through' : ''}`}>
+                      {task.description}
+                    </p>
                     <div className="flex items-center gap-4 mt-2 text-sm">
                       <span className={`flex items-center gap-1 ${isOverdue(task.due_date, task.completed) ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
                         <Clock className="h-4 w-4" />
@@ -100,7 +102,7 @@ export default function PatientTasks() {
                       </span>
                       <span className="text-muted-foreground">•</span>
                       <span className="text-muted-foreground">
-                        Assigned by: {task.profiles?.first_name} {task.profiles?.last_name}
+                        Assigned by: {task.profiles?.first_name || ''} {task.profiles?.last_name || ''}
                       </span>
                     </div>
                   </div>
