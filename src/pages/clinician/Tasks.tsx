@@ -1,108 +1,116 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import ClinicianLayout from "@/layouts/ClinicianLayout";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, Clock, PlusCircle } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { format } from "date-fns";
-
-type Patient = {
-  patient_id: string;
-  profiles: {
-    first_name: string;
-    last_name: string;
-  };
-};
-
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  due_date: string;
-  completed: boolean;
-  profiles: {
-    first_name: string;
-    last_name: string;
-  };
-};
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import ClinicianLayout from '@/layouts/ClinicianLayout';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Calendar, Clock, Pencil, PlusCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { format } from 'date-fns';
 
 const TasksPage = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [search, setSearch] = useState("");
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [patients, setPatients] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    due_date: "",
-    patient_id: ""
+    id: null,
+    title: '',
+    description: '',
+    due_date: '',
+    patient_id: '',
   });
-
-  const fetchTasks = async () => {
-    const { data: user } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-      .from("tasks")
-      .select("*, profiles:patient_id(first_name, last_name)")
-      .eq("clinician_id", user.user?.id);
-
-    if (error) {
-      console.error("Error fetching tasks", error);
-    } else {
-      setTasks(data || []);
-    }
-  };
-
-  const fetchPatients = async () => {
-    const { data: user } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-      .from("patient_clinician_links")
-      .select("patient_id, profiles:patient_id(first_name, last_name)")
-      .eq("clinician_id", user.user?.id);
-
-    if (error) {
-      console.error("Error fetching patients", error);
-    } else {
-      setPatients(data || []);
-    }
-  };
-
-  const handleCreateTask = async () => {
-    if (!formData.title || !formData.due_date || !formData.patient_id) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    const { data: user } = await supabase.auth.getUser();
-    const { error } = await supabase.from("tasks").insert({
-      title: formData.title,
-      description: formData.description,
-      due_date: formData.due_date,
-      completed: false,
-      patient_id: formData.patient_id,
-      clinician_id: user.user?.id
-    });
-
-    if (error) {
-      console.error("Error creating task", error);
-    } else {
-      setFormData({ title: "", description: "", due_date: "", patient_id: "" });
-      fetchTasks();
-    }
-  };
+  const [isEdit, setIsEdit] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
     fetchTasks();
     fetchPatients();
   }, []);
 
+  const fetchTasks = async () => {
+    const { data: user } = await supabase.auth.getUser();
+
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*, profiles:patient_id(first_name, last_name)')
+      .eq('clinician_id', user.user?.id);
+
+    if (error) console.error('Error fetching tasks:', error.message);
+    else setTasks(data || []);
+  };
+
+  const fetchPatients = async () => {
+    const { data: user } = await supabase.auth.getUser();
+
+    const { data, error } = await supabase
+      .from('patient_clinician_links')
+      .select('patient_id, profiles:patient_id(first_name, last_name)')
+      .eq('clinician_id', user.user?.id);
+
+    if (error) console.error('Error fetching patients:', error.message);
+    else setPatients(data || []);
+  };
+
+  const handleCreateOrUpdateTask = async () => {
+    const { data: user } = await supabase.auth.getUser();
+
+    if (isEdit && formData.id) {
+      const { error } = await supabase
+        .from('tasks')
+        .update({
+          title: formData.title,
+          description: formData.description,
+          due_date: formData.due_date,
+          patient_id: formData.patient_id,
+        })
+        .eq('id', formData.id)
+        .eq('clinician_id', user.user?.id);
+
+      if (error) return console.error('Update failed:', error.message);
+    } else {
+      const { error } = await supabase.from('tasks').insert({
+        title: formData.title,
+        description: formData.description,
+        due_date: formData.due_date,
+        completed: false,
+        patient_id: formData.patient_id,
+        clinician_id: user.user?.id,
+      });
+
+      if (error) return console.error('Create failed:', error.message);
+    }
+
+    setFormData({ id: null, title: '', description: '', due_date: '', patient_id: '' });
+    setIsEdit(false);
+    setShowDialog(false);
+    await fetchTasks();
+  };
+
+  const handleToggleCompleted = async (taskId: string, newValue: boolean) => {
+    const { error } = await supabase.from('tasks').update({ completed: newValue }).eq('id', taskId);
+    if (error) console.error('Error updating task completion:', error.message);
+    else await fetchTasks();
+  };
+
+  const openEditModal = (task: any) => {
+    setFormData({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      due_date: task.due_date?.slice(0, 10),
+      patient_id: task.patient_id,
+    });
+    setIsEdit(true);
+    setShowDialog(true);
+  };
+
   const filteredTasks = tasks.filter((task) =>
-    `${task.profiles.first_name} ${task.profiles.last_name}`
+    `${task.profiles?.first_name ?? ''} ${task.profiles?.last_name ?? ''}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
@@ -110,6 +118,7 @@ const TasksPage = () => {
   return (
     <ClinicianLayout>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Tasks</h1>
           <div className="flex gap-2">
@@ -119,44 +128,47 @@ const TasksPage = () => {
               onChange={(e) => setSearch(e.target.value)}
               className="w-64"
             />
-            <Dialog>
+            <Dialog open={showDialog} onOpenChange={setShowDialog}>
               <DialogTrigger asChild>
-                <Button variant="default" className="gap-2">
+                <Button
+                  className="gap-2"
+                  onClick={() => {
+                    setFormData({ id: null, title: '', description: '', due_date: '', patient_id: '' });
+                    setIsEdit(false);
+                    setShowDialog(true);
+                  }}
+                >
                   <PlusCircle className="h-4 w-4" />
                   New Task
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="sm:max-w-[500px]">
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="title">Title</Label>
+                    <Label>Title</Label>
                     <Input
-                      id="title"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="description">Description</Label>
+                    <Label>Description</Label>
                     <Textarea
-                      id="description"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="due_date">Due Date</Label>
+                    <Label>Due Date</Label>
                     <Input
-                      id="due_date"
                       type="date"
                       value={formData.due_date}
                       onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="patient_id">Assign to Patient</Label>
+                    <Label>Assign to Patient</Label>
                     <select
-                      id="patient_id"
                       className="w-full border rounded px-2 py-1"
                       value={formData.patient_id}
                       onChange={(e) => setFormData({ ...formData, patient_id: e.target.value })}
@@ -169,25 +181,37 @@ const TasksPage = () => {
                       ))}
                     </select>
                   </div>
-                  <Button onClick={handleCreateTask} className="w-full">Create Task</Button>
+                  <Button className="w-full" onClick={handleCreateOrUpdateTask}>
+                    {isEdit ? 'Update Task' : 'Create Task'}
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
           </div>
         </div>
 
+        {/* Task List */}
         <div className="grid gap-4">
+          {filteredTasks.length === 0 && (
+            <p className="text-muted-foreground">No tasks found.</p>
+          )}
           {filteredTasks.map((task) => (
             <Card key={task.id} className="p-4">
               <div className="flex items-start gap-4">
-                <Checkbox checked={task.completed} className="mt-1" />
+                <Checkbox
+                  checked={task.completed}
+                  onCheckedChange={(val) => handleToggleCompleted(task.id, Boolean(val))}
+                  className="mt-1"
+                />
                 <div className="flex-1">
-                  <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                  <h3
+                    className={`font-medium ${
+                      task.completed ? 'line-through text-muted-foreground' : ''
+                    }`}
+                  >
                     {task.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {task.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
                   <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
@@ -195,12 +219,12 @@ const TasksPage = () => {
                     </span>
                     <span>•</span>
                     <span>
-                      Patient: {task.profiles.first_name} {task.profiles.last_name}
+                      Patient: {task.profiles?.first_name} {task.profiles?.last_name}
                     </span>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm">
-                  Details
+                <Button variant="ghost" size="sm" onClick={() => openEditModal(task)}>
+                  <Pencil className="h-4 w-4" />
                 </Button>
               </div>
             </Card>
