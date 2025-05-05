@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,10 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar, Clock, Pencil, PlusCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
+import { PatientSelector } from '@/components/session/PatientSelector';
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState<any[]>([]);
@@ -143,45 +145,59 @@ const TasksPage = () => {
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
-                <div className="space-y-4">
-                  <div>
-                    <Label>Title</Label>
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold">
+                    {isEdit ? 'Edit Task' : 'Create New Task'}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 p-4">
+                  {/* Patient Selection - First */}
+                  <div className="space-y-2">
+                    <PatientSelector 
+                      value={formData.patient_id} 
+                      onChange={(value) => setFormData({ ...formData, patient_id: value })}
+                    />
+                  </div>
+                  
+                  {/* Title - Second */}
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Title</Label>
                     <Input
+                      id="title"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Task title"
                     />
                   </div>
-                  <div>
-                    <Label>Description</Label>
+                  
+                  {/* Description - Third */}
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
                     <Textarea
+                      id="description"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Task description"
+                      className="min-h-[100px]"
                     />
                   </div>
-                  <div>
-                    <Label>Due Date</Label>
+                  
+                  {/* Due Date - Fourth */}
+                  <div className="space-y-2">
+                    <Label htmlFor="due_date">Due Date</Label>
                     <Input
+                      id="due_date"
                       type="date"
                       value={formData.due_date}
                       onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
                     />
                   </div>
-                  <div>
-                    <Label>Assign to Patient</Label>
-                    <select
-                      className="w-full border rounded px-2 py-1"
-                      value={formData.patient_id}
-                      onChange={(e) => setFormData({ ...formData, patient_id: e.target.value })}
-                    >
-                      <option value="">Select a patient</option>
-                      {patients.map((p) => (
-                        <option key={p.patient_id} value={p.patient_id}>
-                          {p.profiles.first_name} {p.profiles.last_name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <Button className="w-full" onClick={handleCreateOrUpdateTask}>
+                  
+                  <Button 
+                    className="w-full mt-6" 
+                    onClick={handleCreateOrUpdateTask}
+                    disabled={!formData.title || !formData.patient_id || !formData.due_date}
+                  >
                     {isEdit ? 'Update Task' : 'Create Task'}
                   </Button>
                 </div>
