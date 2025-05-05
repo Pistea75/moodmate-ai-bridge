@@ -19,25 +19,25 @@ export default function SignupPatient() {
     referralCode: '',
     acceptTerms: false
   });
-  
+
   const navigate = useNavigate();
   const { isLoading, error, signUp, clearError } = useAuthFlow();
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
-    
+
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value
     });
-    
+
     if (error) clearError();
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (step === 1) {
       if (formData.password !== formData.confirmPassword) {
         toast({
@@ -47,7 +47,7 @@ export default function SignupPatient() {
         });
         return;
       }
-      
+
       if (formData.password.length < 6) {
         toast({
           title: "Error",
@@ -56,11 +56,11 @@ export default function SignupPatient() {
         });
         return;
       }
-      
+
       setStep(2);
       return;
     }
-    
+
     if (!formData.acceptTerms) {
       toast({
         title: "Error",
@@ -69,39 +69,33 @@ export default function SignupPatient() {
       });
       return;
     }
-    
+
     try {
-      
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ');
 
-      console.log('🚨 Referral code from form:', formData.referralCode);
+      let referralCodeInput: string | null = null;
 
-let referralCodeInput: string | null = null;
+      if (formData.referralCode?.trim()) {
+        referralCodeInput = formData.referralCode.trim().toUpperCase();
 
-if (formData.referralCode?.trim()) {
-  referralCodeInput = formData.referralCode.trim().toUpperCase();
+        const { data: clinician, error } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .ilike('referral_code', referralCodeInput)
+          .eq('role', 'clinician')
+          .maybeSingle();
 
-  const { data: clinician, error } = await supabase
-    .from('profiles')
-    .select('user_id')
-    .ilike('referral_code', referralCodeInput)
-    .eq('role', 'clinician')
-    .maybeSingle();
-
-  console.log('✅ Full raw response:', clinician);
-  console.log('❌ error:', error);
-
-  if (error || !clinician) {
-    toast({
-      title: "Invalid Referral Code",
-      description: "Please check the referral code with your clinician",
-      variant: "destructive"
-    });
-    return;
-  }
-}
+        if (error || !clinician) {
+          toast({
+            title: "Invalid Referral Code",
+            description: "Please check the referral code with your clinician",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
 
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
@@ -112,7 +106,7 @@ if (formData.referralCode?.trim()) {
             last_name: lastName || '',
             role: 'patient',
             referral_code: referralCodeInput,
-            language: 'en'
+            language: formData.language
           }
         }
       });
@@ -127,10 +121,73 @@ if (formData.referralCode?.trim()) {
         return;
       }
 
+      const newUser = data.user;
+
+      if (!newUser) {
+        throw new Error('User not returned after signup');
+      }
+
+      // Create profile manually (if you don't have an auth.trigger to handle it)
+      const { data: patientProfile, error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          user_id: newUser.id,
+          first_name: firstName,
+          last_name: lastName || '',
+          role: 'patient',
+          referral_code: referralCodeInput,
+          language: formData.language
+        })
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error('Failed to create patient profile:', profileError);
+        toast({
+          title: "Error",
+          description: "Could not create profile. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Link patient to clinician if referral code is valid
+      if (referralCodeInput) {
+        const { data: clinicianProfile, error: clinicianError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('referral_code', referralCodeInput)
+          .eq('role', 'clinician')
+          .single();
+
+        if (clinicianError || !clinicianProfile) {
+          console.warn('Clinician not found to link');
+        } else {
+          const { error: linkError } = await supabase
+            .from('patient_clinician_links')
+            .insert({
+              patient_id: patientProfile.id,
+              clinician_id: clinicianProfile.id
+            });
+
+          if (linkError) {
+            console.error('Error linking patient to clinician:', linkError);
+            toast({
+              title: "Warning",
+              description: "Account created, but failed to link to clinician.",
+              variant: "default"
+            });
+          } else {
+            console.log("✅ Patient linked to clinician successfully");
+          }
+        }
+      }
+
       toast({
         title: "Account Created",
         description: "Please check your email to verify your account."
       });
+
       navigate('/login');
     } catch (err: any) {
       console.error("Signup error:", err);
@@ -143,7 +200,7 @@ if (formData.referralCode?.trim()) {
   };
 
   return (
-    <AuthFormLayout 
+    <AuthFormLayout
       title="Join as a Patient"
       subtitle="Create your account to get started with MoodMate"
     >
@@ -157,9 +214,9 @@ if (formData.referralCode?.trim()) {
         isLoading={isLoading}
         error={error?.message}
         renderStep2Fields={() => (
-          <PatientSignupStep2 
-            formData={formData} 
-            handleChange={handleChange} 
+          <PatientSignupStep2
+            formData={formData}
+            handleChange={handleChange}
           />
         )}
       />
