@@ -28,12 +28,12 @@ interface TaskListProps {
 
 export function TaskList({ tasks, onToggleCompleted, onEditTask }: TaskListProps) {
   // Function to check if a task is overdue
-  const isOverdue = (dateString: string) => {
+  const isOverdue = (dateString: string, completed: boolean) => {
     const today = new Date();
     const dueDate = new Date(dateString);
     today.setHours(0, 0, 0, 0);
     dueDate.setHours(0, 0, 0, 0);
-    return dueDate < today && !task.completed;
+    return dueDate < today && !completed;
   };
 
   return (
@@ -45,7 +45,7 @@ export function TaskList({ tasks, onToggleCompleted, onEditTask }: TaskListProps
       )}
       
       {tasks.map((task) => (
-        <Card key={task.id} className={`p-4 ${isOverdue(task.due_date) ? 'border-destructive/40' : ''}`}>
+        <Card key={task.id} className={`p-4 ${isOverdue(task.due_date, task.completed) ? 'border-destructive/40' : ''}`}>
           <div className="flex items-start gap-4">
             <Checkbox
               checked={task.completed}
@@ -63,11 +63,11 @@ export function TaskList({ tasks, onToggleCompleted, onEditTask }: TaskListProps
               <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
               <div className="flex items-center gap-4 mt-2 text-sm">
                 <span className={`flex items-center gap-1 ${
-                  isOverdue(task.due_date) ? 'text-destructive font-medium' : 'text-muted-foreground'
+                  isOverdue(task.due_date, task.completed) ? 'text-destructive font-medium' : 'text-muted-foreground'
                 }`}>
                   <Clock className="h-4 w-4" />
                   Due: {format(new Date(task.due_date), 'MMM d, yyyy')}
-                  {isOverdue(task.due_date) && " (overdue)"}
+                  {isOverdue(task.due_date, task.completed) && " (overdue)"}
                 </span>
                 <span className="text-muted-foreground">•</span>
                 <span className="text-muted-foreground">
