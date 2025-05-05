@@ -1,69 +1,104 @@
 
+import { format } from 'date-fns';
+import { Clock } from 'lucide-react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, Clock } from "lucide-react";
+import { Skeleton } from '@/components/ui/skeleton';
+import { usePatientTasks } from '@/hooks/usePatientTasks';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 export default function PatientTasks() {
-  const tasks = [
-    {
-      id: 1,
-      title: "Daily Mood Journal",
-      description: "Write about your feelings and experiences today",
-      dueDate: "2025-04-24",
-      completed: false,
-      assignedBy: "Dr. Sarah Johnson"
-    },
-    {
-      id: 2,
-      title: "Mindfulness Exercise",
-      description: "Complete 10-minute breathing meditation",
-      dueDate: "2025-04-24",
-      completed: true,
-      assignedBy: "Dr. Sarah Johnson"
-    }
-  ];
+  const { tasks, loading, error, toggleTaskCompletion } = usePatientTasks();
+
+  // Function to check if a task is overdue
+  const isOverdue = (dateString: string, completed: boolean) => {
+    const today = new Date();
+    const dueDate = new Date(dateString);
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today && !completed;
+  };
 
   return (
     <PatientLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">My Tasks</h1>
-          <Button variant="outline" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            View Calendar
-          </Button>
         </div>
 
-        <div className="grid gap-4">
-          {tasks.map((task) => (
-            <Card key={task.id} className="p-4">
-              <div className="flex items-start gap-4">
-                <Checkbox checked={task.completed} className="mt-1" />
-                <div className="flex-1">
-                  <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-                    {task.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {task.description}
-                  </p>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      Due: {task.dueDate}
-                    </span>
-                    <span>•</span>
-                    <span>Assigned by: {task.assignedBy}</span>
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white border rounded-lg p-4">
+                <div className="flex items-start gap-4">
+                  <Skeleton className="h-5 w-5 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-4/5 mb-2" />
+                    <div className="flex items-center gap-4 mt-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-2" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm">
-                  Details
-                </Button>
               </div>
-            </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {tasks.length === 0 && (
+              <div className="text-center py-8 bg-muted/30 rounded-lg border border-muted">
+                <p className="text-muted-foreground">No tasks assigned yet.</p>
+              </div>
+            )}
+            
+            {tasks.map((task) => (
+              <Card key={task.id} className={`p-4 ${isOverdue(task.due_date, task.completed) ? 'border-destructive/40' : ''}`}>
+                <div className="flex items-start gap-4">
+                  <Checkbox
+                    checked={task.completed}
+                    onCheckedChange={(val) => toggleTaskCompletion(task.id, Boolean(val))}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <h3
+                      className={`font-medium ${
+                        task.completed ? 'line-through text-muted-foreground' : ''
+                      }`}
+                    >
+                      {task.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
+                    <div className="flex items-center gap-4 mt-2 text-sm">
+                      <span className={`flex items-center gap-1 ${
+                        isOverdue(task.due_date, task.completed) ? 'text-destructive font-medium' : 'text-muted-foreground'
+                      }`}>
+                        <Clock className="h-4 w-4" />
+                        Due: {format(new Date(task.due_date), 'MMM d, yyyy')}
+                        {isOverdue(task.due_date, task.completed) && " (overdue)"}
+                      </span>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-muted-foreground">
+                        Assigned by: {task.profiles?.first_name} {task.profiles?.last_name}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </PatientLayout>
   );
