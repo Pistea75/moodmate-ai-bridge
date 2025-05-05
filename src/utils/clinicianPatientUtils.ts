@@ -30,7 +30,7 @@ export async function resolvePatientSessionDetails(patientId: string) {
   
   // Step 2: Check the patient_clinician_links table for a direct relationship
   console.log("Checking patient_clinician_links table for relationship...");
-  const { data: linkData, error: linkError } = await supabase
+  const { data: linkData } = await supabase
     .from("patient_clinician_links")
     .select("clinician_id")
     .eq("patient_id", patientId)
@@ -43,36 +43,45 @@ export async function resolvePatientSessionDetails(patientId: string) {
   
   // Step 3: If not in metadata or links, check the profiles table
   console.log("Checking profiles table for referral code...");
-  const { data: patientProfile, error: profileError } = await supabase
+  const { data: patientProfile } = await supabase
     .from("profiles")
     .select("referral_code")
     .eq("id", patientId)
     .maybeSingle();
 
-  if (!patientProfile || profileError) {
-    console.error("Error getting patient profile:", profileError);
-    throw new Error("Could not get patient's referral code");
-  }
-
-  if (!patientProfile.referral_code) {
+  if (!patientProfile || !patientProfile.referral_code) {
     console.error("No referral code found for patient");
     throw new Error("No referral code found. Please connect to a clinician first.");
   }
 
-  // Step 4: Get clinician by referral code
-  console.log("Finding clinician with referral code:", patientProfile.referral_code);
-  const { data: clinician, error: clinicianError } = await supabase
+  const referralCode = patientProfile.referral_code.trim().toUpperCase();
+  console.log("Found referral code in profile:", referralCode);
+
+  // Step 4: Get clinician by referral code - CASE INSENSITIVE SEARCH
+  console.log("Finding clinician with referral code:", referralCode);
+  
+  // Try with exact match first
+  const { data: clinician } = await supabase
     .from("profiles")
-    .select("id")
-    .eq("referral_code", patientProfile.referral_code)
+    .select("id, first_name, last_name")
     .eq("role", "clinician")
+    .ilike("referral_code", referralCode) // Using ilike for case-insensitive matching
     .maybeSingle();
 
-  if (!clinician || clinicianError) {
-    console.error("Error finding clinician:", clinicianError);
-    throw new Error("No clinician found with referral code");
+  if (clinician?.id) {
+    console.log("Found clinician by referral code:", clinician.id, clinician.first_name, clinician.last_name);
+    
+    // Update the user metadata with the clinician connection for faster lookup later
+    await supabase.auth.updateUser({
+      data: {
+        connected_clinician_id: clinician.id,
+        connected_clinician_name: `${clinician.first_name || ''} ${clinician.last_name || ''}`.trim()
+      }
+    });
+    
+    return { clinicianId: clinician.id };
   }
-
-  console.log("Found clinician by referral code:", clinician.id);
-  return { clinicianId: clinician.id };
+  
+  console.error("No clinician found with referral code:", referralCode);
+  throw new Error("No clinician found with referral code. Please check your referral code or contact your clinician.");
 }

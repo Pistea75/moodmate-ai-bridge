@@ -30,28 +30,16 @@ export function ReferralCodeInput() {
         .from('profiles')
         .select('id, first_name, last_name')
         .eq('role', 'clinician')
-        .eq('referral_code', normalizedCode)
+        .ilike('referral_code', normalizedCode) // Use case-insensitive search
         .maybeSingle();
 
       if (clinicianError) {
         console.error('Error finding clinician with referral code:', clinicianError);
-        toast({
-          title: "Error",
-          description: "Could not verify the referral code. Please try again.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
+        throw new Error("Could not verify the referral code. Please try again.");
       }
       
       if (!clinician) {
-        toast({
-          title: "Invalid referral code",
-          description: "No clinician found with this code. Please check and try again.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
+        throw new Error("No clinician found with this code. Please check and try again.");
       }
 
       console.log('Found clinician:', clinician);

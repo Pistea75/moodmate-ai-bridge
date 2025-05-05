@@ -42,7 +42,7 @@ export const usePatientSessions = () => {
         return true;
       }
       
-      // If not in links, check profile
+      // If not in links, check profile for referral code
       const { data: profile } = await supabase
         .from("profiles")
         .select("referral_code")
@@ -51,17 +51,26 @@ export const usePatientSessions = () => {
         
       if (profile?.referral_code) {
         console.log("Found referral code in profile:", profile.referral_code);
+        const referralCode = profile.referral_code.trim().toUpperCase();
         
         // Verify the referral code links to a valid clinician
         const { data: clinician } = await supabase
           .from("profiles")
           .select("id")
-          .eq("referral_code", profile.referral_code)
           .eq("role", "clinician")
+          .ilike("referral_code", referralCode) // Case-insensitive match
           .maybeSingle();
           
         if (clinician?.id) {
           console.log("Verified clinician from referral code:", clinician.id);
+          
+          // Store the connection in user metadata for future use
+          await supabase.auth.updateUser({
+            data: {
+              connected_clinician_id: clinician.id
+            }
+          });
+          
           return true;
         }
       }
