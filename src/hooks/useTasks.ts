@@ -33,8 +33,15 @@ export function useTasks() {
       const { data, error } = await supabase
         .from('tasks')
         .select(`
-          *,
-          profiles:patient_id(first_name, last_name)
+          id,
+          title,
+          description,
+          due_date,
+          completed,
+          patient_id,
+          clinician_id,
+          inserted_at,
+          profiles!tasks_patient_id_fkey(first_name, last_name)
         `)
         .eq('clinician_id', user.user?.id);
 
