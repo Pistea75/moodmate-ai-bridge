@@ -11,6 +11,7 @@ export function usePatientTasks() {
     setLoading(true);
     setError(null);
 
+    // Step 1: Get the authenticated user
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
     if (userError || !userData.user) {
@@ -19,13 +20,29 @@ export function usePatientTasks() {
       return;
     }
 
+    const userId = userData.user.id;
+
+    // Step 2: Get the matching profile for this user
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .single();
+
+    if (profileError || !profile) {
+      setError("Profile not found");
+      setLoading(false);
+      return;
+    }
+
+    // Step 3: Fetch tasks assigned to the profile ID
     const { data, error: taskError } = await supabase
       .from('tasks')
       .select(`
         *,
         profiles:clinician_id(first_name, last_name)
       `)
-      .eq('patient_id', userData.user.id);
+      .eq('patient_id', profile.id);
 
     if (taskError) {
       setError(taskError.message);
