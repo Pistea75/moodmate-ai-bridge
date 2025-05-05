@@ -84,7 +84,7 @@ export default function PatientTasks() {
                 <div className="flex items-start gap-4">
                   <Checkbox
                     checked={task.completed}
-                    onCheckedChange={(val) => toggleTaskCompletion(task.id, Boolean(val))}
+                    onCheckedChange={(checked) => toggleTaskCompletion(task.id, Boolean(checked))}
                     className="mt-1"
                   />
                   <div className="flex-1">

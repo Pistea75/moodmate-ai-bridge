@@ -71,7 +71,16 @@ export function usePatientTasks() {
       
       if (updateError) throw new Error(updateError.message);
       
+      // Update local state to immediately reflect changes in UI
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId ? { ...task, completed } : task
+        )
+      );
+      
+      // Also refresh from server to ensure data consistency
       await fetchTasks();
+      
       toast({
         title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
         description: "Task status updated successfully",
@@ -95,7 +104,9 @@ export function usePatientTasks() {
       
       if (deleteError) throw new Error(deleteError.message);
       
-      await fetchTasks();
+      // Update local state to immediately remove the task
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+      
       toast({
         title: "Task deleted",
         description: "Task has been removed successfully",
