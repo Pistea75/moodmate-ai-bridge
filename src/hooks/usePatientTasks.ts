@@ -1,19 +1,27 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+export interface PatientTask {
+  id: string;
+  title: string;
+  description: string;
+  due_date: string;
+  completed: boolean;
+  patient_id: string;
+  clinician_id: string;
+  profiles?: {
+    first_name: string;
+    last_name: string;
+  };
+}
 
 export function usePatientTasks() {
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<PatientTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const fetchTasks =import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-
-export function usePatientTasks() {
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -34,13 +42,18 @@ export function usePatientTasks() {
       .from('tasks')
       .select(`
         *,
-        profiles:clinician_id(first_name, last_name)
+        profiles!tasks_patient_id_fkey(first_name, last_name)
       `)
       .eq('patient_id', patientId);
 
     if (taskError) {
       setError(taskError.message);
       console.error("Supabase query error:", taskError);
+      toast({
+        variant: "destructive",
+        title: "Error loading tasks",
+        description: taskError.message || 'An unexpected error occurred',
+      });
     } else {
       console.log("Fetched tasks:", tasksData);
       setTasks(tasksData ?? []);
@@ -50,13 +63,51 @@ export function usePatientTasks() {
   };
 
   const toggleTaskCompletion = async (taskId: string, completed: boolean) => {
-    await supabase.from('tasks').update({ completed }).eq('id', taskId);
-    fetchTasks();
+    try {
+      const { error: updateError } = await supabase
+        .from('tasks')
+        .update({ completed })
+        .eq('id', taskId);
+      
+      if (updateError) throw new Error(updateError.message);
+      
+      await fetchTasks();
+      toast({
+        title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
+        description: "Task status updated successfully",
+      });
+    } catch (err: any) {
+      console.error('Error updating task completion:', err.message);
+      toast({
+        variant: "destructive",
+        title: "Failed to update task",
+        description: err.message || 'An unexpected error occurred',
+      });
+    }
   };
 
   const deleteTask = async (taskId: string) => {
-    await supabase.from('tasks').delete().eq('id', taskId);
-    fetchTasks();
+    try {
+      const { error: deleteError } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+      
+      if (deleteError) throw new Error(deleteError.message);
+      
+      await fetchTasks();
+      toast({
+        title: "Task deleted",
+        description: "Task has been removed successfully",
+      });
+    } catch (err: any) {
+      console.error('Error deleting task:', err.message);
+      toast({
+        variant: "destructive",
+        title: "Failed to delete task",
+        description: err.message || 'An unexpected error occurred',
+      });
+    }
   };
 
   useEffect(() => {
@@ -71,4 +122,3 @@ export function usePatientTasks() {
     deleteTask,
   };
 }
-
