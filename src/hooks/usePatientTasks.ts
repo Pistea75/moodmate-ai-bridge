@@ -11,7 +11,6 @@ export function usePatientTasks() {
     setLoading(true);
     setError(null);
 
-    // Step 1: Get the authenticated user
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
     if (userError || !userData.user) {
@@ -22,27 +21,19 @@ export function usePatientTasks() {
 
     const userId = userData.user.id;
 
-    // Step 2: Get the matching profile for this user
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', userId)
-      .single();
-
-    if (profileError || !profile) {
-      setError("Profile not found");
-      setLoading(false);
-      return;
-    }
-
-    // Step 3: Fetch tasks assigned to the profile ID
     const { data, error: taskError } = await supabase
       .from('tasks')
       .select(`
-        *,
+        id,
+        title,
+        description,
+        due_date,
+        completed,
+        patient_id,
+        clinician_id,
         profiles:clinician_id(first_name, last_name)
       `)
-      .eq('patient_id', profile.id);
+      .eq('patient_id', userId);
 
     if (taskError) {
       setError(taskError.message);
@@ -53,12 +44,12 @@ export function usePatientTasks() {
     setLoading(false);
   };
 
-  const toggleTaskCompletion = async (taskId: number, completed: boolean) => {
+  const toggleTaskCompletion = async (taskId: string, completed: boolean) => {
     await supabase.from('tasks').update({ completed }).eq('id', taskId);
     fetchTasks();
   };
 
-  const deleteTask = async (taskId: number) => {
+  const deleteTask = async (taskId: string) => {
     await supabase.from('tasks').delete().eq('id', taskId);
     fetchTasks();
   };
@@ -75,4 +66,5 @@ export function usePatientTasks() {
     deleteTask
   };
 }
+
 
