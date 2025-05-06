@@ -1,4 +1,3 @@
-
 import { format } from 'date-fns';
 import { Clock, Trash2 } from 'lucide-react';
 import PatientLayout from '../../layouts/PatientLayout';
@@ -102,7 +101,7 @@ export default function PatientTasks() {
                       </span>
                       <span className="text-muted-foreground">•</span>
                       <span className="text-muted-foreground">
-                        Assigned by: {task.profiles?.first_name || ''} {task.profiles?.last_name || ''}
+                        Assigned by: {task.clinician?.first_name || ''} {task.clinician?.last_name || ''}
                       </span>
                     </div>
                   </div>
@@ -140,3 +139,4 @@ export default function PatientTasks() {
     </PatientLayout>
   );
 }
+
