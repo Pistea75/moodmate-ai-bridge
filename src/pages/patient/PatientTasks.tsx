@@ -25,6 +25,7 @@ import { useState } from 'react';
 export default function PatientTasks() {
   const { tasks, loading, error, toggleTaskCompletion, deleteTask } = usePatientTasks();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // 🔍 Debug logs
   console.log('Tasks from hook:', tasks);
@@ -41,8 +42,13 @@ export default function PatientTasks() {
   };
 
   const handleToggleCompletion = async (taskId: string, currentState: boolean) => {
-    console.log(`Toggle completion for task ${taskId} from ${currentState} to ${!currentState}`);
-    await toggleTaskCompletion(taskId, !currentState);
+    try {
+      console.log(`Toggle completion for task ${taskId} from ${currentState} to ${!currentState}`);
+      setUpdatingId(taskId);
+      await toggleTaskCompletion(taskId, !currentState);
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   const handleDelete = async (taskId: string) => {
@@ -99,7 +105,8 @@ export default function PatientTasks() {
                   <Checkbox
                     checked={task.completed}
                     onCheckedChange={() => handleToggleCompletion(task.id, task.completed)}
-                    className="mt-1"
+                    className={`mt-1 ${updatingId === task.id ? 'opacity-50' : ''}`}
+                    disabled={updatingId === task.id}
                   />
                   <div className="flex-1">
                     <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>

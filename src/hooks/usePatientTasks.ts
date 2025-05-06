@@ -78,16 +78,22 @@ export function usePatientTasks() {
         )
       );
       
+      // Explicitly log the request we're sending to Supabase
+      console.log(`Sending update to Supabase for task ${taskId}, setting completed to ${completed}`);
+      
       // Then update in the database
-      const { error: updateError } = await supabase
+      const { data, error: updateError } = await supabase
         .from('tasks')
         .update({ completed })
-        .eq('id', taskId);
+        .eq('id', taskId)
+        .select();
       
       if (updateError) {
         console.error("Error updating task:", updateError);
         throw new Error(updateError.message);
       }
+      
+      console.log("Update response from Supabase:", data);
       
       toast({
         title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
@@ -116,6 +122,7 @@ export function usePatientTasks() {
       // Update local state immediately for better UI responsiveness
       setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
       
+      // Then delete from database
       const { error: deleteError } = await supabase
         .from('tasks')
         .delete()
@@ -130,6 +137,9 @@ export function usePatientTasks() {
         title: "Task deleted",
         description: "Task has been removed successfully",
       });
+      
+      // We should still fetch tasks to ensure we're in sync with server
+      await fetchTasks();
     } catch (err: any) {
       console.error('Error deleting task:', err.message);
       toast({
