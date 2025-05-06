@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -23,7 +23,7 @@ export function usePatientTasks() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -60,7 +60,7 @@ export function usePatientTasks() {
     }
 
     setLoading(false);
-  };
+  }, [toast]);
 
   const toggleTaskCompletion = async (taskId: string, completed: boolean) => {
     try {
@@ -77,6 +77,9 @@ export function usePatientTasks() {
         .eq('id', taskId);
       
       if (updateError) throw new Error(updateError.message);
+      
+      // Fetch the latest data to ensure sync with clinician view
+      await fetchTasks();
       
       toast({
         title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
@@ -107,6 +110,9 @@ export function usePatientTasks() {
       
       if (deleteError) throw new Error(deleteError.message);
       
+      // Fetch the latest data to ensure sync with clinician view
+      await fetchTasks();
+      
       toast({
         title: "Task deleted",
         description: "Task has been removed successfully",
@@ -126,7 +132,7 @@ export function usePatientTasks() {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [fetchTasks]);
 
   return {
     tasks,
@@ -134,5 +140,6 @@ export function usePatientTasks() {
     error,
     toggleTaskCompletion,
     deleteTask,
+    fetchTasks
   };
 }

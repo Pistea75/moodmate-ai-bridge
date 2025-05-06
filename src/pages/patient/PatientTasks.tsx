@@ -63,8 +63,6 @@ export default function PatientTasks() {
                     <Skeleton className="h-4 w-4/5 mb-2" />
                     <div className="flex items-center gap-4 mt-2">
                       <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-4 w-2" />
-                      <Skeleton className="h-4 w-32" />
                     </div>
                   </div>
                 </div>
