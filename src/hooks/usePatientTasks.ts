@@ -78,15 +78,15 @@ export function usePatientTasks() {
         )
       );
       
-      // Explicitly log the request we're sending to Supabase
+      // Log the request details for debugging
       console.log(`Sending update to Supabase for task ${taskId}, setting completed to ${completed}`);
       
-      // Then update in the database
+      // Then update in the database with explicit select to return updated data
       const { data, error: updateError } = await supabase
         .from('tasks')
         .update({ completed })
         .eq('id', taskId)
-        .select();
+        .select('*');
       
       if (updateError) {
         console.error("Error updating task:", updateError);
@@ -95,13 +95,23 @@ export function usePatientTasks() {
       
       console.log("Update response from Supabase:", data);
       
+      if (!data || data.length === 0) {
+        console.error("No data returned from update operation");
+        throw new Error("Task update failed - no data returned");
+      }
+      
       toast({
         title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
         description: "Task status updated successfully",
       });
       
-      // Refresh tasks from server to ensure consistency
-      await fetchTasks();
+      // Explicitly update the task in local state with returned data
+      const updatedTask = data[0];
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId ? { ...task, completed: updatedTask.completed } : task
+        )
+      );
     } catch (err: any) {
       console.error('Error updating task completion:', err.message);
       toast({
@@ -138,7 +148,7 @@ export function usePatientTasks() {
         description: "Task has been removed successfully",
       });
       
-      // We should still fetch tasks to ensure we're in sync with server
+      // Refresh tasks from server to ensure we're in sync
       await fetchTasks();
     } catch (err: any) {
       console.error('Error deleting task:', err.message);

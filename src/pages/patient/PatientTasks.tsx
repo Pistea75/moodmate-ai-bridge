@@ -20,17 +20,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function PatientTasks() {
-  const { tasks, loading, error, toggleTaskCompletion, deleteTask } = usePatientTasks();
+  const { tasks, loading, error, toggleTaskCompletion, deleteTask, fetchTasks } = usePatientTasks();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  // 🔍 Debug logs
+  // Debug logs
   console.log('Tasks from hook:', tasks);
   console.log('Loading:', loading);
   console.log('Error:', error);
+
+  // Refresh tasks when the component mounts
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   // Function to check if a task is overdue
   const isOverdue = (dateString: string, completed: boolean) => {
@@ -44,10 +49,10 @@ export default function PatientTasks() {
   const handleToggleCompletion = async (taskId: string, currentState: boolean) => {
     try {
       console.log(`Toggle completion for task ${taskId} from ${currentState} to ${!currentState}`);
-      setUpdatingId(taskId);
+      setUpdatingId(taskId); // Set loading state
       await toggleTaskCompletion(taskId, !currentState);
     } finally {
-      setUpdatingId(null);
+      setUpdatingId(null); // Clear loading state
     }
   };
 
@@ -65,6 +70,13 @@ export default function PatientTasks() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">My Tasks</h1>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => fetchTasks()}
+          >
+            Refresh Tasks
+          </Button>
         </div>
 
         {error && (
