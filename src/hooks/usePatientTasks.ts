@@ -11,9 +11,9 @@ export interface PatientTask {
   completed: boolean;
   patient_id: string;
   clinician_id: string;
-  profiles?: {
-    first_name: string;
-    last_name: string;
+  clinician?: {
+    first_name: string | null;
+    last_name: string | null;
   };
 }
 
@@ -42,7 +42,7 @@ export function usePatientTasks() {
       .from('tasks')
       .select(`
         *,
-        profiles!tasks_clinician_id_fkey(first_name, last_name)
+        clinician:profiles!clinician_id (first_name, last_name)
       `)
       .eq('patient_id', patientId);
 
@@ -71,16 +71,14 @@ export function usePatientTasks() {
       
       if (updateError) throw new Error(updateError.message);
       
-      // Update local state to immediately reflect changes in UI
       setTasks(prevTasks => 
         prevTasks.map(task => 
           task.id === taskId ? { ...task, completed } : task
         )
       );
-      
-      // Also refresh from server to ensure data consistency
+
       await fetchTasks();
-      
+
       toast({
         title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
         description: "Task status updated successfully",
@@ -104,7 +102,6 @@ export function usePatientTasks() {
       
       if (deleteError) throw new Error(deleteError.message);
       
-      // Update local state to immediately remove the task
       setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
       
       toast({
