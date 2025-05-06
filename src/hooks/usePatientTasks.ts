@@ -78,9 +78,6 @@ export function usePatientTasks() {
       
       if (updateError) throw new Error(updateError.message);
       
-      // Fetch the latest data to ensure sync with clinician view
-      await fetchTasks();
-      
       toast({
         title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
         description: "Task status updated successfully",
@@ -109,9 +106,6 @@ export function usePatientTasks() {
         .eq('id', taskId);
       
       if (deleteError) throw new Error(deleteError.message);
-      
-      // Fetch the latest data to ensure sync with clinician view
-      await fetchTasks();
       
       toast({
         title: "Task deleted",
