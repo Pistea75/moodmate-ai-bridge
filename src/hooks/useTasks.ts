@@ -63,6 +63,13 @@ export function useTasks() {
 
   const toggleTaskCompletion = async (taskId: string, newValue: boolean) => {
     try {
+      // Update local state immediately for better UI responsiveness
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId ? { ...task, completed: newValue } : task
+        )
+      );
+      
       const { error } = await supabase
         .from('tasks')
         .update({ completed: newValue })
@@ -70,7 +77,6 @@ export function useTasks() {
       
       if (error) throw new Error(error.message);
       
-      await fetchTasks();
       toast({
         title: `Task marked as ${newValue ? 'completed' : 'incomplete'}`,
         description: "Task status updated successfully",
@@ -82,11 +88,17 @@ export function useTasks() {
         title: "Failed to update task",
         description: err.message || 'An unexpected error occurred',
       });
+      
+      // Revert the local state change if the server update failed
+      await fetchTasks();
     }
   };
 
   const deleteTask = async (taskId: string) => {
     try {
+      // Update local state immediately for better UI responsiveness
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+      
       const { error } = await supabase
         .from('tasks')
         .delete()
@@ -94,7 +106,6 @@ export function useTasks() {
       
       if (error) throw new Error(error.message);
       
-      await fetchTasks();
       toast({
         title: "Task deleted",
         description: "Task has been removed successfully",
@@ -106,6 +117,9 @@ export function useTasks() {
         title: "Failed to delete task",
         description: err.message || 'An unexpected error occurred',
       });
+      
+      // Revert the local state change if the server delete failed
+      await fetchTasks();
     }
   };
 
