@@ -69,19 +69,23 @@ export function usePatientTasks() {
 
   const toggleTaskCompletion = async (taskId: string, completed: boolean) => {
     try {
-      // Update local state immediately for better UI responsiveness
+      console.log(`Toggling task ${taskId} to ${completed ? 'completed' : 'incomplete'}`);
+      
+      // First update local state for immediate UI feedback
       setTasks(prevTasks => 
         prevTasks.map(task => 
           task.id === taskId ? { ...task, completed } : task
         )
       );
       
+      // Then update in the database
       const { error: updateError } = await supabase
         .from('tasks')
         .update({ completed })
         .eq('id', taskId);
       
       if (updateError) {
+        console.error("Error updating task:", updateError);
         throw new Error(updateError.message);
       }
       
@@ -90,7 +94,7 @@ export function usePatientTasks() {
         description: "Task status updated successfully",
       });
       
-      // Re-fetch to ensure sync with server state
+      // Refresh tasks from server to ensure consistency
       await fetchTasks();
     } catch (err: any) {
       console.error('Error updating task completion:', err.message);
@@ -107,6 +111,8 @@ export function usePatientTasks() {
 
   const deleteTask = async (taskId: string) => {
     try {
+      console.log(`Deleting task ${taskId}`);
+      
       // Update local state immediately for better UI responsiveness
       setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
       
@@ -116,6 +122,7 @@ export function usePatientTasks() {
         .eq('id', taskId);
       
       if (deleteError) {
+        console.error("Error deleting task:", deleteError);
         throw new Error(deleteError.message);
       }
       
@@ -123,9 +130,6 @@ export function usePatientTasks() {
         title: "Task deleted",
         description: "Task has been removed successfully",
       });
-      
-      // Re-fetch to ensure sync with server state
-      await fetchTasks();
     } catch (err: any) {
       console.error('Error deleting task:', err.message);
       toast({

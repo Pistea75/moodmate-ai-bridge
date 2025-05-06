@@ -20,9 +20,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { useState } from 'react';
 
 export default function PatientTasks() {
   const { tasks, loading, error, toggleTaskCompletion, deleteTask } = usePatientTasks();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // 🔍 Debug logs
   console.log('Tasks from hook:', tasks);
@@ -36,6 +38,20 @@ export default function PatientTasks() {
     today.setHours(0, 0, 0, 0);
     dueDate.setHours(0, 0, 0, 0);
     return dueDate < today && !completed;
+  };
+
+  const handleToggleCompletion = async (taskId: string, currentState: boolean) => {
+    console.log(`Toggle completion for task ${taskId} from ${currentState} to ${!currentState}`);
+    await toggleTaskCompletion(taskId, !currentState);
+  };
+
+  const handleDelete = async (taskId: string) => {
+    setDeletingId(taskId);
+    try {
+      await deleteTask(taskId);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -82,7 +98,7 @@ export default function PatientTasks() {
                 <div className="flex items-start gap-4">
                   <Checkbox
                     checked={task.completed}
-                    onCheckedChange={(checked) => toggleTaskCompletion(task.id, Boolean(checked))}
+                    onCheckedChange={() => handleToggleCompletion(task.id, task.completed)}
                     className="mt-1"
                   />
                   <div className="flex-1">
@@ -117,10 +133,11 @@ export default function PatientTasks() {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => deleteTask(task.id)}
+                          onClick={() => handleDelete(task.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          disabled={deletingId === task.id}
                         >
-                          Delete
+                          {deletingId === task.id ? 'Deleting...' : 'Delete'}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
