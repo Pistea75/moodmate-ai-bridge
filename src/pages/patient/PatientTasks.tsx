@@ -1,6 +1,6 @@
 
 import { format } from 'date-fns';
-import { Clock, Trash2 } from 'lucide-react';
+import { Clock, Trash2, RefreshCcw } from 'lucide-react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,8 +74,10 @@ export default function PatientTasks() {
             variant="outline" 
             size="sm"
             onClick={() => fetchTasks()}
+            className="gap-2"
           >
-            Refresh Tasks
+            <RefreshCcw className="h-4 w-4" />
+            Refresh
           </Button>
         </div>
 
@@ -115,15 +117,19 @@ export default function PatientTasks() {
               <Card key={task.id} className={`p-4 ${isOverdue(task.due_date, task.completed) ? 'border-destructive/40' : ''}`}>
                 <div className="flex items-start gap-4">
                   <Checkbox
+                    id={`task-${task.id}`}
                     checked={task.completed}
                     onCheckedChange={() => handleToggleCompletion(task.id, task.completed)}
                     className={`mt-1 ${updatingId === task.id ? 'opacity-50' : ''}`}
                     disabled={updatingId === task.id}
                   />
                   <div className="flex-1">
-                    <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                    <label
+                      htmlFor={`task-${task.id}`}
+                      className={`font-medium cursor-pointer ${task.completed ? 'line-through text-muted-foreground' : ''}`}
+                    >
                       {task.title}
-                    </h3>
+                    </label>
                     <p className={`text-sm text-muted-foreground mt-1 ${task.completed ? 'line-through' : ''}`}>
                       {task.description}
                     </p>

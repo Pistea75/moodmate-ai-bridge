@@ -81,23 +81,15 @@ export function usePatientTasks() {
       // Log the request details for debugging
       console.log(`Sending update to Supabase for task ${taskId}, setting completed to ${completed}`);
       
-      // Then update in the database with explicit select to return updated data
-      const { data, error: updateError } = await supabase
+      // Update in the database WITHOUT select() - don't expect data back
+      const { error: updateError } = await supabase
         .from('tasks')
         .update({ completed })
-        .eq('id', taskId)
-        .select('*');
+        .eq('id', taskId);
       
       if (updateError) {
         console.error("Error updating task:", updateError);
         throw new Error(updateError.message);
-      }
-      
-      console.log("Update response from Supabase:", data);
-      
-      if (!data || data.length === 0) {
-        console.error("No data returned from update operation");
-        throw new Error("Task update failed - no data returned");
       }
       
       toast({
@@ -105,13 +97,7 @@ export function usePatientTasks() {
         description: "Task status updated successfully",
       });
       
-      // Explicitly update the task in local state with returned data
-      const updatedTask = data[0];
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id === taskId ? { ...task, completed: updatedTask.completed } : task
-        )
-      );
+      // No need to await fetchTasks here - the optimistic UI update handles it
     } catch (err: any) {
       console.error('Error updating task completion:', err.message);
       toast({
