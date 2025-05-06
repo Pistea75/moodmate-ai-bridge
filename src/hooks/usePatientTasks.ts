@@ -24,42 +24,47 @@ export function usePatientTasks() {
   const { toast } = useToast();
 
   const fetchTasks = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-    const { data: userData, error: userError } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await supabase.auth.getUser();
 
-    if (userError || !userData?.user) {
-      setError("User not authenticated.");
+      if (userError || !userData?.user) {
+        setError("User not authenticated.");
+        setLoading(false);
+        return;
+      }
+
+      const patientId = userData.user.id;
+      console.log("Patient ID:", patientId);
+
+      const { data: tasksData, error: taskError } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          clinician:profiles!clinician_id (first_name, last_name)
+        `)
+        .eq('patient_id', patientId);
+
+      if (taskError) {
+        setError(taskError.message);
+        console.error("Supabase query error:", taskError);
+        toast({
+          variant: "destructive",
+          title: "Error loading tasks",
+          description: taskError.message || 'An unexpected error occurred',
+        });
+      } else {
+        console.log("Fetched tasks:", tasksData);
+        setTasks(tasksData ?? []);
+      }
+    } catch (err: any) {
+      console.error('Error in fetchTasks:', err.message);
+      setError(err.message);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const patientId = userData.user.id;
-    console.log("Patient ID:", patientId);
-
-    const { data: tasksData, error: taskError } = await supabase
-      .from('tasks')
-      .select(`
-        *,
-        clinician:profiles!clinician_id (first_name, last_name)
-      `)
-      .eq('patient_id', patientId);
-
-    if (taskError) {
-      setError(taskError.message);
-      console.error("Supabase query error:", taskError);
-      toast({
-        variant: "destructive",
-        title: "Error loading tasks",
-        description: taskError.message || 'An unexpected error occurred',
-      });
-    } else {
-      console.log("Fetched tasks:", tasksData);
-      setTasks(tasksData ?? []);
-    }
-
-    setLoading(false);
   }, [toast]);
 
   const toggleTaskCompletion = async (taskId: string, completed: boolean) => {
@@ -76,12 +81,17 @@ export function usePatientTasks() {
         .update({ completed })
         .eq('id', taskId);
       
-      if (updateError) throw new Error(updateError.message);
+      if (updateError) {
+        throw new Error(updateError.message);
+      }
       
       toast({
         title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
         description: "Task status updated successfully",
       });
+      
+      // Re-fetch to ensure sync with server state
+      await fetchTasks();
     } catch (err: any) {
       console.error('Error updating task completion:', err.message);
       toast({
@@ -105,12 +115,17 @@ export function usePatientTasks() {
         .delete()
         .eq('id', taskId);
       
-      if (deleteError) throw new Error(deleteError.message);
+      if (deleteError) {
+        throw new Error(deleteError.message);
+      }
       
       toast({
         title: "Task deleted",
         description: "Task has been removed successfully",
       });
+      
+      // Re-fetch to ensure sync with server state
+      await fetchTasks();
     } catch (err: any) {
       console.error('Error deleting task:', err.message);
       toast({
