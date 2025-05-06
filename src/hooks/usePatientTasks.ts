@@ -64,6 +64,13 @@ export function usePatientTasks() {
 
   const toggleTaskCompletion = async (taskId: string, completed: boolean) => {
     try {
+      // Update local state immediately for better UI responsiveness
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId ? { ...task, completed } : task
+        )
+      );
+      
       const { error: updateError } = await supabase
         .from('tasks')
         .update({ completed })
@@ -71,14 +78,6 @@ export function usePatientTasks() {
       
       if (updateError) throw new Error(updateError.message);
       
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id === taskId ? { ...task, completed } : task
-        )
-      );
-
-      await fetchTasks();
-
       toast({
         title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
         description: "Task status updated successfully",
@@ -90,19 +89,23 @@ export function usePatientTasks() {
         title: "Failed to update task",
         description: err.message || 'An unexpected error occurred',
       });
+      
+      // Revert the local state change if the server update failed
+      await fetchTasks();
     }
   };
 
   const deleteTask = async (taskId: string) => {
     try {
+      // Update local state immediately for better UI responsiveness
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+      
       const { error: deleteError } = await supabase
         .from('tasks')
         .delete()
         .eq('id', taskId);
       
       if (deleteError) throw new Error(deleteError.message);
-      
-      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
       
       toast({
         title: "Task deleted",
@@ -115,6 +118,9 @@ export function usePatientTasks() {
         title: "Failed to delete task",
         description: err.message || 'An unexpected error occurred',
       });
+      
+      // Revert the local state change if the server delete failed
+      await fetchTasks();
     }
   };
 

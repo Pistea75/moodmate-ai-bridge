@@ -1,3 +1,4 @@
+
 import { format } from 'date-fns';
 import { Clock, Trash2 } from 'lucide-react';
 import PatientLayout from '../../layouts/PatientLayout';
@@ -99,10 +100,6 @@ export default function PatientTasks() {
                         Due: {format(new Date(task.due_date), 'MMM d, yyyy')}
                         {isOverdue(task.due_date, task.completed) && " (overdue)"}
                       </span>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="text-muted-foreground">
-                        Assigned by: {task.clinician?.first_name || ''} {task.clinician?.last_name || ''}
-                      </span>
                     </div>
                   </div>
                   <AlertDialog>
@@ -139,4 +136,3 @@ export default function PatientTasks() {
     </PatientLayout>
   );
 }
-
