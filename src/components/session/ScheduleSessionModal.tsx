@@ -11,6 +11,7 @@ import { X } from "lucide-react";
 import { scheduleSession } from "@/utils/sessionUtils";
 import { useToast } from "@/hooks/use-toast";
 import { SessionScheduleForm, SessionFormData } from "./SessionScheduleForm";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ScheduleSessionModalProps {
   open: boolean;
@@ -58,10 +59,28 @@ export function ScheduleSessionModal({
       console.log("📅 Final UTC ISO Date:", scheduledUTC.toISOString());
       console.log("🔄 Scheduling session with isPatientView:", isPatientView);
 
+      // Get the current user (clinician) ID when not in patient view
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error("❌ Error getting current user:", userError);
+        throw new Error("Could not get current user information");
+      }
+      
+      if (!user) {
+        throw new Error("No authenticated user found");
+      }
+      
+      // For clinician view, use the current user's ID as clinicianId
+      const clinicianId = isPatientView ? undefined : user.id;
+      
+      console.log("👨‍⚕️ Using clinician ID:", clinicianId);
+
       await scheduleSession({
         date: scheduledUTC.toISOString(), // UTC datetime
         time: formData.time,
         patientId: isPatientView ? undefined : formData.patientId,
+        clinicianId: clinicianId,
         timezone: formData.timezone,
         isPatientView,
       });
