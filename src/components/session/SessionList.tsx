@@ -2,9 +2,17 @@
 import { format, isBefore, isSameDay, addMinutes } from "date-fns";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { deleteSession } from "@/utils/sessionUtils";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  AlertDialog, AlertDialogTrigger, AlertDialogContent, 
+  AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, 
+  AlertDialogFooter, AlertDialogCancel, AlertDialogAction 
+} from "@/components/ui/alert-dialog";
 
 export type PatientSession = {
   id: string;
@@ -18,9 +26,19 @@ interface SessionListProps {
   date: Date;
   loading: boolean;
   onScheduleClick: () => void;
+  onSessionDelete?: () => void;
 }
 
-export const SessionList = ({ sessions, date, loading, onScheduleClick }: SessionListProps) => {
+export const SessionList = ({ 
+  sessions, 
+  date, 
+  loading, 
+  onScheduleClick,
+  onSessionDelete 
+}: SessionListProps) => {
+  const { toast } = useToast();
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
+  
   // Filter sessions for the selected date
   const filteredSessions = sessions.filter((session) =>
     isSameDay(new Date(session.scheduled_time), date)
@@ -31,6 +49,30 @@ export const SessionList = ({ sessions, date, loading, onScheduleClick }: Sessio
     const sessionTime = new Date(sessionDate);
     const sessionEndTime = addMinutes(sessionTime, durationMinutes);
     return isBefore(sessionEndTime, new Date());
+  };
+  
+  const handleDeleteSession = async (sessionId: string) => {
+    try {
+      setDeletingSessionId(sessionId);
+      await deleteSession(sessionId);
+      toast({
+        title: "Success",
+        description: "Session deleted successfully",
+      });
+      
+      if (onSessionDelete) {
+        onSessionDelete();
+      }
+    } catch (error: any) {
+      console.error("Error deleting session:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete session",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingSessionId(null);
+    }
   };
 
   if (loading) {
@@ -89,9 +131,42 @@ export const SessionList = ({ sessions, date, loading, onScheduleClick }: Sessio
                 </span>
               </div>
             </div>
-            {!isPast(session.scheduled_time, session.duration_minutes) && (
-              <Button variant="outline">View Details</Button>
-            )}
+            <div className="flex items-center gap-2">
+              {!isPast(session.scheduled_time, session.duration_minutes) && (
+                <>
+                  <Button variant="outline">View Details</Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="icon"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Session</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this session? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDeleteSession(session.id)}
+                          disabled={deletingSessionId === session.id}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {deletingSessionId === session.id ? "Deleting..." : "Delete"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              )}
+            </div>
           </div>
         </Card>
       ))}

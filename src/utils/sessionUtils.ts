@@ -6,4 +6,4 @@
 // Re-export all functions from the specialized modules
 export { generateTimeSlots, getCommonTimezones, getCurrentTimezone } from './timeUtils';
 export { resolvePatientSessionDetails } from './clinicianPatientUtils';
-export { scheduleSession, type ScheduleSessionParams } from './sessionScheduleUtils';
+export { scheduleSession, deleteSession, type ScheduleSessionParams } from './sessionScheduleUtils';

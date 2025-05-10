@@ -16,7 +16,8 @@ export default function PatientSessions() {
     isCheckingConnection,
     getSessionsForDate,
     handleScheduleClick,
-    handleScheduleComplete
+    handleScheduleComplete,
+    fetchSessions
   } = usePatientSessions();
 
   return (
@@ -37,6 +38,7 @@ export default function PatientSessions() {
           date={date}
           loading={loading}
           onScheduleClick={handleScheduleClick}
+          onSessionDelete={fetchSessions}
         />
       </div>
 

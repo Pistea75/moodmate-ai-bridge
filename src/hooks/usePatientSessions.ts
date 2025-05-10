@@ -166,6 +166,7 @@ export const usePatientSessions = () => {
     isCheckingConnection,
     getSessionsForDate,
     handleScheduleClick,
-    handleScheduleComplete
+    handleScheduleComplete,
+    fetchSessions
   };
 };

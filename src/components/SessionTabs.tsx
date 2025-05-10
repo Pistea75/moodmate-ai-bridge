@@ -12,9 +12,10 @@ interface SessionTabsProps {
     all: any[];
   };
   selectedDate: Date;
+  onSessionDelete?: () => void;
 }
 
-export function SessionTabs({ loading, filtered }: SessionTabsProps) {
+export function SessionTabs({ loading, filtered, onSessionDelete }: SessionTabsProps) {
   return (
     <Tabs defaultValue="upcoming" className="space-y-6">
       <TabsList className="grid w-full grid-cols-3">
@@ -48,6 +49,7 @@ export function SessionTabs({ loading, filtered }: SessionTabsProps) {
                     notes: session.notes
                   }}
                   variant="clinician"
+                  onDelete={onSessionDelete}
                 />
               ))
             )}

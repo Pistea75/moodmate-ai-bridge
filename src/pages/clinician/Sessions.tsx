@@ -106,6 +106,7 @@ export default function Sessions() {
           loading={loading}
           filtered={filtered}
           selectedDate={selectedDate}
+          onSessionDelete={fetchSessions}
         />
 
         <ScheduleSessionModal 
