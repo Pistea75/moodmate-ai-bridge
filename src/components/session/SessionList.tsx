@@ -55,7 +55,9 @@ export function SessionList({
     try {
       setDeletingSessionId(sessionId);
       console.log("Deleting session with ID:", sessionId);
+      
       await deleteSession(sessionId);
+      
       toast({
         title: "Success",
         description: "Session deleted successfully",

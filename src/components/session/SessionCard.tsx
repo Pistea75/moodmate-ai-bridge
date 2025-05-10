@@ -51,7 +51,10 @@ export function SessionCard({ session, variant, onDelete }: SessionCardProps) {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
+      console.log("SessionCard: Deleting session with ID:", session.id);
+      
       await deleteSession(session.id);
+      
       toast({
         title: "Session deleted",
         description: "The session has been successfully removed",

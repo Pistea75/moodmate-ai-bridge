@@ -101,6 +101,11 @@ export default function Sessions() {
     return sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
   };
 
+  const handleSessionDelete = () => {
+    console.log("Session deleted, refreshing sessions list");
+    fetchSessions();
+  };
+
   return (
     <ClinicianLayout>
       <div className="space-y-6">
@@ -115,7 +120,7 @@ export default function Sessions() {
           loading={loading}
           filtered={filtered}
           selectedDate={selectedDate}
-          onSessionDelete={fetchSessions}
+          onSessionDelete={handleSessionDelete}
         />
 
         <ScheduleSessionModal 
