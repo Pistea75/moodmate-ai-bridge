@@ -35,7 +35,11 @@ export const scheduleSession = async ({
   }
   
   // Parse the ISO string back to a Date object
+  // This is already in the local timezone from the form
   const scheduledTime = new Date(date);
+  console.log("📆 Parsed scheduled time:", scheduledTime.toLocaleString());
+  console.log("⏰ Time string from form:", time);
+  console.log("🌐 User selected timezone:", timezone);
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   

@@ -200,7 +200,7 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "clinician_referral_codes"
-            referencedColumns: ["clinician_id"]
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "sessions_clinician_id_fkey"
@@ -214,7 +214,7 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "clinician_referral_codes"
-            referencedColumns: ["clinician_id"]
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "sessions_patient_id_fkey"
@@ -262,7 +262,7 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "clinician_referral_codes"
-            referencedColumns: ["clinician_id"]
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "tasks_clinician_id_fkey"
@@ -276,7 +276,7 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "clinician_referral_codes"
-            referencedColumns: ["clinician_id"]
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "tasks_patient_id_fkey"
@@ -315,16 +315,16 @@ export type Database = {
     Views: {
       clinician_referral_codes: {
         Row: {
-          clinician_id: string | null
           referral_code: string | null
+          user_id: string | null
         }
         Insert: {
-          clinician_id?: string | null
           referral_code?: string | null
+          user_id?: string | null
         }
         Update: {
-          clinician_id?: string | null
           referral_code?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

@@ -35,7 +35,7 @@ export function ScheduleSessionModal({
       setLoading(true);
       setError(null);
 
-      // 🧠 Combine selected date + time into a proper UTC datetime
+      // 🧠 Validate required inputs
       if (!formData.date) {
         throw new Error("Please select a date");
       }
@@ -43,20 +43,20 @@ export function ScheduleSessionModal({
       const selectedDate = formData.date;
       const [hours, minutes] = formData.time.split(":").map(Number);
 
-      // Create a new UTC datetime
-      const scheduledUTC = new Date(
-        Date.UTC(
-          selectedDate.getFullYear(),
-          selectedDate.getMonth(),
-          selectedDate.getDate(),
-          hours,
-          minutes,
-          0,
-          0
-        )
+      // Create a date object representing the local date and time selected
+      // This preserves the actual date and time the user selected without timezone shifting
+      const scheduledDate = new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        hours,
+        minutes,
+        0,
+        0
       );
-
-      console.log("📅 Final UTC ISO Date:", scheduledUTC.toISOString());
+      
+      console.log("📅 Selected local date and time:", scheduledDate.toLocaleString());
+      console.log("📅 Selected timezone:", formData.timezone);
       console.log("🔄 Scheduling session with isPatientView:", isPatientView);
 
       // Get the current user (clinician) ID when not in patient view
@@ -77,7 +77,9 @@ export function ScheduleSessionModal({
       console.log("👨‍⚕️ Using clinician ID:", clinicianId);
 
       await scheduleSession({
-        date: scheduledUTC.toISOString(), // UTC datetime
+        // Pass the formatted date string directly - this will be treated as a local time 
+        // with the specified timezone in the backend
+        date: scheduledDate.toISOString(),
         time: formData.time,
         patientId: isPatientView ? undefined : formData.patientId,
         clinicianId: clinicianId,
