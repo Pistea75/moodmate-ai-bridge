@@ -31,21 +31,30 @@ export default function Sessions() {
 
   const fetchSessions = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("sessions")
-      .select(`
-        *,
-        patient:profiles!sessions_patient_id_fkey(first_name, last_name)
-      `)
-      .order("scheduled_time", { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from("sessions")
+        .select(`
+          *,
+          patient:profiles!sessions_patient_id_fkey(first_name, last_name)
+        `)
+        .order("scheduled_time", { ascending: true });
 
-    if (error) {
-      console.error("❌ Error fetching sessions:", error);
-    } else {
-      setSessions((data || []) as SessionWithPatient[]);
+      if (error) {
+        console.error("❌ Error fetching sessions:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load sessions. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        setSessions((data || []) as SessionWithPatient[]);
+      }
+    } catch (err) {
+      console.error("Unexpected error fetching sessions:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   useEffect(() => {

@@ -7,4 +7,3 @@
 export { generateTimeSlots, getCommonTimezones, getCurrentTimezone } from './timeUtils';
 export { resolvePatientSessionDetails } from './clinicianPatientUtils';
 export { scheduleSession, deleteSession, type ScheduleSessionParams } from './sessionScheduleUtils';
-

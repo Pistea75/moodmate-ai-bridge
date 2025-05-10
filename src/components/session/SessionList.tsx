@@ -29,13 +29,13 @@ interface SessionListProps {
   onSessionDelete?: () => void;
 }
 
-export const SessionList = ({ 
+export function SessionList({ 
   sessions, 
   date, 
   loading, 
   onScheduleClick,
   onSessionDelete 
-}: SessionListProps) => {
+}: SessionListProps) {
   const { toast } = useToast();
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
   
@@ -54,6 +54,7 @@ export const SessionList = ({
   const handleDeleteSession = async (sessionId: string) => {
     try {
       setDeletingSessionId(sessionId);
+      console.log("Deleting session with ID:", sessionId);
       await deleteSession(sessionId);
       toast({
         title: "Success",

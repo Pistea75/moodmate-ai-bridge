@@ -95,6 +95,8 @@ export const deleteSession = async (sessionId: string) => {
     throw new Error("Session ID is required");
   }
   
+  console.log("Attempting to delete session with ID:", sessionId);
+  
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
   if (userError || !user) {
@@ -133,5 +135,6 @@ export const deleteSession = async (sessionId: string) => {
     throw new Error(`Error deleting session: ${error.message}`);
   }
   
+  console.log("Session deleted successfully:", sessionId);
   return { success: true };
 };
