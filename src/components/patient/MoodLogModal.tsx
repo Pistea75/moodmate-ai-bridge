@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [notes, setNotes] = useState('');
@@ -21,13 +23,20 @@ export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) 
       return;
     }
 
+    if (!user) {
+      toast({ variant: 'destructive', title: 'You need to be logged in to log your mood.' });
+      return;
+    }
+
     const { error } = await supabase.from('mood_entries').insert({
       mood_score: score,
       notes,
       triggers: triggers ? triggers.split(',').map(t => t.trim()) : [],
+      patient_id: user.id,
     });
 
     if (error) {
+      console.error('Error logging mood:', error);
       toast({ variant: 'destructive', title: 'Error logging mood', description: error.message });
     } else {
       toast({ title: 'Mood logged successfully' });
