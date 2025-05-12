@@ -45,35 +45,31 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          mood_score: number
           notes: string | null
-          sentiment: string | null
-          user_id: string | null
+          patient_id: string
+          triggers: string[] | null
         }
         Insert: {
           created_at?: string | null
           id?: string
+          mood_score: number
           notes?: string | null
-          sentiment?: string | null
-          user_id?: string | null
+          patient_id: string
+          triggers?: string[] | null
         }
         Update: {
           created_at?: string | null
           id?: string
+          mood_score?: number
           notes?: string | null
-          sentiment?: string | null
-          user_id?: string | null
+          patient_id?: string
+          triggers?: string[] | null
         }
         Relationships: [
           {
-            foreignKeyName: "mood_entries_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mood_entries_user_id_fkey1"
-            columns: ["user_id"]
+            foreignKeyName: "mood_entries_patient_id_fkey"
+            columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
