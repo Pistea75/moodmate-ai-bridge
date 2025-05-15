@@ -2,7 +2,7 @@ import { MoodChart } from '../../components/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard, Session } from '../../components/SessionCard';
 import PatientLayout from '../../layouts/PatientLayout';
-import MoodLogModal from '../../components/MoodLogModal';
+import MoodLogModal from '../../components/patient/MoodLogModal';
 
 // Sample upcoming sessions
 const upcomingSessions: Session[] = [
