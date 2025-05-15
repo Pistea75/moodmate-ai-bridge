@@ -1,8 +1,8 @@
-
 import { MoodChart } from '../../components/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard, Session } from '../../components/SessionCard';
 import PatientLayout from '../../layouts/PatientLayout';
+import MoodLogModal from '../../components/MoodLogModal';
 
 // Sample upcoming sessions
 const upcomingSessions: Session[] = [
@@ -33,9 +33,7 @@ export default function PatientDashboard() {
             <h1 className="text-2xl font-bold">Welcome back, Alex</h1>
             <p className="text-muted-foreground">Here's your mental wellness summary</p>
           </div>
-          <button className="px-4 py-2 bg-mood-purple text-white rounded-lg text-sm font-medium">
-            Log Mood
-          </button>
+          <MoodLogModal />
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
