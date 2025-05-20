@@ -25,6 +25,20 @@ const commonTriggers = [
   { label: 'Health', value: 'health' }
 ];
 
+// Enhanced mood score descriptions
+const moodScoreDescriptions = [
+  { score: 1, label: 'Crisis', description: 'Panic attack, suicidal thoughts, or emotional breakdown' },
+  { score: 2, label: 'Severely Distressed', description: 'Intense anxiety, unable to function, overwhelmed' },
+  { score: 3, label: 'Very Low', description: 'Depressed, hopeless, avoiding interaction' },
+  { score: 4, label: 'Low', description: 'Sad or anxious, difficulty focusing or getting through the day' },
+  { score: 5, label: 'Below Average', description: 'Mild anxiety or low motivation, not feeling like yourself' },
+  { score: 6, label: 'Neutral', description: 'Emotionally flat or numb, not feeling good or bad' },
+  { score: 7, label: 'Slightly Positive', description: 'Okay day, mildly upbeat, some productivity or socialization' },
+  { score: 8, label: 'Good', description: 'Energetic, motivated, calm, pleasant state' },
+  { score: 9, label: 'Very Good', description: 'Happy, accomplished, confident' },
+  { score: 10, label: 'Excellent', description: 'Joyful, balanced, emotionally thriving' }
+];
+
 // Form schema
 const moodFormSchema = z.object({
   mood_score: z.number().min(1).max(10),
@@ -50,6 +64,9 @@ export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) 
       custom_trigger: '',
     },
   });
+
+  const currentMoodScore = form.watch('mood_score');
+  const currentMoodInfo = moodScoreDescriptions[currentMoodScore - 1];
 
   const handleSubmit = async (values: MoodFormValues) => {
     if (!user) {
@@ -92,10 +109,11 @@ export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) 
     }
   };
 
-  const getMoodLabel = (score: number) => {
-    if (score <= 3) return "Low";
-    if (score <= 7) return "Moderate";
-    return "High";
+  const getMoodColor = (score: number) => {
+    if (score <= 3) return "bg-red-500";
+    if (score <= 5) return "bg-yellow-500";
+    if (score <= 7) return "bg-blue-500";
+    return "bg-green-500";
   };
 
   const toggleTrigger = (value: string) => {
@@ -130,23 +148,41 @@ export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) 
                 render={({ field }) => (
                   <FormItem className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <Label>Mood Score: {field.value}</Label>
-                      <span className="text-sm font-medium">{getMoodLabel(field.value)}</span>
+                      <Label className="text-base font-medium">Mood Score: {field.value}</Label>
+                      <span className="text-sm font-semibold px-2 py-1 rounded-full bg-mood-purple text-white">
+                        {currentMoodInfo.label}
+                      </span>
                     </div>
+                    
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      {currentMoodInfo.description}
+                    </div>
+                    
                     <FormControl>
-                      <Slider 
-                        value={[field.value]} 
-                        min={1} 
-                        max={10} 
-                        step={1} 
-                        onValueChange={(values) => field.onChange(values[0])} 
-                        className="py-4"
-                      />
+                      <div className="pt-2 pb-6">
+                        <Slider 
+                          value={[field.value]} 
+                          min={1} 
+                          max={10} 
+                          step={1} 
+                          onValueChange={(values) => field.onChange(values[0])} 
+                          className="py-4"
+                        />
+                        
+                        <div className="mt-2 grid grid-cols-10 text-xs text-center">
+                          {moodScoreDescriptions.map((desc) => (
+                            <div key={desc.score} className={`${field.value === desc.score ? 'font-bold' : 'text-muted-foreground'}`}>
+                              {desc.score}
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+                          <span>Crisis</span>
+                          <span>Excellent</span>
+                        </div>
+                      </div>
                     </FormControl>
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Low</span>
-                      <span>High</span>
-                    </div>
                   </FormItem>
                 )}
               />
