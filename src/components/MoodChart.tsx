@@ -19,8 +19,9 @@ type ViewMode = 'weekly' | 'daily';
 const MOOD_LABELS = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
 const MOOD_COLORS = ['#F87171', '#FCD34D', '#A3E635', '#34D399', '#60A5FA'];
 
+// Update the MoodEntry interface to match what's coming from Supabase
 interface MoodEntry {
-  timestamp: string;
+  created_at: string; // Changed from timestamp to created_at
   mood_score: number;
 }
 
@@ -91,7 +92,7 @@ export function MoodChart() {
     const grouped: { [key: string]: number[] } = {};
 
     entries.forEach((entry) => {
-      const date = new Date(entry.created_at);
+      const date = new Date(entry.created_at); // Updated to use created_at instead of timestamp
       const key =
         view === 'weekly'
           ? date.toLocaleDateString(undefined, { weekday: 'short' })
@@ -179,5 +180,3 @@ export function MoodChart() {
     </div>
   );
 }
-
-
