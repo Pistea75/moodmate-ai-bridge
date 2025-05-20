@@ -1,3 +1,4 @@
+
 import { Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { AuthProvider } from './contexts/AuthContext';
@@ -25,6 +26,7 @@ import PatientSettings from './pages/patient/PatientSettings';
 import PatientProfile from './pages/patient/PatientProfile';
 import ClinicianDashboard from './pages/clinician/ClinicianDashboard';
 import Patients from './pages/clinician/Patients';
+import PatientDetail from './pages/clinician/PatientDetail';
 import ClinicianSessions from './pages/clinician/Sessions';
 import ClinicianTasks from './pages/clinician/Tasks';
 import ClinicianReports from './pages/clinician/Reports';
@@ -63,6 +65,7 @@ function App() {
           
           <Route path="/clinician/dashboard" element={<ProtectedRoute requiredRole="clinician"><ClinicianDashboard /></ProtectedRoute>} />
           <Route path="/clinician/patients" element={<ProtectedRoute requiredRole="clinician"><Patients /></ProtectedRoute>} />
+          <Route path="/clinician/patients/:patientId" element={<ProtectedRoute requiredRole="clinician"><PatientDetail /></ProtectedRoute>} />
           <Route path="/clinician/sessions" element={<ProtectedRoute requiredRole="clinician"><ClinicianSessions /></ProtectedRoute>} />
           <Route path="/clinician/tasks" element={<ProtectedRoute requiredRole="clinician"><ClinicianTasks /></ProtectedRoute>} />
           <Route path="/clinician/reports" element={<ProtectedRoute requiredRole="clinician"><ClinicianReports /></ProtectedRoute>} />

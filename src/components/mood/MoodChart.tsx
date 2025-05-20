@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -8,12 +7,41 @@ import { ChartData, parseEntries } from './MoodChartUtils';
 import { ViewMode } from './MoodChartConstants';
 import { MoodEntry } from '@/hooks/useMoodEntries';
 
-export function MoodChart() {
+interface MoodChartProps {
+  patientId?: string;
+}
+
+export function MoodChart({ patientId }: MoodChartProps) {
   const [data, setData] = useState<ChartData[]>([]);
   const [view, setView] = useState<ViewMode>('weekly');
   const { toast } = useToast();
 
   const fetchMoodData = async () => {
+    // If patient ID is provided, fetch that specific patient's data (for clinician view)
+    // Otherwise, fetch the current user's data (for patient view)
+    if (patientId) {
+      const { data: entries, error } = await supabase
+        .from('mood_entries')
+        .select('mood_score, created_at')
+        .eq('patient_id', patientId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching mood entries:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Failed to load mood data',
+          description: error.message,
+        });
+        return;
+      }
+
+      const parsed = parseEntries(entries as MoodEntry[] || [], view);
+      setData(parsed);
+      return;
+    }
+
+    // Default path - fetch current user's data
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
       toast({
@@ -46,7 +74,7 @@ export function MoodChart() {
 
   useEffect(() => {
     fetchMoodData();
-  }, [view]);
+  }, [view, patientId]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border p-4 w-full">

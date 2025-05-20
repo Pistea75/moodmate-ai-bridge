@@ -1,14 +1,17 @@
+
 import { useEffect, useState } from 'react';
 import { Search, Plus, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 
 export default function Patients() {
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -26,6 +29,10 @@ export default function Patients() {
 
     fetchPatients();
   }, []);
+
+  const handleViewProfile = (patientId: string) => {
+    navigate(`/clinician/patients/${patientId}`);
+  };
 
   return (
     <ClinicianLayout>
@@ -66,7 +73,12 @@ export default function Patients() {
                     <span>Language: {patient.language || 'N/A'}</span>
                   </div>
                 </div>
-                <Button variant="outline">View Profile</Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleViewProfile(patient.id)}
+                >
+                  View Profile
+                </Button>
               </div>
             </Card>
           ))}
@@ -75,4 +87,3 @@ export default function Patients() {
     </ClinicianLayout>
   );
 }
-
