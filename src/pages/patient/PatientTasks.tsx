@@ -1,4 +1,3 @@
-
 import { format } from 'date-fns';
 import { Clock, Trash2, RefreshCcw } from 'lucide-react';
 import PatientLayout from '../../layouts/PatientLayout';
@@ -84,7 +83,7 @@ export default function PatientTasks() {
         {error && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{error.message}</AlertDescription>
           </Alert>
         )}
 
