@@ -1,3 +1,4 @@
+
 import { format } from 'date-fns';
 import { Clock, Trash2, RefreshCcw } from 'lucide-react';
 import PatientLayout from '../../layouts/PatientLayout';
@@ -19,7 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function PatientTasks() {
   const { tasks, loading, error, toggleTaskCompletion, deleteTask, fetchTasks } = usePatientTasks();
@@ -30,11 +31,6 @@ export default function PatientTasks() {
   console.log('Tasks from hook:', tasks);
   console.log('Loading:', loading);
   console.log('Error:', error);
-
-  // Refresh tasks when the component mounts
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
 
   // Function to check if a task is overdue
   const isOverdue = (dateString: string, completed: boolean) => {
