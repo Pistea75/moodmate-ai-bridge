@@ -7,32 +7,61 @@ import { Card } from "@/components/ui/card";
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Patients() {
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchPatients = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'patient');
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*, email:users(email)')
+          .eq('role', 'patient');
 
-      if (!error) {
-        setPatients(data || []);
+        if (error) {
+          throw error;
+        }
+
+        // Process the joined data to flatten the structure
+        const processedPatients = data?.map(patient => ({
+          ...patient,
+          email: patient.email?.email || 'N/A'
+        })) || [];
+
+        setPatients(processedPatients);
+      } catch (error: any) {
+        console.error('Error fetching patients:', error.message);
+        toast({
+          variant: 'destructive',
+          title: 'Error fetching patients',
+          description: error.message,
+        });
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchPatients();
-  }, []);
+  }, [toast]);
 
   const handleViewProfile = (patientId: string) => {
     navigate(`/clinician/patients/${patientId}`);
   };
+
+  // Filter patients based on search term
+  const filteredPatients = patients.filter(patient => {
+    const fullName = `${patient.first_name || ''} ${patient.last_name || ''}`.toLowerCase();
+    const email = (patient.email || '').toLowerCase();
+    const term = searchTerm.toLowerCase();
+    
+    return fullName.includes(term) || email.includes(term);
+  });
 
   return (
     <ClinicianLayout>
@@ -45,6 +74,8 @@ export default function Patients() {
               <Input
                 placeholder="Search patients..."
                 className="w-[250px] pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <Button className="bg-mood-purple hover:bg-mood-purple/90">
@@ -56,8 +87,10 @@ export default function Patients() {
 
         <div className="grid gap-4">
           {loading && <p>Loading patients...</p>}
-          {!loading && patients.length === 0 && <p>No patients found.</p>}
-          {patients.map((patient) => (
+          {!loading && filteredPatients.length === 0 && searchTerm === '' && <p>No patients found.</p>}
+          {!loading && filteredPatients.length === 0 && searchTerm !== '' && <p>No patients matching your search.</p>}
+          
+          {filteredPatients.map((patient) => (
             <Card key={patient.id} className="p-4">
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">

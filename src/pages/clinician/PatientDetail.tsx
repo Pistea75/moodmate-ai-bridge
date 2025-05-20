@@ -36,18 +36,28 @@ export default function PatientDetail() {
           return;
         }
 
-        // Fetch patient profile data
+        // Fetch patient profile data including email from profiles table and auth.users
         const { data: patientData, error: patientError } = await supabase
           .from('profiles')
-          .select('*')
+          .select('*, email:users(email)')
           .eq('id', patientId)
           .single();
 
         if (patientError) {
           console.error('Error fetching patient:', patientError);
           setError(patientError.message);
-        } else {
-          setPatient(patientData);
+        } else if (patientData) {
+          // Extract the email from the joined users table and structure the patient object
+          const email = patientData.email?.email || 'No email available';
+          
+          // Create the patient profile with all required fields
+          setPatient({
+            id: patientData.id,
+            first_name: patientData.first_name || '',
+            last_name: patientData.last_name || '',
+            email: email,
+            language: patientData.language || '',
+          });
         }
         
       } catch (err: any) {
