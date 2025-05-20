@@ -1,164 +1,53 @@
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
-export interface PatientTask {
+interface Task {
   id: string;
   title: string;
   description: string;
   due_date: string;
   completed: boolean;
   patient_id: string;
-  clinician_id: string;
-  clinician?: {
-    first_name: string | null;
-    last_name: string | null;
-  };
 }
 
-export function usePatientTasks() {
-  const [tasks, setTasks] = useState<PatientTask[]>([]);
+export function usePatientTasks(patientId: string) {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-
-  const fetchTasks = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-
-      if (userError || !userData?.user) {
-        setError("User not authenticated.");
-        setLoading(false);
-        return;
-      }
-
-      const patientId = userData.user.id;
-      console.log("Patient ID:", patientId);
-
-      const { data: tasksData, error: taskError } = await supabase
-        .from('tasks')
-        .select(`
-          *,
-          clinician:profiles!clinician_id (first_name, last_name)
-        `)
-        .eq('patient_id', patientId);
-
-      if (taskError) {
-        setError(taskError.message);
-        console.error("Supabase query error:", taskError);
-        toast({
-          variant: "destructive",
-          title: "Error loading tasks",
-          description: taskError.message || 'An unexpected error occurred',
-        });
-      } else {
-        console.log("Fetched tasks:", tasksData);
-        setTasks(tasksData ?? []);
-      }
-    } catch (err: any) {
-      console.error('Error in fetchTasks:', err.message);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
-  const toggleTaskCompletion = async (taskId: string, completed: boolean) => {
-    try {
-      console.log(`Toggling task ${taskId} to ${completed ? 'completed' : 'incomplete'}`);
-      
-      // First update local state for immediate UI feedback
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id === taskId ? { ...task, completed } : task
-        )
-      );
-      
-      // Log the request details for debugging
-      console.log(`Sending update to Supabase for task ${taskId}, setting completed to ${completed}`);
-      
-      // Update in the database WITHOUT select() - don't expect data back
-      const { error: updateError } = await supabase
-        .from('tasks')
-        .update({ completed })
-        .eq('id', taskId);
-      
-      if (updateError) {
-        console.error("Error updating task:", updateError);
-        throw new Error(updateError.message);
-      }
-      
-      toast({
-        title: `Task marked as ${completed ? 'completed' : 'incomplete'}`,
-        description: "Task status updated successfully",
-      });
-      
-      // No need to await fetchTasks here - the optimistic UI update handles it
-    } catch (err: any) {
-      console.error('Error updating task completion:', err.message);
-      toast({
-        variant: "destructive",
-        title: "Failed to update task",
-        description: err.message || 'An unexpected error occurred',
-      });
-      
-      // Revert the local state change if the server update failed
-      await fetchTasks();
-    }
-  };
-
-  const deleteTask = async (taskId: string) => {
-    try {
-      console.log(`Deleting task ${taskId}`);
-      
-      // Update local state immediately for better UI responsiveness
-      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-      
-      // Then delete from database
-      const { error: deleteError } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', taskId);
-      
-      if (deleteError) {
-        console.error("Error deleting task:", deleteError);
-        throw new Error(deleteError.message);
-      }
-      
-      toast({
-        title: "Task deleted",
-        description: "Task has been removed successfully",
-      });
-      
-      // Refresh tasks from server to ensure we're in sync
-      await fetchTasks();
-    } catch (err: any) {
-      console.error('Error deleting task:', err.message);
-      toast({
-        variant: "destructive",
-        title: "Failed to delete task",
-        description: err.message || 'An unexpected error occurred',
-      });
-      
-      // Revert the local state change if the server delete failed
-      await fetchTasks();
-    }
+  const [error, setError] = useState<Error | null>(null);
+  
+  // Format date to a more readable format
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
   useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('tasks')
+          .select('*')
+          .eq('patient_id', patientId)
+          .order('due_date', { ascending: true });
+          
+        if (error) throw new Error(error.message);
+        setTasks(data || []);
+      } catch (err) {
+        console.error('Error fetching tasks:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchTasks();
-  }, [fetchTasks]);
+  }, [patientId]);
 
-  return {
-    tasks,
-    loading,
-    error,
-    toggleTaskCompletion,
-    deleteTask,
-    fetchTasks
-  };
+  return { tasks, loading, error, formatDate };
 }
