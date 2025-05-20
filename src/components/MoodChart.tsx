@@ -7,259 +7,177 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Area,
-  AreaChart,
-  TooltipProps,
 } from 'recharts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Search, ZoomIn, ZoomOut } from 'lucide-react';
-import { useMoodEntries } from '@/hooks/useMoodEntries';
-import { format } from 'date-fns';
 
-const MOOD_LEVELS = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
+type ViewMode = 'weekly' | 'daily';
+
+const MOOD_LABELS = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
 const MOOD_COLORS = ['#F87171', '#FCD34D', '#A3E635', '#34D399', '#60A5FA'];
 
-type ChartView = 'weekly' | 'daily' | 'hourly';
+interface MoodEntry {
+  timestamp: string;
+  mood_score: number;
+}
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+interface ChartData {
+  label: string;
+  mood: number;
+}
+
+// Tooltip component
+const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
-    const moodValue = payload[0].value as number;
-    const moodLabel = MOOD_LEVELS[moodValue - 1];
-    const moodColor = MOOD_COLORS[moodValue - 1];
-
+    const mood = payload[0].value;
     return (
       <div className="bg-background p-3 rounded-md shadow-md border">
         <p className="text-sm font-medium">{label}</p>
         <div className="flex items-center gap-2 mt-1">
-          <div className="size-3 rounded-full" style={{ backgroundColor: moodColor }} />
-          <p className="text-sm">{moodLabel}</p>
+          <div
+            className="size-3 rounded-full"
+            style={{ backgroundColor: MOOD_COLORS[mood - 1] }}
+          />
+          <p className="text-sm">{MOOD_LABELS[mood - 1]}</p>
         </div>
       </div>
     );
   }
-
   return null;
 };
 
-// 🔁 Mood transformation helper
-function transformMoodData(moods: any[], view: ChartView) {
-  const mapMood = (score: number) => Math.ceil(score / 2); // 1–10 ➜ 1–5
-  const now = new Date();
-
-  if (view === 'weekly') {
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(now);
-      d.setDate(d.getDate() - (6 - i));
-      const label = format(d, 'EEE');
-
-      const dayEntries = moods.filter(
-        (m) => format(new Date(m.created_at), 'yyyy-MM-dd') === format(d, 'yyyy-MM-dd')
-      );
-
-      const avgMood =
-        dayEntries.length > 0
-          ? Math.round(
-              dayEntries.reduce((sum, m) => sum + mapMood(m.mood_score), 0) / dayEntries.length
-            )
-          : null;
-
-      return { day: label, mood: avgMood };
-    });
-  }
-
-  if (view === 'daily') {
-    const today = format(now, 'yyyy-MM-dd');
-    return Array.from({ length: 12 }).map((_, i) => {
-      const hour = i * 2;
-      const label = `${hour === 0 ? '12' : hour % 12} ${hour < 12 ? 'AM' : 'PM'}`;
-
-      const entries = moods.filter((m) => {
-        const date = new Date(m.created_at);
-        return (
-          format(date, 'yyyy-MM-dd') === today &&
-          date.getHours() >= hour &&
-          date.getHours() < hour + 2
-        );
-      });
-
-      const avgMood =
-        entries.length > 0
-          ? Math.round(
-              entries.reduce((sum, m) => sum + mapMood(m.mood_score), 0) / entries.length
-            )
-          : null;
-
-      return { hour: label, mood: avgMood };
-    });
-  }
-
-  if (view === 'hourly') {
-    const today = format(now, 'yyyy-MM-dd');
-    return moods
-      .filter((m) => format(new Date(m.created_at), 'yyyy-MM-dd') === today)
-      .map((m) => ({
-        time: format(new Date(m.created_at), 'HH:mm'),
-        mood: mapMood(m.mood_score),
-      }));
-  }
-
-  return [];
-}
-
 export function MoodChart() {
-  const { moods, loading } = useMoodEntries();
-  const [view, setView] = useState<ChartView>('weekly');
-  const [previousView, setPreviousView] = useState<ChartView | null>(null);
+  const [data, setData] = useState<ChartData[]>([]);
+  const [view, setView] = useState<ViewMode>('weekly');
+  const { toast } = useToast();
 
-  const data = transformMoodData(moods, view);
-  const dataKey = view === 'weekly' ? 'day' : view === 'daily' ? 'hour' : 'time';
-
-  const handleZoomIn = () => {
-    if (view === 'weekly') {
-      setPreviousView('weekly');
-      setView('daily');
-    } else if (view === 'daily') {
-      setPreviousView('daily');
-      setView('hourly');
+  const fetchMoodData = async () => {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData.user) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'User not authenticated',
+      });
+      return;
     }
+
+    const { data: entries, error } = await supabase
+      .from('mood_entries')
+      .select('mood_score, created_at')
+      .eq('patient_id', userData.user.id)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching mood entries:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Failed to load mood data',
+        description: error.message,
+      });
+      return;
+    }
+
+    const parsed = parseEntries(entries || [], view);
+    setData(parsed);
   };
 
-  const handleZoomOut = () => {
-    if (view === 'hourly') {
-      setView('daily');
-    } else if (view === 'daily') {
-      setView('weekly');
-    }
+  // Group and simplify data
+  const parseEntries = (entries: MoodEntry[], view: ViewMode): ChartData[] => {
+    const now = new Date();
+    const grouped: { [key: string]: number[] } = {};
+
+    entries.forEach((entry) => {
+      const date = new Date(entry.created_at);
+      const key =
+        view === 'weekly'
+          ? date.toLocaleDateString(undefined, { weekday: 'short' })
+          : date.toLocaleTimeString(undefined, {
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(entry.mood_score);
+    });
+
+    const result = Object.entries(grouped).map(([label, moods]) => ({
+      label,
+      mood: Math.round(
+        moods.reduce((sum, m) => sum + normalizeMood(m), 0) / moods.length
+      ),
+    }));
+
+    return result;
   };
+
+  const normalizeMood = (score: number) => {
+    // Convert 1–10 input scale to 1–5 for chart display
+    return Math.max(1, Math.min(5, Math.ceil(score / 2)));
+  };
+
+  useEffect(() => {
+    fetchMoodData();
+  }, [view]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">Mood Timeline</h3>
         <div className="flex gap-2">
-          <div className="flex">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleZoomOut}
-              disabled={view === 'weekly'}
-              className="rounded-r-none border-r-0"
-            >
-              <ZoomOut size={16} />
-              <span className="sr-only">Zoom Out</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleZoomIn}
-              disabled={view === 'hourly'}
-              className="rounded-l-none"
-            >
-              <ZoomIn size={16} />
-              <span className="sr-only">Zoom In</span>
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <button
-              className={`px-3 py-1 text-sm rounded-md ${
-                view === 'weekly'
-                  ? 'bg-mood-purple text-white'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-              onClick={() => setView('weekly')}
-            >
-              Weekly
-            </button>
-            <button
-              className={`px-3 py-1 text-sm rounded-md ${
-                view === 'daily'
-                  ? 'bg-mood-purple text-white'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-              onClick={() => setView('daily')}
-            >
-              Daily
-            </button>
-            <button
-              className={`px-3 py-1 text-sm rounded-md ${
-                view === 'hourly'
-                  ? 'bg-mood-purple text-white'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-              onClick={() => setView('hourly')}
-            >
-              Hourly
-            </button>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setView('weekly')}
+            className={view === 'weekly' ? 'bg-mood-purple text-white' : ''}
+          >
+            Weekly
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setView('daily')}
+            className={view === 'daily' ? 'bg-mood-purple text-white' : ''}
+          >
+            Daily
+          </Button>
         </div>
       </div>
 
       <div className="h-64 mt-2">
         <ResponsiveContainer width="100%" height="100%">
-          {view === 'weekly' ? (
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-              <XAxis dataKey={dataKey} tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis
-                domain={[1, 5]}
-                ticks={[1, 2, 3, 4, 5]}
-                tick={{ fontSize: 12 }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => MOOD_LEVELS[v - 1]?.split(' ')[0]}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="mood"
-                stroke="#9b87f5"
-                strokeWidth={3}
-                dot={{ fill: '#7E69AB', strokeWidth: 2, r: 4 }}
-                activeDot={{ fill: '#6E59A5', r: 6 }}
-              />
-            </LineChart>
-          ) : (
-            <AreaChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-              <XAxis dataKey={dataKey} tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis
-                domain={[1, 5]}
-                ticks={[1, 2, 3, 4, 5]}
-                tick={{ fontSize: 12 }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => MOOD_LEVELS[v - 1]?.split(' ')[0]}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Area
-                type="monotone"
-                dataKey="mood"
-                stroke="#9b87f5"
-                fill="url(#colorMood)"
-                strokeWidth={3}
-                dot={{ fill: '#7E69AB', strokeWidth: 2, r: 4 }}
-                activeDot={{ fill: '#6E59A5', r: 6 }}
-              />
-              <defs>
-                <linearGradient id="colorMood" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#9b87f5" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#E5DEFF" stopOpacity={0.1} />
-                </linearGradient>
-              </defs>
-            </AreaChart>
-          )}
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+            <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+            <YAxis
+              domain={[1, 5]}
+              ticks={[1, 2, 3, 4, 5]}
+              tickFormatter={(val) => MOOD_LABELS[val - 1]}
+              tick={{ fontSize: 12 }}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Line
+              type="monotone"
+              dataKey="mood"
+              stroke="#9b87f5"
+              strokeWidth={3}
+              dot={{ fill: '#7E69AB', strokeWidth: 2, r: 4 }}
+              activeDot={{ fill: '#6E59A5', r: 6 }}
+            />
+          </LineChart>
         </ResponsiveContainer>
       </div>
 
-      {(view === 'daily' || view === 'hourly') && (
+      {view === 'daily' && (
         <div className="mt-3 text-xs text-center text-muted-foreground">
-          {view === 'hourly'
-            ? 'Hourly zoom view (exact entries)'
-            : 'Daily view (2-hour intervals)'}
+          Daily view (grouped by time)
         </div>
       )}
     </div>
   );
 }
+
 
