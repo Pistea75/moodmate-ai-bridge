@@ -8,17 +8,29 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Import our new components
+// Import mood components
 import { moodFormSchema, MoodFormValues } from './mood/MoodFormSchema';
 import { MoodSlider } from './mood/MoodSlider';
 import { MoodTriggers } from './mood/MoodTriggers';
 import { MoodNotes } from './mood/MoodNotes';
+import { MoodHistoryButton } from './mood/MoodHistoryButton';
 import { useMoodSubmit } from './mood/useMoodSubmit';
 
+/**
+ * MoodLogModal Component
+ * 
+ * A comprehensive modal interface for users to log their current mood state.
+ * Includes mood score selection, trigger identification, and optional notes.
+ * 
+ * @param {Object} props - Component properties
+ * @param {Function} [props.onLogComplete] - Optional callback triggered when mood logging is complete
+ * @returns {JSX.Element} - Rendered modal component
+ */
 export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   
+  // Initialize form with default values
   const form = useForm<MoodFormValues>({
     resolver: zodResolver(moodFormSchema),
     defaultValues: {
@@ -26,9 +38,11 @@ export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) 
       notes: '',
       triggers: [],
       custom_trigger: '',
+      activities: [],
     },
   });
 
+  // Handle form submission
   const { handleSubmit, isSubmitting } = useMoodSubmit({
     onComplete: () => {
       setOpen(false);
@@ -37,6 +51,7 @@ export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) 
         notes: '',
         triggers: [],
         custom_trigger: '',
+        activities: [],
       });
       onLogComplete?.();
     },
@@ -49,9 +64,13 @@ export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default">Log Mood</Button>
-      </DialogTrigger>
+      <div className="flex items-center space-x-2">
+        <DialogTrigger asChild>
+          <Button variant="default">Log Mood</Button>
+        </DialogTrigger>
+        <MoodHistoryButton />
+      </div>
+      
       <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0 m-4 my-8">
         <DialogHeader className="border-b px-6 py-4 bg-white">
           <DialogTitle className="text-xl font-semibold text-gray-900">How are you feeling?</DialogTitle>

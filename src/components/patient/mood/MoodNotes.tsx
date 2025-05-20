@@ -10,6 +10,15 @@ interface MoodNotesProps {
   form: UseFormReturn<MoodFormValues>;
 }
 
+/**
+ * MoodNotes Component
+ * 
+ * Provides a text area for users to enter additional context about their mood.
+ * This component is part of the mood logging form and handles the optional notes field.
+ * 
+ * @param {MoodNotesProps} props - Component props containing form control
+ * @returns {JSX.Element} - Rendered form field for mood notes
+ */
 export const MoodNotes = ({ form }: MoodNotesProps) => {
   return (
     <FormField
