@@ -11,7 +11,6 @@ import {
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type ViewMode = 'weekly' | 'daily';
@@ -19,20 +18,18 @@ type ViewMode = 'weekly' | 'daily';
 const MOOD_LABELS = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
 const MOOD_COLORS = ['#F87171', '#FCD34D', '#A3E635', '#34D399', '#60A5FA'];
 
-// Update the MoodEntry interface to match what's coming from Supabase
 interface MoodEntry {
-  created_at: string; // Changed from timestamp to created_at
+  created_at: string;
   mood_score: number;
 }
 
 interface ChartData {
   label: string;
-  mood: number;
+  mood: number | null;
 }
 
-// Tooltip component
 const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
+  if (active && payload && payload.length && payload[0].value !== null) {
     const mood = payload[0].value;
     return (
       <div className="bg-background p-3 rounded-md shadow-md border">
@@ -46,6 +43,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </div>
       </div>
     );
+  } else if (active && payload && payload.length) {
+    return (
+      <div className="bg-background p-3 rounded-md shadow-md border">
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-muted-foreground text-sm mt-1">No entry</p>
+      </div>
+    );
   }
   return null;
 };
@@ -54,6 +58,9 @@ export function MoodChart() {
   const [data, setData] = useState<ChartData[]>([]);
   const [view, setView] = useState<ViewMode>('weekly');
   const { toast } = useToast();
+
+  const normalizeMood = (score: number) =>
+    Math.max(1, Math.min(5, Math.ceil(score / 2)));
 
   const fetchMoodData = async () => {
     const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -86,38 +93,52 @@ export function MoodChart() {
     setData(parsed);
   };
 
-  // Group and simplify data
   const parseEntries = (entries: MoodEntry[], view: ViewMode): ChartData[] => {
-    const now = new Date();
-    const grouped: { [key: string]: number[] } = {};
+    const normalizeMood = (score: number) =>
+      Math.max(1, Math.min(5, Math.ceil(score / 2)));
+
+    if (view === 'weekly') {
+      const weekLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const moodMap: Record<string, number[]> = {};
+
+      entries.forEach((entry) => {
+        const date = new Date(entry.created_at);
+        const label = date.toLocaleDateString(undefined, { weekday: 'short' });
+        if (!moodMap[label]) moodMap[label] = [];
+        moodMap[label].push(normalizeMood(entry.mood_score));
+      });
+
+      return weekLabels.map((label) => {
+        const moods = moodMap[label] || [];
+        const average =
+          moods.length > 0
+            ? Math.round(moods.reduce((sum, val) => sum + val, 0) / moods.length)
+            : null;
+
+        return {
+          label,
+          mood: average,
+        };
+      });
+    }
+
+    // Daily view
+    const timeMap: Record<string, number[]> = {};
 
     entries.forEach((entry) => {
-      const date = new Date(entry.created_at); // Updated to use created_at instead of timestamp
-      const key =
-        view === 'weekly'
-          ? date.toLocaleDateString(undefined, { weekday: 'short' })
-          : date.toLocaleTimeString(undefined, {
-              hour: '2-digit',
-              minute: '2-digit',
-            });
-
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(entry.mood_score);
+      const date = new Date(entry.created_at);
+      const time = date.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      if (!timeMap[time]) timeMap[time] = [];
+      timeMap[time].push(normalizeMood(entry.mood_score));
     });
 
-    const result = Object.entries(grouped).map(([label, moods]) => ({
+    return Object.entries(timeMap).map(([label, moods]) => ({
       label,
-      mood: Math.round(
-        moods.reduce((sum, m) => sum + normalizeMood(m), 0) / moods.length
-      ),
+      mood: Math.round(moods.reduce((sum, m) => sum + m, 0) / moods.length),
     }));
-
-    return result;
-  };
-
-  const normalizeMood = (score: number) => {
-    // Convert 1–10 input scale to 1–5 for chart display
-    return Math.max(1, Math.min(5, Math.ceil(score / 2)));
   };
 
   useEffect(() => {
@@ -167,6 +188,7 @@ export function MoodChart() {
               strokeWidth={3}
               dot={{ fill: '#7E69AB', strokeWidth: 2, r: 4 }}
               activeDot={{ fill: '#6E59A5', r: 6 }}
+              connectNulls={false}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -180,3 +202,4 @@ export function MoodChart() {
     </div>
   );
 }
+
