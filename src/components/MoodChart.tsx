@@ -28,9 +28,19 @@ interface ChartData {
   mood: number | null;
 }
 
+// Tooltip component
 const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length && payload[0].value !== null) {
+  if (active && payload && payload.length) {
     const mood = payload[0].value;
+    if (mood === null) {
+      return (
+        <div className="bg-background p-3 rounded-md shadow-md border">
+          <p className="text-sm font-medium">{label}</p>
+          <p className="text-sm text-muted-foreground">No entry</p>
+        </div>
+      );
+    }
+
     return (
       <div className="bg-background p-3 rounded-md shadow-md border">
         <p className="text-sm font-medium">{label}</p>
@@ -43,13 +53,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </div>
       </div>
     );
-  } else if (active && payload && payload.length) {
-    return (
-      <div className="bg-background p-3 rounded-md shadow-md border">
-        <p className="text-sm font-medium">{label}</p>
-        <p className="text-muted-foreground text-sm mt-1">No entry</p>
-      </div>
-    );
   }
   return null;
 };
@@ -58,9 +61,6 @@ export function MoodChart() {
   const [data, setData] = useState<ChartData[]>([]);
   const [view, setView] = useState<ViewMode>('weekly');
   const { toast } = useToast();
-
-  const normalizeMood = (score: number) =>
-    Math.max(1, Math.min(5, Math.ceil(score / 2)));
 
   const fetchMoodData = async () => {
     const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -93,30 +93,35 @@ export function MoodChart() {
     setData(parsed);
   };
 
-  const parseEntries = (entries: MoodEntry[], view: ViewMode): ChartData[] => {
-    const normalizeMood = (score: number) =>
-      Math.max(1, Math.min(5, Math.ceil(score / 2)));
+  const normalizeMood = (score: number) =>
+    Math.max(1, Math.min(5, Math.ceil(score / 2)));
 
+  const parseEntries = (entries: MoodEntry[], view: ViewMode): ChartData[] => {
     if (view === 'weekly') {
-      const weekLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const moodMap: Record<string, number[]> = {};
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+
+      const moodMap: Record<number, number[]> = {};
 
       entries.forEach((entry) => {
         const date = new Date(entry.created_at);
-        const label = date.toLocaleDateString(undefined, { weekday: 'short' });
-        if (!moodMap[label]) moodMap[label] = [];
-        moodMap[label].push(normalizeMood(entry.mood_score));
+        const dayIndex = date.getDay();
+        if (!moodMap[dayIndex]) moodMap[dayIndex] = [];
+        moodMap[dayIndex].push(normalizeMood(entry.mood_score));
       });
 
-      return weekLabels.map((label) => {
-        const moods = moodMap[label] || [];
+      const weekLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+      return Array.from({ length: 7 }, (_, i) => {
+        const moods = moodMap[i] || [];
         const average =
           moods.length > 0
             ? Math.round(moods.reduce((sum, val) => sum + val, 0) / moods.length)
             : null;
 
         return {
-          label,
+          label: weekLabels[i],
           mood: average,
         };
       });
@@ -171,7 +176,10 @@ export function MoodChart() {
 
       <div className="h-64 mt-2">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart
+            data={data}
+            margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
             <XAxis dataKey="label" tick={{ fontSize: 12 }} />
             <YAxis
@@ -188,7 +196,7 @@ export function MoodChart() {
               strokeWidth={3}
               dot={{ fill: '#7E69AB', strokeWidth: 2, r: 4 }}
               activeDot={{ fill: '#6E59A5', r: 6 }}
-              connectNulls={false}
+              connectNulls
             />
           </LineChart>
         </ResponsiveContainer>
@@ -202,4 +210,5 @@ export function MoodChart() {
     </div>
   );
 }
+
 
