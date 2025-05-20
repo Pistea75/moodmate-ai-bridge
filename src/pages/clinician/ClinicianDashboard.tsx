@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { MoodChart } from '../../components/MoodChart';
+import { MoodChart } from '../../components/mood/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard } from '../../components/SessionCard';
-import { Skeleton } from "@/components/ui/skeleton"; // 🦴 Import Skeleton
+import { Skeleton } from "@/components/ui/skeleton";
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { startOfDay, endOfDay, isAfter } from 'date-fns'; 
 
