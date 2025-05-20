@@ -36,10 +36,17 @@ export default function PatientDetail() {
           return;
         }
 
-        // Fetch patient profile data including email from profiles table and auth.users
+        // Fetch patient profile data
         const { data: patientData, error: patientError } = await supabase
           .from('profiles')
-          .select('*, email:users(email)')
+          .select('*')
+          .eq('id', patientId)
+          .single();
+
+        // Separately fetch email from users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('email')
           .eq('id', patientId)
           .single();
 
@@ -47,15 +54,12 @@ export default function PatientDetail() {
           console.error('Error fetching patient:', patientError);
           setError(patientError.message);
         } else if (patientData) {
-          // Extract the email from the joined users table and structure the patient object
-          const email = patientData.email?.email || 'No email available';
-          
           // Create the patient profile with all required fields
           setPatient({
             id: patientData.id,
             first_name: patientData.first_name || '',
             last_name: patientData.last_name || '',
-            email: email,
+            email: userData?.email || 'No email available',
             language: patientData.language || '',
           });
         }

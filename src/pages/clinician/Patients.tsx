@@ -9,8 +9,17 @@ import { useNavigate } from 'react-router-dom';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { useToast } from '@/hooks/use-toast';
 
+interface PatientWithEmail {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  language: string | null;
+  [key: string]: any;
+}
+
 export default function Patients() {
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<PatientWithEmail[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
@@ -19,20 +28,38 @@ export default function Patients() {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const { data, error } = await supabase
+        // First get all patient profiles
+        const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('*, email:users(email)')
+          .select('*')
           .eq('role', 'patient');
-
-        if (error) {
-          throw error;
+          
+        if (profilesError) {
+          throw profilesError;
         }
-
-        // Process the joined data to flatten the structure
-        const processedPatients = data?.map(patient => ({
+        
+        // Then get emails from users table
+        const patientIds = profilesData?.map(patient => patient.id) || [];
+        const { data: emailsData, error: emailsError } = await supabase
+          .from('users')
+          .select('id, email')
+          .in('id', patientIds);
+          
+        if (emailsError) {
+          throw emailsError;
+        }
+        
+        // Create a map of user IDs to emails
+        const emailMap = (emailsData || []).reduce((acc, user) => {
+          acc[user.id] = user.email;
+          return acc;
+        }, {} as Record<string, string>);
+        
+        // Combine the data
+        const processedPatients = (profilesData || []).map(patient => ({
           ...patient,
-          email: patient.email?.email || 'N/A'
-        })) || [];
+          email: emailMap[patient.id] || 'N/A'
+        }));
 
         setPatients(processedPatients);
       } catch (error: any) {
