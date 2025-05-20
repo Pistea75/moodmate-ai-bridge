@@ -1,4 +1,4 @@
-import { MoodChart } from '../../components/MoodChart';
+import { MoodChart } from '../../components/mood/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard, Session } from '../../components/SessionCard';
 import PatientLayout from '../../layouts/PatientLayout';

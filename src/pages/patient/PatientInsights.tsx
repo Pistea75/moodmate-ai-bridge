@@ -1,6 +1,6 @@
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
-import { MoodChart } from '@/components/MoodChart';
+import { MoodChart } from '@/components/mood/MoodChart';
 import { MoodLogModal } from '@/components/patient/MoodLogModal'; 
 import { Button } from '@/components/ui/button';
 
