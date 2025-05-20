@@ -5,7 +5,6 @@ import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import ClinicianLayout from '@/layouts/ClinicianLayout';
-import { PatientInfoCard } from '@/components/clinician/PatientInfoCard';
 import { PatientMoodSection } from '@/components/clinician/PatientMoodSection';
 import { PatientTasksSection } from '@/components/clinician/PatientTasksSection';
 import { PatientDetailSkeleton } from '@/components/clinician/PatientDetailSkeleton';
@@ -112,11 +111,6 @@ export default function PatientDetail() {
         </div>
 
         <div className="grid gap-6">
-          <PatientInfoCard
-            email={patient.email}
-            language={patient.language}
-          />
-
           <div className="grid gap-6 grid-cols-1">
             <PatientMoodSection patientId={patientId} />
           </div>
