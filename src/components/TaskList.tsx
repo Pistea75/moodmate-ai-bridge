@@ -1,3 +1,4 @@
+
 import { Check, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,7 +37,7 @@ const sampleTasks = [
 ];
 
 type Task = {
-  id: number;
+  id: number | string;
   title: string;
   dueDate: string;
   completed: boolean;
@@ -47,7 +48,7 @@ interface TaskListProps {
   variant?: 'patient' | 'clinician';
   patientName?: string;
   tasks?: Task[];
-  onTaskUpdate?: (taskId: number, completed: boolean) => void;
+  onTaskUpdate?: (taskId: number | string, completed: boolean) => void;
 }
 
 export function TaskList({ 
@@ -58,7 +59,7 @@ export function TaskList({
 }: TaskListProps) {
   const [tasks, setTasks] = useState<Task[]>(propTasks || sampleTasks);
 
-  const toggleTaskCompletion = async (taskId: number) => {
+  const toggleTaskCompletion = async (taskId: number | string) => {
     // If onTaskUpdate is provided, use that instead
     if (onTaskUpdate) {
       const task = tasks.find(t => t.id === taskId);

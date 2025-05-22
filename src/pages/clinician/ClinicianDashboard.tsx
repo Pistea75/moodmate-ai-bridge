@@ -91,7 +91,7 @@ export default function ClinicianDashboard() {
       id: task.id,
       title: task.title,
       description: task.description || '',
-      dueDate: task.due_date,
+      dueDate: task.dueDate,
       completed: task.completed
     }));
   };
@@ -214,7 +214,7 @@ export default function ClinicianDashboard() {
                 variant="clinician" 
                 patientName="Clinician"
                 tasks={formatTasksForComponent(tasks)}
-                onTaskUpdate={(taskId, completed) => updateTaskCompletion(taskId, completed)}
+                onTaskUpdate={(taskId, completed) => updateTaskCompletion(taskId.toString(), completed)}
               />
             )}
           </div>

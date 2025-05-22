@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface ClinicianTask {
-  id: number;
+  id: string;
   title: string;
   description: string;
   dueDate: string;
@@ -62,7 +62,7 @@ export function useClinicianTasks() {
     }
   }, [toast]);
 
-  const updateTaskCompletion = async (taskId: number, completed: boolean) => {
+  const updateTaskCompletion = async (taskId: string, completed: boolean) => {
     try {
       // Update local state for immediate feedback
       setTasks(prevTasks => 
