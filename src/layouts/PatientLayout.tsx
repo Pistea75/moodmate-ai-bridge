@@ -1,5 +1,5 @@
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -23,6 +23,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useTheme } from '@/providers/ThemeProvider';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 type PatientLayoutProps = {
   children: ReactNode;
@@ -32,6 +34,46 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const { themeColor } = useTheme();
+  const { user } = useAuth();
+  const [patientName, setPatientName] = useState('Patient');
+  const [patientFullName, setPatientFullName] = useState('Patient Name');
+  
+  useEffect(() => {
+    const fetchPatientProfile = async () => {
+      if (user) {
+        try {
+          const { data: profileData, error } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', user.id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching patient profile:', error);
+            return;
+          }
+          
+          if (profileData) {
+            const firstName = profileData.first_name || '';
+            const lastName = profileData.last_name || '';
+            
+            if (firstName) {
+              setPatientName(firstName);
+            }
+            
+            const fullName = [firstName, lastName].filter(Boolean).join(' ');
+            if (fullName) {
+              setPatientFullName(fullName);
+            }
+          }
+        } catch (error) {
+          console.error('Error in fetchPatientProfile:', error);
+        }
+      }
+    };
+    
+    fetchPatientProfile();
+  }, [user]);
   
   const navItems = [
     { name: 'Dashboard', path: '/patient/dashboard', icon: Home },
@@ -64,7 +106,7 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
                     <AvatarImage src="/placeholder-avatar.jpg" />
                     <AvatarFallback><User className="h-6 w-6" /></AvatarFallback>
                   </Avatar>
-                  <div className="mt-2 font-medium">Patient Name</div>
+                  <div className="mt-2 font-medium">{patientFullName}</div>
                 </div>
                 <div className="flex-1 overflow-auto py-2">
                   <div className="space-y-1">
@@ -150,7 +192,7 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
               <User size={20} className="text-foreground" />
             </div>
             <div className="flex-1 text-sm">
-              <div className="font-medium text-foreground">Patient Name</div>
+              <div className="font-medium text-foreground">{patientFullName}</div>
               <div className="text-muted-foreground">View Profile</div>
             </div>
           </Link>

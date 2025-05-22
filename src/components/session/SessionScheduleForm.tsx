@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "./DateTimePicker";
 import { TimezoneSelector } from "./TimezoneSelector";
@@ -12,6 +12,8 @@ interface SessionScheduleFormProps {
   onCancel: () => void;
   isPatientView?: boolean;
   isSubmitting: boolean;
+  bookedSlots?: {[key: string]: boolean};
+  onDateChange?: (date: Date, clinicianId?: string) => void;
 }
 
 export interface SessionFormData {
@@ -25,7 +27,9 @@ export function SessionScheduleForm({
   onSubmit, 
   onCancel, 
   isPatientView = false,
-  isSubmitting
+  isSubmitting,
+  bookedSlots = {},
+  onDateChange
 }: SessionScheduleFormProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<SessionFormData>({
@@ -34,6 +38,13 @@ export function SessionScheduleForm({
     patientId: "",
     timezone: getCurrentTimezone()
   });
+
+  useEffect(() => {
+    // When date changes or patient selection changes, check for booked slots
+    if (onDateChange && formData.date) {
+      onDateChange(formData.date, isPatientView ? undefined : formData.patientId);
+    }
+  }, [formData.date, formData.patientId, isPatientView, onDateChange]);
 
   const handleSubmit = async () => {
     if (!formData.date) {
@@ -49,6 +60,16 @@ export function SessionScheduleForm({
       toast({
         title: "Missing information",
         description: "Please select a patient",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if the selected time slot is already booked
+    if (bookedSlots && bookedSlots[formData.time]) {
+      toast({
+        title: "Time slot unavailable",
+        description: "This time slot is already booked. Please select a different time.",
         variant: "destructive",
       });
       return;
@@ -74,6 +95,7 @@ export function SessionScheduleForm({
           time={formData.time}
           onDateChange={(date) => setFormData(prev => ({ ...prev, date }))}
           onTimeChange={(time) => setFormData(prev => ({ ...prev, time }))}
+          bookedSlots={bookedSlots}
         />
 
         {/* Timezone Selection */}

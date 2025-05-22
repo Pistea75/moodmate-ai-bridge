@@ -1,5 +1,5 @@
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/providers/ThemeProvider';
+import { supabase } from '@/integrations/supabase/client';
 
 type ClinicianLayoutProps = {
   children: ReactNode;
@@ -22,6 +23,7 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
   const location = useLocation();
   const { user } = useAuth();
   const { themeColor } = useTheme();
+  const [clinicianName, setClinicianName] = useState('');
   
   const navItems = [
     { name: 'Dashboard', path: '/clinician/dashboard', icon: Home },
@@ -33,7 +35,40 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
     { name: 'Settings', path: '/clinician/settings', icon: Settings },
   ];
   
-  const firstName = user?.user_metadata?.first_name || '';
+  useEffect(() => {
+    const fetchClinicianProfile = async () => {
+      if (user) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', user.id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching clinician profile:', error);
+            return;
+          }
+          
+          if (data) {
+            const firstName = data.first_name || '';
+            const lastName = data.last_name || '';
+            
+            const fullName = [firstName, lastName].filter(Boolean).join(' ');
+            if (fullName) {
+              setClinicianName(fullName);
+            } else {
+              setClinicianName('Clinician');
+            }
+          }
+        } catch (error) {
+          console.error('Error in fetchClinicianProfile:', error);
+        }
+      }
+    };
+    
+    fetchClinicianProfile();
+  }, [user]);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -76,7 +111,7 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
               <User size={20} className="text-muted-foreground" />
             </div>
             <div className="flex-1">
-              <div className="font-medium">Dr. {firstName}</div>
+              <div className="font-medium">Dr. {clinicianName}</div>
               {user?.user_metadata?.referral_code && (
                 <div className="text-xs text-muted-foreground font-mono">
                   {user.user_metadata.referral_code}

@@ -1,8 +1,12 @@
+
+import { useState, useEffect } from 'react';
 import { MoodChart } from '../../components/mood/MoodChart';
 import { TaskList } from '../../components/TaskList';
 import { SessionCard, Session } from '../../components/SessionCard';
 import PatientLayout from '../../layouts/PatientLayout';
 import { MoodLogModal } from '../../components/patient/MoodLogModal';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Sample upcoming sessions
 const upcomingSessions: Session[] = [
@@ -25,12 +29,42 @@ const upcomingSessions: Session[] = [
 ];
 
 export default function PatientDashboard() {
+  const { user } = useAuth();
+  const [patientName, setPatientName] = useState('');
+
+  useEffect(() => {
+    const fetchPatientProfile = async () => {
+      if (user) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('first_name')
+            .eq('id', user.id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching patient profile:', error);
+            return;
+          }
+          
+          if (data?.first_name) {
+            setPatientName(data.first_name);
+          }
+        } catch (error) {
+          console.error('Error in fetchPatientProfile:', error);
+        }
+      }
+    };
+    
+    fetchPatientProfile();
+  }, [user]);
+
   return (
     <PatientLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Welcome back, Alex</h1>
+            <h1 className="text-2xl font-bold">Welcome back, {patientName || 'Patient'}</h1>
             <p className="text-muted-foreground">Here's your mental wellness summary</p>
           </div>
           <MoodLogModal />

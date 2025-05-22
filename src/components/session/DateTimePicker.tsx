@@ -1,34 +1,30 @@
 
+import { CalendarIcon, Clock } from "lucide-react";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateTimeSlots } from "@/utils/sessionUtils";
 
 interface DateTimePickerProps {
   date: Date | undefined;
   time: string;
-  onDateChange: (date: Date | undefined) => void;
+  onDateChange: (date: Date) => void;
   onTimeChange: (time: string) => void;
+  bookedSlots?: {[key: string]: boolean};
 }
 
-export function DateTimePicker({ date, time, onDateChange, onTimeChange }: DateTimePickerProps) {
+export function DateTimePicker({ date, time, onDateChange, onTimeChange, bookedSlots = {} }: DateTimePickerProps) {
+  const timeSlots = generateTimeSlots();
+
   return (
     <div className="space-y-4">
-      {/* Date Selection */}
       <div className="space-y-2">
-        <Label className="text-gray-700 font-medium">Select Date</Label>
+        <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+          Session Date
+        </label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -42,36 +38,48 @@ export function DateTimePicker({ date, time, onDateChange, onTimeChange }: DateT
               {date ? format(date, "PPP") : <span>Pick a date</span>}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0">
             <Calendar
               mode="single"
               selected={date}
-              onSelect={onDateChange}
-              disabled={(date) => date < new Date()}
+              onSelect={(newDate) => newDate && onDateChange(newDate)}
+              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
               initialFocus
-              className="pointer-events-auto"
             />
           </PopoverContent>
         </Popover>
       </div>
 
-      {/* Time Selection */}
       <div className="space-y-2">
-        <Label htmlFor="time" className="text-gray-700 font-medium">
-          Select Time
-        </Label>
+        <label htmlFor="time" className="block text-sm font-medium text-gray-700">
+          Time
+        </label>
         <Select value={time} onValueChange={onTimeChange}>
-          <SelectTrigger id="time" className="bg-white">
-            <SelectValue placeholder="Select time" />
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a time">
+              <div className="flex items-center">
+                <Clock className="mr-2 h-4 w-4" />
+                {time}
+              </div>
+            </SelectValue>
           </SelectTrigger>
-          <SelectContent className="h-[200px]">
-            <ScrollArea className="h-[200px]">
-              {generateTimeSlots().map((slot) => (
-                <SelectItem key={slot} value={slot}>
-                  {slot}
+          <SelectContent>
+            {timeSlots.map((slot) => {
+              const isBooked = !!bookedSlots[slot];
+              return (
+                <SelectItem 
+                  key={slot} 
+                  value={slot}
+                  disabled={isBooked}
+                  className={isBooked ? "opacity-50 line-through" : ""}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span>{slot}</span>
+                    {isBooked && <span className="text-xs text-red-500 ml-2">Booked</span>}
+                  </div>
                 </SelectItem>
-              ))}
-            </ScrollArea>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
