@@ -2,6 +2,7 @@ import { Check, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Sample task data - this would come from your backend in a real app
 const sampleTasks = [{
@@ -30,7 +31,7 @@ const sampleTasks = [{
   description: "Complete the gentle yoga routine"
 }];
 type Task = {
-  id: number | string;
+  id: string;
   title: string;
   dueDate: string;
   completed: boolean;
@@ -40,19 +41,25 @@ interface TaskListProps {
   variant?: 'patient' | 'clinician';
   patientName?: string;
   tasks?: Task[];
-  onTaskUpdate?: (taskId: number | string, completed: boolean) => void;
+  onTaskUpdate?: (taskId: string, completed: boolean) => void;
+  loading?: boolean;
 }
 export function TaskList({
   variant = 'patient',
   patientName,
-  tasks: propTasks,
-  onTaskUpdate
+  tasks = [],
+  onTaskUpdate,
+  loading = false
 }: TaskListProps) {
-  const [tasks, setTasks] = useState<Task[]>(propTasks || sampleTasks);
-  const toggleTaskCompletion = async (taskId: number | string) => {
+  const [localTasks, setLocalTasks] = useState<Task[]>(tasks);
+  
+  // Use provided tasks if available, otherwise use local state
+  const displayTasks = tasks.length > 0 ? tasks : localTasks;
+
+  const toggleTaskCompletion = async (taskId: string) => {
     // If onTaskUpdate is provided, use that instead
     if (onTaskUpdate) {
-      const task = tasks.find(t => t.id === taskId);
+      const task = displayTasks.find(t => t.id === taskId);
       if (task) {
         onTaskUpdate(taskId, !task.completed);
       }
@@ -60,7 +67,7 @@ export function TaskList({
     }
 
     // Otherwise handle it internally
-    setTasks(tasks.map(task => task.id === taskId ? {
+    setLocalTasks(tasks.map(task => task.id === taskId ? {
       ...task,
       completed: !task.completed
     } : task));
@@ -74,7 +81,7 @@ export function TaskList({
       toast.error("Failed to update task status");
 
       // Revert the change if there's an error
-      setTasks(tasks.map(task => task));
+      setLocalTasks(tasks.map(task => task));
     }
   };
 
@@ -102,7 +109,32 @@ export function TaskList({
     const dueDate = new Date(dateString);
     return today.toDateString() === dueDate.toDateString();
   };
-  return <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
+  
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
+        <div className="flex items-center justify-between mb-4">
+          <Skeleton className="h-6 w-40" />
+        </div>
+        <div className="space-y-3">
+          {[...Array(3)].map((_, idx) => (
+            <div key={idx} className="p-3 rounded-lg border">
+              <div className="flex items-start gap-3">
+                <Skeleton className="size-5 rounded-full flex-shrink-0" />
+                <div className="flex-1 min-w-0 space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-3 w-3/4" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">
           {variant === 'patient' ? 'Assigned Tasks' : `Tasks for ${patientName || 'Clinician'}`}
@@ -111,32 +143,51 @@ export function TaskList({
       </div>
 
       <div className="space-y-3">
-        {tasks.length > 0 ? tasks.map(task => <div key={task.id} className={`p-3 rounded-lg border ${task.completed ? 'bg-muted/50 border-muted' : 'bg-white border-muted'}`}>
-              <div className="flex items-start gap-3">
-                <button onClick={() => variant === 'patient' ? toggleTaskCompletion(task.id) : null} className={`mt-0.5 flex-shrink-0 size-5 rounded-full flex items-center justify-center border ${task.completed ? 'bg-mood-purple border-mood-purple text-white' : 'border-mood-neutral hover:border-mood-purple'}`}>
-                  {task.completed && <Check size={12} />}
-                </button>
+        {displayTasks.length > 0 ? displayTasks.map(task => (
+          <div 
+            key={task.id} 
+            className={`p-3 rounded-lg border ${task.completed ? 'bg-muted/50 border-muted' : 'bg-white border-muted'}`}
+          >
+            <div className="flex items-start gap-3">
+              <button 
+                onClick={() => variant === 'patient' ? toggleTaskCompletion(task.id) : null} 
+                className={`mt-0.5 flex-shrink-0 size-5 rounded-full flex items-center justify-center border ${
+                  task.completed ? 'bg-mood-purple border-mood-purple text-white' : 'border-mood-neutral hover:border-mood-purple'
+                }`}
+              >
+                {task.completed && <Check size={12} />}
+              </button>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className={`font-medium text-sm ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-                      {task.title}
-                    </h4>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Calendar size={12} className="text-muted-foreground" />
-                      <span className={`text-xs ${isOverdue(task.dueDate) && !task.completed ? 'text-destructive' : isToday(task.dueDate) && !task.completed ? 'text-mood-purple font-medium' : 'text-muted-foreground'}`}>
-                        {isToday(task.dueDate) ? 'Today' : formatDate(task.dueDate)}
-                      </span>
-                    </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <h4 className={`font-medium text-sm ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                    {task.title}
+                  </h4>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <Calendar size={12} className="text-muted-foreground" />
+                    <span className={`text-xs ${
+                      isOverdue(task.dueDate) && !task.completed 
+                        ? 'text-destructive' 
+                        : isToday(task.dueDate) && !task.completed 
+                          ? 'text-mood-purple font-medium' 
+                          : 'text-muted-foreground'
+                    }`}>
+                      {isToday(task.dueDate) ? 'Today' : formatDate(task.dueDate)}
+                    </span>
                   </div>
-                  <p className={`text-xs mt-1 ${task.completed ? 'text-muted-foreground' : 'text-foreground/80'}`}>
-                    {task.description}
-                  </p>
                 </div>
+                <p className={`text-xs mt-1 ${task.completed ? 'text-muted-foreground' : 'text-foreground/80'}`}>
+                  {task.description}
+                </p>
               </div>
-            </div>) : <div className="text-center py-6 text-muted-foreground">
+            </div>
+          </div>
+        )) : (
+          <div className="text-center py-6 text-muted-foreground">
             No tasks assigned yet.
-          </div>}
+          </div>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 }

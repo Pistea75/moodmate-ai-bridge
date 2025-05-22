@@ -2,35 +2,30 @@
 import { useState, useEffect } from 'react';
 import { MoodChart } from '../../components/mood/MoodChart';
 import { TaskList } from '../../components/TaskList';
-import { SessionCard, Session } from '../../components/SessionCard';
+import { SessionCard } from '../../components/SessionCard';
 import PatientLayout from '../../layouts/PatientLayout';
 import { MoodLogModal } from '../../components/patient/MoodLogModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-
-// Sample upcoming sessions
-const upcomingSessions: Session[] = [
-  {
-    id: '1',
-    title: 'Weekly Therapy Session',
-    dateTime: '2025-04-28T13:00:00',
-    duration: 50,
-    clinicianName: 'Dr. Sarah Johnson',
-    status: 'upcoming'
-  },
-  {
-    id: '2',
-    title: 'Follow-up Discussion',
-    dateTime: '2025-05-05T15:30:00',
-    duration: 30,
-    clinicianName: 'Dr. Sarah Johnson',
-    status: 'upcoming'
-  }
-];
+import { usePatientTasks } from '@/hooks/usePatientTasks';
+import { usePatientSessions } from '@/hooks/usePatientSessions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function PatientDashboard() {
   const { user } = useAuth();
   const [patientName, setPatientName] = useState('');
+  
+  // Get patient tasks using the hook
+  const { tasks, loading: tasksLoading } = usePatientTasks();
+  
+  // Get patient sessions using the hook
+  const { sessions, loading: sessionsLoading } = usePatientSessions();
+  
+  // Get upcoming sessions only
+  const upcomingSessions = sessions.filter(session => {
+    const sessionDate = new Date(session.scheduled_time);
+    return sessionDate >= new Date();
+  }).slice(0, 2); // Show only 2 upcoming sessions
 
   useEffect(() => {
     const fetchPatientProfile = async () => {
@@ -75,7 +70,17 @@ export default function PatientDashboard() {
             <MoodChart />
           </div>
           <div>
-            <TaskList />
+            <TaskList 
+              variant="patient" 
+              tasks={tasks.map(task => ({
+                id: task.id,
+                title: task.title,
+                dueDate: task.due_date,
+                completed: task.completed,
+                description: task.description
+              }))}
+              loading={tasksLoading}
+            />
           </div>
         </div>
         
@@ -88,20 +93,34 @@ export default function PatientDashboard() {
           </div>
           
           <div className="space-y-4">
-            {upcomingSessions.length > 0 ? (
+            {sessionsLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-28 w-full rounded-xl" />
+                <Skeleton className="h-28 w-full rounded-xl" />
+              </div>
+            ) : upcomingSessions.length > 0 ? (
               upcomingSessions.map(session => (
                 <SessionCard 
                   key={session.id} 
-                  session={session} 
+                  session={{
+                    id: session.id,
+                    title: "Therapy Session",
+                    dateTime: session.scheduled_time,
+                    duration: session.duration_minutes,
+                    clinicianName: session.clinician_name,
+                    status: 'upcoming'
+                  }} 
                   variant="patient"
                 />
               ))
             ) : (
               <div className="text-center py-8 bg-white rounded-xl border">
                 <p className="text-muted-foreground">No upcoming sessions scheduled.</p>
-                <button className="mt-3 px-4 py-2 bg-mood-purple text-white rounded-lg text-sm">
-                  Schedule a Session
-                </button>
+                <a href="/patient/sessions">
+                  <button className="mt-3 px-4 py-2 bg-mood-purple text-white rounded-lg text-sm">
+                    Schedule a Session
+                  </button>
+                </a>
               </div>
             )}
           </div>
