@@ -1,7 +1,5 @@
-
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { MOOD_LABELS } from '@/components/mood/MoodChartConstants';
+// components/clinician/PatientMoodInsights.tsx
+import { Card } from "@/components/ui/card";
 
 interface MoodStats {
   averageMood: number;
@@ -9,49 +7,42 @@ interface MoodStats {
   lowestDay: string;
 }
 
-interface PatientMoodInsightsProps {
+interface Props {
   patientName: string;
   moodStats?: MoodStats;
 }
 
-export function PatientMoodInsights({ patientName, moodStats }: PatientMoodInsightsProps) {
-  if (!moodStats) {
-    return (
-      <Card className="mt-4">
-        <CardContent className="pt-4">
-          <p className="text-muted-foreground">Not enough data to generate mood insights.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Round the average mood to the nearest integer for displaying the mood label
-  const moodIndex = Math.round(moodStats.averageMood) - 1;
-  const averageMoodLabel = MOOD_LABELS[moodIndex] || 'Unknown';
+export function PatientMoodInsights({ patientName, moodStats }: Props) {
+  const insights = [
+    {
+      title: "Weekly Mood Summary",
+      description: moodStats
+        ? `${patientName}'s average mood this week was ${
+            ["Very Low", "Low", "Neutral", "Good", "Excellent"][
+              Math.round(moodStats.averageMood) - 1
+            ]
+          }.`
+        : `Not enough data to generate a summary.`,
+    },
+    {
+      title: "Mood Extremes",
+      description: moodStats
+        ? `${patientName} felt best on ${moodStats.highestDay} and lowest on ${moodStats.lowestDay}.`
+        : `Waiting for more mood logs to identify patterns.`,
+    },
+  ];
 
   return (
-    <Card className="mt-4">
-      <CardContent className="pt-4">
-        <h3 className="text-lg font-medium mb-3">Mood Insights</h3>
-
-        <div className="space-y-3">
-          <div>
-            <p className="text-sm font-medium">Average Mood</p>
-            <p className="text-sm text-muted-foreground">{averageMoodLabel} ({moodStats.averageMood.toFixed(1)})</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-sm font-medium">Best Day</p>
-              <p className="text-sm text-muted-foreground">{moodStats.highestDay}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium">Most Challenging Day</p>
-              <p className="text-sm text-muted-foreground">{moodStats.lowestDay}</p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="grid gap-4 mt-6">
+      {insights.map((insight, i) => (
+        <Card key={i} className="p-4">
+          <h3 className="font-medium">{insight.title}</h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            {insight.description}
+          </p>
+        </Card>
+      ))}
+    </div>
   );
 }
+
