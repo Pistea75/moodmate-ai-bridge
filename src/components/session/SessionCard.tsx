@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { SessionMetadata } from './SessionMetadata';
 import { SessionStatusIndicator } from './SessionStatusIndicator';
 import { RecordingIndicator } from './RecordingIndicator';
