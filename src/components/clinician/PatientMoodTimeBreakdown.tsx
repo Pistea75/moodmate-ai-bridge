@@ -77,7 +77,17 @@ export function PatientMoodTimeBreakdown({ patientId }: { patientId: string }) {
           {moods.map((slot) => (
             <div key={slot.label} className="flex justify-between border-b py-1">
               <span>{slot.label}</span>
-              <span>
+              <span
+                className={`font-medium ${
+                  slot.averageMood === 0
+                    ? 'text-muted-foreground'
+                    : slot.averageMood < 4
+                    ? 'text-red-500'
+                    : slot.averageMood < 7
+                    ? 'text-yellow-500'
+                    : 'text-green-600'
+                }`}
+              >
                 {slot.count > 0
                   ? `${slot.averageMood} (${slot.count} logs)`
                   : 'No data'}
