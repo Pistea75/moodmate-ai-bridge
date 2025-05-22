@@ -10,7 +10,7 @@ import {
 import { X } from "lucide-react";
 import { scheduleSession } from "@/utils/sessionScheduleUtils";
 import { useToast } from "@/hooks/use-toast";
-import { SessionScheduleForm, SessionFormData } from "./SessionScheduleForm";
+import { SessionScheduleForm, SessionFormData } from "@/components/session/SessionScheduleForm";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ScheduleSessionModalProps {
