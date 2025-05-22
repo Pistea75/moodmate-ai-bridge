@@ -48,6 +48,7 @@ export default function Sessions() {
           variant: "destructive",
         });
       } else {
+        console.log("Fetched sessions:", data);
         setSessions((data || []) as SessionWithPatient[]);
       }
     } catch (err) {

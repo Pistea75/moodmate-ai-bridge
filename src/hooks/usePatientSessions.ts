@@ -105,6 +105,7 @@ export const usePatientSessions = () => {
         console.error("❌ Error fetching sessions:", error);
         toast.error("Failed to load sessions");
       } else {
+        console.log("Fetched patient sessions:", data);
         const parsed = (data || []).map((s: any) => ({
           id: s.id,
           scheduled_time: s.scheduled_time,
