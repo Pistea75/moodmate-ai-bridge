@@ -114,6 +114,7 @@ export const usePatientSessions = () => {
             `${s.clinician?.first_name || ""} ${s.clinician?.last_name || ""}`.trim() || "Your Clinician" : 
             "Your Clinician"
         }));
+        // Important: Set the sessions state with new data to trigger a re-render
         setSessions(parsed);
       }
     } catch (err) {

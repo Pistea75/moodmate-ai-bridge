@@ -49,6 +49,7 @@ export default function Sessions() {
         });
       } else {
         console.log("Fetched sessions:", data);
+        // Important: Set the state with new data, this will trigger a re-render
         setSessions((data || []) as SessionWithPatient[]);
       }
     } catch (err) {
@@ -102,9 +103,9 @@ export default function Sessions() {
     return sessions.filter((s) => isSameDay(new Date(s.scheduled_time), date));
   };
 
-  const handleSessionDelete = () => {
+  const handleSessionDelete = async () => {
     console.log("Session deleted, refreshing sessions list");
-    fetchSessions();
+    await fetchSessions();
   };
 
   return (

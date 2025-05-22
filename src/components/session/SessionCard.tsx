@@ -60,6 +60,7 @@ export function SessionCard({ session, variant, onDelete }: SessionCardProps) {
         description: "The session has been successfully removed",
       });
       
+      // Immediately update the local UI
       if (onDelete) {
         onDelete();
       }

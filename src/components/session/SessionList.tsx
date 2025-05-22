@@ -54,6 +54,7 @@ export function SessionList({
   const handleDeleteSession = async (sessionId: string) => {
     try {
       setDeletingSessionId(sessionId);
+      console.log("SessionList: Deleting session with ID:", sessionId);
       
       await deleteSession(sessionId);
       
@@ -62,6 +63,7 @@ export function SessionList({
         description: "Session deleted successfully",
       });
       
+      // After successful deletion, call the callback to refresh the session list
       if (onSessionDelete) {
         onSessionDelete();
       }
