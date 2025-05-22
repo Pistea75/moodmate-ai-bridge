@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +34,8 @@ export function PatientMoodSection({ patientId }: { patientId: string }) {
           const grouped: { [key: string]: number[] } = {};
           data.forEach(entry => {
             const date = new Date(entry.created_at);
-            const day = date.toLocaleDateString(undefined, { weekday: 'long' });
+            // Ensure we use English locale for day names
+            const day = date.toLocaleDateString('en-US', { weekday: 'long' });
             if (!grouped[day]) grouped[day] = [];
             grouped[day].push(normalizeMood(entry.mood_score));
           });
