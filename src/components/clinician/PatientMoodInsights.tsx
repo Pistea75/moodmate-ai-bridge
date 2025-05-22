@@ -1,3 +1,4 @@
+
 // components/clinician/PatientMoodInsights.tsx
 import { Card } from "@/components/ui/card";
 
@@ -10,9 +11,10 @@ interface MoodStats {
 interface Props {
   patientName: string;
   moodStats?: MoodStats;
+  topTriggers?: string[];
 }
 
-export function PatientMoodInsights({ patientName, moodStats }: Props) {
+export function PatientMoodInsights({ patientName, moodStats, topTriggers }: Props) {
   const capitalizedName =
     patientName.charAt(0).toUpperCase() + patientName.slice(1);
 
@@ -35,6 +37,12 @@ export function PatientMoodInsights({ patientName, moodStats }: Props) {
           : `${capitalizedName} felt best on ${moodStats.highestDay} and lowest on ${moodStats.lowestDay}.`
         : `Waiting for more mood logs to identify patterns.`,
     },
+    {
+      title: "Common Mood Triggers",
+      description: topTriggers && topTriggers.length > 0
+        ? `${capitalizedName}'s most frequent triggers this week: ${topTriggers.join(", ")}.`
+        : `No significant trigger patterns identified yet.`,
+    },
   ];
 
   return (
@@ -50,5 +58,3 @@ export function PatientMoodInsights({ patientName, moodStats }: Props) {
     </div>
   );
 }
-
-

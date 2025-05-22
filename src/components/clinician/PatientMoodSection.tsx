@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { MoodChart } from '@/components/mood/MoodChart';
 import { PatientMoodInsights } from '@/components/clinician/PatientMoodInsights';
+import { getMostCommonTriggers } from '@/lib/analyzeMoodTriggers';
 
 function normalizeMood(score: number) {
   return Math.max(1, Math.min(5, Math.ceil(score / 2))); // Convert 1–10 to 1–5
@@ -17,20 +18,28 @@ export function PatientMoodSection({ patientId }: { patientId: string }) {
     highestDay: string;
     lowestDay: string;
   } | null>(null);
+  const [topTriggers, setTopTriggers] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchMoodData = async () => {
       try {
+        setLoading(true);
+        
         const { data, error } = await supabase
           .from('mood_entries')
-          .select('mood_score, created_at')
+          .select('mood_score, created_at, triggers')
           .eq('patient_id', patientId)
           .order('created_at', { ascending: true });
 
         if (error) throw error;
         setMoodData(data || []);
 
+        // Process triggers if we have data
         if (data && data.length > 0) {
+          const mostCommonTriggers = getMostCommonTriggers(data);
+          setTopTriggers(mostCommonTriggers);
+
+          // Process mood data for stats
           const grouped: { [key: string]: number[] } = {};
           data.forEach(entry => {
             const date = new Date(entry.created_at);
@@ -83,6 +92,7 @@ export function PatientMoodSection({ patientId }: { patientId: string }) {
           <PatientMoodInsights
             patientName="This Patient"
             moodStats={moodStats || undefined}
+            topTriggers={topTriggers}
           />
         </>
       )}
