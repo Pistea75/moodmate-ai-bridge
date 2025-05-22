@@ -2,7 +2,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SessionCard } from "@/components/SessionCard";
-import { Card } from "@/components/ui/card";
 
 interface SessionTabsProps {
   loading: boolean;
