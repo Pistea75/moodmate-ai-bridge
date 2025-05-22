@@ -10,7 +10,12 @@ function normalizeMood(score: number) {
   return Math.max(1, Math.min(5, Math.ceil(score / 2))); // Convert 1–10 to 1–5
 }
 
-export function PatientMoodSection({ patientId }: { patientId: string }) {
+interface PatientMoodSectionProps {
+  patientId: string;
+  patientName: string;
+}
+
+export function PatientMoodSection({ patientId, patientName }: PatientMoodSectionProps) {
   const [moodData, setMoodData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [moodStats, setMoodStats] = useState<{
@@ -33,6 +38,9 @@ export function PatientMoodSection({ patientId }: { patientId: string }) {
 
         if (error) throw error;
         setMoodData(data || []);
+        
+        // Debug log for triggers
+        console.log("Mood entries triggers:", data?.map(d => d.triggers));
 
         // Process triggers if we have data
         if (data && data.length > 0) {
@@ -90,7 +98,7 @@ export function PatientMoodSection({ patientId }: { patientId: string }) {
         <>
           <MoodChart patientId={patientId} />
           <PatientMoodInsights
-            patientName="This Patient"
+            patientName={patientName}
             moodStats={moodStats || undefined}
             topTriggers={topTriggers}
           />

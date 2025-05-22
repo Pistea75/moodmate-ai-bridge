@@ -79,6 +79,9 @@ export default function PatientDetail() {
     navigate('/clinician/patients');
   };
 
+  // Get full patient name to display
+  const patientFullName = patient ? `${patient.first_name} ${patient.last_name}`.trim() : '';
+
   if (loading) {
     return (
       <ClinicianLayout>
@@ -112,7 +115,7 @@ export default function PatientDetail() {
 
         <div className="grid gap-6">
           <div className="grid gap-6 grid-cols-1">
-            <PatientMoodSection patientId={patientId} />
+            <PatientMoodSection patientId={patientId} patientName={patientFullName} />
           </div>
 
           <PatientTasksSection patientId={patientId} />
