@@ -124,7 +124,10 @@ export default function Patients() {
                   <User className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div className="flex-1">
-              
+                  <h3 className="text-lg font-medium">
+                    {patient.first_name || ''} {patient.last_name || ''}
+                    {(!patient.first_name && !patient.last_name) && 'No name provided'}
+                  </h3>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span>Email: {patient.email}</span>
                     <span>•</span>
