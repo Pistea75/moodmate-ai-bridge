@@ -13,21 +13,26 @@ interface Props {
 }
 
 export function PatientMoodInsights({ patientName, moodStats }: Props) {
+  const capitalizedName =
+    patientName.charAt(0).toUpperCase() + patientName.slice(1);
+
   const insights = [
     {
       title: "Weekly Mood Summary",
       description: moodStats
-        ? `${patientName}'s average mood this week was ${
+        ? `${capitalizedName}'s average mood this week was ${
             ["Very Low", "Low", "Neutral", "Good", "Excellent"][
               Math.round(moodStats.averageMood) - 1
             ]
-          }.`
+          }.` // maps mood 1–5 to label
         : `Not enough data to generate a summary.`,
     },
     {
       title: "Mood Extremes",
       description: moodStats
-        ? `${patientName} felt best on ${moodStats.highestDay} and lowest on ${moodStats.lowestDay}.`
+        ? moodStats.highestDay === moodStats.lowestDay
+          ? `${capitalizedName} only logged mood on ${moodStats.highestDay}.`
+          : `${capitalizedName} felt best on ${moodStats.highestDay} and lowest on ${moodStats.lowestDay}.`
         : `Waiting for more mood logs to identify patterns.`,
     },
   ];
@@ -45,4 +50,5 @@ export function PatientMoodInsights({ patientName, moodStats }: Props) {
     </div>
   );
 }
+
 
