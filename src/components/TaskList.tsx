@@ -1,6 +1,7 @@
-
 import { Check, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 // Sample task data - this would come from your backend in a real app
 const sampleTasks = [
@@ -45,12 +46,29 @@ type Task = {
 interface TaskListProps {
   variant?: 'patient' | 'clinician';
   patientName?: string;
+  tasks?: Task[];
+  onTaskUpdate?: (taskId: number, completed: boolean) => void;
 }
 
-export function TaskList({ variant = 'patient', patientName }: TaskListProps) {
-  const [tasks, setTasks] = useState<Task[]>(sampleTasks);
+export function TaskList({ 
+  variant = 'patient', 
+  patientName,
+  tasks: propTasks,
+  onTaskUpdate
+}: TaskListProps) {
+  const [tasks, setTasks] = useState<Task[]>(propTasks || sampleTasks);
 
-  const toggleTaskCompletion = (taskId: number) => {
+  const toggleTaskCompletion = async (taskId: number) => {
+    // If onTaskUpdate is provided, use that instead
+    if (onTaskUpdate) {
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        onTaskUpdate(taskId, !task.completed);
+      }
+      return;
+    }
+
+    // Otherwise handle it internally
     setTasks(
       tasks.map(task => 
         task.id === taskId 
@@ -58,6 +76,20 @@ export function TaskList({ variant = 'patient', patientName }: TaskListProps) {
           : task
       )
     );
+    
+    // In a real app, you would also update this in your database
+    try {
+      /* You would update the task in your database here */
+      toast.success("Task status updated successfully");
+    } catch (error) {
+      console.error("Error updating task:", error);
+      toast.error("Failed to update task status");
+      
+      // Revert the change if there's an error
+      setTasks(
+        tasks.map(task => task)
+      );
+    }
   };
 
   // Format date to a more readable format
@@ -89,7 +121,7 @@ export function TaskList({ variant = 'patient', patientName }: TaskListProps) {
     <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">
-          {variant === 'patient' ? 'Assigned Tasks' : `Tasks for ${patientName || 'Patient'}`}
+          {variant === 'patient' ? 'Assigned Tasks' : `Tasks for ${patientName || 'Clinician'}`}
         </h3>
         {variant === 'clinician' && (
           <button className="text-sm px-3 py-1 bg-mood-purple text-white rounded-md">
@@ -111,7 +143,7 @@ export function TaskList({ variant = 'patient', patientName }: TaskListProps) {
             >
               <div className="flex items-start gap-3">
                 <button 
-                  onClick={() => variant === 'patient' && toggleTaskCompletion(task.id)}
+                  onClick={() => variant === 'patient' ? toggleTaskCompletion(task.id) : null}
                   className={`mt-0.5 flex-shrink-0 size-5 rounded-full flex items-center justify-center border ${
                     task.completed
                       ? 'bg-mood-purple border-mood-purple text-white'
