@@ -12,6 +12,7 @@ export const usePatientSessions = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [hasConnectedClinician, setHasConnectedClinician] = useState<boolean | null>(null);
   const [isCheckingConnection, setIsCheckingConnection] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Check if the patient has connected to a clinician
   const checkClinicianConnection = async () => {
@@ -87,6 +88,7 @@ export const usePatientSessions = () => {
 
   const fetchSessions = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error } = await supabase
         .from("sessions")
@@ -103,6 +105,7 @@ export const usePatientSessions = () => {
 
       if (error) {
         console.error("❌ Error fetching sessions:", error);
+        setError("Failed to load sessions. Please try again.");
         toast.error("Failed to load sessions");
       } else {
         console.log("Fetched patient sessions:", data);
@@ -114,11 +117,12 @@ export const usePatientSessions = () => {
             `${s.clinician?.first_name || ""} ${s.clinician?.last_name || ""}`.trim() || "Your Clinician" : 
             "Your Clinician"
         }));
-        // Important: Set the sessions state with new data to trigger a re-render
+        // Set the sessions state with new data to trigger a re-render
         setSessions(parsed);
       }
     } catch (err) {
       console.error("Error fetching sessions:", err);
+      setError("An unexpected error occurred. Please try again.");
       toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -172,6 +176,7 @@ export const usePatientSessions = () => {
     setModalOpen,
     hasConnectedClinician,
     isCheckingConnection,
+    error,
     getSessionsForDate,
     handleScheduleClick,
     handleScheduleComplete,

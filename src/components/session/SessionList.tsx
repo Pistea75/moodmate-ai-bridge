@@ -52,6 +52,15 @@ export function SessionList({
   };
   
   const handleDeleteSession = async (sessionId: string) => {
+    if (!sessionId) {
+      toast({
+        title: "Error",
+        description: "Invalid session ID",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       setDeletingSessionId(sessionId);
       console.log("SessionList: Deleting session with ID:", sessionId);

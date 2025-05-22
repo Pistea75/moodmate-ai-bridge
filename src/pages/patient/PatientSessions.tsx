@@ -4,6 +4,8 @@ import { SessionList } from '@/components/session/SessionList';
 import { PatientSessionHeader } from '@/components/session/PatientSessionHeader';
 import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
 import { usePatientSessions } from '@/hooks/usePatientSessions';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 export default function PatientSessions() {
   const {
@@ -17,7 +19,8 @@ export default function PatientSessions() {
     getSessionsForDate,
     handleScheduleClick,
     handleScheduleComplete,
-    fetchSessions
+    fetchSessions,
+    error
   } = usePatientSessions();
 
   return (
@@ -31,6 +34,14 @@ export default function PatientSessions() {
           getSessionsForDate={getSessionsForDate}
           isCheckingConnection={isCheckingConnection}
         />
+
+        {/* Error state */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         {/* List of Sessions */}
         <SessionList 

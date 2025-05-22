@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ClinicianLayout from "../../layouts/ClinicianLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +7,8 @@ import { isSameDay, isBefore, addMinutes } from "date-fns";
 import { SessionTabs } from "@/components/SessionTabs";
 import { SessionHeader } from "@/components/SessionHeader";
 import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 // ✅ Custom Type
 interface SessionWithPatient {
@@ -28,9 +30,11 @@ export default function Sessions() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error } = await supabase
         .from("sessions")
@@ -42,6 +46,7 @@ export default function Sessions() {
 
       if (error) {
         console.error("❌ Error fetching sessions:", error);
+        setError("Failed to load sessions. Please try again.");
         toast({
           title: "Error",
           description: "Failed to load sessions. Please try again.",
@@ -49,15 +54,16 @@ export default function Sessions() {
         });
       } else {
         console.log("Fetched sessions:", data);
-        // Important: Set the state with new data, this will trigger a re-render
+        // Set the state with new data, this will trigger a re-render
         setSessions((data || []) as SessionWithPatient[]);
       }
     } catch (err) {
       console.error("Unexpected error fetching sessions:", err);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchSessions();
@@ -68,7 +74,7 @@ export default function Sessions() {
     }, 60000); // Check every minute
     
     return () => clearInterval(intervalId);
-  }, []);
+  }, [fetchSessions]);
 
   const today = new Date();
 
@@ -117,6 +123,14 @@ export default function Sessions() {
           onDateChange={setSelectedDate}
           getSessionsForDate={getSessionsForDate}
         />
+
+        {/* Error state */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         <SessionTabs 
           loading={loading}

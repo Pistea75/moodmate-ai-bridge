@@ -15,34 +15,6 @@ export const deleteSession = async (sessionId: string) => {
   
   console.log("Attempting to delete session with ID:", sessionId);
   
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  
-  if (userError || !user) {
-    throw new Error("Could not get current user");
-  }
-  
-  // Check if user has permission to delete this session (either patient or clinician)
-  const { data: sessionData, error: sessionError } = await supabase
-    .from("sessions")
-    .select("patient_id, clinician_id")
-    .eq("id", sessionId)
-    .single();
-    
-  if (sessionError) {
-    console.error("Error fetching session:", sessionError);
-    throw new Error(`Error fetching session: ${sessionError.message}`);
-  }
-  
-  if (!sessionData) {
-    throw new Error("Session not found");
-  }
-  
-  // Verify the user is either the patient or clinician for this session
-  if (sessionData.patient_id !== user.id && sessionData.clinician_id !== user.id) {
-    throw new Error("You don't have permission to delete this session");
-  }
-  
-  // Delete the session
   const { error } = await supabase
     .from("sessions")
     .delete()
@@ -54,7 +26,6 @@ export const deleteSession = async (sessionId: string) => {
   }
   
   console.log("Session deleted successfully:", sessionId);
-  toast.success("Session deleted successfully");
   return { success: true };
 };
 
