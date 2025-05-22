@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { getCurrentTimezone, getCommonTimezones } from "./timeUtils";
 
 /**
  * Deletes a therapy session
@@ -70,3 +71,14 @@ export const generateTimeSlots = () => {
   }
   return slots;
 };
+
+// Re-export the necessary functions from timeUtils
+export { getCurrentTimezone, getCommonTimezones };
+
+// Import and re-export scheduleSession from sessionScheduleUtils
+import { scheduleSession, type ScheduleSessionParams } from "./sessionScheduleUtils";
+export { scheduleSession, type ScheduleSessionParams };
+
+// Re-export resolvePatientSessionDetails from clinicianPatientUtils
+import { resolvePatientSessionDetails } from "./clinicianPatientUtils";
+export { resolvePatientSessionDetails };
