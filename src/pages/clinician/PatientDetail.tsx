@@ -9,6 +9,7 @@ import { PatientMoodSection } from '@/components/clinician/PatientMoodSection';
 import { PatientTasksSection } from '@/components/clinician/PatientTasksSection';
 import { PatientDetailSkeleton } from '@/components/clinician/PatientDetailSkeleton';
 import { PatientDetailError } from '@/components/clinician/PatientDetailError';
+import { PatientMoodTimeBreakdown } from '@/components/clinician/PatientMoodTimeBreakdown';
 
 interface PatientProfile {
   id: string;
@@ -116,6 +117,7 @@ export default function PatientDetail() {
         <div className="grid gap-6">
           <div className="grid gap-6 grid-cols-1">
             <PatientMoodSection patientId={patientId} patientName={patientFullName} />
+            <PatientMoodTimeBreakdown patientId={patientId} />
           </div>
 
           <PatientTasksSection patientId={patientId} />
