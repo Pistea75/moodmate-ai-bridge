@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MoodChart } from '../../components/mood/MoodChart';
@@ -23,6 +22,7 @@ export default function ClinicianDashboard() {
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '' });
+  const [clinicianName, setClinicianName] = useState('');
 
   const {
     tasks,
@@ -65,8 +65,24 @@ export default function ClinicianDashboard() {
       setLoadingSessions(false);
     };
 
+    const fetchClinicianProfile = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', data.user.id)
+          .single();
+        
+        if (profile) {
+          setClinicianName(profile.first_name || '');
+        }
+      }
+    };
+
     fetchPatients();
     fetchSessionsToday();
+    fetchClinicianProfile();
   }, []);
 
   const upcomingSessions = sessionsToday.filter(
@@ -102,7 +118,7 @@ export default function ClinicianDashboard() {
 
         {/* Welcome */}
         <div>
-          <h1 className="text-2xl font-bold">Welcome, Dr. Johnson</h1>
+          <h1 className="text-2xl font-bold">Welcome, Dr {clinicianName}</h1>
           <p className="text-muted-foreground">Here's your practice overview for today</p>
         </div>
 
