@@ -1,8 +1,10 @@
+
 import { Check, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 
 // Sample task data - this would come from your backend in a real app
 const sampleTasks = [{
@@ -149,14 +151,22 @@ export function TaskList({
             className={`p-3 rounded-lg border ${task.completed ? 'bg-muted/50 border-muted' : 'bg-white border-muted'}`}
           >
             <div className="flex items-start gap-3">
-              <button 
-                onClick={() => variant === 'patient' ? toggleTaskCompletion(task.id) : null} 
-                className={`mt-0.5 flex-shrink-0 size-5 rounded-full flex items-center justify-center border ${
-                  task.completed ? 'bg-mood-purple border-mood-purple text-white' : 'border-mood-neutral hover:border-mood-purple'
-                }`}
-              >
-                {task.completed && <Check size={12} />}
-              </button>
+              {variant === 'clinician' ? (
+                <Checkbox
+                  checked={task.completed} 
+                  onCheckedChange={() => onTaskUpdate ? onTaskUpdate(task.id, !task.completed) : toggleTaskCompletion(task.id)}
+                  className="mt-0.5"
+                />
+              ) : (
+                <button 
+                  onClick={() => toggleTaskCompletion(task.id)} 
+                  className={`mt-0.5 flex-shrink-0 size-5 rounded-full flex items-center justify-center border ${
+                    task.completed ? 'bg-mood-purple border-mood-purple text-white' : 'border-mood-neutral hover:border-mood-purple'
+                  }`}
+                >
+                  {task.completed && <Check size={12} />}
+                </button>
+              )}
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">

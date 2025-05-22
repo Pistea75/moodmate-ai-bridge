@@ -219,20 +219,13 @@ export default function ClinicianDashboard() {
               </Button>
             </div>
             
-            {loadingTasks ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, idx) => (
-                  <Skeleton key={idx} className="h-20 w-full rounded-lg" />
-                ))}
-              </div>
-            ) : (
-              <TaskList 
-                variant="clinician" 
-                patientName="Clinician"
-                tasks={formatTasksForComponent(tasks)}
-                onTaskUpdate={(taskId, completed) => updateTaskCompletion(taskId.toString(), completed)}
-              />
-            )}
+            <TaskList 
+              variant="clinician" 
+              patientName="Clinician"
+              tasks={formatTasksForComponent(tasks)}
+              onTaskUpdate={updateTaskCompletion}
+              loading={loadingTasks}
+            />
           </div>
         </div>
 
