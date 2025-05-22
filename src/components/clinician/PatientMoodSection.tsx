@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -88,4 +87,3 @@ export function PatientMoodSection({ patientId }: { patientId: string }) {
     </Card>
   );
 }
-
