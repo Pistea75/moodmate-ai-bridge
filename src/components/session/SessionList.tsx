@@ -54,7 +54,6 @@ export function SessionList({
   const handleDeleteSession = async (sessionId: string) => {
     try {
       setDeletingSessionId(sessionId);
-      console.log("Deleting session with ID:", sessionId);
       
       await deleteSession(sessionId);
       

@@ -14,7 +14,7 @@ interface SessionTabsProps {
   onSessionDelete?: () => void;
 }
 
-export function SessionTabs({ loading, filtered, onSessionDelete }: SessionTabsProps) {
+export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }: SessionTabsProps) {
   return (
     <Tabs defaultValue="upcoming" className="space-y-6">
       <TabsList className="grid w-full grid-cols-3">

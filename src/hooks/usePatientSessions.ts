@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 import { PatientSession } from '@/components/session/SessionList';
@@ -85,37 +85,43 @@ export const usePatientSessions = () => {
     }
   };
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("sessions")
-      .select(`
-        id,
-        scheduled_time,
-        duration_minutes,
-        clinician:clinician_id (
-          first_name,
-          last_name
-        )
-      `)
-      .order("scheduled_time", { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from("sessions")
+        .select(`
+          id,
+          scheduled_time,
+          duration_minutes,
+          clinician:clinician_id (
+            first_name,
+            last_name
+          )
+        `)
+        .order("scheduled_time", { ascending: true });
 
-    if (error) {
-      console.error("❌ Error fetching sessions:", error);
-    } else {
-      const parsed = (data || []).map((s: any) => ({
-        id: s.id,
-        scheduled_time: s.scheduled_time,
-        duration_minutes: s.duration_minutes,
-        clinician_name: s.clinician ? 
-          `${s.clinician?.first_name || ""} ${s.clinician?.last_name || ""}`.trim() || "Your Clinician" : 
-          "Your Clinician"
-      }));
-      setSessions(parsed);
+      if (error) {
+        console.error("❌ Error fetching sessions:", error);
+        toast.error("Failed to load sessions");
+      } else {
+        const parsed = (data || []).map((s: any) => ({
+          id: s.id,
+          scheduled_time: s.scheduled_time,
+          duration_minutes: s.duration_minutes,
+          clinician_name: s.clinician ? 
+            `${s.clinician?.first_name || ""} ${s.clinician?.last_name || ""}`.trim() || "Your Clinician" : 
+            "Your Clinician"
+        }));
+        setSessions(parsed);
+      }
+    } catch (err) {
+      console.error("Error fetching sessions:", err);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     fetchSessions();
@@ -129,7 +135,7 @@ export const usePatientSessions = () => {
     checkClinicianConnection().then(setHasConnectedClinician);
     
     return () => clearInterval(intervalId);
-  }, []);
+  }, [fetchSessions]);
 
   const getSessionsForDate = (date: Date) => {
     return sessions.filter((session) =>

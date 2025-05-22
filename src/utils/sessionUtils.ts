@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentTimezone, getCommonTimezones } from "./timeUtils";
+import { toast } from "sonner";
 
 /**
  * Deletes a therapy session
@@ -53,6 +54,7 @@ export const deleteSession = async (sessionId: string) => {
   }
   
   console.log("Session deleted successfully:", sessionId);
+  toast.success("Session deleted successfully");
   return { success: true };
 };
 
