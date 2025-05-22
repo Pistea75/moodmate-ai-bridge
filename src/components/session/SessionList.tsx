@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { deleteSession } from "@/utils/sessionUtils";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { 
   AlertDialog, AlertDialogTrigger, AlertDialogContent, 
   AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, 
@@ -36,7 +36,6 @@ export function SessionList({
   onScheduleClick,
   onSessionDelete 
 }: SessionListProps) {
-  const { toast } = useToast();
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
   
   // Filter sessions for the selected date
@@ -53,11 +52,7 @@ export function SessionList({
   
   const handleDeleteSession = async (sessionId: string) => {
     if (!sessionId) {
-      toast({
-        title: "Error",
-        description: "Invalid session ID",
-        variant: "destructive",
-      });
+      toast.error("Invalid session ID");
       return;
     }
     
@@ -67,22 +62,12 @@ export function SessionList({
       
       await deleteSession(sessionId);
       
-      toast({
-        title: "Success",
-        description: "Session deleted successfully",
-      });
-      
       // After successful deletion, call the callback to refresh the session list
       if (onSessionDelete) {
         onSessionDelete();
       }
     } catch (error: any) {
       console.error("Error deleting session:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete session",
-        variant: "destructive",
-      });
     } finally {
       setDeletingSessionId(null);
     }

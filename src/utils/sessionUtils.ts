@@ -10,23 +10,32 @@ import { toast } from "sonner";
  */
 export const deleteSession = async (sessionId: string) => {
   if (!sessionId) {
+    toast.error("Session ID is required");
     throw new Error("Session ID is required");
   }
   
   console.log("Attempting to delete session with ID:", sessionId);
   
-  const { error } = await supabase
-    .from("sessions")
-    .delete()
-    .eq("id", sessionId);
+  try {
+    const { error } = await supabase
+      .from("sessions")
+      .delete()
+      .eq("id", sessionId);
+      
+    if (error) {
+      console.error("Error deleting session:", error);
+      toast.error(`Failed to delete session: ${error.message}`);
+      throw new Error(`Error deleting session: ${error.message}`);
+    }
     
-  if (error) {
-    console.error("Error deleting session:", error);
-    throw new Error(`Error deleting session: ${error.message}`);
+    console.log("Session deleted successfully:", sessionId);
+    toast.success("Session deleted successfully");
+    return { success: true };
+  } catch (err: any) {
+    console.error("Unexpected error deleting session:", err);
+    toast.error(err.message || "Failed to delete session");
+    throw err;
   }
-  
-  console.log("Session deleted successfully:", sessionId);
-  return { success: true };
 };
 
 /**

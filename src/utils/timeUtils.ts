@@ -9,7 +9,8 @@
  */
 export const generateTimeSlots = () => {
   const slots = [];
-  for (let hour = 6; hour < 22; hour++) {
+  // Generate time slots for all 24 hours
+  for (let hour = 0; hour < 24; hour++) {
     const hourStr = hour.toString().padStart(2, "0");
     slots.push(`${hourStr}:00`);
     slots.push(`${hourStr}:30`);

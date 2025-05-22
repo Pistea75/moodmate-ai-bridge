@@ -33,11 +33,6 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
       
       await deleteSession(sessionId);
       
-      toast({
-        title: "Success",
-        description: "Session deleted successfully",
-      });
-      
       // After successful deletion, call the callback to refresh the session list
       if (onSessionDelete) {
         onSessionDelete();
