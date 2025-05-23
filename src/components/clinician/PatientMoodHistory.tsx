@@ -8,6 +8,7 @@ import { MOOD_LABELS, MOOD_COLORS } from '@/components/mood/MoodChartConstants';
 import { Badge } from '@/components/ui/badge';
 import { normalizeMood } from '@/components/mood/MoodChartUtils';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface MoodEntry {
   created_at: string;
@@ -19,6 +20,7 @@ interface MoodEntry {
 export function PatientMoodHistory({ patientId }: { patientId: string }) {
   const [entries, setEntries] = useState<MoodEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const fetchMoodHistory = async () => {
@@ -51,6 +53,9 @@ export function PatientMoodHistory({ patientId }: { patientId: string }) {
     );
   };
 
+  // Determine visible entries based on expanded state
+  const visibleEntries = expanded ? entries : entries.slice(0, 10);
+
   return (
     <Card className="p-6 mt-6">
       <h2 className="text-xl font-semibold mb-4">Mood History</h2>
@@ -59,61 +64,75 @@ export function PatientMoodHistory({ patientId }: { patientId: string }) {
       ) : entries.length === 0 ? (
         <p className="text-muted-foreground">No entries yet.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Mood</TableHead>
-                <TableHead>Notes</TableHead>
-                <TableHead>Triggers</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {entries.map((entry, index) => {
-                const normalized = normalizeMood(entry.mood_score) - 1;
-                const flagged = isHighRiskMood(entry.mood_score, entry.triggers || []);
-                const isLowMood = normalized <= 1; // Mood scores 1-2 (normalized to 0-1)
-                const isStriped = index % 2 === 1;
-                
-                return (
-                  <TableRow
-                    key={index}
-                    className={cn(
-                      isStriped ? 'bg-muted/10' : '',
-                      flagged ? 'bg-red-50 text-red-700' : 
-                      isLowMood ? 'bg-red-50/50' : ''
-                    )}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: MOOD_COLORS[normalized] }}
-                        />
-                        <span>
-                          {entry.mood_score} – {MOOD_LABELS[normalized]}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate" title={entry.notes || ''}>
-                      {entry.notes || '—'}
-                    </TableCell>
-                    <TableCell>
-                      {formatTriggers(entry.triggers)}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(entry.created_at).toLocaleDateString(undefined, {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+        <div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Mood</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead>Triggers</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {visibleEntries.map((entry, index) => {
+                  const normalized = normalizeMood(entry.mood_score) - 1;
+                  const flagged = isHighRiskMood(entry.mood_score, entry.triggers || []);
+                  const isLowMood = normalized <= 1; // Mood scores 1-2 (normalized to 0-1)
+                  const isStriped = index % 2 === 1;
+                  
+                  return (
+                    <TableRow
+                      key={index}
+                      className={cn(
+                        isStriped ? 'bg-muted/10' : '',
+                        flagged ? 'bg-red-50 text-red-700' : 
+                        isLowMood ? 'bg-red-50/50' : ''
+                      )}
+                    >
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: MOOD_COLORS[normalized] }}
+                          />
+                          <span>
+                            {entry.mood_score} – {MOOD_LABELS[normalized]}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate" title={entry.notes || ''}>
+                        {entry.notes || '—'}
+                      </TableCell>
+                      <TableCell>
+                        {formatTriggers(entry.triggers)}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(entry.created_at).toLocaleDateString(undefined, {
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          {entries.length > 10 && (
+            <div className="text-center mt-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setExpanded(!expanded)}
+              >
+                {expanded ? 'View Less' : 'View More'}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </Card>
