@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -129,9 +128,9 @@ export default function PatientDetail() {
             </div>
           </div>
           
-          <PatientMoodHistory patientId={patientId as string} />
-
           <PatientTasksSection patientId={patientId as string} />
+          
+          <PatientMoodHistory patientId={patientId as string} />
         </div>
       </div>
     </ClinicianLayout>
