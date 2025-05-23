@@ -336,7 +336,16 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_patient_mood_summaries: {
+        Args: { clinician_uuid: string }
+        Returns: {
+          patient_id: string
+          first_name: string
+          last_name: string
+          avg_mood: number
+          last_entry: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

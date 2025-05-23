@@ -7,6 +7,7 @@ import { PatientSpotlight } from '@/components/clinician/PatientSpotlight';
 import { ClinicianTasks } from '@/components/clinician/ClinicianTasks';
 import { AddTaskDialog } from '@/components/clinician/AddTaskDialog';
 import { RecentReports } from '@/components/clinician/RecentReports';
+import { PatientComparisonWidget } from '@/components/clinician/PatientComparisonWidget';
 import { useDashboardData } from '@/hooks/useDashboardData';
 
 export default function ClinicianDashboard() {
@@ -67,6 +68,9 @@ export default function ClinicianDashboard() {
           sessions={upcomingSessions}
           loading={loadingSessions}
         />
+
+        {/* Patient Comparison Widget - New addition */}
+        <PatientComparisonWidget />
 
         {/* Spotlight and Tasks */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
