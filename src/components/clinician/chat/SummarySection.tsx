@@ -1,12 +1,14 @@
 
 import { FC } from 'react';
 import { Button } from '@/components/ui/button';
+import { ChatExportPDF } from './ChatExportPDF';
 
 interface SummarySectionProps {
   summary: string | null;
   summarizing: boolean;
   logs: any[];
   savingReport: boolean;
+  patientName?: string;
   onSummarize: () => void;
   onSaveReport: () => void;
 }
@@ -15,7 +17,8 @@ export const SummarySection: FC<SummarySectionProps> = ({
   summary, 
   summarizing, 
   logs, 
-  savingReport, 
+  savingReport,
+  patientName = "Patient", 
   onSummarize, 
   onSaveReport 
 }) => {
@@ -36,14 +39,22 @@ export const SummarySection: FC<SummarySectionProps> = ({
             <div className="text-sm whitespace-pre-line">{summary}</div>
           </div>
           
-          <Button
-            variant="secondary"
-            onClick={onSaveReport}
-            disabled={savingReport}
-            className="w-full"
-          >
-            {savingReport ? 'Saving Report...' : 'Save as Report'}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="secondary"
+              onClick={onSaveReport}
+              disabled={savingReport}
+              className="w-full"
+            >
+              {savingReport ? 'Saving Report...' : 'Save as Report'}
+            </Button>
+            
+            <ChatExportPDF 
+              logs={logs} 
+              summary={summary} 
+              patientName={patientName} 
+            />
+          </div>
         </div>
       )}
     </div>

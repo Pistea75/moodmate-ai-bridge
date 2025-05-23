@@ -22,6 +22,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   const [summary, setSummary] = useState<string | null>(null);
   const [summarizing, setSummarizing] = useState(false);
   const [savingReport, setSavingReport] = useState(false);
+  const [patientName, setPatientName] = useState<string>("Patient");
   
   // Date filter states
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -30,7 +31,31 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
 
   useEffect(() => {
     fetchLogs();
+    fetchPatientName();
   }, [patientId]);
+
+  const fetchPatientName = async () => {
+    if (!patientId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', patientId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching patient name:', error);
+        return;
+      }
+
+      if (data) {
+        setPatientName(`${data.first_name || ''} ${data.last_name || ''}`.trim() || "Patient");
+      }
+    } catch (err) {
+      console.error('Error in fetchPatientName:', err);
+    }
+  };
 
   const fetchLogs = async () => {
     if (!patientId) {
@@ -210,6 +235,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
               summarizing={summarizing}
               logs={logs}
               savingReport={savingReport}
+              patientName={patientName}
               onSummarize={handleSummarize}
               onSaveReport={handleSaveReport}
             />
