@@ -30,8 +30,12 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   const [isFilterActive, setIsFilterActive] = useState(false);
 
   useEffect(() => {
-    fetchLogs();
-    fetchPatientName();
+    if (patientId) {
+      fetchLogs();
+      fetchPatientName();
+    } else {
+      setLoading(false);
+    }
   }, [patientId]);
 
   const fetchPatientName = async () => {
@@ -65,6 +69,13 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
     
     try {
       setLoading(true);
+      console.log('Fetching logs for patient:', patientId);
+      console.log('Filter active:', isFilterActive);
+      if (isFilterActive) {
+        console.log('Start date:', startDate ? startDate.toISOString() : 'null');
+        console.log('End date:', endDate ? endDate.toISOString() : 'null');
+      }
+      
       let query = supabase
         .from('ai_chat_logs')
         .select('*')
@@ -74,10 +85,16 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
       // Apply date filters if active
       if (isFilterActive) {
         if (startDate) {
-          query = query.gte('created_at', startOfDay(startDate).toISOString());
+          // Convert to start of day in ISO format
+          const startDateISO = startOfDay(startDate).toISOString();
+          console.log('Using startDate ISO:', startDateISO);
+          query = query.gte('created_at', startDateISO);
         }
         if (endDate) {
-          query = query.lte('created_at', endOfDay(endDate).toISOString());
+          // Convert to end of day in ISO format
+          const endDateISO = endOfDay(endDate).toISOString();
+          console.log('Using endDate ISO:', endDateISO);
+          query = query.lte('created_at', endDateISO);
         }
       }
 
@@ -85,9 +102,16 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
 
       if (error) {
         console.error('Error fetching chat logs:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load chat logs. Please try again.",
+          variant: "destructive",
+        });
         return;
       }
 
+      console.log('Chat logs fetched:', data?.length || 0);
+      
       if (data) {
         // Sanitize the data to ensure the role property conforms to LogEntry type
         const sanitized = data.map(log => ({
@@ -96,15 +120,23 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
         })) as LogEntry[];
         
         setLogs(sanitized);
+      } else {
+        setLogs([]);
       }
     } catch (err) {
       console.error('Error in fetchLogs:', err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while fetching chat logs.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleApplyFilter = () => {
+    console.log('Applying filter with dates:', startDate, endDate);
     setIsFilterActive(true);
     setSummary(null); // Reset summary when filter changes
     fetchLogs();
@@ -119,7 +151,14 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   };
 
   const handleSummarize = async () => {
-    if (logs.length === 0) return;
+    if (logs.length === 0) {
+      toast({
+        title: "No chat logs",
+        description: "There are no chat logs to summarize.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setSummarizing(true);
     setSummary(null);
