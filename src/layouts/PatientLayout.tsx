@@ -19,24 +19,14 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
     <div className="flex min-h-screen bg-background">
       {/* Mobile Top Nav */}
       <MobileTopNav 
-        patientFullName={
-          <>
-            {patientFullName}
-            {user?.id && <PatientMoodBadge patientId={user.id} />}
-          </>
-        } 
+        patientFullName={<span>{patientFullName}</span>} 
         isOpen={isOpen} 
         setIsOpen={setIsOpen}
       />
       
       {/* Sidebar for Desktop */}
       <DesktopSidebar 
-        patientFullName={
-          <div className="flex items-center gap-2">
-            <span>{patientFullName}</span>
-            {user?.id && <PatientMoodBadge patientId={user.id} />}
-          </div>
-        } 
+        patientFullName={<span>{patientFullName}</span>} 
       />
       
       {/* Main Content */}

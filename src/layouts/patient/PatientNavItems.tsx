@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -10,6 +9,8 @@ import {
   Settings, 
   User
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { PatientMoodBadge } from '@/components/clinician/PatientMoodBadge';
 
 export type NavItem = {
   name: string;
@@ -33,6 +34,7 @@ type PatientNavItemsProps = {
 
 export function PatientNavItems({ isMobile = false, onItemClick }: PatientNavItemsProps) {
   const location = useLocation();
+  const { user } = useAuth();
   
   if (isMobile) {
     return (
@@ -57,7 +59,7 @@ export function PatientNavItems({ isMobile = false, onItemClick }: PatientNavIte
   }
   
   return (
-    <ul className="space-y-1">
+    <nav className="space-y-1 px-2">
       {patientNavItems.map((item) => (
         <li key={item.path}>
           <Link 
@@ -74,6 +76,13 @@ export function PatientNavItems({ isMobile = false, onItemClick }: PatientNavIte
           </Link>
         </li>
       ))}
-    </ul>
+      
+      {/* Add mood badge at the bottom */}
+      {user?.id && (
+        <div className="mt-6 px-2">
+          <PatientMoodBadge patientId={user.id} />
+        </div>
+      )}
+    </nav>
   );
 }
