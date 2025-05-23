@@ -31,7 +31,14 @@ export function useChatLogs(patientId: string, startDate?: string, endDate?: str
       .order('created_at', { ascending: true });
 
     if (startDate && endDate) {
-      query = query.gte('created_at', startDate).lte('created_at', endDate);
+      // Normalize dates to UTC for consistent filtering
+      const startUTC = new Date(startDate);
+      startUTC.setUTCHours(0, 0, 0, 0);
+
+      const endUTC = new Date(endDate);
+      endUTC.setUTCHours(23, 59, 59, 999);
+
+      query = query.gte('created_at', startUTC.toISOString()).lte('created_at', endUTC.toISOString());
     }
 
     const { data, error } = await query;
