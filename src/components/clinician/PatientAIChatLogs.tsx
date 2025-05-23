@@ -30,8 +30,21 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [isFilterActive, setIsFilterActive] = useState(false);
 
+  // UUID validation regex
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
   useEffect(() => {
     if (patientId) {
+      // Validate the UUID format
+      if (!uuidRegex.test(patientId)) {
+        console.warn('Invalid patient UUID format:', patientId);
+        toast({
+          title: "Warning",
+          description: "Patient ID format is invalid. This may cause issues with data retrieval.",
+          variant: "destructive",
+        });
+      }
+      
       fetchPatientName();
       
       // When component mounts, default to the last 7 days
@@ -79,12 +92,14 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
       setLoading(true);
       console.log('Fetching logs for patient:', patientId);
       console.log('Patient ID type:', typeof patientId);
+      console.log('Is valid UUID format:', uuidRegex.test(patientId));
       
       // First, check if the ai_chat_logs table has entries for this patient
+      // Using filter method instead of eq for better type handling
       const { count, error: countError } = await supabase
         .from('ai_chat_logs')
         .select('*', { count: 'exact', head: true })
-        .eq('patient_id', patientId);
+        .filter('patient_id', 'eq', patientId);
       
       if (countError) {
         console.error('Error checking for chat logs:', countError);
@@ -96,20 +111,20 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
       let query = supabase
         .from('ai_chat_logs')
         .select('*')
-        .eq('patient_id', patientId)
+        .filter('patient_id', 'eq', patientId)
         .order('created_at', { ascending: true });
       
       // Apply date filters if active
       if (isFilterActive) {
         if (startDate) {
-          // Convert to start of day in ISO format and ensure it's a string
+          // Convert to start of day in ISO format
           const startDateISO = startOfDay(startDate).toISOString();
           console.log('Using startDate ISO:', startDateISO);
           query = query.gte('created_at', startDateISO);
         }
         
         if (endDate) {
-          // Convert to end of day in ISO format and ensure it's a string
+          // Convert to end of day in ISO format
           const endDateISO = endOfDay(endDate).toISOString();
           console.log('Using endDate ISO:', endDateISO);
           query = query.lte('created_at', endDateISO);
@@ -148,10 +163,11 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
         if (isFilterActive && startDate && endDate) {
           console.log('Attempting to fetch all logs without date filter');
           
+          // Use filter method here too for consistency
           const { data: allData, error: allError } = await supabase
             .from('ai_chat_logs')
             .select('*')
-            .eq('patient_id', patientId)
+            .filter('patient_id', 'eq', patientId)
             .order('created_at', { ascending: true });
           
           if (!allError && allData && allData.length > 0) {
@@ -165,7 +181,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
             const { data: nullCheckData, error: nullCheckError } = await supabase
               .from('ai_chat_logs')
               .select('id, created_at')
-              .eq('patient_id', patientId)
+              .filter('patient_id', 'eq', patientId)
               .is('created_at', null);
             
             if (!nullCheckError && nullCheckData && nullCheckData.length > 0) {
