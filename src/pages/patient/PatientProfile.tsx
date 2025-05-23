@@ -5,6 +5,7 @@ import { ProfileForm } from '@/components/profile/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogoutButton } from '@/components/LogoutButton';
 import { DeleteProfileButton } from '@/components/profile/DeleteProfileButton';
+import { PatientSummaryStats } from '@/components/clinician/PatientSummaryStats';
 
 export default function PatientProfile() {
   const { user } = useAuth();
@@ -19,6 +20,9 @@ export default function PatientProfile() {
             <DeleteProfileButton />
           </div>
         </div>
+        
+        {/* Add PatientSummaryStats component */}
+        {user?.id && <PatientSummaryStats patientId={user.id} />}
         
         <div className="grid gap-6">
           <Card className="p-6">
