@@ -4,8 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { MoodChartView } from './MoodChartView';
-import { ChartData, parseEntries } from './MoodChartUtils';
-import { ViewMode } from './MoodChartConstants';
+import { ChartData, MoodEntry as MoodChartEntry, parseEntries, ViewMode } from './MoodChartUtils';
+import { ViewMode as MoodViewMode } from './MoodChartConstants';
 import { MoodEntry } from '@/hooks/useMoodEntries';
 
 interface MoodChartProps {
@@ -37,11 +37,11 @@ export function MoodChart({ patientId }: MoodChartProps) {
         return;
       }
 
-      // Convert the entries to the expected format
+      // Convert the entries to the expected format for MoodChartUtils
       const parsedEntries = entries ? entries.map(entry => ({
         ...entry,
         triggers: entry.triggers || [] // Ensure triggers is always an array
-      })) as MoodEntry[] : [];
+      })) as MoodChartEntry[] : [];
       
       const parsed = parseEntries(parsedEntries, view);
       setData(parsed);
@@ -75,11 +75,11 @@ export function MoodChart({ patientId }: MoodChartProps) {
       return;
     }
 
-    // Convert the entries to the expected format
+    // Convert the entries to the expected format for MoodChartUtils
     const parsedEntries = entries ? entries.map(entry => ({
       ...entry,
       triggers: entry.triggers || [] // Ensure triggers is always an array
-    })) as MoodEntry[] : [];
+    })) as MoodChartEntry[] : [];
     
     const parsed = parseEntries(parsedEntries, view);
     setData(parsed);

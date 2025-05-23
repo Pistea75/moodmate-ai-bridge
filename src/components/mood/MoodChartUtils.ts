@@ -1,3 +1,4 @@
+
 import { MOOD_LABELS } from './MoodChartConstants';
 
 export interface MoodEntry {
@@ -17,7 +18,7 @@ export interface ChartData {
 export type ViewMode = 'weekly' | 'daily';
 
 // Function to normalize mood score from 1-10 to 1-5
-function normalizeMood(score: number) {
+export function normalizeMood(score: number) {
   return Math.max(1, Math.min(5, Math.ceil(score / 2)));
 }
 
