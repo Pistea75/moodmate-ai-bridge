@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { LogEntry } from "@/hooks/usePatientAIChatLogs/types";
@@ -97,9 +96,10 @@ export async function fetchPatientChatLogs(
     
     // Also try a raw SQL query via RPC function (if possible)
     try {
+      // Use try-catch since the function may not exist and we don't want to error out
       const { data: rawQueryData, error: rawQueryError } = await supabase.rpc(
-        'debug_get_patient_logs',
-        { p_patient_id: patientIdStr }
+        'get_patient_mood_summaries', 
+        { clinician_uuid: patientIdStr }
       );
       
       if (!rawQueryError && rawQueryData) {

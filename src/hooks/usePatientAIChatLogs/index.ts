@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import { LogEntry, UseChatLogsResult } from './types';
@@ -14,7 +13,7 @@ import { getLastSevenDays, validateDateFilter } from './dateUtils';
 // Change from 'export' to 'export type' for TypeScript types
 export type { LogEntry, UseChatLogsResult } from './types';
 
-export function usePatientAIChatLogs(patientId: string): UseChatLogsResult & { refreshLogs: () => Promise<void> } {
+export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<string | null>(null);
@@ -176,7 +175,7 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult & { r
     setSavingReport(false);
   };
   
-  // New function to manually refresh logs
+  // Add the refreshLogs function
   const refreshLogs = async () => {
     await fetchLogs();
     toast({

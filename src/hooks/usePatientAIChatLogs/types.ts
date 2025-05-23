@@ -22,4 +22,5 @@ export interface UseChatLogsResult {
   handleClearFilter: () => void;
   handleSummarize: () => Promise<void>;
   handleSaveReport: () => Promise<void>;
+  refreshLogs: () => Promise<void>;
 }
