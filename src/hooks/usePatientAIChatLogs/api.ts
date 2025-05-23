@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { LogEntry } from "@/hooks/usePatientAIChatLogs/types";
@@ -51,9 +52,16 @@ export async function fetchPatientChatLogs(
     return [];
   }
   
+  // Convert patientId to string explicitly if it's not already
+  const patientIdStr = String(patientId).trim();
+  
+  console.log('Patient ID being used for query:', patientIdStr);
+  console.log('Patient ID type:', typeof patientIdStr);
+  
   // Validate the UUID format
-  if (!uuidRegex.test(patientId)) {
-    console.warn('Invalid patient UUID format:', patientId);
+  console.log('Is valid UUID format:', uuidRegex.test(patientIdStr));
+  if (!uuidRegex.test(patientIdStr)) {
+    console.warn('Invalid patient UUID format:', patientIdStr);
     toast({
       title: "Warning",
       description: "Patient ID format is invalid. This may cause issues with data retrieval.",
@@ -62,50 +70,54 @@ export async function fetchPatientChatLogs(
   }
   
   try {
-    console.log('Fetching logs for patient:', patientId);
+    console.log('Fetching logs for patient:', patientIdStr);
     
-    // TEMPORARY DEBUGGING: First fetch ALL logs for this patient to see if any exist
+    // TEMPORARY DEBUGGING: Look for ANY logs in the entire ai_chat_logs table to check if the table has data
+    const { count: totalLogsInTable, error: totalLogsError } = await supabase
+      .from('ai_chat_logs')
+      .select('*', { count: 'exact', head: true });
+      
+    console.log(`Total logs in the entire ai_chat_logs table: ${totalLogsInTable || 0}`);
+    
+    if (totalLogsError) {
+      console.error('Error checking total logs in table:', totalLogsError);
+    }
+    
+    // Now check if any logs exist specifically for this patient
     const { count: totalCount, error: countError } = await supabase
       .from('ai_chat_logs')
       .select('*', { count: 'exact', head: true })
-      .eq('patient_id', patientId);
+      .eq('patient_id', patientIdStr);
     
-    console.log(`Total logs for patient ${patientId} (ignoring filters): ${totalCount || 0}`);
+    console.log(`Total logs for patient ${patientIdStr} (ignoring filters): ${totalCount || 0}`);
     
     if (countError) {
-      console.error('Error checking total logs:', countError);
+      console.error('Error checking total logs for patient:', countError);
     }
     
-    if (totalCount === 0) {
-      console.log('No logs found for this patient at all, returning empty array');
-      return [];
+    // Also try a raw SQL query via RPC function (if possible)
+    try {
+      const { data: rawQueryData, error: rawQueryError } = await supabase.rpc(
+        'debug_get_patient_logs',
+        { p_patient_id: patientIdStr }
+      );
+      
+      if (!rawQueryError && rawQueryData) {
+        console.log('Raw query results:', rawQueryData);
+      } else if (rawQueryError) {
+        console.log('Raw query error (expected if function does not exist):', rawQueryError);
+      }
+    } catch (e) {
+      // Expected to fail if the function doesn't exist
+      console.log('Raw query function does not exist (expected)');
     }
     
-    // Build query
-    let query = supabase
+    // Build query with no filters, just to get any logs for this patient
+    const { data, error } = await supabase
       .from('ai_chat_logs')
       .select('*')
-      .eq('patient_id', patientId)
+      .eq('patient_id', patientIdStr)
       .order('created_at', { ascending: true });
-    
-    // TEMPORARILY COMMENT OUT DATE FILTER TO TEST IF LOGS EXIST
-    /* 
-    // Apply date filters if active
-    if (isFilterActive && startDate && endDate) {
-      const startDateISO = getStartOfDayISO(startDate);
-      const endDateISO = getEndOfDayISO(endDate);
-      
-      console.log('Date filter:', formatDateForDisplay(startDateISO), 'to', formatDateForDisplay(endDateISO));
-      console.log('Raw ISO strings - start:', startDateISO, 'end:', endDateISO);
-      
-      // Using gte and lte for timestamp comparison with proper UTC values
-      query = query
-        .gte('created_at', startDateISO)
-        .lte('created_at', endDateISO);
-    }
-    */
-
-    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching chat logs:', error);
@@ -121,15 +133,29 @@ export async function fetchPatientChatLogs(
     }
 
     console.log(`Chat logs fetched: ${data?.length || 0}`);
-    console.log('First few logs:', data?.slice(0, 3));
     
     if (data && data.length > 0) {
+      console.log('First few logs:', data.slice(0, Math.min(3, data.length)));
+      
       // Sanitize the data to ensure the role property conforms to LogEntry type
       return data.map(log => ({
         ...log,
         role: log.role === 'assistant' ? 'assistant' : 'user'
       })) as LogEntry[];
     } 
+    
+    console.log('No logs found for this patient, trying alternative approaches...');
+    
+    // As a last resort, try fetching without patient_id equality check (debugging only)
+    const { data: allLogsData, error: allLogsError } = await supabase
+      .from('ai_chat_logs')
+      .select('patient_id, role, message, created_at')
+      .limit(10);
+      
+    if (!allLogsError && allLogsData && allLogsData.length > 0) {
+      console.log('Sample of logs in the table:', allLogsData);
+      console.log('Patient IDs in the sample:', allLogsData.map(log => log.patient_id));
+    }
     
     return [];
   } catch (err) {

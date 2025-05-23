@@ -5,9 +5,14 @@ import { ChatLogList } from './chat/ChatLogList';
 import { SummarySection } from './chat/SummarySection';
 import { DateRangeFilter } from './chat/DateRangeFilter';
 import { usePatientAIChatLogs } from '@/hooks/usePatientAIChatLogs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function PatientAIChatLogs({ patientId }: { patientId: string }) {
+  const [debugMode, setDebugMode] = useState(false);
+  
   const { 
     logs,
     loading,
@@ -23,12 +28,14 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
     handleApplyFilter,
     handleClearFilter,
     handleSummarize,
-    handleSaveReport
+    handleSaveReport,
+    refreshLogs
   } = usePatientAIChatLogs(patientId);
 
   // Add debugging to verify patientId and logs
   useEffect(() => {
     console.log('PatientAIChatLogs - Patient ID:', patientId);
+    console.log('PatientAIChatLogs - Patient ID type:', typeof patientId);
     console.log('PatientAIChatLogs - isLoading:', loading);
     console.log('PatientAIChatLogs - logs count:', logs?.length || 0);
   }, [patientId, loading, logs]);
@@ -36,9 +43,46 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-semibold">AI Chat History</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg font-semibold">AI Chat History</CardTitle>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => refreshLogs()}
+              title="Refresh logs"
+            >
+              <RefreshCcw className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost" 
+              size="sm"
+              onClick={() => setDebugMode(!debugMode)}
+            >
+              {debugMode ? 'Hide Debug Info' : 'Show Debug Info'}
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
+        {debugMode && (
+          <Alert className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Debug Information</AlertTitle>
+            <AlertDescription>
+              <div className="text-xs font-mono mt-2 space-y-1">
+                <div>Patient ID: {patientId}</div>
+                <div>Patient ID type: {typeof patientId}</div>
+                <div>Loading: {loading ? 'true' : 'false'}</div>
+                <div>Log Count: {logs?.length || 0}</div>
+                <div>Date Filter Active: {isFilterActive ? 'true' : 'false'}</div>
+                <div>Start Date: {startDate?.toISOString() || 'null'}</div>
+                <div>End Date: {endDate?.toISOString() || 'null'}</div>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+      
         <DateRangeFilter 
           startDate={startDate}
           endDate={endDate}

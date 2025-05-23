@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import { LogEntry, UseChatLogsResult } from './types';
@@ -13,7 +14,7 @@ import { getLastSevenDays, validateDateFilter } from './dateUtils';
 // Change from 'export' to 'export type' for TypeScript types
 export type { LogEntry, UseChatLogsResult } from './types';
 
-export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
+export function usePatientAIChatLogs(patientId: string): UseChatLogsResult & { refreshLogs: () => Promise<void> } {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<string | null>(null);
@@ -69,28 +70,40 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
       console.log('Using endDate:', endDate ? endDate.toISOString() : 'null');
       console.log('Is filter active:', isFilterActive);
       
-      const fetchedLogs = await fetchPatientChatLogs(
+      // IMPORTANT: Try fetching all logs first, without any date filtering
+      console.log('Attempting to fetch all logs without date filter');
+      let fetchedLogs = await fetchPatientChatLogs(
         patientId, 
-        startDate, 
-        endDate, 
-        isFilterActive
+        null,
+        null,
+        false  // disable filtering completely for initial fetch
       );
       
-      console.log('Logs fetched successfully, count:', fetchedLogs.length);
-      setLogs(fetchedLogs);
+      console.log('Logs fetched without filter, count:', fetchedLogs.length);
       
-      // If no logs were found with a date filter, check if there are logs outside the filter
-      if (fetchedLogs.length === 0 && isFilterActive && startDate && endDate) {
-        const totalLogCount = await checkForLogsOutsideFilter(patientId, null, null);
+      // Only if we found logs, try applying the filter
+      if (fetchedLogs.length > 0 && isFilterActive && startDate && endDate) {
+        const filteredLogs = await fetchPatientChatLogs(
+          patientId, 
+          startDate, 
+          endDate, 
+          true
+        );
         
-        if (totalLogCount > 0) {
-          console.log(`No logs in date range, but ${totalLogCount} logs exist in total`);
+        console.log('Filtered logs fetched, count:', filteredLogs.length);
+        
+        if (filteredLogs.length > 0) {
+          fetchedLogs = filteredLogs;
+        } else {
+          console.log('No logs in filtered range, using all logs instead');
           toast({
             title: "No logs in date range",
-            description: `No logs found in the selected date range. There are ${totalLogCount} logs in total.`,
+            description: `No logs found in the selected date range. Showing all ${fetchedLogs.length} logs instead.`,
           });
         }
       }
+      
+      setLogs(fetchedLogs);
     } catch (err) {
       console.error('Error in fetchLogs:', err);
       toast({
@@ -162,6 +175,15 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
     
     setSavingReport(false);
   };
+  
+  // New function to manually refresh logs
+  const refreshLogs = async () => {
+    await fetchLogs();
+    toast({
+      title: "Refreshed",
+      description: "Chat logs have been refreshed"
+    });
+  };
 
   return {
     logs,
@@ -178,6 +200,7 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
     handleApplyFilter,
     handleClearFilter,
     handleSummarize,
-    handleSaveReport
+    handleSaveReport,
+    refreshLogs
   };
 }
