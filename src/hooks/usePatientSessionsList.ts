@@ -10,6 +10,7 @@ interface Session {
   status: string;
   notes?: string;
   timezone?: string;
+  clinician_name: string; // Add clinician_name property
 }
 
 export function usePatientSessions() {
@@ -28,9 +29,16 @@ export function usePatientSessions() {
     setError(null);
     
     try {
+      // Join with profiles table to get clinician's name
       const { data, error } = await supabase
         .from('sessions')
-        .select('*')
+        .select(`
+          *,
+          profiles:clinician_id (
+            first_name,
+            last_name
+          )
+        `)
         .eq('patient_id', user.id)
         .order('scheduled_time', { ascending: true });
         
@@ -40,7 +48,19 @@ export function usePatientSessions() {
         return;
       }
       
-      setSessions(data || []);
+      // Transform the data to include clinician_name
+      const transformedData = (data || []).map(session => {
+        const clinicianFirstName = session.profiles?.first_name || '';
+        const clinicianLastName = session.profiles?.last_name || '';
+        const clinician_name = `${clinicianFirstName} ${clinicianLastName}`.trim() || 'Unknown Clinician';
+        
+        return {
+          ...session,
+          clinician_name
+        };
+      });
+      
+      setSessions(transformedData);
     } catch (err) {
       console.error('Unexpected error fetching sessions:', err);
       setError('An unexpected error occurred');
