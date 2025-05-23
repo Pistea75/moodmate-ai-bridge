@@ -10,6 +10,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePatientTasks } from '@/hooks/usePatientTasks';
 import { usePatientSessions } from '@/hooks/usePatientSessions';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MoodStatsCard } from '@/components/patient/MoodStatsCard';
+import { TasksCompletedCard } from '@/components/patient/TasksCompletedCard';
 
 export default function PatientDashboard() {
   const { user } = useAuth();
@@ -63,6 +65,12 @@ export default function PatientDashboard() {
             <p className="text-muted-foreground">Here's your mental wellness summary</p>
           </div>
           <MoodLogModal />
+        </div>
+        
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <MoodStatsCard />
+          <TasksCompletedCard />
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
