@@ -10,10 +10,11 @@ import {
 } from './api';
 import { getLastSevenDays, validateDateFilter } from './dateUtils';
 
-// Change from 'export' to 'export type' for TypeScript types
+// Export the types for external use
 export type { LogEntry, UseChatLogsResult } from './types';
 
 export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
+  // State declarations
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<string | null>(null);
