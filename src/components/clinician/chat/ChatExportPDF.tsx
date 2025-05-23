@@ -26,8 +26,8 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
   const handleExport = async () => {
     // Create PDF document
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage();
-    const { width, height } = page.getSize();
+    let currentPage = pdfDoc.addPage();
+    const { width, height } = currentPage.getSize();
     
     // Set up fonts
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -43,7 +43,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
     let y = height - margin;
     
     // Add title
-    page.drawText('AI Chat Log & Summary', {
+    currentPage.drawText('AI Chat Log & Summary', {
       x: margin,
       y,
       size: titleSize,
@@ -53,7 +53,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
     y -= lineHeight * 2;
     
     // Add patient info
-    page.drawText(`Patient: ${patientName}`, {
+    currentPage.drawText(`Patient: ${patientName}`, {
       x: margin,
       y,
       size: fontSize,
@@ -63,7 +63,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
     y -= lineHeight;
     
     // Add date info
-    page.drawText(`Date Generated: ${format(new Date(), 'PPP')}`, {
+    currentPage.drawText(`Date Generated: ${format(new Date(), 'PPP')}`, {
       x: margin,
       y,
       size: fontSize,
@@ -73,7 +73,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
     y -= lineHeight * 2;
     
     // Add chat logs heading
-    page.drawText('Chat Log Entries:', {
+    currentPage.drawText('Chat Log Entries:', {
       x: margin,
       y,
       size: headingSize,
@@ -89,7 +89,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
       const header = `${role} - ${dateStr}`;
       
       // Add entry header
-      page.drawText(header, {
+      currentPage.drawText(header, {
         x: margin,
         y,
         size: fontSize,
@@ -109,7 +109,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
         const testLineWidth = font.widthOfTextAtSize(testLine, fontSize);
         
         if (testLineWidth > maxWidth) {
-          page.drawText(line, {
+          currentPage.drawText(line, {
             x: margin,
             y,
             size: fontSize,
@@ -121,7 +121,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
           
           // Add new page if needed
           if (y < margin) {
-            page.drawText('(continued on next page)', {
+            currentPage.drawText('(continued on next page)', {
               x: margin,
               y,
               size: fontSize,
@@ -129,9 +129,9 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
               color: rgb(0.5, 0.5, 0.5),
             });
             
-            const newPage = pdfDoc.addPage();
+            currentPage = pdfDoc.addPage();
             y = height - margin;
-            newPage.drawText('(continued from previous page)', {
+            currentPage.drawText('(continued from previous page)', {
               x: margin,
               y,
               size: fontSize,
@@ -140,7 +140,6 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
             });
             
             y -= lineHeight * 1.5;
-            page = newPage;
           }
         } else {
           line = testLine;
@@ -149,7 +148,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
       
       // Draw the last line
       if (line) {
-        page.drawText(line, {
+        currentPage.drawText(line, {
           x: margin,
           y,
           size: fontSize,
@@ -162,9 +161,8 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
       
       // Add new page if needed
       if (y < margin) {
-        const newPage = pdfDoc.addPage();
+        currentPage = pdfDoc.addPage();
         y = height - margin;
-        page = newPage;
       }
     }
     
@@ -172,7 +170,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
     if (summary) {
       y -= lineHeight;
       
-      page.drawText('Clinical Summary:', {
+      currentPage.drawText('Clinical Summary:', {
         x: margin,
         y,
         size: headingSize,
@@ -191,7 +189,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
         const testLineWidth = font.widthOfTextAtSize(testLine, fontSize);
         
         if (testLineWidth > maxWidth) {
-          page.drawText(line, {
+          currentPage.drawText(line, {
             x: margin,
             y,
             size: fontSize,
@@ -203,7 +201,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
           
           // Add new page if needed
           if (y < margin) {
-            page.drawText('(continued on next page)', {
+            currentPage.drawText('(continued on next page)', {
               x: margin,
               y,
               size: fontSize,
@@ -211,9 +209,9 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
               color: rgb(0.5, 0.5, 0.5),
             });
             
-            const newPage = pdfDoc.addPage();
+            currentPage = pdfDoc.addPage();
             y = height - margin;
-            newPage.drawText('(continued from previous page)', {
+            currentPage.drawText('(continued from previous page)', {
               x: margin,
               y,
               size: fontSize,
@@ -222,7 +220,6 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
             });
             
             y -= lineHeight * 1.5;
-            page = newPage;
           }
         } else {
           line = testLine;
@@ -231,7 +228,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
       
       // Draw the last line
       if (line) {
-        page.drawText(line, {
+        currentPage.drawText(line, {
           x: margin,
           y,
           size: fontSize,
