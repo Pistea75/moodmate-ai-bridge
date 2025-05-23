@@ -8,6 +8,7 @@ import { ChatLogList } from './chat/ChatLogList';
 import { SummarySection } from './chat/SummarySection';
 import { DateRangeFilter } from './chat/DateRangeFilter';
 import { endOfDay, startOfDay, subDays } from 'date-fns';
+import { getLastSevenDays, ensureDateFormat } from '@/lib/utils/dateHelpers';
 
 interface LogEntry {
   id: string;
@@ -34,10 +35,9 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
       fetchPatientName();
       
       // When component mounts, default to the last 7 days
-      const today = new Date();
-      const sevenDaysAgo = subDays(today, 7);
-      setStartDate(sevenDaysAgo);
-      setEndDate(today);
+      const { start, end } = getLastSevenDays();
+      setStartDate(start);
+      setEndDate(end);
       setIsFilterActive(true);
       
       fetchLogs();
@@ -78,6 +78,20 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
     try {
       setLoading(true);
       console.log('Fetching logs for patient:', patientId);
+      console.log('Patient ID type:', typeof patientId);
+      
+      // First, check if the ai_chat_logs table has entries for this patient
+      const { count, error: countError } = await supabase
+        .from('ai_chat_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('patient_id', patientId);
+      
+      if (countError) {
+        console.error('Error checking for chat logs:', countError);
+        throw countError;
+      }
+      
+      console.log('Total logs for this patient (before filtering):', count);
       
       let query = supabase
         .from('ai_chat_logs')
@@ -106,6 +120,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
 
       if (error) {
         console.error('Error fetching chat logs:', error);
+        console.error('Error details:', error.message, error.details, error.hint);
         toast({
           title: "Error",
           description: "Failed to load chat logs. Please try again.",
@@ -115,6 +130,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
       }
 
       console.log('Chat logs fetched:', data?.length || 0);
+      console.log('First few logs:', data?.slice(0, 3));
       
       if (data && data.length > 0) {
         // Sanitize the data to ensure the role property conforms to LogEntry type
@@ -145,7 +161,23 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
               description: `No logs found in the selected date range. There are ${allData.length} logs in total.`,
             });
           } else {
-            console.log('No logs found at all');
+            // Check if created_at values are null
+            const { data: nullCheckData, error: nullCheckError } = await supabase
+              .from('ai_chat_logs')
+              .select('id, created_at')
+              .eq('patient_id', patientId)
+              .is('created_at', null);
+            
+            if (!nullCheckError && nullCheckData && nullCheckData.length > 0) {
+              console.log('Found logs with NULL created_at:', nullCheckData.length);
+              toast({
+                title: "Date filtering issue",
+                description: "Some chat logs have missing timestamps. Please contact support.",
+                variant: "destructive",
+              });
+            } else {
+              console.log('No logs found at all');
+            }
           }
         }
       }
@@ -163,6 +195,10 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
 
   const handleApplyFilter = () => {
     console.log('Applying filter with dates:', startDate, endDate);
+    console.log('Dates as ISO strings:', 
+      startDate ? startDate.toISOString() : 'null',
+      endDate ? endDate.toISOString() : 'null'
+    );
     setIsFilterActive(true);
     setSummary(null); // Reset summary when filter changes
     fetchLogs();
