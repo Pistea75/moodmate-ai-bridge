@@ -10,7 +10,7 @@ export async function saveChatReport(
   summary: string
 ): Promise<boolean> {
   try {
-    // Get the current user (clinician)
+    // Get the current user (patient)
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -21,8 +21,8 @@ export async function saveChatReport(
     const { error } = await supabase
       .from('ai_chat_reports')
       .insert({
-        patient_id: patientId,
-        clinician_id: user.id,
+        patient_id: user.id, // Use the authenticated user's ID as patient_id
+        clinician_id: null, // Set to null since this is a patient-generated report
         title: `AI Chat Summary - ${new Date().toLocaleDateString()}`,
         report_type: 'chat_summary',
         content: summary,
