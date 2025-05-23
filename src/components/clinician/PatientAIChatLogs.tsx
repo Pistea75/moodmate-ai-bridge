@@ -19,6 +19,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<string | null>(null);
   const [summarizing, setSummarizing] = useState(false);
+  const [savingReport, setSavingReport] = useState(false);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -99,6 +100,52 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
     }
   };
 
+  const handleSaveReport = async () => {
+    if (!summary || !patientId) return;
+    
+    setSavingReport(true);
+    
+    try {
+      // Get the current user (clinician)
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("You must be logged in to save a report");
+      }
+      
+      // Save the report to the database
+      const { error } = await supabase
+        .from('ai_chat_reports')
+        .insert({
+          patient_id: patientId,
+          clinician_id: user.id,
+          title: `AI Chat Summary - ${new Date().toLocaleDateString()}`,
+          report_type: 'chat_summary',
+          content: summary,
+          status: 'completed',
+          chat_date: new Date().toISOString()
+        });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      toast({
+        title: "Success",
+        description: "Report saved successfully",
+      });
+    } catch (error) {
+      console.error('Error saving report:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save report",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingReport(false);
+    }
+  };
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
@@ -138,7 +185,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
               </div>
             </ScrollArea>
             
-            <div className="mt-4 pt-4 border-t">
+            <div className="mt-4 pt-4 border-t space-y-4">
               <Button 
                 onClick={handleSummarize} 
                 disabled={summarizing || logs.length === 0}
@@ -148,9 +195,20 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
               </Button>
               
               {summary && (
-                <div className="mt-4 p-4 bg-primary/5 rounded-md border">
-                  <h4 className="font-medium text-sm mb-2">Clinical Summary:</h4>
-                  <div className="text-sm whitespace-pre-line">{summary}</div>
+                <div className="space-y-3">
+                  <div className="p-4 bg-primary/5 rounded-md border">
+                    <h4 className="font-medium text-sm mb-2">Clinical Summary:</h4>
+                    <div className="text-sm whitespace-pre-line">{summary}</div>
+                  </div>
+                  
+                  <Button
+                    variant="secondary"
+                    onClick={handleSaveReport}
+                    disabled={savingReport}
+                    className="w-full"
+                  >
+                    {savingReport ? 'Saving Report...' : 'Save as Report'}
+                  </Button>
                 </div>
               )}
             </div>
