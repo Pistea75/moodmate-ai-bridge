@@ -4,7 +4,6 @@ import { MobileTopNav } from './patient/MobileTopNav';
 import { DesktopSidebar } from './patient/DesktopSidebar';
 import { usePatientProfile } from './patient/usePatientProfile';
 import { useAuth } from '@/contexts/AuthContext';
-import { PatientMoodBadge } from '@/components/clinician/PatientMoodBadge';
 
 type PatientLayoutProps = {
   children: ReactNode;
