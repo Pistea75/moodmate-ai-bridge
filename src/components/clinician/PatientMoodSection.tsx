@@ -6,6 +6,7 @@ import { MoodChart } from '@/components/mood/MoodChart';
 import { PatientMoodInsights } from '@/components/clinician/PatientMoodInsights';
 import { getMostCommonTriggers } from '@/lib/analyzeMoodTriggers';
 import { isHighRiskMood } from '@/lib/utils/alertTriggers';
+import { detectMoodDrop } from '@/lib/utils/moodInsights';
 
 function normalizeMood(score: number) {
   return Math.max(1, Math.min(5, Math.ceil(score / 2))); // Convert 1–10 to 1–5
@@ -85,6 +86,9 @@ export function PatientMoodSection({ patientId, patientName }: PatientMoodSectio
     fetchMoodData();
   }, [patientId]);
 
+  // Detect mood drop
+  const dropAlert = detectMoodDrop(moodData);
+
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-4">Mood Trends</h2>
@@ -97,6 +101,12 @@ export function PatientMoodSection({ patientId, patientName }: PatientMoodSectio
         </div>
       ) : (
         <>
+          {dropAlert && (
+            <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 p-3 mb-4 rounded-md text-sm">
+              ⚠️ {dropAlert}
+            </div>
+          )}
+          
           {moodData.length > 0 && (() => {
             const latestEntry = moodData[moodData.length - 1];
             const risky = isHighRiskMood(latestEntry.mood_score, latestEntry.triggers);
