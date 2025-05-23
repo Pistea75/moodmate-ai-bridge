@@ -76,9 +76,11 @@ export async function fetchPatientChatLogs(
       const endDateISO = getEndOfDayISO(endDate);
       
       console.log('Date filter:', formatDateForDisplay(startDateISO), 'to', formatDateForDisplay(endDateISO));
+      
+      // Using filter instead of eq/gte/lte to ensure consistent behavior
       query = query
-        .gte('created_at', startDateISO)
-        .lte('created_at', endDateISO);
+        .filter('created_at', 'gte', startDateISO)
+        .filter('created_at', 'lte', endDateISO);
     }
 
     const { data, error } = await query;
@@ -132,6 +134,11 @@ export async function checkForLogsOutsideFilter(
       .select('*', { count: 'exact', head: true })
       .filter('patient_id', 'eq', patientId);
       
+    if (error) {
+      console.error('Error checking for logs outside filter:', error);
+      return 0;
+    }
+    
     return count || 0;
   } catch (error) {
     console.error('Error checking for logs outside filter:', error);

@@ -56,6 +56,12 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
     try {
       setLoading(true);
       
+      // Log before fetch to help with debugging
+      console.log('Total logs for this patient (before filtering):', await checkForLogsOutsideFilter(patientId, null, null));
+      console.log('Using startDate:', startDate ? startDate.toISOString() : 'null');
+      console.log('Using endDate:', endDate ? endDate.toISOString() : 'null');
+      console.log('Is filter active:', isFilterActive);
+      
       const fetchedLogs = await fetchPatientChatLogs(
         patientId, 
         startDate, 
@@ -67,7 +73,7 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
       
       // If no logs were found with a date filter, check if there are logs outside the filter
       if (fetchedLogs.length === 0 && isFilterActive && startDate && endDate) {
-        const totalLogCount = await checkForLogsOutsideFilter(patientId, startDate, endDate);
+        const totalLogCount = await checkForLogsOutsideFilter(patientId, null, null);
         
         if (totalLogCount > 0) {
           toast({
@@ -76,6 +82,13 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
           });
         }
       }
+    } catch (err) {
+      console.error('Error in fetchLogs:', err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while fetching chat logs.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
