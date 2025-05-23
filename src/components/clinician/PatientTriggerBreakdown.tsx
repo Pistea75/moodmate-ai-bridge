@@ -47,14 +47,22 @@ export function PatientTriggerBreakdown({ patientId }: Props) {
       data?.forEach((entry) => {
         const entryNotes = entry.notes?.trim();
         
-        // Properly type and handle the triggers field
+        // Handle different potential types for triggers with proper type guards
         let validTriggers: string[] = [];
         
         if (entry.triggers) {
           if (Array.isArray(entry.triggers)) {
-            validTriggers = entry.triggers.map((t: string) => t.trim().toLowerCase()).filter(Boolean);
+            // If triggers is already an array, just map and clean it
+            validTriggers = entry.triggers
+              .filter((t): t is string => typeof t === 'string')
+              .map(t => t.trim().toLowerCase())
+              .filter(Boolean);
           } else if (typeof entry.triggers === 'string') {
-            validTriggers = entry.triggers.split(',').map((t: string) => t.trim().toLowerCase()).filter(Boolean);
+            // If triggers is a string, split it into an array
+            validTriggers = entry.triggers
+              .split(',')
+              .map(t => t.trim().toLowerCase())
+              .filter(Boolean);
           }
         }
 
