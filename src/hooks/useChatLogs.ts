@@ -39,7 +39,12 @@ export function useChatLogs(patientId: string, startDate?: string, endDate?: str
     if (error) {
       console.error('Error fetching chat logs:', error);
     } else {
-      setLogs(data || []);
+      setLogs(
+        (data || []).map((entry) => ({
+          ...entry,
+          role: entry.role as 'user' | 'assistant',
+        }))
+      );
     }
 
     setLoading(false);
