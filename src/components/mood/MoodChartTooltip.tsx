@@ -1,5 +1,6 @@
 
 import { MOOD_COLORS, MOOD_LABELS } from './MoodChartConstants';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -10,6 +11,8 @@ interface CustomTooltipProps {
 export function MoodChartTooltip({ active, payload, label }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     const mood = payload[0].value;
+    const isFlagged = payload[0].payload?.flagged;
+    
     if (mood === null) {
       return (
         <div className="bg-background p-3 rounded-md shadow-md border">
@@ -29,6 +32,11 @@ export function MoodChartTooltip({ active, payload, label }: CustomTooltipProps)
           />
           <p className="text-sm">{MOOD_LABELS[mood - 1]}</p>
         </div>
+        {isFlagged && (
+          <div className="text-xs text-red-600 mt-2 font-medium">
+            ⚠️ High-risk entry
+          </div>
+        )}
       </div>
     );
   }

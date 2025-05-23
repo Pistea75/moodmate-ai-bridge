@@ -22,7 +22,7 @@ export function MoodChart({ patientId }: MoodChartProps) {
     if (patientId) {
       const { data: entries, error } = await supabase
         .from('mood_entries')
-        .select('mood_score, created_at')
+        .select('mood_score, created_at, triggers')
         .eq('patient_id', patientId)
         .order('created_at', { ascending: true });
 
@@ -54,7 +54,7 @@ export function MoodChart({ patientId }: MoodChartProps) {
 
     const { data: entries, error } = await supabase
       .from('mood_entries')
-      .select('mood_score, created_at')
+      .select('mood_score, created_at, triggers')
       .eq('patient_id', userData.user.id)
       .order('created_at', { ascending: true });
 

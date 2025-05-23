@@ -7,15 +7,33 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts';
 import { MOOD_LABELS } from './MoodChartConstants';
 import { MoodChartTooltip } from './MoodChartTooltip';
 import { ChartData } from './MoodChartUtils';
+import { Alert, AlertTriangle } from 'lucide-react';
 
 interface MoodChartViewProps {
   data: ChartData[];
   view: 'daily' | 'weekly';
 }
+
+// Custom dot component to show warning icon for flagged entries
+const CustomDot = (props: any) => {
+  const { cx, cy, payload } = props;
+  
+  if (payload.flagged) {
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={4} fill="#7E69AB" stroke="#fff" strokeWidth={2} />
+        <text x={cx} y={cy - 8} textAnchor="middle" fill="#EF4444" fontSize={12}>⚠️</text>
+      </g>
+    );
+  }
+  
+  return <circle cx={cx} cy={cy} r={4} fill="#7E69AB" stroke="#fff" strokeWidth={2} />;
+};
 
 export function MoodChartView({ data, view }: MoodChartViewProps) {
   return (
@@ -40,7 +58,7 @@ export function MoodChartView({ data, view }: MoodChartViewProps) {
               dataKey="mood"
               stroke="#9b87f5"
               strokeWidth={3}
-              dot={{ fill: '#7E69AB', strokeWidth: 2, r: 4 }}
+              dot={<CustomDot />}
               activeDot={{ fill: '#6E59A5', r: 6 }}
               connectNulls
             />
