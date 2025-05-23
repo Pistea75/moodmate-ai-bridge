@@ -2,7 +2,7 @@
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Filter, Search, RefreshCw } from "lucide-react";
+import { Download, Eye, RefreshCw, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useAiChatReports } from '@/hooks/useAiChatReports';
 import { useState, useEffect } from 'react';
@@ -16,6 +16,8 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Reports() {
   const { reports, loading, error, fetchReports } = useAiChatReports();
@@ -23,6 +25,41 @@ export default function Reports() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deletingReportId, setDeletingReportId] = useState<string | null>(null);
+  const [patientNames, setPatientNames] = useState<{[key: string]: string}>({});
+
+  // Fetch patient names for display
+  useEffect(() => {
+    const fetchPatientNames = async () => {
+      const patientIds = [...new Set(reports.map(report => report.patient_id))].filter(Boolean);
+      
+      if (patientIds.length === 0) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', patientIds);
+
+        if (error) {
+          console.error('Error fetching patient names:', error);
+          return;
+        }
+
+        const nameMap: {[key: string]: string} = {};
+        data?.forEach(profile => {
+          const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+          nameMap[profile.id] = fullName || 'Unknown Patient';
+        });
+        
+        setPatientNames(nameMap);
+      } catch (err) {
+        console.error('Error fetching patient names:', err);
+      }
+    };
+
+    fetchPatientNames();
+  }, [reports]);
 
   // Debug logging
   useEffect(() => {
@@ -36,11 +73,20 @@ export default function Reports() {
   const reportTypes = [...new Set(reports.map(report => report.report_type))].filter(Boolean);
 
   const filteredReports = reports.filter(report => {
-    const matchesSearch = report.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          report.report_type?.toLowerCase().includes(searchTerm.toLowerCase());
+    const patientName = patientNames[report.patient_id] || '';
+    const reportTitle = formatReportTitle(report);
+    const matchesSearch = reportTitle.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          report.report_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          patientName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'all' || report.report_type === typeFilter;
     return matchesSearch && matchesType;
   });
+
+  const formatReportTitle = (report) => {
+    const patientName = patientNames[report.patient_id] || 'Unknown Patient';
+    const date = new Date(report.chat_date).toLocaleDateString();
+    return `${patientName} - ${date}`;
+  };
 
   const handleDownload = (report) => {
     if (!report.content) {
@@ -53,13 +99,37 @@ export default function Reports() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${report.title.replace(/\s+/g, '_')}.txt`;
+      const fileName = formatReportTitle(report).replace(/\s+/g, '_');
+      link.download = `${fileName}.txt`;
       link.click();
       window.URL.revokeObjectURL(url);
       toast.success("Report downloaded successfully");
     } catch (error) {
       console.error("Download error:", error);
       toast.error("Failed to download report");
+    }
+  };
+
+  const handleDelete = async (reportId: string) => {
+    try {
+      setDeletingReportId(reportId);
+      
+      const { error } = await supabase
+        .from('ai_chat_reports')
+        .delete()
+        .eq('id', reportId);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Report deleted successfully");
+      fetchReports(); // Refresh the list
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete report");
+    } finally {
+      setDeletingReportId(null);
     }
   };
 
@@ -91,11 +161,9 @@ export default function Reports() {
           <div className="space-y-1 flex-1">
             <Label htmlFor="search">Search Reports</Label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="search"
-                placeholder="Search by title or type..."
-                className="pl-9"
+                placeholder="Search by patient name, title or type..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -160,10 +228,8 @@ export default function Reports() {
               <Card key={report.id} className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-medium">{report.title}</h3>
+                    <h3 className="font-medium">{formatReportTitle(report)}</h3>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>Date: {new Date(report.chat_date).toLocaleDateString()}</span>
-                      <span>•</span>
                       <span>Type: {report.report_type}</span>
                       <span>•</span>
                       <span>Status: {report.status}</span>
@@ -189,6 +255,36 @@ export default function Reports() {
                       <Download className="h-4 w-4 mr-2" />
                       Download
                     </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Report</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this report? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleDelete(report.id)}
+                            disabled={deletingReportId === report.id}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            {deletingReportId === report.id ? "Deleting..." : "Delete"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </Card>
@@ -202,7 +298,7 @@ export default function Reports() {
             setModalOpen(false);
             setSelectedReport(null);
           }}
-          report={selectedReport}
+          report={selectedReport ? { ...selectedReport, title: formatReportTitle(selectedReport) } : null}
           onDownload={handleDownload}
         />
       </div>

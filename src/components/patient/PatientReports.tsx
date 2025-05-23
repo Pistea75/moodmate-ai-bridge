@@ -3,15 +3,18 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAiChatReports, AiChatReport } from '@/hooks/useAiChatReports';
-import { Eye, Download, RefreshCw } from "lucide-react";
+import { Eye, Download, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 export function PatientReports() {
   const { reports, loading, error, fetchReports } = useAiChatReports();
   const [selectedReport, setSelectedReport] = useState<AiChatReport | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
+  const [deletingReportId, setDeletingReportId] = useState<string | null>(null);
 
   const handleRefresh = () => {
     fetchReports();
@@ -42,6 +45,35 @@ export function PatientReports() {
       console.error("Download error:", error);
       toast.error("Failed to download report");
     }
+  };
+
+  const handleDelete = async (reportId: string) => {
+    try {
+      setDeletingReportId(reportId);
+      
+      const { error } = await supabase
+        .from('ai_chat_reports')
+        .delete()
+        .eq('id', reportId);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Report deleted successfully");
+      fetchReports(); // Refresh the list
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete report");
+    } finally {
+      setDeletingReportId(null);
+    }
+  };
+
+  const formatReportTitle = (report: AiChatReport) => {
+    const date = new Date(report.chat_date).toLocaleDateString();
+    // For patient reports, we'll show "Your Report" since it's their own report
+    return `Your Report - ${date}`;
   };
 
   return (
@@ -75,9 +107,9 @@ export function PatientReports() {
             {reports.map((report) => (
               <div key={report.id} className="p-3 border rounded-md flex justify-between items-center">
                 <div>
-                  <h3 className="font-medium text-sm">{report.title}</h3>
+                  <h3 className="font-medium text-sm">{formatReportTitle(report)}</h3>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(report.chat_date).toLocaleDateString()} · {report.report_type}
+                    {report.report_type} • {report.status}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -89,6 +121,32 @@ export function PatientReports() {
                     <Download className="h-4 w-4 mr-1" />
                     Download
                   </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-destructive hover:bg-destructive/10">
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Report</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this report? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDelete(report.id)}
+                          disabled={deletingReportId === report.id}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {deletingReportId === report.id ? "Deleting..." : "Delete"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             ))}
@@ -98,7 +156,7 @@ export function PatientReports() {
         <Dialog open={viewOpen} onOpenChange={setViewOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>{selectedReport?.title}</DialogTitle>
+              <DialogTitle>{selectedReport ? formatReportTitle(selectedReport) : ''}</DialogTitle>
             </DialogHeader>
             <ScrollArea className="h-[400px] w-full rounded-md border p-4 bg-muted/10 text-sm whitespace-pre-wrap">
               {selectedReport?.content || "This report has no content."}
