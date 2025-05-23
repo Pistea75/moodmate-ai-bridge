@@ -35,7 +35,15 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
           return;
         }
 
-        setLogs(data || []);
+        if (data) {
+          // Sanitize the data to ensure the role property conforms to LogEntry type
+          const sanitized = data.map(log => ({
+            ...log,
+            role: log.role === 'assistant' ? 'assistant' : 'user'
+          })) as LogEntry[];
+          
+          setLogs(sanitized);
+        }
       } catch (err) {
         console.error('Error in fetchLogs:', err);
       } finally {
