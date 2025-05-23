@@ -10,6 +10,8 @@ import {
   Settings, 
   User
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { PatientMoodBadge } from '@/components/clinician/PatientMoodBadge';
 
 export type NavItem = {
   name: string;
@@ -33,6 +35,7 @@ type PatientNavItemsProps = {
 
 export function PatientNavItems({ isMobile = false, onItemClick }: PatientNavItemsProps) {
   const location = useLocation();
+  const { user } = useAuth();
   
   if (isMobile) {
     return (
@@ -52,6 +55,13 @@ export function PatientNavItems({ isMobile = false, onItemClick }: PatientNavIte
             <span>{item.name}</span>
           </Link>
         ))}
+        
+        {/* Add mood badge for mobile view too */}
+        {user?.id && (
+          <div className="mt-6 px-4">
+            <PatientMoodBadge patientId={user.id} />
+          </div>
+        )}
       </div>
     );
   }
@@ -74,6 +84,13 @@ export function PatientNavItems({ isMobile = false, onItemClick }: PatientNavIte
           </Link>
         </li>
       ))}
+      
+      {/* Add mood badge at the bottom */}
+      {user?.id && (
+        <div className="mt-6 px-2">
+          <PatientMoodBadge patientId={user.id} />
+        </div>
+      )}
     </nav>
   );
 }
