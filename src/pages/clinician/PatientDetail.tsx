@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -128,6 +129,7 @@ export default function PatientDetail() {
             </div>
           </div>
           
+          {/* Tasks section moved up, right after the Mood section */}
           <PatientTasksSection patientId={patientId as string} />
           
           <PatientMoodHistory patientId={patientId as string} />
