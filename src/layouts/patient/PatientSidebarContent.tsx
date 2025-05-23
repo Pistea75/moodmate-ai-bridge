@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { PatientNavItems } from './PatientNavItems';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,7 +33,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
       
       {/* Profile section at bottom */}
       <div className="mt-auto border-t pt-4 px-3 pb-4">
-        <div className="flex items-center gap-3">
+        <Link to="/patient/profile" className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
             <AvatarFallback>{getInitial()}</AvatarFallback>
           </Avatar>
@@ -40,7 +41,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
             <span className="text-sm font-medium">{patientName}</span>
             <span className="text-xs text-muted-foreground">Patient</span>
           </div>
-        </div>
+        </Link>
         <div className="mt-2">
           <LogoutButton className="w-full justify-start text-sm" />
         </div>

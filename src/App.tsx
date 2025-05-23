@@ -1,4 +1,3 @@
-
 import { Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { AuthProvider } from './contexts/AuthContext';
@@ -41,6 +40,8 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Routes>
+          
+          
           <Route path="/" element={<Landing />} />
           <Route path="/features" element={<Features />} />
           <Route path="/about" element={<About />} />

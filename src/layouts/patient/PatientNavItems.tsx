@@ -24,6 +24,7 @@ export const patientNavItems: NavItem[] = [
   { name: 'Sessions', path: '/patient/sessions', icon: Calendar },
   { name: 'Insights', path: '/patient/insights', icon: BarChart },
   { name: 'Settings', path: '/patient/settings', icon: Settings },
+  { name: 'Profile', path: '/patient/profile', icon: User },
 ];
 
 type PatientNavItemsProps = {
