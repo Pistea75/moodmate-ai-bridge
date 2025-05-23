@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -11,6 +10,7 @@ import { PatientDetailSkeleton } from '@/components/clinician/PatientDetailSkele
 import { PatientDetailError } from '@/components/clinician/PatientDetailError';
 import { PatientMoodTimeBreakdown } from '@/components/clinician/PatientMoodTimeBreakdown';
 import { PatientTriggerBreakdown } from '@/components/clinician/PatientTriggerBreakdown';
+import { PatientMoodHistory } from '@/components/clinician/PatientMoodHistory';
 
 interface PatientProfile {
   id: string;
@@ -123,6 +123,8 @@ export default function PatientDetail() {
               <PatientTriggerBreakdown patientId={patientId} />
             </div>
           </div>
+          
+          <PatientMoodHistory patientId={patientId} />
 
           <PatientTasksSection patientId={patientId} />
         </div>
