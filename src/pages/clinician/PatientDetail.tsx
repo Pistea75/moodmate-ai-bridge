@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -11,6 +12,7 @@ import { PatientDetailError } from '@/components/clinician/PatientDetailError';
 import { PatientMoodTimeBreakdown } from '@/components/clinician/PatientMoodTimeBreakdown';
 import { PatientTriggerBreakdown } from '@/components/clinician/PatientTriggerBreakdown';
 import { PatientMoodHistory } from '@/components/clinician/PatientMoodHistory';
+import { MoodReportPDF } from '@/components/clinician/MoodReportPDF';
 
 interface PatientProfile {
   id: string;
@@ -113,20 +115,23 @@ export default function PatientDetail() {
               {patient.first_name} {patient.last_name}'s Profile
             </h1>
           </div>
+          <div>
+            <MoodReportPDF patientId={patientId as string} patientName={patientFullName} />
+          </div>
         </div>
 
         <div className="grid gap-6">
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-            <PatientMoodSection patientId={patientId} patientName={patientFullName} />
+            <PatientMoodSection patientId={patientId as string} patientName={patientFullName} />
             <div className="grid gap-6">
-              <PatientMoodTimeBreakdown patientId={patientId} />
-              <PatientTriggerBreakdown patientId={patientId} />
+              <PatientMoodTimeBreakdown patientId={patientId as string} />
+              <PatientTriggerBreakdown patientId={patientId as string} />
             </div>
           </div>
           
-          <PatientMoodHistory patientId={patientId} />
+          <PatientMoodHistory patientId={patientId as string} />
 
-          <PatientTasksSection patientId={patientId} />
+          <PatientTasksSection patientId={patientId as string} />
         </div>
       </div>
     </ClinicianLayout>
