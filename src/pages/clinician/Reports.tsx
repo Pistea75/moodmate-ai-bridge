@@ -6,6 +6,7 @@ import { Download, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useAiChatReports } from '@/hooks/useAiChatReports';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function Reports() {
   const { reports, loading, error } = useAiChatReports();
@@ -17,13 +18,24 @@ export default function Reports() {
   );
 
   const handleDownload = (report) => {
-    const blob = new Blob([report.content], { type: 'text/plain;charset=utf-8' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${report.title.replace(/\s+/g, '_')}.txt`;
-    link.click();
-    window.URL.revokeObjectURL(url);
+    if (!report.content) {
+      toast.error("This report has no content to download.");
+      return;
+    }
+    
+    try {
+      const blob = new Blob([report.content], { type: 'text/plain;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${report.title.replace(/\s+/g, '_')}.txt`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      toast.success("Report downloaded successfully");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download report");
+    }
   };
 
   return (
