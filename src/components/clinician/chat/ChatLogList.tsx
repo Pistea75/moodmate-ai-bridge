@@ -2,7 +2,7 @@
 import { FC } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChatLogEntry } from './ChatLogEntry';
-import { LogEntry } from '@/hooks/usePatientAIChatLogs';
+import { LogEntry } from '@/hooks/usePatientAIChatLogs/types';
 
 interface ChatLogListProps {
   logs: LogEntry[];
