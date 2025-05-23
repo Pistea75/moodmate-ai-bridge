@@ -14,8 +14,20 @@ interface PatientTaskCardProps {
 }
 
 export function PatientTaskCard({ task, formatDate }: PatientTaskCardProps) {
+  // Check if task is overdue
+  const isOverdue = new Date(task.due_date) < new Date() && !task.completed;
+  
   return (
-    <Card key={task.id} className={`p-4 ${task.completed ? 'bg-muted/50' : ''}`}>
+    <Card 
+      key={task.id} 
+      className={`p-4 transition-shadow ${
+        task.completed 
+          ? 'bg-green-50 border-green-200' 
+          : isOverdue
+            ? 'bg-red-50 border-red-200'
+            : 'bg-white'
+      }`}
+    >
       <div className="flex items-start gap-3">
         <div className={`mt-1 size-5 rounded-full border flex-shrink-0 ${
           task.completed 
@@ -33,7 +45,10 @@ export function PatientTaskCard({ task, formatDate }: PatientTaskCardProps) {
             <h3 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
               {task.title}
             </h3>
-            <span className="text-xs text-muted-foreground">{formatDate(task.due_date)}</span>
+            <span className={`text-xs ${isOverdue ? 'text-red-700 font-medium' : 'text-muted-foreground'}`}>
+              {formatDate(task.due_date)}
+              {isOverdue && ' (overdue)'}
+            </span>
           </div>
           <p className={`text-sm mt-1 ${task.completed ? 'text-muted-foreground' : ''}`}>
             {task.description}

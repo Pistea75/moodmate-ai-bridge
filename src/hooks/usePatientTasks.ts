@@ -53,7 +53,16 @@ export function usePatientTasks(patientId?: string) {
         .order('due_date', { ascending: true });
           
       if (supabaseError) throw new Error(supabaseError.message);
-      setTasks(data || []);
+
+      // Sort tasks: incomplete first, then by closest due date
+      const sortedTasks = (data || []).sort((a, b) => {
+        if (a.completed !== b.completed) {
+          return a.completed ? 1 : -1; // incomplete first
+        }
+        return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+      });
+      
+      setTasks(sortedTasks);
     } catch (err) {
       console.error('Error fetching tasks:', err);
       setError(err instanceof Error ? err : new Error('Unknown error'));

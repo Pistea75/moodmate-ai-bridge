@@ -7,6 +7,7 @@ import { PatientMoodInsights } from '@/components/clinician/PatientMoodInsights'
 import { getMostCommonTriggers } from '@/lib/analyzeMoodTriggers';
 import { isHighRiskMood } from '@/lib/utils/alertTriggers';
 import { detectMoodDrop, detectLowMoodStreak, detectTriggerFrequency } from '@/lib/utils/moodInsights';
+import { MOOD_LABELS } from '@/components/mood/MoodChartConstants';
 
 function normalizeMood(score: number) {
   return Math.max(1, Math.min(5, Math.ceil(score / 2))); // Convert 1–10 to 1–5
@@ -26,16 +27,22 @@ export function PatientMoodSection({ patientId, patientName }: PatientMoodSectio
     lowestDay: string;
   } | null>(null);
   const [topTriggers, setTopTriggers] = useState<string[]>([]);
+  const [weeklyAverage, setWeeklyAverage] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchMoodData = async () => {
       try {
         setLoading(true);
         
+        // Get entries from the last 7 days for the weekly average
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        
         const { data, error } = await supabase
           .from('mood_entries')
           .select('mood_score, created_at, triggers')
           .eq('patient_id', patientId)
+          .gte('created_at', oneWeekAgo.toISOString())
           .order('created_at', { ascending: true });
 
         if (error) throw error;
@@ -44,8 +51,13 @@ export function PatientMoodSection({ patientId, patientName }: PatientMoodSectio
         // Debug log for triggers
         console.log("Mood entries triggers:", data?.map(d => d.triggers));
 
-        // Process triggers if we have data
+        // Calculate weekly average mood
         if (data && data.length > 0) {
+          const totalMood = data.reduce((sum, entry) => sum + normalizeMood(entry.mood_score), 0);
+          const avgMood = Math.round(totalMood / data.length);
+          setWeeklyAverage(avgMood);
+          
+          // Process triggers
           const mostCommonTriggers = getMostCommonTriggers(data);
           setTopTriggers(mostCommonTriggers);
 
@@ -103,6 +115,20 @@ export function PatientMoodSection({ patientId, patientName }: PatientMoodSectio
         </div>
       ) : (
         <>
+          {weeklyAverage && (
+            <div className="mb-4 flex items-center">
+              <div className="bg-muted/20 px-3 py-2 rounded-lg inline-flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: ['#F87171', '#FCD34D', '#A3E635', '#34D399', '#60A5FA'][weeklyAverage - 1] }} 
+                />
+                <span className="text-sm">
+                  Weekly Average Mood: <span className="font-medium">{MOOD_LABELS[weeklyAverage - 1]}</span>
+                </span>
+              </div>
+            </div>
+          )}
+
           {dropAlert && (
             <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 p-3 mb-4 rounded-md text-sm">
               ⚠️ {dropAlert}

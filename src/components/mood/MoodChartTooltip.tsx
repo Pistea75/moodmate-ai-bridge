@@ -12,6 +12,7 @@ export function MoodChartTooltip({ active, payload, label }: CustomTooltipProps)
   if (active && payload && payload.length) {
     const mood = payload[0].value;
     const isFlagged = payload[0].payload?.flagged;
+    const notes = payload[0].payload?.notes;
     
     if (mood === null) {
       return (
@@ -36,6 +37,11 @@ export function MoodChartTooltip({ active, payload, label }: CustomTooltipProps)
           <div className="text-xs text-red-600 mt-2 font-medium">
             ⚠️ High-risk entry
           </div>
+        )}
+        {notes && (
+          <p className="text-xs text-muted-foreground mt-1 italic max-w-xs">
+            "{notes.length > 100 ? notes.slice(0, 100) + '...' : notes}"
+          </p>
         )}
       </div>
     );
