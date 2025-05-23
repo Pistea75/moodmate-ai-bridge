@@ -28,6 +28,13 @@ export default function Reports() {
   const [deletingReportId, setDeletingReportId] = useState<string | null>(null);
   const [patientNames, setPatientNames] = useState<{[key: string]: string}>({});
 
+  // Move formatReportTitle function to the top, before it's used
+  const formatReportTitle = (report) => {
+    const patientName = patientNames[report.patient_id] || 'Unknown Patient';
+    const date = new Date(report.chat_date).toLocaleDateString();
+    return `${patientName} - ${date}`;
+  };
+
   // Fetch patient names for display
   useEffect(() => {
     const fetchPatientNames = async () => {
@@ -81,12 +88,6 @@ export default function Reports() {
     const matchesType = typeFilter === 'all' || report.report_type === typeFilter;
     return matchesSearch && matchesType;
   });
-
-  const formatReportTitle = (report) => {
-    const patientName = patientNames[report.patient_id] || 'Unknown Patient';
-    const date = new Date(report.chat_date).toLocaleDateString();
-    return `${patientName} - ${date}`;
-  };
 
   const handleDownload = (report) => {
     if (!report.content) {
