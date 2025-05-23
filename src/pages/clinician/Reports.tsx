@@ -8,17 +8,31 @@ import { useAiChatReports } from '@/hooks/useAiChatReports';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ReportViewerModal } from '@/components/clinician/ReportViewerModal';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue 
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 export default function Reports() {
   const { reports, loading, error } = useAiChatReports();
   const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const filteredReports = reports.filter(report => 
-    report.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    report.report_type?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Extract unique report types for the filter dropdown
+  const reportTypes = [...new Set(reports.map(report => report.report_type))].filter(Boolean);
+
+  const filteredReports = reports.filter(report => {
+    const matchesSearch = report.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          report.report_type?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = typeFilter === 'all' || report.report_type === typeFilter;
+    return matchesSearch && matchesType;
+  });
 
   const handleDownload = (report) => {
     if (!report.content) {
@@ -49,20 +63,39 @@ export default function Reports() {
             <h1 className="text-2xl font-bold">AI Chat Reports</h1>
             <p className="text-muted-foreground">View and analyze patient chat sessions</p>
           </div>
-          <div className="flex items-center gap-4">
+        </div>
+
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="space-y-1 flex-1">
+            <Label htmlFor="search">Search Reports</Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search reports..."
-                className="w-[250px] pl-9"
+                id="search"
+                placeholder="Search by title or type..."
+                className="pl-9"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
+          </div>
+
+          <div className="space-y-1 w-[180px]">
+            <Label htmlFor="type-filter">Report Type</Label>
+            <Select 
+              value={typeFilter} 
+              onValueChange={setTypeFilter}
+            >
+              <SelectTrigger id="type-filter">
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {reportTypes.map(type => (
+                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -73,7 +106,7 @@ export default function Reports() {
             <p className="text-red-500">Error: {error}</p>
           ) : filteredReports.length === 0 ? (
             <p className="text-muted-foreground">
-              {searchTerm ? "No matching reports found." : "No reports available."}
+              {searchTerm || typeFilter !== 'all' ? "No matching reports found." : "No reports available."}
             </p>
           ) : (
             filteredReports.map((report) => (
