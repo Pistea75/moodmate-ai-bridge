@@ -1,6 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
 export interface AiChatReport {
   id: string;
@@ -18,43 +20,36 @@ export function useAiChatReports() {
   const [reports, setReports] = useState<AiChatReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user, userRole } = useAuth();
 
   const fetchReports = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data: userData, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !userData.user) {
+      if (!user) {
         setError("User not authenticated");
         setLoading(false);
         return;
       }
 
-      const userId = userData.user.id;
-      console.log("Fetching reports for clinician:", userId);
-
-      // Check if we have any patient-clinician links first
-      const { data: links, error: linksError } = await supabase
-        .from('patient_clinician_links')
-        .select('patient_id')
-        .eq('clinician_id', userId);
-
-      if (linksError) {
-        console.error('Error fetching patient links:', linksError);
-        setError(linksError.message);
-        setLoading(false);
-        return;
+      const userId = user.id;
+      console.log(`Fetching reports for ${userRole}:`, userId);
+      
+      let query = supabase.from('ai_chat_reports').select('*');
+      
+      // Apply different filters based on user role
+      if (userRole === 'clinician') {
+        // For clinicians, we rely on RLS policies to filter reports from linked patients
+        console.log("Using clinician report filtering");
+      } else if (userRole === 'patient') {
+        // For patients, only show their own reports
+        console.log("Filtering reports for patient:", userId);
+        query = query.eq('patient_id', userId);
       }
-
-      console.log("Patient links found:", links?.length || 0);
-
-      // Fetch reports where clinician can access them through RLS policy
-      const { data, error } = await supabase
-        .from('ai_chat_reports')
-        .select('*')
-        .order('chat_date', { ascending: false });
+      
+      // Always order by most recent first
+      const { data, error } = await query.order('chat_date', { ascending: false });
 
       if (error) {
         console.error('Error loading reports:', error);
@@ -73,8 +68,10 @@ export function useAiChatReports() {
   };
 
   useEffect(() => {
-    fetchReports();
-  }, []);
+    if (user) {
+      fetchReports();
+    }
+  }, [user, userRole]);
 
   return { reports, loading, error, fetchReports };
 }
