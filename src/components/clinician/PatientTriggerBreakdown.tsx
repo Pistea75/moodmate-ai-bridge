@@ -58,8 +58,8 @@ export function PatientTriggerBreakdown({ patientId }: Props) {
               .map(t => t.trim().toLowerCase())
               .filter(Boolean);
           } else if (typeof entry.triggers === 'string') {
-            // If triggers is a string, split it into an array
-            validTriggers = entry.triggers
+            // If triggers is a string, split it into an array using type assertion
+            validTriggers = (entry.triggers as string)
               .split(',')
               .map(t => t.trim().toLowerCase())
               .filter(Boolean);
