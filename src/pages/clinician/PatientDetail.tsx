@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -13,6 +12,8 @@ import { PatientMoodTimeBreakdown } from '@/components/clinician/PatientMoodTime
 import { PatientTriggerBreakdown } from '@/components/clinician/PatientTriggerBreakdown';
 import { PatientMoodHistory } from '@/components/clinician/PatientMoodHistory';
 import { MoodReportPDF } from '@/components/clinician/MoodReportPDF';
+import { PatientSessionRecap } from '@/components/clinician/PatientSessionRecap';
+import { PatientMoodAlertFeed } from '@/components/clinician/PatientMoodAlertFeed';
 
 interface PatientProfile {
   id: string;
@@ -127,6 +128,11 @@ export default function PatientDetail() {
               <PatientMoodTimeBreakdown patientId={patientId as string} />
               <PatientTriggerBreakdown patientId={patientId as string} />
             </div>
+          </div>
+          
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+            <PatientSessionRecap patientId={patientId as string} />
+            <PatientMoodAlertFeed patientId={patientId as string} />
           </div>
           
           {/* Tasks section moved up, right after the Mood section */}
