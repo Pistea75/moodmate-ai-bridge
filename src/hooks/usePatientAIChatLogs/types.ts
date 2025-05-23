@@ -1,5 +1,4 @@
 
-
 export interface LogEntry {
   id: string;
   role: 'user' | 'assistant';
@@ -25,4 +24,3 @@ export interface UseChatLogsResult {
   handleSaveReport: () => Promise<void>;
   refreshLogs: () => Promise<void>;
 }
-
