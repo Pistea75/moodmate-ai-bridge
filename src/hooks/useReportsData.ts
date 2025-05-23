@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAiChatReports } from '@/hooks/useAiChatReports';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,9 +11,12 @@ export function useReportsData() {
   // Fetch patient names for display
   useEffect(() => {
     const fetchPatientNames = async () => {
+      // Get unique patient IDs from reports (these should be the patients whose chats were summarized)
       const patientIds = [...new Set(reports.map(report => report.patient_id))].filter(Boolean);
       
       if (patientIds.length === 0) return;
+
+      console.log('Fetching patient names for IDs:', patientIds);
 
       try {
         const { data, error } = await supabase
@@ -27,22 +29,28 @@ export function useReportsData() {
           return;
         }
 
+        console.log('Fetched patient profiles:', data);
+
         const nameMap: {[key: string]: string} = {};
         data?.forEach(profile => {
           const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
           nameMap[profile.id] = fullName || 'Unknown Patient';
         });
         
+        console.log('Patient name mapping:', nameMap);
         setPatientNames(nameMap);
       } catch (err) {
         console.error('Error fetching patient names:', err);
       }
     };
 
-    fetchPatientNames();
+    if (reports.length > 0) {
+      fetchPatientNames();
+    }
   }, [reports]);
 
   const formatReportTitle = (report: any) => {
+    // Use the patient_id to get the correct patient name (whose chat this report is about)
     const patientName = patientNames[report.patient_id] || 'Unknown Patient';
     const date = new Date(report.chat_date).toLocaleDateString();
     return `${patientName} - ${date}`;
