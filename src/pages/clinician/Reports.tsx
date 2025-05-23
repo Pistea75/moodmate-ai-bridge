@@ -2,10 +2,10 @@
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Filter, Search } from "lucide-react";
+import { Download, Eye, Filter, Search, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useAiChatReports } from '@/hooks/useAiChatReports';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { ReportViewerModal } from '@/components/clinician/ReportViewerModal';
 import { 
@@ -18,11 +18,19 @@ import {
 import { Label } from "@/components/ui/label";
 
 export default function Reports() {
-  const { reports, loading, error } = useAiChatReports();
+  const { reports, loading, error, fetchReports } = useAiChatReports();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('Reports page - loading:', loading);
+    console.log('Reports page - error:', error);
+    console.log('Reports page - reports count:', reports.length);
+    console.log('Reports page - reports data:', reports);
+  }, [loading, error, reports]);
 
   // Extract unique report types for the filter dropdown
   const reportTypes = [...new Set(reports.map(report => report.report_type))].filter(Boolean);
@@ -55,6 +63,12 @@ export default function Reports() {
     }
   };
 
+  const handleRefresh = () => {
+    console.log('Refreshing reports...');
+    fetchReports();
+    toast.success("Reports refreshed");
+  };
+
   return (
     <ClinicianLayout>
       <div className="space-y-6">
@@ -63,6 +77,14 @@ export default function Reports() {
             <h1 className="text-2xl font-bold">AI Chat Reports</h1>
             <p className="text-muted-foreground">View and analyze patient chat sessions</p>
           </div>
+          <Button 
+            onClick={handleRefresh} 
+            variant="outline"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         </div>
 
         <div className="flex flex-wrap gap-4 items-end">
@@ -99,15 +121,40 @@ export default function Reports() {
           </div>
         </div>
 
+        {/* Debug information in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <Card className="p-4 bg-muted/50">
+            <h3 className="font-medium mb-2">Debug Information</h3>
+            <div className="text-sm space-y-1">
+              <p>Loading: {loading ? 'true' : 'false'}</p>
+              <p>Error: {error || 'none'}</p>
+              <p>Reports found: {reports.length}</p>
+              <p>Filtered reports: {filteredReports.length}</p>
+            </div>
+          </Card>
+        )}
+
         <div className="grid gap-4">
           {loading ? (
             <p className="text-muted-foreground">Loading reports...</p>
           ) : error ? (
-            <p className="text-red-500">Error: {error}</p>
+            <Card className="p-4 border-destructive">
+              <p className="text-destructive">Error: {error}</p>
+              <Button onClick={handleRefresh} variant="outline" className="mt-2">
+                Try Again
+              </Button>
+            </Card>
           ) : filteredReports.length === 0 ? (
-            <p className="text-muted-foreground">
-              {searchTerm || typeFilter !== 'all' ? "No matching reports found." : "No reports available."}
-            </p>
+            <Card className="p-4">
+              <p className="text-muted-foreground">
+                {searchTerm || typeFilter !== 'all' ? "No matching reports found." : "No reports available."}
+              </p>
+              {reports.length === 0 && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Reports will appear here after patients generate AI chat summaries.
+                </p>
+              )}
+            </Card>
           ) : (
             filteredReports.map((report) => (
               <Card key={report.id} className="p-4">

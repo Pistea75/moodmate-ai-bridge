@@ -35,10 +35,25 @@ export function useAiChatReports() {
       const userId = userData.user.id;
       console.log("Fetching reports for clinician:", userId);
 
+      // Check if we have any patient-clinician links first
+      const { data: links, error: linksError } = await supabase
+        .from('patient_clinician_links')
+        .select('patient_id')
+        .eq('clinician_id', userId);
+
+      if (linksError) {
+        console.error('Error fetching patient links:', linksError);
+        setError(linksError.message);
+        setLoading(false);
+        return;
+      }
+
+      console.log("Patient links found:", links?.length || 0);
+
+      // Fetch reports where clinician can access them through RLS policy
       const { data, error } = await supabase
         .from('ai_chat_reports')
         .select('*')
-        .eq('clinician_id', userId)
         .order('chat_date', { ascending: false });
 
       if (error) {
@@ -46,6 +61,7 @@ export function useAiChatReports() {
         setError(error.message);
       } else {
         console.log("Retrieved reports:", data?.length || 0);
+        console.log("Reports data:", data);
         setReports(data || []);
       }
     } catch (e) {
