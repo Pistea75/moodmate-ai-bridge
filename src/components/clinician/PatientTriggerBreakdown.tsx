@@ -46,11 +46,15 @@ export function PatientTriggerBreakdown({ patientId }: Props) {
 
       data?.forEach((entry) => {
         const entryNotes = entry.notes?.trim();
-        const validTriggers = Array.isArray(entry.triggers)
-          ? entry.triggers.map((t) => t.trim().toLowerCase()).filter(Boolean)
-          : typeof entry.triggers === 'string'
-            ? entry.triggers.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
-            : [];
+        
+        // Fix the TypeScript error by properly handling different types of triggers
+        let validTriggers: string[] = [];
+        
+        if (Array.isArray(entry.triggers)) {
+          validTriggers = entry.triggers.map((t) => t.trim().toLowerCase()).filter(Boolean);
+        } else if (typeof entry.triggers === 'string') {
+          validTriggers = entry.triggers.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+        }
 
         validTriggers.forEach((trigger) => {
           if (!trigger) return;
