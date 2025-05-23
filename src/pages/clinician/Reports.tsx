@@ -5,9 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Download, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useAiChatReports } from '@/hooks/useAiChatReports';
+import { useState } from 'react';
 
 export default function Reports() {
   const { reports, loading, error } = useAiChatReports();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredReports = reports.filter(report => 
+    report.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    report.report_type?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <ClinicianLayout>
@@ -23,6 +30,8 @@ export default function Reports() {
               <Input
                 placeholder="Search reports..."
                 className="w-[250px] pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <Button variant="outline">
@@ -37,10 +46,12 @@ export default function Reports() {
             <p className="text-muted-foreground">Loading reports...</p>
           ) : error ? (
             <p className="text-red-500">Error: {error}</p>
-          ) : reports.length === 0 ? (
-            <p className="text-muted-foreground">No reports available.</p>
+          ) : filteredReports.length === 0 ? (
+            <p className="text-muted-foreground">
+              {searchTerm ? "No matching reports found." : "No reports available."}
+            </p>
           ) : (
-            reports.map((report) => (
+            filteredReports.map((report) => (
               <Card key={report.id} className="p-4">
                 <div className="flex items-center justify-between">
                   <div>

@@ -23,30 +23,37 @@ export function useAiChatReports() {
     setLoading(true);
     setError(null);
 
-    const { data: userData, error: authError } = await supabase.auth.getUser();
+    try {
+      const { data: userData, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !userData.user) {
-      setError("User not authenticated");
+      if (authError || !userData.user) {
+        setError("User not authenticated");
+        setLoading(false);
+        return;
+      }
+
+      const userId = userData.user.id;
+      console.log("Fetching reports for clinician:", userId);
+
+      const { data, error } = await supabase
+        .from('ai_chat_reports')
+        .select('*')
+        .eq('clinician_id', userId)
+        .order('chat_date', { ascending: false });
+
+      if (error) {
+        console.error('Error loading reports:', error);
+        setError(error.message);
+      } else {
+        console.log("Retrieved reports:", data?.length || 0);
+        setReports(data || []);
+      }
+    } catch (e) {
+      console.error("Unexpected error:", e);
+      setError(e instanceof Error ? e.message : "Unknown error occurred");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const userId = userData.user.id;
-
-    const { data, error } = await supabase
-      .from('ai_chat_reports')
-      .select('*')
-      .eq('clinician_id', userId) // adjust if needed to show based on role
-      .order('chat_date', { ascending: false });
-
-    if (error) {
-      console.error('Error loading reports:', error);
-      setError(error.message);
-    } else {
-      setReports(data || []);
-    }
-
-    setLoading(false);
   };
 
   useEffect(() => {
