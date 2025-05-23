@@ -5,6 +5,9 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { isHighRiskMood } from '@/lib/utils/alertTriggers';
 import { format } from 'date-fns';
+import { MOOD_LABELS, MOOD_COLORS } from '@/components/mood/MoodChartConstants';
+import { Badge } from '@/components/ui/badge';
+import { normalizeMood } from '@/components/mood/MoodChartUtils';
 
 interface MoodEntry {
   created_at: string;
@@ -34,9 +37,18 @@ export function PatientMoodHistory({ patientId }: { patientId: string }) {
     fetchMoodHistory();
   }, [patientId]);
 
-  const getMoodLabel = (score: number) => {
-    const norm = Math.ceil(score / 2);
-    return ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'][norm - 1];
+  const formatTriggers = (triggers: string[] | null) => {
+    if (!triggers || triggers.length === 0) return '—';
+    
+    return (
+      <div className="flex flex-wrap gap-1">
+        {triggers.map((trigger, idx) => (
+          <Badge key={idx} variant="outline" className="text-xs bg-muted">
+            {trigger}
+          </Badge>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -51,28 +63,46 @@ export function PatientMoodHistory({ patientId }: { patientId: string }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead>Level</TableHead>
-                <TableHead>Triggers</TableHead>
+                <TableHead>Mood</TableHead>
                 <TableHead>Notes</TableHead>
-                <TableHead>⚠️</TableHead>
+                <TableHead>Triggers</TableHead>
+                <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {entries.map((entry, index) => {
+                const normalized = normalizeMood(entry.mood_score) - 1;
                 const flagged = isHighRiskMood(entry.mood_score, entry.triggers || []);
+                
                 return (
                   <TableRow
                     key={index}
                     className={flagged ? 'bg-red-50 text-red-700' : ''}
                   >
-                    <TableCell>{format(new Date(entry.created_at), 'MMM dd')}</TableCell>
-                    <TableCell>{entry.mood_score}</TableCell>
-                    <TableCell>{getMoodLabel(entry.mood_score)}</TableCell>
-                    <TableCell>{(entry.triggers || []).join(', ')}</TableCell>
-                    <TableCell className="max-w-xs truncate">{entry.notes || '-'}</TableCell>
-                    <TableCell>{flagged ? '🚨' : ''}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: MOOD_COLORS[normalized] }}
+                        />
+                        <span>
+                          {entry.mood_score} – {MOOD_LABELS[normalized]}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate" title={entry.notes || ''}>
+                      {entry.notes || '—'}
+                    </TableCell>
+                    <TableCell>
+                      {formatTriggers(entry.triggers)}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(entry.created_at).toLocaleDateString(undefined, {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </TableCell>
                   </TableRow>
                 );
               })}
