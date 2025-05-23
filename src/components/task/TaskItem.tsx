@@ -1,15 +1,10 @@
 
 import { Check, Calendar } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Task } from './TaskListUtils';
 
 interface TaskItemProps {
-  task: {
-    id: string;
-    title: string;
-    description: string;
-    dueDate: string;
-    completed: boolean;
-  };
+  task: Task;
   variant: 'patient' | 'clinician';
   toggleTaskCompletion: (taskId: string) => void;
   formatDate: (dateString: string) => string;

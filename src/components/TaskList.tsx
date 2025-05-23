@@ -1,9 +1,16 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { TaskItem } from './task/TaskItem';
-import { formatDate, isOverdue, isToday, filterTasks, getEmptyTaskMessage } from './task/TaskListUtils';
+import { 
+  formatDate, 
+  isOverdue, 
+  isToday, 
+  filterTasks, 
+  getEmptyTaskMessage,
+  Task,
+  convertDatabaseTasksToUITasks
+} from './task/TaskListUtils';
 import { TaskListSkeleton } from './task/TaskListSkeleton';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Circle } from 'lucide-react';
@@ -19,7 +26,7 @@ type Task = {
 interface TaskListProps {
   variant?: 'patient' | 'clinician';
   patientName?: string;
-  tasks?: Task[];
+  tasks?: any[]; // Accept any task type from the parent
   onTaskUpdate?: (taskId: string, completed: boolean) => void;
   loading?: boolean;
 }
@@ -31,11 +38,13 @@ export function TaskList({
   onTaskUpdate,
   loading = false
 }: TaskListProps) {
-  const [localTasks, setLocalTasks] = useState<Task[]>(tasks);
+  const [localTasks, setLocalTasks] = useState<Task[]>([]);
   const [showCompleted, setShowCompleted] = useState(false);
   
-  // Use provided tasks if available, otherwise use local state
-  const displayTasks = tasks.length > 0 ? tasks : localTasks;
+  // Convert incoming tasks to our UI format if needed and use them, otherwise use local state
+  const displayTasks: Task[] = tasks.length > 0 
+    ? convertDatabaseTasksToUITasks(tasks)
+    : localTasks;
   
   // Filter tasks based on completion status
   const filteredTasks = filterTasks(displayTasks, showCompleted);
@@ -51,10 +60,12 @@ export function TaskList({
     }
 
     // Otherwise handle it internally
-    setLocalTasks(tasks.map(task => task.id === taskId ? {
-      ...task,
-      completed: !task.completed
-    } : task));
+    setLocalTasks(prevTasks => prevTasks.map(task => 
+      task.id === taskId ? {
+        ...task,
+        completed: !task.completed
+      } : task
+    ));
 
     // In a real app, you would also update this in your database
     try {
@@ -65,7 +76,7 @@ export function TaskList({
       toast.error("Failed to update task status");
 
       // Revert the change if there's an error
-      setLocalTasks(tasks.map(task => task));
+      setLocalTasks(prevTasks => [...prevTasks]);
     }
   };
   
