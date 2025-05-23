@@ -18,11 +18,13 @@ type Message = {
 interface AudioChatInterfaceProps {
   isClinicianView?: boolean;
   clinicianName?: string;
+  systemPrompt?: string; // Add system prompt prop
 }
 
 export function AudioChatInterface({
   isClinicianView,
-  clinicianName = "Martinez"
+  clinicianName = "Martinez",
+  systemPrompt = "You are Dr. Martinez, a compassionate mental health assistant. Provide supportive and professional responses to the patient."
 }: AudioChatInterfaceProps) {
   const { toast } = useToast();
   const [isRecording, setIsRecording] = useState(false);
@@ -73,7 +75,8 @@ export function AudioChatInterface({
       
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: {
-          messages: updatedHistory
+          messages: updatedHistory,
+          systemPrompt // Pass the system prompt to the edge function
         }
       });
 

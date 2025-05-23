@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { AudioChatInterface } from '@/components/AudioChatInterface';
@@ -10,6 +9,9 @@ export default function PatientChat() {
   const { user } = useAuth();
   const [clinicianName, setClinicianName] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // Custom system prompt for CBT-focused assistance
+  const systemPrompt = "You are a supportive mental health assistant trained in CBT. Your goal is to help users process difficult thoughts, challenge cognitive distortions, and identify positive coping strategies. Always be empathetic, evidence-based, and non-judgmental. Address the user as a caring professional would, but do not diagnose or provide medical advice.";
 
   useEffect(() => {
     const fetchClinicianDetails = async () => {
@@ -46,7 +48,10 @@ export default function PatientChat() {
   return (
     <PatientLayout>
       <div className="container mx-auto px-4">
-        <AudioChatInterface clinicianName={clinicianName || 'Martinez'} />
+        <AudioChatInterface 
+          clinicianName={clinicianName || 'Martinez'} 
+          systemPrompt={systemPrompt}
+        />
       </div>
     </PatientLayout>
   );

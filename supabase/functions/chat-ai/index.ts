@@ -16,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, systemPrompt } = await req.json();
 
     if (!Array.isArray(messages)) {
       return new Response(
@@ -28,6 +28,10 @@ serve(async (req) => {
       );
     }
 
+    // Use the provided system prompt or fall back to default
+    const finalSystemPrompt = systemPrompt || 
+      'You are Dr. Martinez, a compassionate mental health assistant. Provide supportive and professional responses to the patient.';
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -37,7 +41,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are Dr. Martinez, a compassionate mental health assistant. Provide supportive and professional responses to the patient.' },
+          { role: 'system', content: finalSystemPrompt },
           ...messages
         ],
       }),
