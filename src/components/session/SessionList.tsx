@@ -13,12 +13,14 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, 
   AlertDialogFooter, AlertDialogCancel, AlertDialogAction 
 } from "@/components/ui/alert-dialog";
+import { SessionRecapModal } from "@/components/clinician/SessionRecapModal";
 
 export type PatientSession = {
   id: string;
   scheduled_time: string;
   duration_minutes: number;
   clinician_name: string;
+  notes?: string;
 };
 
 interface SessionListProps {
@@ -128,6 +130,13 @@ export function SessionList({
                   {format(new Date(session.scheduled_time), "p")} ({session.duration_minutes} min)
                 </span>
               </div>
+              
+              {/* Display session notes if they exist */}
+              {session.notes && (
+                <div className="mt-2 pt-2 border-t text-sm text-muted-foreground">
+                  <p>{session.notes}</p>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2">
               {!isPast(session.scheduled_time, session.duration_minutes) && (

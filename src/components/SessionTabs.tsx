@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { deleteSession } from "@/utils/sessionUtils";
 import { useToast } from "@/hooks/use-toast";
+import { SessionRecapModal } from "@/components/clinician/SessionRecapModal";
 
 interface SessionTabsProps {
   loading: boolean;
@@ -84,9 +85,18 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
                     variant="clinician"
                   />
                   
-                  {/* Direct delete button for clinician view */}
-                  {type !== 'past' && (
-                    <div className="absolute top-4 right-4">
+                  <div className="absolute top-4 right-4 flex gap-2">
+                    {/* Add Session Recap Modal for past sessions */}
+                    {type === 'past' && (
+                      <SessionRecapModal
+                        sessionId={session.id}
+                        initialNotes={session.notes || ''}
+                        onSaved={onSessionDelete} // Use the same callback to refresh sessions
+                      />
+                    )}
+                    
+                    {/* Delete button for non-past sessions */}
+                    {type !== 'past' && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button 
@@ -116,8 +126,8 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               ))
             )}
