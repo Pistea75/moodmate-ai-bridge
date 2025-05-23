@@ -7,7 +7,7 @@ import { toast } from '@/components/ui/use-toast';
 import { ChatLogList } from './chat/ChatLogList';
 import { SummarySection } from './chat/SummarySection';
 import { DateRangeFilter } from './chat/DateRangeFilter';
-import { endOfDay, startOfDay } from 'date-fns';
+import { endOfDay, startOfDay, subDays } from 'date-fns';
 
 interface LogEntry {
   id: string;
@@ -31,8 +31,16 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
 
   useEffect(() => {
     if (patientId) {
-      fetchLogs();
       fetchPatientName();
+      
+      // When component mounts, default to the last 7 days
+      const today = new Date();
+      const sevenDaysAgo = subDays(today, 7);
+      setStartDate(sevenDaysAgo);
+      setEndDate(today);
+      setIsFilterActive(true);
+      
+      fetchLogs();
     } else {
       setLoading(false);
     }
@@ -70,11 +78,6 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
     try {
       setLoading(true);
       console.log('Fetching logs for patient:', patientId);
-      console.log('Filter active:', isFilterActive);
-      if (isFilterActive) {
-        console.log('Start date:', startDate ? startDate.toISOString() : 'null');
-        console.log('End date:', endDate ? endDate.toISOString() : 'null');
-      }
       
       let query = supabase
         .from('ai_chat_logs')
@@ -85,13 +88,14 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
       // Apply date filters if active
       if (isFilterActive) {
         if (startDate) {
-          // Convert to start of day in ISO format
+          // Convert to start of day in ISO format and ensure it's a string
           const startDateISO = startOfDay(startDate).toISOString();
           console.log('Using startDate ISO:', startDateISO);
           query = query.gte('created_at', startDateISO);
         }
+        
         if (endDate) {
-          // Convert to end of day in ISO format
+          // Convert to end of day in ISO format and ensure it's a string
           const endDateISO = endOfDay(endDate).toISOString();
           console.log('Using endDate ISO:', endDateISO);
           query = query.lte('created_at', endDateISO);
@@ -112,7 +116,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
 
       console.log('Chat logs fetched:', data?.length || 0);
       
-      if (data) {
+      if (data && data.length > 0) {
         // Sanitize the data to ensure the role property conforms to LogEntry type
         const sanitized = data.map(log => ({
           ...log,
@@ -121,7 +125,29 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
         
         setLogs(sanitized);
       } else {
+        console.log('No chat logs found for this patient in the specified date range');
         setLogs([]);
+        
+        // If no logs were found with a date filter, try fetching all logs
+        if (isFilterActive && startDate && endDate) {
+          console.log('Attempting to fetch all logs without date filter');
+          
+          const { data: allData, error: allError } = await supabase
+            .from('ai_chat_logs')
+            .select('*')
+            .eq('patient_id', patientId)
+            .order('created_at', { ascending: true });
+          
+          if (!allError && allData && allData.length > 0) {
+            console.log('Found logs without date filter:', allData.length);
+            toast({
+              title: "No logs in date range",
+              description: `No logs found in the selected date range. There are ${allData.length} logs in total.`,
+            });
+          } else {
+            console.log('No logs found at all');
+          }
+        }
       }
     } catch (err) {
       console.error('Error in fetchLogs:', err);
