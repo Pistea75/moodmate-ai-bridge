@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAiChatReports } from '@/hooks/useAiChatReports';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +19,12 @@ export function useReportsData() {
 
       console.log('Fetching patient names for IDs:', patientIds);
       console.log('Sample report structure:', reports[0]);
+      console.log('Reports with patient_id and clinician_id:', reports.map(r => ({
+        id: r.id,
+        patient_id: r.patient_id,
+        clinician_id: r.clinician_id,
+        title: r.title
+      })));
 
       try {
         const { data, error } = await supabase
@@ -58,6 +65,7 @@ export function useReportsData() {
     
     console.log(`Formatting report ${report.id}:`);
     console.log(`- patient_id: ${report.patient_id}`);
+    console.log(`- clinician_id: ${report.clinician_id}`);
     console.log(`- patientNames lookup: ${patientNames[report.patient_id]}`);
     console.log(`- Final title: ${patientName} - ${date}`);
     

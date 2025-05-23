@@ -123,6 +123,10 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
   const handleSaveReport = async () => {
     if (!summary || !patientId) return;
     
+    // Add debugging to verify the correct patient ID is being used
+    console.log("handleSaveReport called with patient ID:", patientId);
+    console.log("Summary exists:", !!summary);
+    
     setSavingReport(true);
     const success = await saveChatReport(patientId, summary);
     
