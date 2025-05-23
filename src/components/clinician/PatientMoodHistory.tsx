@@ -4,10 +4,10 @@ import { Card } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { isHighRiskMood } from '@/lib/utils/alertTriggers';
-import { format } from 'date-fns';
 import { MOOD_LABELS, MOOD_COLORS } from '@/components/mood/MoodChartConstants';
 import { Badge } from '@/components/ui/badge';
 import { normalizeMood } from '@/components/mood/MoodChartUtils';
+import { cn } from '@/lib/utils';
 
 interface MoodEntry {
   created_at: string;
@@ -73,11 +73,17 @@ export function PatientMoodHistory({ patientId }: { patientId: string }) {
               {entries.map((entry, index) => {
                 const normalized = normalizeMood(entry.mood_score) - 1;
                 const flagged = isHighRiskMood(entry.mood_score, entry.triggers || []);
+                const isLowMood = normalized <= 1; // Mood scores 1-2 (normalized to 0-1)
+                const isStriped = index % 2 === 1;
                 
                 return (
                   <TableRow
                     key={index}
-                    className={flagged ? 'bg-red-50 text-red-700' : ''}
+                    className={cn(
+                      isStriped ? 'bg-muted/10' : '',
+                      flagged ? 'bg-red-50 text-red-700' : 
+                      isLowMood ? 'bg-red-50/50' : ''
+                    )}
                   >
                     <TableCell>
                       <div className="flex items-center gap-2">
