@@ -30,6 +30,7 @@ export function AudioChatInterface({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<{role: string, content: string}[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when messages change
@@ -67,13 +68,22 @@ export function AudioChatInterface({
   const sendToAI = async (messageContent: string) => {
     setIsLoading(true);
     try {
+      // Add the new user message to the conversation history
+      const updatedHistory = [...conversationHistory, { role: 'user', content: messageContent }];
+      
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: {
-          messages: [{ role: 'user', content: messageContent }]
+          messages: updatedHistory
         }
       });
 
       if (error) throw new Error(error.message);
+      
+      // Add the AI response to the conversation history
+      setConversationHistory([...updatedHistory, { 
+        role: 'assistant', 
+        content: data.reply.content 
+      }]);
       
       return data.reply.content;
     } catch (error) {
