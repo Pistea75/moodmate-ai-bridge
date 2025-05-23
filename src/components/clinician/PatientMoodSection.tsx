@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { MoodChart } from '@/components/mood/MoodChart';
 import { PatientMoodInsights } from '@/components/clinician/PatientMoodInsights';
 import { getMostCommonTriggers } from '@/lib/analyzeMoodTriggers';
+import { isHighRiskMood } from '@/lib/utils/alertTriggers';
 
 function normalizeMood(score: number) {
   return Math.max(1, Math.min(5, Math.ceil(score / 2))); // Convert 1–10 to 1–5
@@ -96,7 +97,21 @@ export function PatientMoodSection({ patientId, patientName }: PatientMoodSectio
         </div>
       ) : (
         <>
-          <MoodChart patientId={patientId} />
+          {moodData.length > 0 && (() => {
+            const latestEntry = moodData[moodData.length - 1];
+            const risky = isHighRiskMood(latestEntry.mood_score, latestEntry.triggers);
+
+            return (
+              <>
+                {risky && (
+                  <div className="bg-red-100 border border-red-300 text-red-700 p-3 mb-4 rounded-md text-sm">
+                    ⚠️ Alert: Recent mood entry indicates potential crisis. Follow up recommended.
+                  </div>
+                )}
+                <MoodChart patientId={patientId} />
+              </>
+            );
+          })()}
           <PatientMoodInsights
             patientName={patientName}
             moodStats={moodStats || undefined}
