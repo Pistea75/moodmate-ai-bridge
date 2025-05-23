@@ -1,13 +1,21 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL');
+const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const supabase = createClient(
+  supabaseUrl || '',
+  serviceRoleKey || ''
+);
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -16,7 +24,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, systemPrompt } = await req.json();
+    const { messages, systemPrompt, userId } = await req.json();
 
     if (!Array.isArray(messages)) {
       return new Response(
@@ -26,6 +34,30 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );
+    }
+
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: 'Missing userId: Patient ID is required' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    // Get the latest user message
+    const latestUserMessage = messages[messages.length - 1];
+    
+    // Log user message to database
+    if (latestUserMessage && latestUserMessage.role === 'user') {
+      await supabase
+        .from('ai_chat_logs')
+        .insert({
+          patient_id: userId,
+          role: 'user',
+          message: latestUserMessage.content
+        });
     }
 
     // Use the provided system prompt or fall back to default
@@ -54,6 +86,15 @@ serve(async (req) => {
     }
     
     const reply = data.choices[0].message;
+
+    // Log assistant's message to database
+    await supabase
+      .from('ai_chat_logs')
+      .insert({
+        patient_id: userId,
+        role: 'assistant',
+        message: reply.content
+      });
 
     return new Response(JSON.stringify({ reply }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

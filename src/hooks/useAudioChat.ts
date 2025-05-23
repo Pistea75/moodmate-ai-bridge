@@ -73,28 +73,17 @@ export function useAudioChat(systemPrompt: string) {
     fetchChatHistory();
   }, [user, toast]);
 
-  // Save message to the database
-  const saveMessageToDatabase = async (messageType: 'user' | 'assistant', messageContent: string) => {
-    if (!user) return;
-    
-    try {
-      const { error } = await supabase
-        .from('ai_chat_logs')
-        .insert({
-          patient_id: user.id,
-          role: messageType,
-          message: messageContent
-        });
-      
-      if (error) throw error;
-    } catch (error) {
-      console.error("Error saving message to database:", error);
-      // Don't show a toast here to avoid disrupting the user experience
-    }
-  };
-
   // Function to send message to OpenAI API via Edge Function
   const sendToAI = async (messageContent: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to send messages",
+        variant: "destructive"
+      });
+      return "Please log in to continue this conversation.";
+    }
+    
     setIsLoading(true);
     try {
       // Add the new user message to the conversation history
@@ -103,7 +92,8 @@ export function useAudioChat(systemPrompt: string) {
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: {
           messages: updatedHistory,
-          systemPrompt
+          systemPrompt,
+          userId: user.id
         }
       });
 
@@ -130,7 +120,7 @@ export function useAudioChat(systemPrompt: string) {
   };
 
   const handleSendMessage = async (messageText: string) => {
-    if (!messageText.trim()) return;
+    if (!messageText.trim() || !user) return;
     
     // Add user message to chat
     const userMessage: Message = {
@@ -140,9 +130,6 @@ export function useAudioChat(systemPrompt: string) {
       timestamp: new Date()
     };
     setMessages(prev => [...prev, userMessage]);
-    
-    // Save user message to database
-    await saveMessageToDatabase('user', messageText);
     
     // Get AI response
     const aiResponse = await sendToAI(messageText);
@@ -155,9 +142,6 @@ export function useAudioChat(systemPrompt: string) {
       timestamp: new Date()
     };
     setMessages(prev => [...prev, aiMessage]);
-    
-    // Save AI response to database
-    await saveMessageToDatabase('assistant', aiResponse);
   };
 
   return {
