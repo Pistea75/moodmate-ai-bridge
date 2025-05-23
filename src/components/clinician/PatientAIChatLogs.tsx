@@ -2,10 +2,10 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
+import { ChatLogList } from './chat/ChatLogList';
+import { SummarySection } from './chat/SummarySection';
 
 interface LogEntry {
   id: string;
@@ -158,60 +158,18 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
             <Skeleton className="h-16 w-full" />
             <Skeleton className="h-16 w-full" />
           </div>
-        ) : logs.length === 0 ? (
-          <p className="text-muted-foreground text-sm py-4 text-center">No AI chat history found for this patient.</p>
         ) : (
           <>
-            <ScrollArea className="h-[400px] pr-4">
-              <div className="space-y-4">
-                {logs.map((log) => (
-                  <div key={log.id} className="space-y-1">
-                    <div
-                      className={`text-xs font-medium ${
-                        log.role === 'user' ? 'text-blue-600 dark:text-blue-400' : 'text-primary'
-                      }`}
-                    >
-                      {log.role === 'user' ? 'Patient' : 'AI Assistant'} • {new Date(log.created_at).toLocaleString()}
-                    </div>
-                    <div className={`p-3 rounded-lg text-sm whitespace-pre-line ${
-                      log.role === 'user' 
-                        ? 'bg-accent text-accent-foreground' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {log.message}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
+            <ChatLogList logs={logs} />
             
-            <div className="mt-4 pt-4 border-t space-y-4">
-              <Button 
-                onClick={handleSummarize} 
-                disabled={summarizing || logs.length === 0}
-                className="w-full"
-              >
-                {summarizing ? 'Generating Summary...' : 'Generate AI Summary'}
-              </Button>
-              
-              {summary && (
-                <div className="space-y-3">
-                  <div className="p-4 bg-primary/5 rounded-md border">
-                    <h4 className="font-medium text-sm mb-2">Clinical Summary:</h4>
-                    <div className="text-sm whitespace-pre-line">{summary}</div>
-                  </div>
-                  
-                  <Button
-                    variant="secondary"
-                    onClick={handleSaveReport}
-                    disabled={savingReport}
-                    className="w-full"
-                  >
-                    {savingReport ? 'Saving Report...' : 'Save as Report'}
-                  </Button>
-                </div>
-              )}
-            </div>
+            <SummarySection 
+              summary={summary}
+              summarizing={summarizing}
+              logs={logs}
+              savingReport={savingReport}
+              onSummarize={handleSummarize}
+              onSaveReport={handleSaveReport}
+            />
           </>
         )}
       </CardContent>
