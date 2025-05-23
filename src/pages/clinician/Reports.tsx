@@ -16,6 +16,16 @@ export default function Reports() {
     report.report_type?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleDownload = (report) => {
+    const blob = new Blob([report.content], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${report.title.replace(/\s+/g, '_')}.txt`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <ClinicianLayout>
       <div className="space-y-6">
@@ -64,7 +74,11 @@ export default function Reports() {
                       <span>Status: {report.status}</span>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDownload(report)}
+                  >
                     <Download className="h-4 w-4 mr-2" />
                     Download
                   </Button>
