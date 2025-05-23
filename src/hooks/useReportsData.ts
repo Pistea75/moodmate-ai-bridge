@@ -17,6 +17,7 @@ export function useReportsData() {
       if (patientIds.length === 0) return;
 
       console.log('Fetching patient names for IDs:', patientIds);
+      console.log('Sample report structure:', reports[0]);
 
       try {
         const { data, error } = await supabase
@@ -35,6 +36,7 @@ export function useReportsData() {
         data?.forEach(profile => {
           const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
           nameMap[profile.id] = fullName || 'Unknown Patient';
+          console.log(`Mapped patient ID ${profile.id} to name: "${fullName}"`);
         });
         
         console.log('Patient name mapping:', nameMap);
@@ -53,6 +55,12 @@ export function useReportsData() {
     // Use the patient_id to get the correct patient name (whose chat this report is about)
     const patientName = patientNames[report.patient_id] || 'Unknown Patient';
     const date = new Date(report.chat_date).toLocaleDateString();
+    
+    console.log(`Formatting report ${report.id}:`);
+    console.log(`- patient_id: ${report.patient_id}`);
+    console.log(`- patientNames lookup: ${patientNames[report.patient_id]}`);
+    console.log(`- Final title: ${patientName} - ${date}`);
+    
     return `${patientName} - ${date}`;
   };
 
