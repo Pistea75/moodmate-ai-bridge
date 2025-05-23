@@ -78,7 +78,7 @@ export async function fetchPatientChatLogs(
       console.log('Date filter:', formatDateForDisplay(startDateISO), 'to', formatDateForDisplay(endDateISO));
       console.log('Raw ISO strings - start:', startDateISO, 'end:', endDateISO);
       
-      // Using gte and lte for timestamp comparison
+      // Using gte and lte for timestamp comparison with proper UTC values
       query = query
         .gte('created_at', startDateISO)
         .lte('created_at', endDateISO);

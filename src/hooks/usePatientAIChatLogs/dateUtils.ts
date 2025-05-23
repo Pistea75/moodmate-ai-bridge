@@ -2,18 +2,23 @@
 import { startOfDay, endOfDay, subDays } from "date-fns";
 
 /**
- * Returns ISO string for the start of day
+ * Returns ISO string for the start of day in UTC
  */
 export function getStartOfDayISO(date: Date): string {
-  return startOfDay(date).toISOString();
+  // Ensure we're setting to midnight in UTC
+  const utcDate = new Date(date);
+  utcDate.setUTCHours(0, 0, 0, 0);
+  return utcDate.toISOString();
 }
 
 /**
- * Returns ISO string for the end of day
+ * Returns ISO string for the end of day in UTC
  */
 export function getEndOfDayISO(date: Date): string {
-  // Set hours to 23:59:59.999 to include the entire day
-  return endOfDay(date).toISOString();
+  // Set hours to 23:59:59.999 in UTC to include the entire day
+  const utcDate = new Date(date);
+  utcDate.setUTCHours(23, 59, 59, 999);
+  return utcDate.toISOString();
 }
 
 /**
