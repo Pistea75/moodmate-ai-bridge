@@ -12,7 +12,7 @@ import {
 import { MOOD_LABELS } from './MoodChartConstants';
 import { MoodChartTooltip } from './MoodChartTooltip';
 import { ChartData } from './MoodChartUtils';
-import { Alert, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 interface MoodChartViewProps {
   data: ChartData[];
