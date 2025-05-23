@@ -3,7 +3,6 @@ import { ReactNode, useState } from 'react';
 import { MobileTopNav } from './patient/MobileTopNav';
 import { DesktopSidebar } from './patient/DesktopSidebar';
 import { usePatientProfile } from './patient/usePatientProfile';
-import { useAuth } from '@/contexts/AuthContext';
 
 type PatientLayoutProps = {
   children: ReactNode;
@@ -12,7 +11,6 @@ type PatientLayoutProps = {
 export default function PatientLayout({ children }: PatientLayoutProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { patientFullName } = usePatientProfile();
-  const { user } = useAuth();
   
   return (
     <div className="flex min-h-screen bg-background">
