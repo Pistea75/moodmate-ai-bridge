@@ -73,6 +73,27 @@ export function useAudioChat(systemPrompt: string) {
     fetchChatHistory();
   }, [user, toast]);
 
+  // Function to save message to database
+  const saveMessageToDatabase = async (role: 'user' | 'assistant', message: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('ai_chat_logs')
+        .insert({
+          patient_id: user.id,
+          role: role,
+          message: message
+        });
+        
+      if (error) {
+        console.error("Error saving message to database:", error);
+      }
+    } catch (error) {
+      console.error("Error in saveMessageToDatabase:", error);
+    }
+  };
+
   // Function to send message to OpenAI API via Edge Function
   const sendToAI = async (messageContent: string) => {
     if (!user) {
@@ -131,6 +152,9 @@ export function useAudioChat(systemPrompt: string) {
     };
     setMessages(prev => [...prev, userMessage]);
     
+    // Save user message to database
+    await saveMessageToDatabase('user', messageText);
+    
     // Get AI response
     const aiResponse = await sendToAI(messageText);
     
@@ -142,6 +166,9 @@ export function useAudioChat(systemPrompt: string) {
       timestamp: new Date()
     };
     setMessages(prev => [...prev, aiMessage]);
+    
+    // Save AI response to database
+    await saveMessageToDatabase('assistant', aiResponse);
   };
 
   return {
