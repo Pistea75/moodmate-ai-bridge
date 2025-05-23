@@ -29,12 +29,12 @@ export function usePatientSessions() {
     setError(null);
     
     try {
-      // Join with profiles table to get clinician's name
+      // Join with profiles table to get clinician's name using explicit foreign key reference
       const { data, error } = await supabase
         .from('sessions')
         .select(`
           *,
-          profiles(first_name, last_name)
+          clinician:profiles!sessions_clinician_id_fkey(first_name, last_name)
         `)
         .eq('patient_id', user.id)
         .order('scheduled_time', { ascending: true });
@@ -47,8 +47,8 @@ export function usePatientSessions() {
       
       // Transform the data to include clinician_name
       const transformedData = (data || []).map(session => {
-        const clinicianFirstName = session.profiles?.first_name || '';
-        const clinicianLastName = session.profiles?.last_name || '';
+        const clinicianFirstName = session.clinician?.first_name || '';
+        const clinicianLastName = session.clinician?.last_name || '';
         const clinician_name = `${clinicianFirstName} ${clinicianLastName}`.trim() || 'Unknown Clinician';
         
         return {
