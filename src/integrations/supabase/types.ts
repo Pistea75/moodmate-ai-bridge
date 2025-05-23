@@ -172,6 +172,7 @@ export type Database = {
           created_at: string | null
           duration_minutes: number
           id: string
+          notes: string | null
           patient_id: string | null
           scheduled_time: string
           status: string | null
@@ -182,6 +183,7 @@ export type Database = {
           created_at?: string | null
           duration_minutes: number
           id?: string
+          notes?: string | null
           patient_id?: string | null
           scheduled_time: string
           status?: string | null
@@ -192,6 +194,7 @@ export type Database = {
           created_at?: string | null
           duration_minutes?: number
           id?: string
+          notes?: string | null
           patient_id?: string | null
           scheduled_time?: string
           status?: string | null
