@@ -2,7 +2,9 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChatLogList } from './chat/ChatLogList';
-import { useChatLogs } from '@/hooks/useChatLogs';
+import { DateRangeFilter } from './chat/DateRangeFilter';
+import { SummarySection } from './chat/SummarySection';
+import { usePatientAIChatLogs } from '@/hooks/usePatientAIChatLogs';
 import { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
@@ -11,7 +13,24 @@ import { Button } from '@/components/ui/button';
 export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   const [debugMode, setDebugMode] = useState(false);
   
-  const { logs, refreshLogs, loading } = useChatLogs(patientId);
+  const {
+    logs,
+    loading,
+    summary,
+    summarizing,
+    savingReport,
+    patientName,
+    startDate,
+    endDate,
+    isFilterActive,
+    setStartDate,
+    setEndDate,
+    handleApplyFilter,
+    handleClearFilter,
+    handleSummarize,
+    handleSaveReport,
+    refreshLogs
+  } = usePatientAIChatLogs(patientId);
 
   // Add debugging to verify patientId and logs
   useEffect(() => {
@@ -56,15 +75,36 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
                 <div>Patient ID type: {typeof patientId}</div>
                 <div>Loading: {loading ? 'true' : 'false'}</div>
                 <div>Log Count: {logs?.length || 0}</div>
+                <div>Filter Active: {isFilterActive ? 'true' : 'false'}</div>
               </div>
             </AlertDescription>
           </Alert>
         )}
         
+        <DateRangeFilter
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          onApplyFilter={handleApplyFilter}
+          onClearFilter={handleClearFilter}
+        />
+        
         {loading ? (
           <LoadingState />
         ) : (
-          <ChatLogList logs={logs} />
+          <>
+            <ChatLogList logs={logs} />
+            <SummarySection
+              summary={summary}
+              summarizing={summarizing}
+              logs={logs}
+              savingReport={savingReport}
+              patientName={patientName}
+              onSummarize={handleSummarize}
+              onSaveReport={handleSaveReport}
+            />
+          </>
         )}
       </CardContent>
     </Card>
