@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { MoodChart } from '../../components/mood/MoodChart';
 import { TaskList } from '../../components/TaskList';
@@ -21,13 +20,10 @@ export default function PatientDashboard() {
   const { tasks, loading: tasksLoading } = usePatientTasks();
   
   // Get patient sessions using the hook
-  const { sessions, loading: sessionsLoading } = usePatientSessions();
+  const { pastSession, upcomingSession, loading: sessionsLoading } = usePatientSessions(user?.id || '');
   
   // Get upcoming sessions only
-  const upcomingSessions = sessions.filter(session => {
-    const sessionDate = new Date(session.scheduled_time);
-    return sessionDate >= new Date();
-  }).slice(0, 2); // Show only 2 upcoming sessions
+  const upcomingSessions = upcomingSession ? [upcomingSession] : [];
 
   useEffect(() => {
     const fetchPatientProfile = async () => {
