@@ -6,6 +6,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/use-toast';
 import { ChatLogList } from './chat/ChatLogList';
 import { SummarySection } from './chat/SummarySection';
+import { DateRangeFilter } from './chat/DateRangeFilter';
+import { endOfDay, startOfDay } from 'date-fns';
 
 interface LogEntry {
   id: string;
@@ -20,44 +22,76 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   const [summary, setSummary] = useState<string | null>(null);
   const [summarizing, setSummarizing] = useState(false);
   const [savingReport, setSavingReport] = useState(false);
+  
+  // Date filter states
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [isFilterActive, setIsFilterActive] = useState(false);
 
   useEffect(() => {
-    const fetchLogs = async () => {
-      if (!patientId) {
-        setLoading(false);
-        return;
-      }
-      
-      try {
-        const { data, error } = await supabase
-          .from('ai_chat_logs')
-          .select('*')
-          .eq('patient_id', patientId)
-          .order('created_at', { ascending: true });
-
-        if (error) {
-          console.error('Error fetching chat logs:', error);
-          return;
-        }
-
-        if (data) {
-          // Sanitize the data to ensure the role property conforms to LogEntry type
-          const sanitized = data.map(log => ({
-            ...log,
-            role: log.role === 'assistant' ? 'assistant' : 'user'
-          })) as LogEntry[];
-          
-          setLogs(sanitized);
-        }
-      } catch (err) {
-        console.error('Error in fetchLogs:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchLogs();
   }, [patientId]);
+
+  const fetchLogs = async () => {
+    if (!patientId) {
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      let query = supabase
+        .from('ai_chat_logs')
+        .select('*')
+        .eq('patient_id', patientId)
+        .order('created_at', { ascending: true });
+      
+      // Apply date filters if active
+      if (isFilterActive) {
+        if (startDate) {
+          query = query.gte('created_at', startOfDay(startDate).toISOString());
+        }
+        if (endDate) {
+          query = query.lte('created_at', endOfDay(endDate).toISOString());
+        }
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching chat logs:', error);
+        return;
+      }
+
+      if (data) {
+        // Sanitize the data to ensure the role property conforms to LogEntry type
+        const sanitized = data.map(log => ({
+          ...log,
+          role: log.role === 'assistant' ? 'assistant' : 'user'
+        })) as LogEntry[];
+        
+        setLogs(sanitized);
+      }
+    } catch (err) {
+      console.error('Error in fetchLogs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApplyFilter = () => {
+    setIsFilterActive(true);
+    setSummary(null); // Reset summary when filter changes
+    fetchLogs();
+  };
+
+  const handleClearFilter = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setIsFilterActive(false);
+    setSummary(null); // Reset summary when filter changes
+    fetchLogs();
+  };
 
   const handleSummarize = async () => {
     if (logs.length === 0) return;
@@ -152,6 +186,15 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
         <CardTitle className="text-lg font-semibold">AI Chat History</CardTitle>
       </CardHeader>
       <CardContent>
+        <DateRangeFilter 
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          onApplyFilter={handleApplyFilter}
+          onClearFilter={handleClearFilter}
+        />
+        
         {loading ? (
           <div className="space-y-2">
             <Skeleton className="h-16 w-full" />
