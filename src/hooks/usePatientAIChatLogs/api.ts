@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { LogEntry } from "@/hooks/usePatientAIChatLogs/types";
@@ -15,6 +14,7 @@ export async function fetchPatientName(patientId: string): Promise<string> {
   if (!patientId) return "Patient";
   
   try {
+    console.log('Fetching patient name for ID:', patientId);
     const { data, error } = await supabase
       .from('profiles')
       .select('first_name, last_name')
@@ -47,6 +47,7 @@ export async function fetchPatientChatLogs(
   isFilterActive: boolean = false
 ): Promise<LogEntry[]> {
   if (!patientId) {
+    console.error('No patient ID provided for fetchPatientChatLogs');
     return [];
   }
   
@@ -63,13 +64,32 @@ export async function fetchPatientChatLogs(
   try {
     console.log('Fetching logs for patient:', patientId);
     
+    // TEMPORARY DEBUGGING: First fetch ALL logs for this patient to see if any exist
+    const { count: totalCount, error: countError } = await supabase
+      .from('ai_chat_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('patient_id', patientId);
+    
+    console.log(`Total logs for patient ${patientId} (ignoring filters): ${totalCount || 0}`);
+    
+    if (countError) {
+      console.error('Error checking total logs:', countError);
+    }
+    
+    if (totalCount === 0) {
+      console.log('No logs found for this patient at all, returning empty array');
+      return [];
+    }
+    
     // Build query
     let query = supabase
       .from('ai_chat_logs')
       .select('*')
-      .filter('patient_id', 'eq', patientId)
+      .eq('patient_id', patientId)
       .order('created_at', { ascending: true });
     
+    // TEMPORARILY COMMENT OUT DATE FILTER TO TEST IF LOGS EXIST
+    /* 
     // Apply date filters if active
     if (isFilterActive && startDate && endDate) {
       const startDateISO = getStartOfDayISO(startDate);
@@ -83,6 +103,7 @@ export async function fetchPatientChatLogs(
         .gte('created_at', startDateISO)
         .lte('created_at', endDateISO);
     }
+    */
 
     const { data, error } = await query;
 
@@ -100,6 +121,7 @@ export async function fetchPatientChatLogs(
     }
 
     console.log(`Chat logs fetched: ${data?.length || 0}`);
+    console.log('First few logs:', data?.slice(0, 3));
     
     if (data && data.length > 0) {
       // Sanitize the data to ensure the role property conforms to LogEntry type

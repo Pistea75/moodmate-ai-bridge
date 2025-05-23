@@ -5,6 +5,7 @@ import { ChatLogList } from './chat/ChatLogList';
 import { SummarySection } from './chat/SummarySection';
 import { DateRangeFilter } from './chat/DateRangeFilter';
 import { usePatientAIChatLogs } from '@/hooks/usePatientAIChatLogs';
+import { useEffect } from 'react';
 
 export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   const { 
@@ -24,6 +25,13 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
     handleSummarize,
     handleSaveReport
   } = usePatientAIChatLogs(patientId);
+
+  // Add debugging to verify patientId and logs
+  useEffect(() => {
+    console.log('PatientAIChatLogs - Patient ID:', patientId);
+    console.log('PatientAIChatLogs - isLoading:', loading);
+    console.log('PatientAIChatLogs - logs count:', logs?.length || 0);
+  }, [patientId, loading, logs]);
 
   return (
     <Card className="h-full">

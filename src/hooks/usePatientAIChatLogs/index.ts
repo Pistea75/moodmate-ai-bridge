@@ -27,15 +27,21 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
   const [isFilterActive, setIsFilterActive] = useState(false);
 
   useEffect(() => {
+    console.log('usePatientAIChatLogs hook initialized with patientId:', patientId);
     if (patientId) {
       initializeData();
     } else {
       setLoading(false);
+      console.warn('No patientId provided to usePatientAIChatLogs hook');
     }
   }, [patientId]);
 
   const initializeData = async () => {
-    await fetchPatientName(patientId).then(name => setPatientName(name));
+    console.log('Initializing data for patientId:', patientId);
+    await fetchPatientName(patientId).then(name => {
+      console.log('Patient name fetched:', name);
+      setPatientName(name);
+    });
     
     // When component mounts, default to the last 7 days
     const { start, end } = getLastSevenDays();
@@ -49,6 +55,7 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
   const fetchLogs = async () => {
     if (!patientId) {
       setLoading(false);
+      console.warn('No patientId provided to fetchLogs');
       return;
     }
     
@@ -69,6 +76,7 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
         isFilterActive
       );
       
+      console.log('Logs fetched successfully, count:', fetchedLogs.length);
       setLogs(fetchedLogs);
       
       // If no logs were found with a date filter, check if there are logs outside the filter
@@ -76,6 +84,7 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
         const totalLogCount = await checkForLogsOutsideFilter(patientId, null, null);
         
         if (totalLogCount > 0) {
+          console.log(`No logs in date range, but ${totalLogCount} logs exist in total`);
           toast({
             title: "No logs in date range",
             description: `No logs found in the selected date range. There are ${totalLogCount} logs in total.`,
