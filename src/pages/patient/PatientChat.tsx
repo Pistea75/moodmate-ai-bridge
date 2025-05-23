@@ -45,7 +45,9 @@ export default function PatientChat() {
 
   return (
     <PatientLayout>
-      <AudioChatInterface clinicianName={clinicianName || 'Martinez'} />
+      <div className="container mx-auto px-4">
+        <AudioChatInterface clinicianName={clinicianName || 'Martinez'} />
+      </div>
     </PatientLayout>
   );
 }
