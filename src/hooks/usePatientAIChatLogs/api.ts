@@ -76,11 +76,12 @@ export async function fetchPatientChatLogs(
       const endDateISO = getEndOfDayISO(endDate);
       
       console.log('Date filter:', formatDateForDisplay(startDateISO), 'to', formatDateForDisplay(endDateISO));
+      console.log('Raw ISO strings - start:', startDateISO, 'end:', endDateISO);
       
-      // Using filter instead of eq/gte/lte to ensure consistent behavior
+      // Using gte and lte for timestamp comparison
       query = query
-        .filter('created_at', 'gte', startDateISO)
-        .filter('created_at', 'lte', endDateISO);
+        .gte('created_at', startDateISO)
+        .lte('created_at', endDateISO);
     }
 
     const { data, error } = await query;

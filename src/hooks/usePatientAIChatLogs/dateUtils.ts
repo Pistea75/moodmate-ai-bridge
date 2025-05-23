@@ -12,6 +12,7 @@ export function getStartOfDayISO(date: Date): string {
  * Returns ISO string for the end of day
  */
 export function getEndOfDayISO(date: Date): string {
+  // Set hours to 23:59:59.999 to include the entire day
   return endOfDay(date).toISOString();
 }
 

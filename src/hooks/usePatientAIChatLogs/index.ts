@@ -57,7 +57,8 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
       setLoading(true);
       
       // Log before fetch to help with debugging
-      console.log('Total logs for this patient (before filtering):', await checkForLogsOutsideFilter(patientId, null, null));
+      const totalLogs = await checkForLogsOutsideFilter(patientId, null, null);
+      console.log('Total logs for this patient (before filtering):', totalLogs);
       console.log('Using startDate:', startDate ? startDate.toISOString() : 'null');
       console.log('Using endDate:', endDate ? endDate.toISOString() : 'null');
       console.log('Is filter active:', isFilterActive);
