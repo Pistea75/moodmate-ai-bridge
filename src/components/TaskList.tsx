@@ -15,14 +15,6 @@ import { TaskListSkeleton } from './task/TaskListSkeleton';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Circle } from 'lucide-react';
 
-type Task = {
-  id: string;
-  title: string;
-  dueDate: string;
-  completed: boolean;
-  description: string;
-};
-
 interface TaskListProps {
   variant?: 'patient' | 'clinician';
   patientName?: string;
