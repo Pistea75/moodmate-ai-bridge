@@ -26,9 +26,7 @@ export function MobileTopNav({ patientFullName, isOpen, setIsOpen }: MobileTopNa
             <PatientSidebarContent patientName={patientFullName} />
           </SheetContent>
         </Sheet>
-        <div className="flex items-center gap-2">
-          {patientFullName}
-        </div>
+        <h3 className="text-lg font-medium">MoodMate</h3>
       </div>
     </div>
   );
