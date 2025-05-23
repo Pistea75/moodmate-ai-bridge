@@ -1,6 +1,7 @@
 
 import { toast } from "@/components/ui/use-toast";
 import { LogEntry } from "./types";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Generate summary of chat logs using OpenAI
@@ -13,21 +14,15 @@ export async function generateChatSummary(logs: LogEntry[]): Promise<string | nu
       content: log.message,
     }));
 
-    // Call the Edge Function
-    const response = await fetch('/api/functions/v1/summarize-chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ messages: formattedLogs }),
+    // Call the Edge Function using supabase client
+    const { data, error } = await supabase.functions.invoke('summarize-chat', {
+      body: { messages: formattedLogs },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to generate summary');
+    if (error) {
+      throw new Error(error.message || 'Failed to generate summary');
     }
 
-    const data = await response.json();
     return data.summary;
   } catch (error) {
     console.error('Error summarizing chat:', error);
