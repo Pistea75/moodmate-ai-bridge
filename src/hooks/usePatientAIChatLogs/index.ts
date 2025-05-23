@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import { LogEntry, UseChatLogsResult } from './types';
@@ -200,6 +201,6 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
     handleClearFilter,
     handleSummarize,
     handleSaveReport,
-    refreshLogs
+    refreshLogs  // Make sure refreshLogs is returned
   };
 }
