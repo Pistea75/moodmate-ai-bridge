@@ -4,31 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useAiChatReports } from '@/hooks/useAiChatReports';
 
 export default function Reports() {
-  const reports = [
-    {
-      id: 1,
-      title: "Session Summary - Sarah Johnson",
-      date: "2025-04-23",
-      type: "Session",
-      status: "AI Generated"
-    },
-    {
-      id: 2,
-      title: "Weekly Chat Analysis - Michael Chen",
-      date: "2025-04-22",
-      type: "AI Chat",
-      status: "Ready"
-    },
-    {
-      id: 3,
-      title: "Treatment Progress Report - Emily Wilson",
-      date: "2025-04-21",
-      type: "Progress",
-      status: "Ready for Review"
-    }
-  ];
+  const { reports, loading, error } = useAiChatReports();
 
   return (
     <ClinicianLayout>
@@ -54,29 +33,36 @@ export default function Reports() {
         </div>
 
         <div className="grid gap-4">
-          {reports.map((report) => (
-            <Card key={report.id} className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium">{report.title}</h3>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>Date: {report.date}</span>
-                    <span>•</span>
-                    <span>Type: {report.type}</span>
-                    <span>•</span>
-                    <span>Status: {report.status}</span>
+          {loading ? (
+            <p className="text-muted-foreground">Loading reports...</p>
+          ) : error ? (
+            <p className="text-red-500">Error: {error}</p>
+          ) : reports.length === 0 ? (
+            <p className="text-muted-foreground">No reports available.</p>
+          ) : (
+            reports.map((report) => (
+              <Card key={report.id} className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">{report.title}</h3>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>Date: {new Date(report.chat_date).toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span>Type: {report.report_type}</span>
+                      <span>•</span>
+                      <span>Status: {report.status}</span>
+                    </div>
                   </div>
+                  <Button variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
                 </div>
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
-                </Button>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))
+          )}
         </div>
       </div>
     </ClinicianLayout>
   );
 }
-

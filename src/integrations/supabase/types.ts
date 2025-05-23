@@ -9,6 +9,77 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_chat_reports: {
+        Row: {
+          chat_date: string | null
+          clinician_id: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          patient_id: string | null
+          pdf_url: string | null
+          report_type: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          chat_date?: string | null
+          clinician_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string | null
+          pdf_url?: string | null
+          report_type?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          chat_date?: string | null
+          clinician_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string | null
+          pdf_url?: string | null
+          report_type?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_chat_reports_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ai_chat_reports_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_chat_reports_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ai_chat_reports_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_reports: {
         Row: {
           advice: string | null
