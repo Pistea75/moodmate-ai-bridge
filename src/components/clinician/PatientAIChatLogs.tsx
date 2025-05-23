@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 
 interface LogEntry {
   id: string;
@@ -15,6 +17,8 @@ interface LogEntry {
 export function PatientAIChatLogs({ patientId }: { patientId: string }) {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summarizing, setSummarizing] = useState(false);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -54,6 +58,47 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
     fetchLogs();
   }, [patientId]);
 
+  const handleSummarize = async () => {
+    if (logs.length === 0) return;
+    
+    setSummarizing(true);
+    setSummary(null);
+    
+    try {
+      // Format the logs for the OpenAI API
+      const formattedLogs = logs.map(log => ({
+        role: log.role,
+        content: log.message,
+      }));
+
+      // Call the Edge Function
+      const response = await fetch('/api/functions/v1/summarize-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: formattedLogs }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate summary');
+      }
+
+      const data = await response.json();
+      setSummary(data.summary);
+    } catch (error) {
+      console.error('Error summarizing chat:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate summary. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSummarizing(false);
+    }
+  };
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
@@ -69,28 +114,47 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
         ) : logs.length === 0 ? (
           <p className="text-muted-foreground text-sm py-4 text-center">No AI chat history found for this patient.</p>
         ) : (
-          <ScrollArea className="h-[400px] pr-4">
-            <div className="space-y-4">
-              {logs.map((log) => (
-                <div key={log.id} className="space-y-1">
-                  <div
-                    className={`text-xs font-medium ${
-                      log.role === 'user' ? 'text-blue-600 dark:text-blue-400' : 'text-primary'
-                    }`}
-                  >
-                    {log.role === 'user' ? 'Patient' : 'AI Assistant'} • {new Date(log.created_at).toLocaleString()}
+          <>
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-4">
+                {logs.map((log) => (
+                  <div key={log.id} className="space-y-1">
+                    <div
+                      className={`text-xs font-medium ${
+                        log.role === 'user' ? 'text-blue-600 dark:text-blue-400' : 'text-primary'
+                      }`}
+                    >
+                      {log.role === 'user' ? 'Patient' : 'AI Assistant'} • {new Date(log.created_at).toLocaleString()}
+                    </div>
+                    <div className={`p-3 rounded-lg text-sm whitespace-pre-line ${
+                      log.role === 'user' 
+                        ? 'bg-accent text-accent-foreground' 
+                        : 'bg-muted text-muted-foreground'
+                    }`}>
+                      {log.message}
+                    </div>
                   </div>
-                  <div className={`p-3 rounded-lg text-sm whitespace-pre-line ${
-                    log.role === 'user' 
-                      ? 'bg-accent text-accent-foreground' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {log.message}
-                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            
+            <div className="mt-4 pt-4 border-t">
+              <Button 
+                onClick={handleSummarize} 
+                disabled={summarizing || logs.length === 0}
+                className="w-full"
+              >
+                {summarizing ? 'Generating Summary...' : 'Generate AI Summary'}
+              </Button>
+              
+              {summary && (
+                <div className="mt-4 p-4 bg-primary/5 rounded-md border">
+                  <h4 className="font-medium text-sm mb-2">Clinical Summary:</h4>
+                  <div className="text-sm whitespace-pre-line">{summary}</div>
                 </div>
-              ))}
+              )}
             </div>
-          </ScrollArea>
+          </>
         )}
       </CardContent>
     </Card>
