@@ -34,10 +34,7 @@ export function usePatientSessions() {
         .from('sessions')
         .select(`
           *,
-          profiles:clinician_id (
-            first_name,
-            last_name
-          )
+          profiles(first_name, last_name)
         `)
         .eq('patient_id', user.id)
         .order('scheduled_time', { ascending: true });
