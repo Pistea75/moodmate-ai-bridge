@@ -2,15 +2,18 @@
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Filter, Search } from "lucide-react";
+import { Download, Eye, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useAiChatReports } from '@/hooks/useAiChatReports';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { ReportViewerModal } from '@/components/clinician/ReportViewerModal';
 
 export default function Reports() {
   const { reports, loading, error } = useAiChatReports();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedReport, setSelectedReport] = useState<any | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const filteredReports = reports.filter(report => 
     report.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -86,19 +89,42 @@ export default function Reports() {
                       <span>Status: {report.status}</span>
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleDownload(report)}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedReport(report);
+                        setModalOpen(true);
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleDownload(report)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))
           )}
         </div>
+
+        <ReportViewerModal
+          open={modalOpen}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedReport(null);
+          }}
+          report={selectedReport}
+          onDownload={handleDownload}
+        />
       </div>
     </ClinicianLayout>
   );
