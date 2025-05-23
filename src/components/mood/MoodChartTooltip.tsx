@@ -1,6 +1,5 @@
 
 import { MOOD_COLORS, MOOD_LABELS } from './MoodChartConstants';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CustomTooltipProps {
   active?: boolean;

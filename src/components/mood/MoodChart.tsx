@@ -37,7 +37,13 @@ export function MoodChart({ patientId }: MoodChartProps) {
         return;
       }
 
-      const parsed = parseEntries(entries as MoodEntry[] || [], view);
+      // Convert the entries to the expected format
+      const parsedEntries = entries ? entries.map(entry => ({
+        ...entry,
+        triggers: entry.triggers || [] // Ensure triggers is always an array
+      })) as MoodEntry[] : [];
+      
+      const parsed = parseEntries(parsedEntries, view);
       setData(parsed);
       return;
     }
@@ -69,7 +75,13 @@ export function MoodChart({ patientId }: MoodChartProps) {
       return;
     }
 
-    const parsed = parseEntries(entries as MoodEntry[] || [], view);
+    // Convert the entries to the expected format
+    const parsedEntries = entries ? entries.map(entry => ({
+      ...entry,
+      triggers: entry.triggers || [] // Ensure triggers is always an array
+    })) as MoodEntry[] : [];
+    
+    const parsed = parseEntries(parsedEntries, view);
     setData(parsed);
   };
 
