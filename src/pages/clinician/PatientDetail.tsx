@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -14,6 +15,7 @@ import { PatientMoodHistory } from '@/components/clinician/PatientMoodHistory';
 import { MoodReportPDF } from '@/components/clinician/MoodReportPDF';
 import { PatientSessionRecap } from '@/components/clinician/PatientSessionRecap';
 import { PatientMoodAlertFeed } from '@/components/clinician/PatientMoodAlertFeed';
+import { PatientAIChatLogs } from '@/components/clinician/PatientAIChatLogs';
 
 interface PatientProfile {
   id: string;
@@ -133,6 +135,11 @@ export default function PatientDetail() {
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
             <PatientSessionRecap patientId={patientId as string} />
             <PatientMoodAlertFeed patientId={patientId as string} />
+          </div>
+          
+          {/* Add the AI Chat Logs component */}
+          <div className="grid gap-6 grid-cols-1">
+            <PatientAIChatLogs patientId={patientId as string} />
           </div>
           
           {/* Tasks section moved up, right after the Mood section */}
