@@ -3,7 +3,7 @@ import PatientLayout from '../../layouts/PatientLayout';
 import { SessionList } from '@/components/session/SessionList';
 import { PatientSessionHeader } from '@/components/session/PatientSessionHeader';
 import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
-import { usePatientSessions } from '@/hooks/usePatientSessions';
+import { usePatientSessions } from '@/hooks/usePatientSessionsList'; // Import the list-specific hook
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 

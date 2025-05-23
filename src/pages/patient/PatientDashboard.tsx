@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { MoodChart } from '../../components/mood/MoodChart';
 import { TaskList } from '../../components/TaskList';
@@ -111,7 +112,6 @@ export default function PatientDashboard() {
                     title: "Therapy Session",
                     dateTime: session.scheduled_time,
                     duration: session.duration_minutes,
-                    clinicianName: session.clinician_name,
                     status: 'upcoming'
                   }} 
                   variant="patient"
