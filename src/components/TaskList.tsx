@@ -1,9 +1,12 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { TaskItem } from './task/TaskItem';
-import { formatDate, isOverdue, isToday } from './task/TaskListUtils';
+import { formatDate, isOverdue, isToday, filterTasks, getEmptyTaskMessage } from './task/TaskListUtils';
 import { TaskListSkeleton } from './task/TaskListSkeleton';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, Circle } from 'lucide-react';
 
 type Task = {
   id: string;
@@ -29,9 +32,13 @@ export function TaskList({
   loading = false
 }: TaskListProps) {
   const [localTasks, setLocalTasks] = useState<Task[]>(tasks);
+  const [showCompleted, setShowCompleted] = useState(false);
   
   // Use provided tasks if available, otherwise use local state
   const displayTasks = tasks.length > 0 ? tasks : localTasks;
+  
+  // Filter tasks based on completion status
+  const filteredTasks = filterTasks(displayTasks, showCompleted);
 
   const toggleTaskCompletion = async (taskId: string) => {
     // If onTaskUpdate is provided, use that instead
@@ -72,11 +79,28 @@ export function TaskList({
         <h3 className="font-semibold">
           {variant === 'patient' ? 'Assigned Tasks' : `Tasks for ${patientName || 'Clinician'}`}
         </h3>
-        {variant === 'clinician'}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2 text-xs"
+          onClick={() => setShowCompleted(!showCompleted)}
+        >
+          {showCompleted ? (
+            <>
+              <CheckCircle className="h-4 w-4" />
+              Showing Completed
+            </>
+          ) : (
+            <>
+              <Circle className="h-4 w-4" />
+              Show Completed
+            </>
+          )}
+        </Button>
       </div>
 
       <div className="space-y-3">
-        {displayTasks.length > 0 ? displayTasks.map(task => (
+        {filteredTasks.length > 0 ? filteredTasks.map(task => (
           <TaskItem
             key={task.id}
             task={task}
@@ -88,7 +112,7 @@ export function TaskList({
           />
         )) : (
           <div className="text-center py-6 text-muted-foreground">
-            No tasks assigned yet.
+            {getEmptyTaskMessage(showCompleted)}
           </div>
         )}
       </div>
