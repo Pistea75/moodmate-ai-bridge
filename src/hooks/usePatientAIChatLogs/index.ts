@@ -6,8 +6,6 @@ import { fetchLogsLogic } from './fetchLogic';
 import { getLastSevenDays, validateDateFilter } from './dateUtils';
 import { 
   fetchPatientName,
-  fetchPatientChatLogs,
-  checkForLogsOutsideFilter,
   generateChatSummary,
   saveChatReport 
 } from './api';
