@@ -24,6 +24,11 @@ export function useChatLogs(patientId: string, startDate?: string, endDate?: str
     if (!patientId) return;
 
     setLoading(true);
+    
+    // Log patient ID for debugging
+    console.log('Fetching logs for patientId:', patientId);
+    console.log('Type of patientId:', typeof patientId);
+    
     let query = supabase
       .from('ai_chat_logs')
       .select('*')
@@ -37,6 +42,10 @@ export function useChatLogs(patientId: string, startDate?: string, endDate?: str
 
       const endUTC = new Date(endDate);
       endUTC.setUTCHours(23, 59, 59, 999);
+      
+      // Log UTC date strings for debugging
+      console.log('Filtering logs with startDate (UTC):', startUTC.toISOString());
+      console.log('Filtering logs with endDate (UTC):', endUTC.toISOString());
 
       query = query.gte('created_at', startUTC.toISOString()).lte('created_at', endUTC.toISOString());
     }
@@ -45,7 +54,13 @@ export function useChatLogs(patientId: string, startDate?: string, endDate?: str
 
     if (error) {
       console.error('Error fetching chat logs:', error);
+      console.error('Error details:', error.message, error.details);
     } else {
+      console.log('Chat logs fetched:', data?.length || 0);
+      if (data && data.length > 0) {
+        console.log('Sample log entry:', data[0]);
+      }
+      
       setLogs(
         (data || []).map((entry) => ({
           ...entry,

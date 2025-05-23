@@ -94,30 +94,31 @@ export async function fetchPatientChatLogs(
       console.error('Error checking total logs for patient:', countError);
     }
     
-    // Also try a raw SQL query via RPC function (if possible)
-    try {
-      // Use try-catch since the function may not exist and we don't want to error out
-      const { data: rawQueryData, error: rawQueryError } = await supabase.rpc(
-        'get_patient_mood_summaries', 
-        { clinician_uuid: patientIdStr }
-      );
-      
-      if (!rawQueryError && rawQueryData) {
-        console.log('Raw query results:', rawQueryData);
-      } else if (rawQueryError) {
-        console.log('Raw query error (expected if function does not exist):', rawQueryError);
-      }
-    } catch (e) {
-      // Expected to fail if the function doesn't exist
-      console.log('Raw query function does not exist (expected)');
-    }
-    
-    // Build query with no filters, just to get any logs for this patient
-    const { data, error } = await supabase
+    // Build the base query
+    let query = supabase
       .from('ai_chat_logs')
       .select('*')
       .eq('patient_id', patientIdStr)
       .order('created_at', { ascending: true });
+    
+    // Apply date filters if active
+    if (isFilterActive && startDate && endDate) {
+      // Normalize to UTC for consistent filtering
+      const startUTC = new Date(startDate);
+      startUTC.setUTCHours(0, 0, 0, 0);
+      
+      const endUTC = new Date(endDate);
+      endUTC.setUTCHours(23, 59, 59, 999);
+      
+      console.log('Filtering logs with startDate (UTC):', startUTC.toISOString());
+      console.log('Filtering logs with endDate (UTC):', endUTC.toISOString());
+      
+      query = query
+        .gte('created_at', startUTC.toISOString())
+        .lte('created_at', endUTC.toISOString());
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching chat logs:', error);
@@ -145,6 +146,24 @@ export async function fetchPatientChatLogs(
     } 
     
     console.log('No logs found for this patient, trying alternative approaches...');
+    
+    // Also try a raw SQL query via RPC function (if possible)
+    try {
+      // Use try-catch since the function may not exist and we don't want to error out
+      const { data: rawQueryData, error: rawQueryError } = await supabase.rpc(
+        'get_patient_mood_summaries', 
+        { clinician_uuid: patientIdStr }
+      );
+      
+      if (!rawQueryError && rawQueryData) {
+        console.log('Raw query results:', rawQueryData);
+      } else if (rawQueryError) {
+        console.log('Raw query error (expected if function does not exist):', rawQueryError);
+      }
+    } catch (e) {
+      // Expected to fail if the function doesn't exist
+      console.log('Raw query function does not exist (expected)');
+    }
     
     // As a last resort, try fetching without patient_id equality check (debugging only)
     const { data: allLogsData, error: allLogsError } = await supabase
