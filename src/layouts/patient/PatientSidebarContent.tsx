@@ -3,6 +3,7 @@ import React from 'react';
 import { PatientNavItems } from './PatientNavItems';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
+import { LogoutButton } from '@/components/LogoutButton';
 
 type PatientSidebarContentProps = {
   patientName: React.ReactNode;
@@ -39,6 +40,9 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
             <span className="text-sm font-medium">{patientName}</span>
             <span className="text-xs text-muted-foreground">Patient</span>
           </div>
+        </div>
+        <div className="mt-2">
+          <LogoutButton className="w-full justify-start text-sm" />
         </div>
       </div>
     </div>
