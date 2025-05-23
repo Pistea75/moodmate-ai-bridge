@@ -2,13 +2,7 @@
 import { FC } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChatLogEntry } from './ChatLogEntry';
-
-interface LogEntry {
-  id: string;
-  role: 'user' | 'assistant';
-  message: string;
-  created_at: string;
-}
+import { LogEntry } from '@/hooks/usePatientAIChatLogs';
 
 interface ChatLogListProps {
   logs: LogEntry[];
