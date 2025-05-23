@@ -159,3 +159,4 @@ export function SessionCard({ session, variant, onDelete }: SessionCardProps) {
     </div>
   );
 }
+
