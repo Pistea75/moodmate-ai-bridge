@@ -5,7 +5,7 @@ import { EnhancedSummaryDisplayProps } from './types';
 import { parseSummary } from './summaryParser';
 import { ReportHeader } from './ReportHeader';
 import { SessionOverview } from './SessionOverview';
-import { SummarySection } from './SummarySection';
+import { ReportSummarySection } from './ReportSummarySection';
 import { FinalRecommendations } from './FinalRecommendations';
 
 export const EnhancedSummaryDisplay: FC<EnhancedSummaryDisplayProps> = ({ 
@@ -23,7 +23,7 @@ export const EnhancedSummaryDisplay: FC<EnhancedSummaryDisplayProps> = ({
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <SummarySection
+        <ReportSummarySection
           title="Main Emotional Themes"
           icon={Heart}
           iconColor="text-pink-600"
@@ -32,7 +32,7 @@ export const EnhancedSummaryDisplay: FC<EnhancedSummaryDisplayProps> = ({
           fallbackText="Emotional themes will be identified from the conversation analysis."
         />
 
-        <SummarySection
+        <ReportSummarySection
           title="Warning Signs or Concerns"
           icon={AlertTriangle}
           iconColor="text-orange-600"
@@ -41,7 +41,7 @@ export const EnhancedSummaryDisplay: FC<EnhancedSummaryDisplayProps> = ({
           fallbackText="No immediate warning signs identified in this session."
         />
 
-        <SummarySection
+        <ReportSummarySection
           title="Cognitive Distortions"
           icon={Brain}
           iconColor="text-purple-600"
@@ -50,7 +50,7 @@ export const EnhancedSummaryDisplay: FC<EnhancedSummaryDisplayProps> = ({
           fallbackText="Cognitive patterns will be analyzed from the conversation."
         />
 
-        <SummarySection
+        <ReportSummarySection
           title="Suggested Coping Strategies"
           icon={Lightbulb}
           iconColor="text-yellow-600"
