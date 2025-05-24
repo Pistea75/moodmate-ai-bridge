@@ -6,18 +6,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Settings } from 'lucide-react';
+import { AIPreferences, isValidAIPreferences, getDefaultAIPreferences } from '@/types/aiPersonalization';
 
 interface AIPersonalizationFormProps {
   patientId: string;
 }
 
 export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps) {
-  const [preferences, setPreferences] = useState({
-    challenges: '',
-    strategies: '',
-    tone: '',
-    emergency: ''
-  });
+  const [preferences, setPreferences] = useState<AIPreferences>(getDefaultAIPreferences());
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -39,7 +35,7 @@ export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps)
             title: 'Error loading preferences',
             description: error.message
           });
-        } else if (data?.preferences) {
+        } else if (data?.preferences && isValidAIPreferences(data.preferences)) {
           setPreferences(data.preferences);
         }
       } catch (error) {

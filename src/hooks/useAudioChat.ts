@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { v4 as uuidv4 } from "uuid";
+import { AIPreferences, isValidAIPreferences } from "@/types/aiPersonalization";
 
 type Message = {
   id: string;
@@ -33,15 +34,16 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string) {
           .eq('patient_id', user.id)
           .maybeSingle();
 
-        if (profile?.preferences) {
+        if (profile?.preferences && isValidAIPreferences(profile.preferences)) {
+          const prefs = profile.preferences as AIPreferences;
           const customSystemPrompt = `
 ${baseSystemPrompt}
 
 Patient Personalization:
-- Known challenges/triggers: ${profile.preferences.challenges || 'N/A'}
-- Recommended strategies: ${profile.preferences.strategies || 'General CBT and mindfulness techniques'}
-- Preferred tone: ${profile.preferences.tone || 'supportive and evidence-based'}
-- Emergency protocols: ${profile.preferences.emergency || 'notify clinician if risk detected'}
+- Known challenges/triggers: ${prefs.challenges || 'N/A'}
+- Recommended strategies: ${prefs.strategies || 'General CBT and mindfulness techniques'}
+- Preferred tone: ${prefs.tone || 'supportive and evidence-based'}
+- Emergency protocols: ${prefs.emergency || 'notify clinician if risk detected'}
 
 Instructions:
 - Tailor your responses based on the patient's specific challenges and triggers
@@ -135,7 +137,6 @@ Instructions:
     }
   };
 
-  // Function to send message to OpenAI API via Edge Function
   const sendToAI = async (messageContent: string) => {
     if (!user) {
       toast({
