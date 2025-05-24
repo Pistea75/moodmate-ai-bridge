@@ -1,7 +1,9 @@
 
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChatExportPDF } from './ChatExportPDF';
+import { EnhancedSummaryDisplay } from './EnhancedSummaryDisplay';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface SummarySectionProps {
   summary: string | null;
@@ -22,6 +24,8 @@ export const SummarySection: FC<SummarySectionProps> = ({
   onSummarize, 
   onSaveReport 
 }) => {
+  const [showEnhanced, setShowEnhanced] = useState(false);
+
   return (
     <div className="mt-4 pt-4 border-t space-y-4">
       <Button 
@@ -34,10 +38,30 @@ export const SummarySection: FC<SummarySectionProps> = ({
       
       {summary && (
         <div className="space-y-3">
-          <div className="p-4 bg-primary/5 rounded-md border">
-            <h4 className="font-medium text-sm mb-2">Clinical Summary:</h4>
-            <div className="text-sm whitespace-pre-line">{summary}</div>
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium text-sm">Clinical Summary:</h4>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowEnhanced(!showEnhanced)}
+              className="flex items-center gap-2"
+            >
+              {showEnhanced ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showEnhanced ? 'Simple View' : 'Enhanced View'}
+            </Button>
           </div>
+          
+          {showEnhanced ? (
+            <EnhancedSummaryDisplay 
+              summary={summary} 
+              patientName={patientName}
+              clinicianName="Dr. Martinez" // You could pass this as a prop if needed
+            />
+          ) : (
+            <div className="p-4 bg-primary/5 rounded-md border">
+              <div className="text-sm whitespace-pre-line">{summary}</div>
+            </div>
+          )}
           
           <div className="flex flex-col sm:flex-row gap-2">
             <Button
