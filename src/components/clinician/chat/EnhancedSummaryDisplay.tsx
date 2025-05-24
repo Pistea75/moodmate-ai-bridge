@@ -28,7 +28,7 @@ export const EnhancedSummaryDisplay: FC<EnhancedSummaryDisplayProps> = ({
 
     // Simple parsing logic - in a real implementation, this would be more sophisticated
     const lines = text.split('\n').filter(line => line.trim());
-    let currentSection = 'overview';
+    let currentSection: keyof typeof sections = 'overview';
     
     lines.forEach(line => {
       const lowerLine = line.toLowerCase();
@@ -46,11 +46,12 @@ export const EnhancedSummaryDisplay: FC<EnhancedSummaryDisplayProps> = ({
 
       if (currentSection === 'overview' && !line.includes(':')) {
         sections.overview += line + ' ';
+      } else if (currentSection === 'recommendations') {
+        sections.recommendations += line + ' ';
       } else if (line.includes('•') || line.includes('-')) {
         const cleanLine = line.replace(/^[•\-\s]+/, '').trim();
-        if (cleanLine) {
-          sections[currentSection as keyof typeof sections].push?.(cleanLine) || 
-          (sections[currentSection as keyof typeof sections] += cleanLine + ' ');
+        if (cleanLine && Array.isArray(sections[currentSection])) {
+          (sections[currentSection] as string[]).push(cleanLine);
         }
       }
     });
