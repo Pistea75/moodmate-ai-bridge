@@ -2,9 +2,11 @@
 import { AudioChatInterface } from '@/components/AudioChatInterface';
 import PatientLayout from '../../layouts/PatientLayout';
 import { useClinicianDetails } from '@/hooks/useClinicianDetails';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function PatientChat() {
   const { clinicianName, loading } = useClinicianDetails();
+  const { user } = useAuth();
 
   // Custom system prompt for CBT-focused assistance
   const systemPrompt = "You are a supportive mental health assistant trained in CBT. Your goal is to help users process difficult thoughts, challenge cognitive distortions, and identify positive coping strategies. Always be empathetic, evidence-based, and non-judgmental. Address the user as a caring professional would, but do not diagnose or provide medical advice.";
@@ -20,6 +22,7 @@ export default function PatientChat() {
           <AudioChatInterface 
             clinicianName={clinicianName || 'Martinez'} 
             systemPrompt={systemPrompt}
+            patientId={user?.id}
           />
         )}
       </div>

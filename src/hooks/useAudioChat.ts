@@ -12,13 +12,54 @@ type Message = {
   timestamp: Date;
 };
 
-export function useAudioChat(systemPrompt: string) {
+export function useAudioChat(baseSystemPrompt: string, patientId?: string) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingHistory, setIsFetchingHistory] = useState(true);
   const [conversationHistory, setConversationHistory] = useState<{role: string, content: string}[]>([]);
+  const [personalizedSystemPrompt, setPersonalizedSystemPrompt] = useState(baseSystemPrompt);
+
+  // Fetch AI personalization preferences
+  useEffect(() => {
+    const fetchAIPersonalization = async () => {
+      if (!user) return;
+      
+      try {
+        const { data: profile } = await supabase
+          .from('ai_patient_profiles')
+          .select('preferences')
+          .eq('patient_id', user.id)
+          .maybeSingle();
+
+        if (profile?.preferences) {
+          const customSystemPrompt = `
+${baseSystemPrompt}
+
+Patient Personalization:
+- Known challenges/triggers: ${profile.preferences.challenges || 'N/A'}
+- Recommended strategies: ${profile.preferences.strategies || 'General CBT and mindfulness techniques'}
+- Preferred tone: ${profile.preferences.tone || 'supportive and evidence-based'}
+- Emergency protocols: ${profile.preferences.emergency || 'notify clinician if risk detected'}
+
+Instructions:
+- Tailor your responses based on the patient's specific challenges and triggers
+- Recommend the personalized strategies when appropriate
+- Maintain the preferred tone throughout the conversation
+- Follow emergency protocols if concerning content is detected
+- Always be empathetic and professional
+          `.trim();
+          
+          setPersonalizedSystemPrompt(customSystemPrompt);
+        }
+      } catch (error) {
+        console.error('Error fetching AI personalization:', error);
+      }
+    };
+
+    fetchAIPersonalization();
+  }, [user, baseSystemPrompt]);
 
   // Fetch chat history when component mounts
   useEffect(() => {
@@ -113,7 +154,7 @@ export function useAudioChat(systemPrompt: string) {
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: {
           messages: updatedHistory,
-          systemPrompt,
+          systemPrompt: personalizedSystemPrompt,
           userId: user.id
         }
       });

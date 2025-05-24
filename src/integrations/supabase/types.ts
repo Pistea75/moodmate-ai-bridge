@@ -119,6 +119,59 @@ export type Database = {
           },
         ]
       }
+      ai_patient_profiles: {
+        Row: {
+          clinician_id: string | null
+          created_at: string | null
+          id: string
+          patient_id: string | null
+          preferences: Json
+        }
+        Insert: {
+          clinician_id?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string | null
+          preferences: Json
+        }
+        Update: {
+          clinician_id?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string | null
+          preferences?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_patient_profiles_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ai_patient_profiles_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_patient_profiles_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ai_patient_profiles_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_reports: {
         Row: {
           advice: string | null

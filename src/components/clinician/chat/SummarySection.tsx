@@ -1,6 +1,7 @@
 
 import { FC } from 'react';
 import { EnhancedSummaryDisplay } from './EnhancedSummaryDisplay';
+import { ChatExportPDF } from './ChatExportPDF';
 
 interface SummarySectionProps {
   summary: string;
@@ -46,11 +47,20 @@ export const SummarySection: FC<SummarySectionProps> = ({
       </div>
       
       {summary && (
-        <EnhancedSummaryDisplay
-          summary={summary}
-          patientName={patientName}
-          clinicianName="Clinician"
-        />
+        <div className="space-y-4">
+          <EnhancedSummaryDisplay
+            summary={summary}
+            patientName={patientName}
+            clinicianName="Clinician"
+          />
+          <div className="flex justify-end">
+            <ChatExportPDF 
+              logs={logs} 
+              summary={summary} 
+              patientName={patientName} 
+            />
+          </div>
+        </div>
       )}
       
       {!summary && !summarizing && (

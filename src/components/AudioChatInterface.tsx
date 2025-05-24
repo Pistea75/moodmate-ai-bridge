@@ -12,15 +12,17 @@ interface AudioChatInterfaceProps {
   isClinicianView?: boolean;
   clinicianName?: string;
   systemPrompt?: string;
+  patientId?: string;
 }
 
 export function AudioChatInterface({
   isClinicianView,
   clinicianName = "Martinez",
-  systemPrompt = "You are Dr. Martinez, a compassionate mental health assistant. Provide supportive and professional responses to the patient."
+  systemPrompt = "You are Dr. Martinez, a compassionate mental health assistant. Provide supportive and professional responses to the patient.",
+  patientId
 }: AudioChatInterfaceProps) {
   const [isVoiceMode, setIsVoiceMode] = useState(false);
-  const { messages, isLoading, isFetchingHistory, handleSendMessage } = useAudioChat(systemPrompt);
+  const { messages, isLoading, isFetchingHistory, handleSendMessage } = useAudioChat(systemPrompt, patientId);
 
   return (
     <div className="h-[calc(100vh-160px)] md:h-[calc(100vh-32px)] flex flex-col">
