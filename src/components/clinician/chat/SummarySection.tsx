@@ -5,7 +5,7 @@ import { ChatExportPDF } from './ChatExportPDF';
 import { EnhancedSummaryDisplay } from './EnhancedSummaryDisplay';
 import { Eye, EyeOff } from 'lucide-react';
 
-interface SummarySectionProps {
+interface ChatSummarySectionProps {
   summary: string | null;
   summarizing: boolean;
   logs: any[];
@@ -15,7 +15,7 @@ interface SummarySectionProps {
   onSaveReport: () => void;
 }
 
-export const SummarySection: FC<SummarySectionProps> = ({ 
+export const SummarySection: FC<ChatSummarySectionProps> = ({ 
   summary, 
   summarizing, 
   logs, 
@@ -55,7 +55,7 @@ export const SummarySection: FC<SummarySectionProps> = ({
             <EnhancedSummaryDisplay 
               summary={summary} 
               patientName={patientName}
-              clinicianName="Dr. Martinez" // You could pass this as a prop if needed
+              clinicianName="Dr. Martinez"
             />
           ) : (
             <div className="p-4 bg-primary/5 rounded-md border">
