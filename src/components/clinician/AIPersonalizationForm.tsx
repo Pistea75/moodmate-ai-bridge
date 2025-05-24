@@ -59,14 +59,17 @@ export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps)
         .eq('patient_id', patientId)
         .maybeSingle();
 
+      // Cast preferences to Json for Supabase compatibility
+      const preferencesAsJson = preferences as any;
+
       const { error } = existing
         ? await supabase
             .from('ai_patient_profiles')
-            .update({ preferences })
+            .update({ preferences: preferencesAsJson })
             .eq('patient_id', patientId)
         : await supabase
             .from('ai_patient_profiles')
-            .insert([{ patient_id: patientId, preferences }]);
+            .insert([{ patient_id: patientId, preferences: preferencesAsJson }]);
 
       if (error) {
         throw error;
