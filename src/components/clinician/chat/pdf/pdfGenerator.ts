@@ -1,5 +1,5 @@
 
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, PDFPage, PDFFont, rgb, StandardFonts } from 'pdf-lib';
 import { format } from 'date-fns';
 import { LogEntry, PDFGenerationConfig } from './types';
 import { sanitizeTextForPDF } from './textSanitizer';

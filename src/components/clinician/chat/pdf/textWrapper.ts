@@ -1,5 +1,5 @@
 
-import { StandardFonts, PDFFont, PDFPage, rgb } from 'pdf-lib';
+import { PDFFont, PDFPage, PDFDocument, rgb } from 'pdf-lib';
 
 interface TextWrapperOptions {
   text: string;
@@ -10,7 +10,7 @@ interface TextWrapperOptions {
   lineHeight: number;
   startY: number;
   page: PDFPage;
-  pdfDoc: any;
+  pdfDoc: PDFDocument;
   pageHeight: number;
 }
 
