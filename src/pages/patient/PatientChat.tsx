@@ -3,39 +3,15 @@ import { AudioChatInterface } from '@/components/AudioChatInterface';
 import PatientLayout from '../../layouts/PatientLayout';
 import { useClinicianDetails } from '@/hooks/useClinicianDetails';
 import { useAuth } from '@/contexts/AuthContext';
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { isValidAIPreferences } from '@/types/aiPersonalization';
+import { usePatientAIProfile } from '@/hooks/usePatientAIProfile';
 
 export default function PatientChat() {
   const { clinicianName, loading } = useClinicianDetails();
   const { user } = useAuth();
-  const [hasPersonalization, setHasPersonalization] = useState(false);
+  const { hasPersonalization } = usePatientAIProfile(user?.id || '');
 
   // Custom system prompt for CBT-focused assistance
   const systemPrompt = "You are a supportive mental health assistant trained in CBT. Your goal is to help users process difficult thoughts, challenge cognitive distortions, and identify positive coping strategies. Always be empathetic, evidence-based, and non-judgmental. Address the user as a caring professional would, but do not diagnose or provide medical advice.";
-
-  useEffect(() => {
-    const checkPersonalization = async () => {
-      if (!user) return;
-      
-      try {
-        const { data: profile } = await supabase
-          .from('ai_patient_profiles')
-          .select('preferences')
-          .eq('patient_id', user.id)
-          .maybeSingle();
-
-        if (profile?.preferences && isValidAIPreferences(profile.preferences)) {
-          setHasPersonalization(true);
-        }
-      } catch (error) {
-        console.error('Error checking personalization:', error);
-      }
-    };
-
-    checkPersonalization();
-  }, [user]);
 
   return (
     <PatientLayout>

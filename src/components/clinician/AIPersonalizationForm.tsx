@@ -5,15 +5,24 @@ import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Brain, Settings } from 'lucide-react';
-import { AIPreferences, isValidAIPreferences, getDefaultAIPreferences } from '@/types/aiPersonalization';
 
 interface AIPersonalizationFormProps {
   patientId: string;
+  clinicianId?: string;
 }
 
-export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps) {
-  const [preferences, setPreferences] = useState<AIPreferences>(getDefaultAIPreferences());
+const defaultPrefs = {
+  tone: '',
+  strategies: '',
+  triggersToAvoid: '',
+  motivators: '',
+  dosAndDonts: ''
+};
+
+export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizationFormProps) {
+  const [prefs, setPrefs] = useState(defaultPrefs);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -35,8 +44,8 @@ export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps)
             title: 'Error loading preferences',
             description: error.message
           });
-        } else if (data?.preferences && isValidAIPreferences(data.preferences)) {
-          setPreferences(data.preferences);
+        } else if (data?.preferences) {
+          setPrefs({ ...defaultPrefs, ...data.preferences });
         }
       } catch (error) {
         console.error('Error in fetchPreferences:', error);
@@ -50,6 +59,10 @@ export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps)
     }
   }, [patientId, toast]);
 
+  const handleChange = (name: string, value: string) => {
+    setPrefs(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -59,17 +72,20 @@ export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps)
         .eq('patient_id', patientId)
         .maybeSingle();
 
-      // Cast preferences to Json for Supabase compatibility
-      const preferencesAsJson = preferences as any;
+      const payload = {
+        patient_id: patientId,
+        ...(clinicianId && { clinician_id: clinicianId }),
+        preferences: prefs
+      };
 
       const { error } = existing
         ? await supabase
             .from('ai_patient_profiles')
-            .update({ preferences: preferencesAsJson })
+            .update(payload)
             .eq('patient_id', patientId)
         : await supabase
             .from('ai_patient_profiles')
-            .insert([{ patient_id: patientId, preferences: preferencesAsJson }]);
+            .insert([payload]);
 
       if (error) {
         throw error;
@@ -116,29 +132,32 @@ export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps)
         <div className="grid gap-4">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Challenges / Triggers
+              Preferred Tone
             </label>
-            <Textarea
-              rows={3}
-              value={preferences.challenges}
-              onChange={(e) =>
-                setPreferences((prev) => ({ ...prev, challenges: e.target.value }))
-              }
-              placeholder="e.g. anxiety in social settings, fear of failure, work stress"
-              className="resize-none"
-            />
+            <Select value={prefs.tone} onValueChange={(value) => handleChange('tone', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select preferred tone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">-- Select --</SelectItem>
+                <SelectItem value="empathetic">Empathetic</SelectItem>
+                <SelectItem value="motivational">Motivational</SelectItem>
+                <SelectItem value="calm">Calm</SelectItem>
+                <SelectItem value="neutral">Neutral</SelectItem>
+                <SelectItem value="gentle">Gentle</SelectItem>
+                <SelectItem value="encouraging">Encouraging</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Recommended Strategies
+              Coping Strategies
             </label>
             <Textarea
               rows={3}
-              value={preferences.strategies}
-              onChange={(e) =>
-                setPreferences((prev) => ({ ...prev, strategies: e.target.value }))
-              }
+              value={prefs.strategies}
+              onChange={(e) => handleChange('strategies', e.target.value)}
               placeholder="e.g. breathing exercises, CBT thought log, music playlist, mindfulness meditation"
               className="resize-none"
             />
@@ -146,30 +165,39 @@ export function AIPersonalizationForm({ patientId }: AIPersonalizationFormProps)
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Tone Preference
+              Triggers to Avoid
             </label>
             <Textarea
-              rows={2}
-              value={preferences.tone}
-              onChange={(e) =>
-                setPreferences((prev) => ({ ...prev, tone: e.target.value }))
-              }
-              placeholder="e.g. calm and supportive, gentle but assertive, encouraging and motivational"
+              rows={3}
+              value={prefs.triggersToAvoid}
+              onChange={(e) => handleChange('triggersToAvoid', e.target.value)}
+              placeholder="e.g. avoid discussing family trauma, work stress topics, financial issues"
               className="resize-none"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Emergency Instructions
+              Motivators / Interests
             </label>
             <Textarea
               rows={3}
-              value={preferences.emergency}
-              onChange={(e) =>
-                setPreferences((prev) => ({ ...prev, emergency: e.target.value }))
-              }
-              placeholder="e.g. if suicidal thoughts are expressed, suggest calling a helpline; if panic attacks occur, guide through grounding techniques"
+              value={prefs.motivators}
+              onChange={(e) => handleChange('motivators', e.target.value)}
+              placeholder="e.g. loves music, enjoys nature walks, motivated by family goals"
+              className="resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Do's and Don'ts
+            </label>
+            <Textarea
+              rows={3}
+              value={prefs.dosAndDonts}
+              onChange={(e) => handleChange('dosAndDonts', e.target.value)}
+              placeholder="e.g. DO: Use simple language, ask about progress. DON'T: Rush conversations, use clinical jargon"
               className="resize-none"
             />
           </div>

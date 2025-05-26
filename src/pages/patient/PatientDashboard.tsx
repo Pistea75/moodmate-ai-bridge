@@ -4,7 +4,6 @@ import { MoodChart } from '@/components/mood/MoodChart';
 import { MoodLogModal } from '@/components/patient/MoodLogModal';
 import { MoodStatsCard } from '@/components/patient/MoodStatsCard';
 import { TasksCompletedCard } from '@/components/patient/TasksCompletedCard';
-import { PatientReports } from '@/components/patient/PatientReports';
 
 export default function PatientDashboard() {
   return (
@@ -14,17 +13,11 @@ export default function PatientDashboard() {
         
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div className="xl:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <MoodStatsCard />
+              <TasksCompletedCard />
+            </div>
             <MoodChart />
-          </div>
-          <div className="flex flex-col space-y-6">
-            <MoodStatsCard />
-            <TasksCompletedCard />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2">
-            <PatientReports />
           </div>
           <div>
             <MoodLogModal />
