@@ -15,6 +15,8 @@ import { MoodReportPDF } from '@/components/clinician/MoodReportPDF';
 import { PatientSessionRecap } from '@/components/clinician/PatientSessionRecap';
 import { PatientMoodAlertFeed } from '@/components/clinician/PatientMoodAlertFeed';
 import { PatientAIChatLogs } from '@/components/clinician/PatientAIChatLogs';
+import { AIPersonalizationModal } from '@/components/clinician/AIPersonalizationModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PatientProfile {
   id: string;
@@ -27,6 +29,7 @@ interface PatientProfile {
 export default function PatientDetail() {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [patient, setPatient] = useState<PatientProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -117,7 +120,11 @@ export default function PatientDetail() {
               {patient.first_name} {patient.last_name}'s Profile
             </h1>
           </div>
-          <div>
+          <div className="flex items-center gap-2">
+            <AIPersonalizationModal 
+              patientId={patientId as string} 
+              clinicianId={user?.id}
+            />
             <MoodReportPDF patientId={patientId as string} patientName={patientFullName} />
           </div>
         </div>
