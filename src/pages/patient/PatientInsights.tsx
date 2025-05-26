@@ -1,8 +1,7 @@
+
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card } from "@/components/ui/card";
 import { MoodChart } from '@/components/mood/MoodChart';
-import { MoodLogModal } from '@/components/patient/MoodLogModal'; 
-import { Button } from '@/components/ui/button';
 
 export default function PatientInsights() {
   const insights = [
@@ -21,10 +20,7 @@ export default function PatientInsights() {
   return (
     <PatientLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Insights</h1>
-          <MoodLogModal />
-        </div>
+        <h1 className="text-2xl font-bold">Insights</h1>
         
         <div className="grid gap-6">
           <Card className="p-6">

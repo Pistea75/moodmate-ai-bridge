@@ -15,7 +15,7 @@ export function AIPersonalizationModal({ patientId, clinicianId, trigger }: AIPe
     <Dialog>
       <DialogTrigger asChild>
         {trigger || (
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="default" className="gap-2">
             <Brain className="h-4 w-4" />
             Personalize AI
           </Button>

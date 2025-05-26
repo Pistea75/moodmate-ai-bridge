@@ -11,7 +11,7 @@ export default function TrainAI() {
     <ClinicianLayout>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Dr. {firstName} AI Training</h1>
+          <h1 className="text-2xl font-bold mb-2">Dr. {firstName} AI Chat</h1>
           <p className="text-muted-foreground -mt-1">
             Train your AI to respond in your unique style
           </p>
