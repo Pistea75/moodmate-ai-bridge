@@ -139,7 +139,7 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
                 <SelectValue placeholder="Select preferred tone" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">-- Select --</SelectItem>
+                <SelectItem value="none">-- Select --</SelectItem>
                 <SelectItem value="empathetic">Empathetic</SelectItem>
                 <SelectItem value="motivational">Motivational</SelectItem>
                 <SelectItem value="calm">Calm</SelectItem>
