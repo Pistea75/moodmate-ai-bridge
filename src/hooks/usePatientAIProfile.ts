@@ -2,14 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-interface AIPreferences {
-  tone: string;
-  strategies: string;
-  triggersToAvoid: string;
-  motivators: string;
-  dosAndDonts: string;
-}
+import { AIPreferences, isValidAIPreferences, getDefaultAIPreferences } from '@/types/aiPersonalization';
 
 export function usePatientAIProfile(patientId: string) {
   const [preferences, setPreferences] = useState<AIPreferences | null>(null);
@@ -35,8 +28,8 @@ export function usePatientAIProfile(patientId: string) {
           title: 'Error loading AI preferences',
           description: error.message
         });
-      } else if (data?.preferences) {
-        setPreferences(data.preferences as AIPreferences);
+      } else if (data?.preferences && isValidAIPreferences(data.preferences)) {
+        setPreferences(data.preferences);
         setHasPersonalization(true);
       } else {
         setHasPersonalization(false);
