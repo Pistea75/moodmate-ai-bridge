@@ -36,7 +36,7 @@ export function usePatientAIProfile(patientId: string) {
           description: error.message
         });
       } else if (data?.preferences) {
-        setPreferences(data.preferences);
+        setPreferences(data.preferences as AIPreferences);
         setHasPersonalization(true);
       } else {
         setHasPersonalization(false);
@@ -63,7 +63,7 @@ export function usePatientAIProfile(patientId: string) {
       const payload = {
         patient_id: patientId,
         ...(clinicianId && { clinician_id: clinicianId }),
-        preferences: newPreferences
+        preferences: newPreferences as any
       };
 
       const { error } = existing

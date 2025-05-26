@@ -25,16 +25,16 @@ export function usePersonalization(baseSystemPrompt: string) {
 ${baseSystemPrompt}
 
 Patient Personalization:
-- Known challenges/triggers: ${prefs.challenges || 'N/A'}
+- Known triggers to avoid: ${prefs.triggersToAvoid || 'N/A'}
 - Recommended strategies: ${prefs.strategies || 'General CBT and mindfulness techniques'}
 - Preferred tone: ${prefs.tone || 'supportive and evidence-based'}
-- Emergency protocols: ${prefs.emergency || 'notify clinician if risk detected'}
+- Patient motivators/interests: ${prefs.motivators || 'N/A'}
+- Do's and Don'ts: ${prefs.dosAndDonts || 'Follow standard therapeutic guidelines'}
 
 Instructions:
-- Tailor your responses based on the patient's specific challenges and triggers
+- Tailor your responses based on the patient's specific triggers and preferences
 - Recommend the personalized strategies when appropriate
 - Maintain the preferred tone throughout the conversation
-- Follow emergency protocols if concerning content is detected
 - Always be empathetic and professional
           `.trim();
           

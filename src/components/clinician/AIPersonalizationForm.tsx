@@ -44,8 +44,8 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
             title: 'Error loading preferences',
             description: error.message
           });
-        } else if (data?.preferences) {
-          setPrefs({ ...defaultPrefs, ...data.preferences });
+        } else if (data?.preferences && typeof data.preferences === 'object') {
+          setPrefs({ ...defaultPrefs, ...(data.preferences as Record<string, string>) });
         }
       } catch (error) {
         console.error('Error in fetchPreferences:', error);
@@ -75,7 +75,7 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
       const payload = {
         patient_id: patientId,
         ...(clinicianId && { clinician_id: clinicianId }),
-        preferences: prefs
+        preferences: prefs as any
       };
 
       const { error } = existing
