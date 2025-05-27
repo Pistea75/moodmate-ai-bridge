@@ -13,20 +13,14 @@ import { moodFormSchema, MoodFormValues } from './mood/MoodFormSchema';
 import { MoodSlider } from './mood/MoodSlider';
 import { MoodTriggers } from './mood/MoodTriggers';
 import { MoodNotes } from './mood/MoodNotes';
-import { MoodHistoryButton } from './mood/MoodHistoryButton';
 import { useMoodSubmit } from './mood/useMoodSubmit';
 
-/**
- * MoodLogModal Component
- * 
- * A comprehensive modal interface for users to log their current mood state.
- * Includes mood score selection, trigger identification, and optional notes.
- * 
- * @param {Object} props - Component properties
- * @param {Function} [props.onLogComplete] - Optional callback triggered when mood logging is complete
- * @returns {JSX.Element} - Rendered modal component
- */
-export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) {
+interface MoodLogModalProps {
+  onLogComplete?: () => void;
+  trigger?: React.ReactNode;
+}
+
+export function MoodLogModal({ onLogComplete, trigger }: MoodLogModalProps) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   
@@ -64,12 +58,9 @@ export function MoodLogModal({ onLogComplete }: { onLogComplete?: () => void }) 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <div className="flex items-center space-x-2">
-        <DialogTrigger asChild>
-          <Button variant="default">Log Mood</Button>
-        </DialogTrigger>
-        <MoodHistoryButton />
-      </div>
+      <DialogTrigger asChild>
+        {trigger || <Button variant="default">Log Mood</Button>}
+      </DialogTrigger>
       
       <DialogContent className="sm:max-w-[425px] bg-white rounded-xl shadow-2xl overflow-hidden p-0 border-0 m-4 my-8">
         <DialogHeader className="border-b px-6 py-4 bg-white">

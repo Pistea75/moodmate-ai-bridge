@@ -21,21 +21,27 @@ export function usePersonalization(baseSystemPrompt: string) {
 
         if (profile?.preferences && isValidAIPreferences(profile.preferences)) {
           const prefs = profile.preferences as AIPreferences;
+          
+          // Enhanced system prompt with comprehensive personalization
           const customSystemPrompt = `
 ${baseSystemPrompt}
 
-Patient Personalization:
-- Known triggers to avoid: ${prefs.triggersToAvoid || 'N/A'}
-- Recommended strategies: ${prefs.strategies || 'General CBT and mindfulness techniques'}
-- Preferred tone: ${prefs.tone || 'supportive and evidence-based'}
-- Patient motivators/interests: ${prefs.motivators || 'N/A'}
-- Do's and Don'ts: ${prefs.dosAndDonts || 'Follow standard therapeutic guidelines'}
+Patient Personalization Context:
+- Diagnosis: ${prefs.diagnosis || 'Not specified'}
+- Personality Traits: ${prefs.personality_traits || 'Not specified'}
+- Helpful Strategies: ${prefs.helpful_strategies || 'General CBT and mindfulness techniques'}
+- Things to Avoid: ${prefs.things_to_avoid || 'N/A'}
+- Clinical Goals: ${prefs.clinical_goals || 'Not specified'}
+
+Latest mood context: Fetch and incorporate recent mood triggers when responding.
 
 Instructions:
-- Tailor your responses based on the patient's specific triggers and preferences
+- Tailor your responses based on the patient's specific diagnosis and personality traits
 - Recommend the personalized strategies when appropriate
-- Maintain the preferred tone throughout the conversation
-- Always be empathetic and professional
+- Actively avoid topics or approaches mentioned in "things to avoid"
+- Keep clinical goals in mind when providing guidance
+- Be especially attentive to the patient's unique personality and adapt your communication style accordingly
+- Always be empathetic, professional, and evidence-based
           `.trim();
           
           setPersonalizedSystemPrompt(customSystemPrompt);
