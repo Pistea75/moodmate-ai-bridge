@@ -5,6 +5,11 @@ export interface AIPreferences {
   triggersToAvoid: string;
   motivators: string;
   dosAndDonts: string;
+  diagnosis?: string;
+  personality_traits?: string;
+  helpful_strategies?: string;
+  things_to_avoid?: string;
+  clinical_goals?: string;
 }
 
 export function isValidAIPreferences(data: any): data is AIPreferences {
@@ -25,6 +30,11 @@ export function getDefaultAIPreferences(): AIPreferences {
     strategies: '',
     triggersToAvoid: '',
     motivators: '',
-    dosAndDonts: ''
+    dosAndDonts: '',
+    diagnosis: '',
+    personality_traits: '',
+    helpful_strategies: '',
+    things_to_avoid: '',
+    clinical_goals: ''
   };
 }

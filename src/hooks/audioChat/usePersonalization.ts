@@ -27,11 +27,11 @@ export function usePersonalization(baseSystemPrompt: string) {
 ${baseSystemPrompt}
 
 Patient Personalization Context:
-- Diagnosis: ${prefs.diagnosis || 'Not specified'}
-- Personality Traits: ${prefs.personality_traits || 'Not specified'}
-- Helpful Strategies: ${prefs.helpful_strategies || 'General CBT and mindfulness techniques'}
-- Things to Avoid: ${prefs.things_to_avoid || 'N/A'}
-- Clinical Goals: ${prefs.clinical_goals || 'Not specified'}
+- Diagnosis: ${prefs.diagnosis || prefs.tone || 'Not specified'}
+- Personality Traits: ${prefs.personality_traits || prefs.motivators || 'Not specified'}
+- Helpful Strategies: ${prefs.helpful_strategies || prefs.strategies || 'General CBT and mindfulness techniques'}
+- Things to Avoid: ${prefs.things_to_avoid || prefs.triggersToAvoid || 'N/A'}
+- Clinical Goals: ${prefs.clinical_goals || prefs.dosAndDonts || 'Not specified'}
 
 Latest mood context: Fetch and incorporate recent mood triggers when responding.
 

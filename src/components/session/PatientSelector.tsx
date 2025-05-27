@@ -13,9 +13,10 @@ import { supabase } from "@/integrations/supabase/client";
 interface PatientSelectorProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 }
 
-export function PatientSelector({ value, onChange }: PatientSelectorProps) {
+export function PatientSelector({ value, onChange, placeholder = "Select patient" }: PatientSelectorProps) {
   const [patients, setPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +46,7 @@ export function PatientSelector({ value, onChange }: PatientSelectorProps) {
       </Label>
       <Select value={value} onValueChange={onChange} disabled={loading}>
         <SelectTrigger id="patient" className="bg-white">
-          <SelectValue placeholder="Select patient" />
+          <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
           {patients.map((patient) => (
