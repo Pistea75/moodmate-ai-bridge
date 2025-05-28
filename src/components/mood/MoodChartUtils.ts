@@ -1,5 +1,5 @@
 
-import { MOOD_LABELS } from './MoodChartConstants';
+import { generateDateLabels } from '@/lib/utils/moodChartDateUtils';
 
 export interface MoodEntry {
   mood_score: number;
@@ -18,7 +18,7 @@ export interface ChartData {
 export type ViewMode = 'weekly' | 'daily';
 
 // Function to normalize mood score from 1-10 to 1-5
-export function normalizeMood(score: number) {
+export function normalizeMood(score: number): number {
   return Math.max(1, Math.min(5, Math.ceil(score / 2)));
 }
 
@@ -30,7 +30,9 @@ function isHighRiskMood(score: number, triggers: string[] | null): boolean {
 
   if (triggers && triggers.length > 0) {
     const riskyTriggers = ['stress', 'anxiety', 'panic', 'overwhelmed'];
-    return triggers.some(trigger => riskyTriggers.includes(trigger.toLowerCase()));
+    return triggers.some(trigger => 
+      riskyTriggers.includes(trigger.toLowerCase())
+    );
   }
 
   return false;
@@ -40,7 +42,12 @@ function isHighRiskMood(score: number, triggers: string[] | null): boolean {
 export function parseEntries(entries: MoodEntry[], view: ViewMode): ChartData[] {
   if (view === 'daily') {
     // Group entries by time of day (Morning, Afternoon, Evening, Night)
-    const grouped: { [key: string]: { sum: number; count: number; flagged: boolean; notes: string[] } } = {
+    const grouped: Record<string, { 
+      sum: number; 
+      count: number; 
+      flagged: boolean; 
+      notes: string[] 
+    }> = {
       Morning: { sum: 0, count: 0, flagged: false, notes: [] },
       Afternoon: { sum: 0, count: 0, flagged: false, notes: [] },
       Evening: { sum: 0, count: 0, flagged: false, notes: [] },
@@ -74,11 +81,16 @@ export function parseEntries(entries: MoodEntry[], view: ViewMode): ChartData[] 
       label,
       mood: data.count > 0 ? Math.round(data.sum / data.count) : null,
       flagged: data.flagged,
-      notes: data.notes.join(', '),
+      notes: data.notes.join(', ') || null,
     }));
   } else {
     // Group entries by day of the week
-    const grouped: { [key: string]: { sum: number; count: number; flagged: boolean; notes: string[] } } = {};
+    const grouped: Record<string, { 
+      sum: number; 
+      count: number; 
+      flagged: boolean; 
+      notes: string[] 
+    }> = {};
 
     entries.forEach(entry => {
       const date = new Date(entry.created_at);
@@ -102,7 +114,7 @@ export function parseEntries(entries: MoodEntry[], view: ViewMode): ChartData[] 
       label: day,
       mood: grouped[day] ? Math.round(grouped[day].sum / grouped[day].count) : null,
       flagged: grouped[day] ? grouped[day].flagged : false,
-      notes: grouped[day] ? grouped[day].notes.join(', ') : null,
+      notes: grouped[day] ? grouped[day].notes.join(', ') || null : null,
     }));
   }
 }

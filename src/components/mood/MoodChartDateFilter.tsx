@@ -54,17 +54,17 @@ export function MoodChartDateFilter({ dateRange, onDateRangeChange }: MoodChartD
     onDateRangeChange({ start: null, end: null });
   };
 
-  const setLastWeek = () => {
+  const setWeek = () => {
     const end = new Date();
     const start = new Date();
-    start.setDate(start.getDate() - 7);
+    start.setDate(start.getDate() - 6); // Last 7 days including today
     onDateRangeChange({ start, end });
   };
 
-  const setLastMonth = () => {
+  const setMonth = () => {
     const end = new Date();
     const start = new Date();
-    start.setMonth(start.getMonth() - 1);
+    start.setDate(start.getDate() - 29); // Last 30 days including today
     onDateRangeChange({ start, end });
   };
 
@@ -96,12 +96,12 @@ export function MoodChartDateFilter({ dateRange, onDateRangeChange }: MoodChartD
         </PopoverContent>
       </Popover>
 
-      <Button variant="outline" size="sm" onClick={setLastWeek}>
-        Last 7 days
+      <Button variant="outline" size="sm" onClick={setWeek}>
+        Week
       </Button>
       
-      <Button variant="outline" size="sm" onClick={setLastMonth}>
-        Last 30 days
+      <Button variant="outline" size="sm" onClick={setMonth}>
+        Month
       </Button>
 
       {(dateRange.start || dateRange.end) && (

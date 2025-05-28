@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button';
 import { MoodChartView } from './MoodChartView';
 import { MoodChartDateFilter } from './MoodChartDateFilter';
 import { ChartData, MoodEntry as MoodChartEntry, parseEntries, ViewMode } from './MoodChartUtils';
-import { ViewMode as MoodViewMode } from './MoodChartConstants';
-import { MoodEntry } from '@/hooks/useMoodEntries';
+import { getLastSevenDays } from '@/lib/utils/moodChartDateUtils';
 
 interface MoodChartProps {
   patientId?: string;
@@ -18,18 +17,13 @@ interface DateRange {
   end: Date | null;
 }
 
-// Helper function to get last 7 days range
-const getLastSevenDays = (): DateRange => {
-  const end = new Date();
-  const start = new Date();
-  start.setDate(start.getDate() - 7);
-  return { start, end };
-};
-
 export function MoodChart({ patientId }: MoodChartProps) {
   const [data, setData] = useState<ChartData[]>([]);
   const [view, setView] = useState<ViewMode>('weekly');
-  const [dateRange, setDateRange] = useState<DateRange>(getLastSevenDays());
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    const range = getLastSevenDays();
+    return { start: range.start, end: range.end };
+  });
   const { toast } = useToast();
 
   const fetchMoodData = async () => {
@@ -66,7 +60,6 @@ export function MoodChart({ patientId }: MoodChartProps) {
     const { data: entries, error } = await query;
 
     if (error) {
-      console.error('Error fetching mood entries:', error);
       toast({
         variant: 'destructive',
         title: 'Failed to load mood data',
@@ -84,6 +77,35 @@ export function MoodChart({ patientId }: MoodChartProps) {
     const parsed = parseEntries(parsedEntries, view);
     setData(parsed);
   };
+
+  // Auto-update every day at midnight or when component mounts
+  useEffect(() => {
+    fetchMoodData();
+    
+    // Set up interval to refresh data daily
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const msUntilMidnight = tomorrow.getTime() - now.getTime();
+    
+    const timeoutId = setTimeout(() => {
+      // Update to new "last 7 days" range at midnight
+      const newRange = getLastSevenDays();
+      setDateRange({ start: newRange.start, end: newRange.end });
+      
+      // Set up daily interval
+      const intervalId = setInterval(() => {
+        const updatedRange = getLastSevenDays();
+        setDateRange({ start: updatedRange.start, end: updatedRange.end });
+      }, 24 * 60 * 60 * 1000); // 24 hours
+      
+      return () => clearInterval(intervalId);
+    }, msUntilMidnight);
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   useEffect(() => {
     fetchMoodData();
