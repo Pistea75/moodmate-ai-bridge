@@ -7,6 +7,7 @@ import { TasksCompletedCard } from '@/components/patient/TasksCompletedCard';
 import { UpcomingSessionsSection } from '@/components/patient/UpcomingSessionsSection';
 import { ChatNowCard } from '@/components/patient/ChatNowCard';
 import { MoodHistoryButton } from '@/components/patient/mood/MoodHistoryButton';
+import { ExerciseTrackingCard } from '@/components/patient/ExerciseTrackingCard';
 
 export default function PatientDashboard() {
   return (
@@ -35,6 +36,7 @@ export default function PatientDashboard() {
           </div>
           <div className="space-y-6">
             <ChatNowCard />
+            <ExerciseTrackingCard />
           </div>
         </div>
       </div>
