@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -17,10 +18,18 @@ interface DateRange {
   end: Date | null;
 }
 
+// Helper function to get last 7 days range
+const getLastSevenDays = (): DateRange => {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - 7);
+  return { start, end };
+};
+
 export function MoodChart({ patientId }: MoodChartProps) {
   const [data, setData] = useState<ChartData[]>([]);
   const [view, setView] = useState<ViewMode>('weekly');
-  const [dateRange, setDateRange] = useState<DateRange>({ start: null, end: null });
+  const [dateRange, setDateRange] = useState<DateRange>(getLastSevenDays());
   const { toast } = useToast();
 
   const fetchMoodData = async () => {

@@ -5,21 +5,22 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { DateRange } from 'react-day-picker';
 
-interface DateRange {
+interface DateRangeFilter {
   start: Date | null;
   end: Date | null;
 }
 
 interface MoodChartDateFilterProps {
-  dateRange: DateRange;
-  onDateRangeChange: (range: DateRange) => void;
+  dateRange: DateRangeFilter;
+  onDateRangeChange: (range: DateRangeFilter) => void;
 }
 
 export function MoodChartDateFilter({ dateRange, onDateRangeChange }: MoodChartDateFilterProps) {
   const formatDateRange = () => {
     if (!dateRange.start && !dateRange.end) {
-      return 'All time';
+      return 'Select date range';
     }
     if (dateRange.start && !dateRange.end) {
       return `From ${format(dateRange.start, 'MMM d, yyyy')}`;
@@ -28,17 +29,24 @@ export function MoodChartDateFilter({ dateRange, onDateRangeChange }: MoodChartD
       return `Until ${format(dateRange.end, 'MMM d, yyyy')}`;
     }
     if (dateRange.start && dateRange.end) {
+      // If same date, show as single date
+      if (dateRange.start.toDateString() === dateRange.end.toDateString()) {
+        return format(dateRange.start, 'MMM d, yyyy');
+      }
       return `${format(dateRange.start, 'MMM d')} - ${format(dateRange.end, 'MMM d, yyyy')}`;
     }
-    return 'Select dates';
+    return 'Select date range';
   };
 
-  const handleDateSelect = (date: Date | undefined, type: 'start' | 'end') => {
-    if (!date) return;
-    
+  const handleRangeSelect = (range: DateRange | undefined) => {
+    if (!range) {
+      onDateRangeChange({ start: null, end: null });
+      return;
+    }
+
     onDateRangeChange({
-      ...dateRange,
-      [type]: date
+      start: range.from || null,
+      end: range.to || null
     });
   };
 
@@ -60,6 +68,12 @@ export function MoodChartDateFilter({ dateRange, onDateRangeChange }: MoodChartD
     onDateRangeChange({ start, end });
   };
 
+  // Convert our date range format to react-day-picker format
+  const dayPickerRange: DateRange | undefined = dateRange.start || dateRange.end ? {
+    from: dateRange.start || undefined,
+    to: dateRange.end || undefined
+  } : undefined;
+
   return (
     <div className="flex items-center gap-2 flex-wrap">
       <Popover>
@@ -70,25 +84,14 @@ export function MoodChartDateFilter({ dateRange, onDateRangeChange }: MoodChartD
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div className="p-4 space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">From Date</label>
-              <Calendar
-                mode="single"
-                selected={dateRange.start || undefined}
-                onSelect={(date) => handleDateSelect(date, 'start')}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">To Date</label>
-              <Calendar
-                mode="single"
-                selected={dateRange.end || undefined}
-                onSelect={(date) => handleDateSelect(date, 'end')}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </div>
+          <div className="p-4">
+            <Calendar
+              mode="range"
+              selected={dayPickerRange}
+              onSelect={handleRangeSelect}
+              numberOfMonths={2}
+              className={cn("pointer-events-auto")}
+            />
           </div>
         </PopoverContent>
       </Popover>
