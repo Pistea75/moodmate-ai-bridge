@@ -10,6 +10,7 @@ import { getLastSevenDays } from '@/lib/utils/moodChartDateUtils';
 
 interface MoodChartProps {
   patientId?: string;
+  showLogButton?: boolean;
 }
 
 interface DateRange {
@@ -17,7 +18,7 @@ interface DateRange {
   end: Date | null;
 }
 
-export function MoodChart({ patientId }: MoodChartProps) {
+export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) {
   const [data, setData] = useState<ChartData[]>([]);
   const [view, setView] = useState<ViewMode>('weekly');
   const [dateRange, setDateRange] = useState<DateRange>(() => {
@@ -74,7 +75,13 @@ export function MoodChart({ patientId }: MoodChartProps) {
       triggers: entry.triggers || [] // Ensure triggers is always an array
     })) as MoodChartEntry[] : [];
     
-    const parsed = parseEntries(parsedEntries, view);
+    // Pass date range for dynamic chart generation
+    const chartDateRange = dateRange.start && dateRange.end ? {
+      start: dateRange.start,
+      end: dateRange.end
+    } : undefined;
+    
+    const parsed = parseEntries(parsedEntries, view, chartDateRange);
     setData(parsed);
   };
 
@@ -132,6 +139,11 @@ export function MoodChart({ patientId }: MoodChartProps) {
           >
             Daily
           </Button>
+          {showLogButton && (
+            <Button variant="default" size="sm">
+              Log Mood
+            </Button>
+          )}
         </div>
       </div>
 

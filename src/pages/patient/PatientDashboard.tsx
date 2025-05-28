@@ -35,8 +35,8 @@ export default function PatientDashboard() {
             <MoodChart />
           </div>
           <div className="space-y-6">
-            <ChatNowCard />
             <ExerciseTrackingCard />
+            <ChatNowCard />
           </div>
         </div>
       </div>

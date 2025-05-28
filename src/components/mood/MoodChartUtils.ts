@@ -1,5 +1,5 @@
 
-import { generateDateLabels } from '@/lib/utils/moodChartDateUtils';
+import { eachDayOfInterval, format, startOfDay, endOfDay } from 'date-fns';
 
 export interface MoodEntry {
   mood_score: number;
@@ -38,8 +38,16 @@ function isHighRiskMood(score: number, triggers: string[] | null): boolean {
   return false;
 }
 
-// Function to parse mood entries into chart data
-export function parseEntries(entries: MoodEntry[], view: ViewMode): ChartData[] {
+// Function to generate dynamic date range for chart
+export function generateDateRange(startDate: Date, endDate: Date): Date[] {
+  return eachDayOfInterval({ 
+    start: startOfDay(startDate), 
+    end: endOfDay(endDate) 
+  });
+}
+
+// Function to parse mood entries into chart data with dynamic date range
+export function parseEntries(entries: MoodEntry[], view: ViewMode, dateRange?: { start: Date; end: Date }): ChartData[] {
   if (view === 'daily') {
     // Group entries by time of day (Morning, Afternoon, Evening, Night)
     const grouped: Record<string, { 
@@ -84,37 +92,94 @@ export function parseEntries(entries: MoodEntry[], view: ViewMode): ChartData[] 
       notes: data.notes.join(', ') || null,
     }));
   } else {
-    // Group entries by day of the week
-    const grouped: Record<string, { 
-      sum: number; 
-      count: number; 
-      flagged: boolean; 
-      notes: string[] 
-    }> = {};
+    // Weekly view with dynamic date range
+    if (!dateRange) {
+      // Fallback to default week view
+      const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const grouped: Record<string, { 
+        sum: number; 
+        count: number; 
+        flagged: boolean; 
+        notes: string[] 
+      }> = {};
 
+      entries.forEach(entry => {
+        const date = new Date(entry.created_at);
+        const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+
+        if (!grouped[day]) {
+          grouped[day] = { sum: 0, count: 0, flagged: false, notes: [] };
+        }
+
+        const normalizedMood = normalizeMood(entry.mood_score);
+        grouped[day].sum += normalizedMood;
+        grouped[day].count++;
+        grouped[day].flagged = grouped[day].flagged || isHighRiskMood(entry.mood_score, entry.triggers);
+        if (entry.notes) {
+          grouped[day].notes.push(entry.notes);
+        }
+      });
+
+      return daysOfWeek.map(day => ({
+        label: day,
+        mood: grouped[day] ? Math.round(grouped[day].sum / grouped[day].count) : null,
+        flagged: grouped[day] ? grouped[day].flagged : false,
+        notes: grouped[day] ? grouped[day].notes.join(', ') || null : null,
+      }));
+    }
+
+    // Generate dynamic date range
+    const dateInterval = generateDateRange(dateRange.start, dateRange.end);
+    
+    // Create a map for quick lookup of mood entries by date
+    const entriesByDate = new Map<string, MoodEntry[]>();
     entries.forEach(entry => {
-      const date = new Date(entry.created_at);
-      const day = date.toLocaleDateString('en-US', { weekday: 'short' });
-
-      if (!grouped[day]) {
-        grouped[day] = { sum: 0, count: 0, flagged: false, notes: [] };
+      const dateKey = format(new Date(entry.created_at), 'yyyy-MM-dd');
+      if (!entriesByDate.has(dateKey)) {
+        entriesByDate.set(dateKey, []);
       }
-
-      const normalizedMood = normalizeMood(entry.mood_score);
-      grouped[day].sum += normalizedMood;
-      grouped[day].count++;
-      grouped[day].flagged = grouped[day].flagged || isHighRiskMood(entry.mood_score, entry.triggers);
-      if (entry.notes) {
-        grouped[day].notes.push(entry.notes);
-      }
+      entriesByDate.get(dateKey)!.push(entry);
     });
 
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return daysOfWeek.map(day => ({
-      label: day,
-      mood: grouped[day] ? Math.round(grouped[day].sum / grouped[day].count) : null,
-      flagged: grouped[day] ? grouped[day].flagged : false,
-      notes: grouped[day] ? grouped[day].notes.join(', ') || null : null,
-    }));
+    // Generate chart data for each day in the range
+    return dateInterval.map(date => {
+      const dateKey = format(date, 'yyyy-MM-dd');
+      const dayEntries = entriesByDate.get(dateKey) || [];
+      
+      // Determine label format based on range length
+      const daysDiff = Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24));
+      const label = daysDiff <= 7 
+        ? format(date, 'EEE')  // Short format for week view
+        : format(date, 'MMM dd'); // Date format for longer ranges
+
+      if (dayEntries.length === 0) {
+        return {
+          label,
+          mood: null,
+          flagged: false,
+          notes: null,
+        };
+      }
+
+      // Calculate average mood for the day
+      const totalMood = dayEntries.reduce((sum, entry) => sum + normalizeMood(entry.mood_score), 0);
+      const avgMood = Math.round(totalMood / dayEntries.length);
+      
+      // Check if any entry is flagged
+      const isFlagged = dayEntries.some(entry => isHighRiskMood(entry.mood_score, entry.triggers));
+      
+      // Combine notes
+      const notes = dayEntries
+        .filter(entry => entry.notes)
+        .map(entry => entry.notes)
+        .join(', ') || null;
+
+      return {
+        label,
+        mood: avgMood,
+        flagged: isFlagged,
+        notes,
+      };
+    });
   }
 }

@@ -25,7 +25,7 @@ export default function PatientInsights() {
         <div className="grid gap-6">
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Mood Trends</h2>
-            <MoodChart />
+            <MoodChart showLogButton={true} />
           </Card>
 
           <div className="grid gap-4">
