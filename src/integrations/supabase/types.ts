@@ -204,6 +204,51 @@ export type Database = {
           },
         ]
       }
+      exercise_logs: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          exercise_text: string
+          id: string
+          patient_id: string | null
+          recommended_at: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          exercise_text: string
+          id?: string
+          patient_id?: string | null
+          recommended_at?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          exercise_text?: string
+          id?: string
+          patient_id?: string | null
+          recommended_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exercise_logs_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "exercise_logs_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mood_entries: {
         Row: {
           created_at: string | null
