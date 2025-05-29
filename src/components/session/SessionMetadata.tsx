@@ -1,7 +1,7 @@
 
 import { Calendar, Clock } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
-import { utcToZonedTime } from 'date-fns-tz';
+import { toZonedTime } from 'date-fns-tz';
 
 interface SessionMetadataProps {
   dateTime: string;
@@ -21,7 +21,7 @@ function formatSessionDate(dateTime: string | undefined | null, timezone?: strin
     
     if (timezone) {
       // Convert UTC time to the session's timezone
-      const zonedDate = utcToZonedTime(utcDate, timezone);
+      const zonedDate = toZonedTime(utcDate, timezone);
       return format(zonedDate, 'MMMM d, yyyy');
     }
     
@@ -40,7 +40,7 @@ function formatSessionTime(dateTime: string | undefined | null, timezone?: strin
     
     if (timezone) {
       // Convert UTC time to the session's timezone
-      const zonedDate = utcToZonedTime(utcDate, timezone);
+      const zonedDate = toZonedTime(utcDate, timezone);
       return format(zonedDate, 'h:mm a');
     }
     

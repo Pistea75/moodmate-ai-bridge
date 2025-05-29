@@ -1,10 +1,9 @@
-
 /**
  * Utility functions for scheduling sessions with timezone support
  */
 import { supabase } from "@/integrations/supabase/client";
 import { resolvePatientSessionDetails } from "./clinicianPatientUtils";
-import { zonedTimeToUtc } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
 
 /**
  * Interface for session scheduling parameters
@@ -46,7 +45,7 @@ export const scheduleSession = async ({
   console.log("🌍 Selected timezone:", timezone);
   
   // Convert the local time to UTC using the selected timezone
-  const utcDateTime = zonedTimeToUtc(localDateTime, timezone);
+  const utcDateTime = fromZonedTime(localDateTime, timezone);
   
   console.log("🌐 Converted to UTC:", utcDateTime.toISOString());
   
