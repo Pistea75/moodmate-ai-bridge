@@ -29,7 +29,8 @@ export function UpcomingSessionsCard() {
               dateTime: upcomingSession.scheduled_time,
               duration: upcomingSession.duration_minutes,
               patientName: '', // Not needed for patient view
-              status: 'upcoming'
+              status: 'upcoming',
+              timezone: upcomingSession.timezone // Pass timezone for proper display
             }}
             variant="patient"
           />

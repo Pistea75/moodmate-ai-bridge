@@ -1,5 +1,6 @@
 
 import { format, isBefore, isSameDay, addMinutes } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Trash2 } from "lucide-react";
@@ -21,6 +22,7 @@ export type PatientSession = {
   duration_minutes: number;
   clinician_name: string;
   notes?: string;
+  timezone?: string;
 };
 
 interface SessionListProps {
@@ -29,6 +31,40 @@ interface SessionListProps {
   loading: boolean;
   onScheduleClick: () => void;
   onSessionDelete?: () => void;
+}
+
+// Helper function to format session date in proper timezone
+function formatSessionDate(dateTime: string, timezone?: string): string {
+  try {
+    const utcDate = new Date(dateTime);
+    
+    if (timezone) {
+      const zonedDate = toZonedTime(utcDate, timezone);
+      return format(zonedDate, 'PPP');
+    }
+    
+    return format(utcDate, 'PPP');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid Date';
+  }
+}
+
+// Helper function to format session time in proper timezone
+function formatSessionTime(dateTime: string, timezone?: string): string {
+  try {
+    const utcDate = new Date(dateTime);
+    
+    if (timezone) {
+      const zonedDate = toZonedTime(utcDate, timezone);
+      return format(zonedDate, 'p');
+    }
+    
+    return format(utcDate, 'p');
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return 'Invalid Time';
+  }
 }
 
 export function SessionList({ 
@@ -123,11 +159,16 @@ export function SessionList({
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  {format(new Date(session.scheduled_time), "PPP")}
+                  {formatSessionDate(session.scheduled_time, session.timezone)}
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
-                  {format(new Date(session.scheduled_time), "p")} ({session.duration_minutes} min)
+                  {formatSessionTime(session.scheduled_time, session.timezone)} ({session.duration_minutes} min)
+                  {session.timezone && (
+                    <span className="ml-1 text-xs text-gray-500">
+                      {session.timezone}
+                    </span>
+                  )}
                 </span>
               </div>
               
