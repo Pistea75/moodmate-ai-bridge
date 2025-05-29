@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Dialog,
@@ -51,7 +52,7 @@ export function ScheduleSessionModal({
 
     const slots: { [key: string]: boolean } = {};
     data?.forEach((session) => {
-      const time = new Date(session.scheduled_time).toTimeString().slice(0, 5); // "HH:MM"
+      const time = new Date(session.scheduled_time).toTimeString().slice(0, 5);
       slots[time] = true;
     });
 
@@ -98,6 +99,8 @@ export function ScheduleSessionModal({
           patient_id: formData.patientId,
           clinician_id: clinicianId,
           timezone: formData.timezone,
+          duration_minutes: 50,
+          status: "scheduled",
         }
       ]);
 
@@ -133,4 +136,3 @@ export function ScheduleSessionModal({
     </Dialog>
   );
 }
-
