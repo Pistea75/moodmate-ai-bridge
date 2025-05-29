@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "./DateTimePicker";
@@ -7,25 +6,25 @@ import { PatientSelector } from "./PatientSelector";
 import { getCurrentTimezone } from "@/utils/sessionUtils";
 import { useToast } from "@/hooks/use-toast";
 
-interface SessionScheduleFormProps {
-  onSubmit: (formData: SessionFormData) => Promise<void>;
-  onCancel: () => void;
-  isPatientView?: boolean;
-  isSubmitting: boolean;
-  bookedSlots?: {[key: string]: boolean};
-  onDateChange?: (date: Date, clinicianId?: string) => void;
-}
-
 export interface SessionFormData {
-  date: Date | undefined;
+  date: Date;
   time: string;
   patientId: string;
   timezone: string;
 }
 
-export function SessionScheduleForm({ 
-  onSubmit, 
-  onCancel, 
+interface SessionScheduleFormProps {
+  onSubmit: (formData: SessionFormData) => Promise<void>;
+  onCancel: () => void;
+  isPatientView?: boolean;
+  isSubmitting: boolean;
+  bookedSlots?: { [key: string]: boolean };
+  onDateChange?: (date: Date, clinicianId?: string) => void;
+}
+
+export function SessionScheduleForm({
+  onSubmit,
+  onCancel,
   isPatientView = false,
   isSubmitting,
   bookedSlots = {},
@@ -40,38 +39,24 @@ export function SessionScheduleForm({
   });
 
   useEffect(() => {
-    // When date changes or patient selection changes, check for booked slots
-    if (onDateChange && formData.date) {
-      onDateChange(formData.date, isPatientView ? undefined : formData.patientId);
+    if (onDateChange && formData.date && !isPatientView) {
+      onDateChange(formData.date, formData.patientId);
     }
-  }, [formData.date, formData.patientId, isPatientView, onDateChange]);
+  }, [formData.date, formData.patientId]);
 
   const handleSubmit = async () => {
     if (!formData.date) {
-      toast({
-        title: "Missing information",
-        description: "Please select a date",
-        variant: "destructive",
-      });
+      toast({ title: "Missing Date", description: "Please select a date", variant: "destructive" });
       return;
     }
 
     if (!isPatientView && !formData.patientId) {
-      toast({
-        title: "Missing information",
-        description: "Please select a patient",
-        variant: "destructive",
-      });
+      toast({ title: "Missing Patient", description: "Please select a patient", variant: "destructive" });
       return;
     }
 
-    // Check if the selected time slot is already booked
-    if (bookedSlots && bookedSlots[formData.time]) {
-      toast({
-        title: "Time slot unavailable",
-        description: "This time slot is already booked. Please select a different time.",
-        variant: "destructive",
-      });
+    if (bookedSlots[formData.time]) {
+      toast({ title: "Time slot unavailable", description: "Please choose a different time.", variant: "destructive" });
       return;
     }
 
@@ -80,41 +65,31 @@ export function SessionScheduleForm({
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
-        {/* Patient Selector - Only for clinician view */}
-        {!isPatientView && (
-          <PatientSelector 
-            value={formData.patientId} 
-            onChange={(value) => setFormData(prev => ({ ...prev, patientId: value }))} 
-          />
-        )}
+      {!isPatientView && (
+        <PatientSelector value={formData.patientId} onChange={(v) => setFormData(prev => ({ ...prev, patientId: v }))} />
+      )}
 
-        {/* Date and Time Selection */}
-        <DateTimePicker
-          date={formData.date}
-          time={formData.time}
-          onDateChange={(date) => setFormData(prev => ({ ...prev, date }))}
-          onTimeChange={(time) => setFormData(prev => ({ ...prev, time }))}
-          bookedSlots={bookedSlots}
-        />
+      <DateTimePicker
+        date={formData.date}
+        time={formData.time}
+        onDateChange={(d) => setFormData(prev => ({ ...prev, date: d }))}
+        onTimeChange={(t) => setFormData(prev => ({ ...prev, time: t }))}
+        bookedSlots={bookedSlots}
+      />
 
-        {/* Timezone Selection */}
-        <TimezoneSelector 
-          value={formData.timezone} 
-          onChange={(timezone) => setFormData(prev => ({ ...prev, timezone }))} 
-        />
-      </div>
+      <TimezoneSelector
+        value={formData.timezone}
+        onChange={(tz) => setFormData(prev => ({ ...prev, timezone: tz }))}
+      />
 
       <div className="flex justify-end space-x-2 pt-4">
-        <Button variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
         <Button
           onClick={handleSubmit}
-          disabled={isSubmitting || !formData.date || (!isPatientView && !formData.patientId)}
-          className="bg-mood-purple hover:bg-mood-purple/90 text-white"
+          disabled={isSubmitting}
+          className="bg-mood-purple text-white"
         >
-          {isSubmitting ? "Scheduling..." : "Schedule Session"}
+          {isSubmitting ? "Scheduling..." : "Schedule"}
         </Button>
       </div>
     </div>
