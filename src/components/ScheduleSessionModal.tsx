@@ -40,8 +40,8 @@ export function ScheduleSessionModal({
         .from("sessions")
         .select("scheduled_time");
       
-      // If clinicianId is provided, filter by that clinician
-      if (clinicianId) {
+      // If clinicianId is provided and valid, filter by that clinician
+      if (clinicianId && clinicianId.trim() !== '') {
         query.eq("clinician_id", clinicianId);
       }
       
@@ -85,16 +85,19 @@ export function ScheduleSessionModal({
       setLoading(true);
       setError(null);
 
-      // 🧠 Validate required inputs
+      // Validate required inputs
       if (!formData.date) {
         throw new Error("Please select a date");
+      }
+      
+      if (!formData.timezone) {
+        throw new Error("Please select a timezone");
       }
       
       const selectedDate = formData.date;
       const [hours, minutes] = formData.time.split(":").map(Number);
 
       // Create a date object representing the local date and time selected
-      // This preserves the actual date and time the user selected without timezone shifting
       const scheduledDate = new Date(
         selectedDate.getFullYear(),
         selectedDate.getMonth(),
@@ -114,7 +117,7 @@ export function ScheduleSessionModal({
       console.log("📅 Selected timezone:", formData.timezone);
       console.log("🔄 Scheduling session with isPatientView:", isPatientView);
 
-      // Get the current user (clinician) ID when not in patient view
+      // Get the current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError) {
@@ -126,18 +129,32 @@ export function ScheduleSessionModal({
         throw new Error("No authenticated user found");
       }
       
-      // For clinician view, use the current user's ID as clinicianId
-      const clinicianId = isPatientView ? undefined : user.id;
+      // Validate and set IDs properly
+      let finalClinicianId: string | undefined;
+      let finalPatientId: string | undefined;
       
-      console.log("👨‍⚕️ Using clinician ID:", clinicianId);
+      if (isPatientView) {
+        // For patient view, the current user is the patient
+        finalPatientId = user.id;
+        // clinicianId will be resolved in the scheduleSession utility
+      } else {
+        // For clinician view, the current user is the clinician
+        finalClinicianId = user.id;
+        // Validate that a patient was selected
+        if (!formData.patientId || formData.patientId.trim() === '') {
+          throw new Error("Please select a patient");
+        }
+        finalPatientId = formData.patientId;
+      }
+      
+      console.log("👨‍⚕️ Using clinician ID:", finalClinicianId);
+      console.log("🏥 Using patient ID:", finalPatientId);
 
       await scheduleSession({
-        // Pass the formatted date string directly - this will be treated as a local time 
-        // with the specified timezone in the backend
         date: scheduledDate.toISOString(),
         time: formData.time,
-        patientId: isPatientView ? undefined : formData.patientId,
-        clinicianId: clinicianId,
+        patientId: finalPatientId,
+        clinicianId: finalClinicianId,
         timezone: formData.timezone,
         isPatientView,
       });

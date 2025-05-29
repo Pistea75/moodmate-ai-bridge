@@ -1,3 +1,4 @@
+
 /**
  * Utility functions for scheduling sessions with timezone support
  */
@@ -56,7 +57,7 @@ export const scheduleSession = async ({
   }
   
   let finalClinicianId = clinicianId;
-  let finalPatientId = patientId || user.id;
+  let finalPatientId = patientId;
   
   // For patient view, we need to find the clinician based on referral code
   if (isPatientView) {
@@ -72,9 +73,17 @@ export const scheduleSession = async ({
     }
   }
   
-  if (!finalClinicianId || !finalPatientId) {
-    throw new Error("Missing clinician or patient information");
+  // Validate that we have both required IDs and they're not empty
+  if (!finalClinicianId || finalClinicianId.trim() === '') {
+    throw new Error("Missing or invalid clinician information");
   }
+  
+  if (!finalPatientId || finalPatientId.trim() === '') {
+    throw new Error("Missing or invalid patient information");
+  }
+  
+  console.log("Final validation - Clinician ID:", finalClinicianId);
+  console.log("Final validation - Patient ID:", finalPatientId);
   
   // Check for conflicts
   const { data: conflictData, error: conflictError } = await supabase
@@ -92,14 +101,19 @@ export const scheduleSession = async ({
     throw new Error("This time slot is already booked. Please select another time.");
   }
   
-  const { error } = await supabase.from("sessions").insert({
+  // Create the payload with only valid, non-empty values
+  const payload = {
     patient_id: finalPatientId,
     clinician_id: finalClinicianId,
     scheduled_time: utcDateTime.toISOString(), // Store in UTC
-    status: "scheduled",
+    status: "scheduled" as const,
     duration_minutes: 50,
     timezone: timezone, // Store the original timezone for display
-  });
+  };
+  
+  console.log("📤 Insert payload:", payload);
+  
+  const { error } = await supabase.from("sessions").insert(payload);
   
   if (error) {
     console.error("Error creating session:", error);
