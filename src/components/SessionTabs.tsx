@@ -80,7 +80,8 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
                         `${session.patient.first_name || ''} ${session.patient.last_name || ''}`.trim() : 
                         'Unknown Patient',
                       status: session.status || 'upcoming',
-                      notes: session.notes
+                      notes: session.notes,
+                      timezone: session.timezone // Pass timezone for proper display
                     }}
                     variant="clinician"
                   />

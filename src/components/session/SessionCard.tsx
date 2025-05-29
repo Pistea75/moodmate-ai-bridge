@@ -21,6 +21,7 @@ export type Session = {
   clinicianName?: string;
   notes?: string;
   status: 'upcoming' | 'completed' | 'cancelled';
+  timezone?: string;
 };
 
 interface SessionCardProps {
@@ -98,6 +99,7 @@ export function SessionCard({ session, variant, onDelete }: SessionCardProps) {
             patientName={validSession.patientName}
             clinicianName={validSession.clinicianName}
             variant={variant}
+            timezone={validSession.timezone}
           />
           
           <RecordingIndicator 
@@ -159,4 +161,3 @@ export function SessionCard({ session, variant, onDelete }: SessionCardProps) {
     </div>
   );
 }
-

@@ -1,9 +1,10 @@
 
 /**
- * Utility functions for scheduling sessions
+ * Utility functions for scheduling sessions with timezone support
  */
 import { supabase } from "@/integrations/supabase/client";
 import { resolvePatientSessionDetails } from "./clinicianPatientUtils";
+import { zonedTimeToUtc } from "date-fns-tz";
 
 /**
  * Interface for session scheduling parameters
@@ -18,7 +19,7 @@ export interface ScheduleSessionParams {
 }
 
 /**
- * Schedules a new therapy session
+ * Schedules a new therapy session with proper timezone handling
  * @param params - Session parameters
  * @returns Object with success status
  */
@@ -30,16 +31,24 @@ export const scheduleSession = async ({
   timezone,
   isPatientView 
 }: ScheduleSessionParams) => {
-  if (!date || !time) {
-    throw new Error("Missing required fields");
+  if (!date || !time || !timezone) {
+    throw new Error("Missing required fields: date, time, or timezone");
   }
   
-  // Parse the ISO string back to a Date object
-  // This is already in the local timezone from the form
-  const scheduledTime = new Date(date);
-  console.log("📆 Parsed scheduled time:", scheduledTime.toLocaleString());
-  console.log("⏰ Time string from form:", time);
-  console.log("🌐 User selected timezone:", timezone);
+  // Parse the local date and time
+  const localDateTime = new Date(date);
+  const [hours, minutes] = time.split(":").map(Number);
+  
+  // Set the time on the date
+  localDateTime.setHours(hours, minutes, 0, 0);
+  
+  console.log("📅 Local date/time selected:", localDateTime.toLocaleString());
+  console.log("🌍 Selected timezone:", timezone);
+  
+  // Convert the local time to UTC using the selected timezone
+  const utcDateTime = zonedTimeToUtc(localDateTime, timezone);
+  
+  console.log("🌐 Converted to UTC:", utcDateTime.toISOString());
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
@@ -68,13 +77,29 @@ export const scheduleSession = async ({
     throw new Error("Missing clinician or patient information");
   }
   
+  // Check for conflicts
+  const { data: conflictData, error: conflictError } = await supabase
+    .from("sessions")
+    .select("*")
+    .eq("clinician_id", finalClinicianId)
+    .eq("scheduled_time", utcDateTime.toISOString())
+    .maybeSingle();
+    
+  if (conflictError) {
+    console.error("Error checking for conflicts:", conflictError);
+  }
+  
+  if (conflictData) {
+    throw new Error("This time slot is already booked. Please select another time.");
+  }
+  
   const { error } = await supabase.from("sessions").insert({
     patient_id: finalPatientId,
     clinician_id: finalClinicianId,
-    scheduled_time: scheduledTime.toISOString(),
+    scheduled_time: utcDateTime.toISOString(), // Store in UTC
     status: "scheduled",
     duration_minutes: 50,
-    timezone: timezone,
+    timezone: timezone, // Store the original timezone for display
   });
   
   if (error) {
@@ -82,5 +107,6 @@ export const scheduleSession = async ({
     throw new Error(`Error scheduling session: ${error.message}`);
   }
   
+  console.log("✅ Session scheduled successfully");
   return { success: true };
 };

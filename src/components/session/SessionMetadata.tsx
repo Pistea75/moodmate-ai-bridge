@@ -1,6 +1,7 @@
 
 import { Calendar, Clock } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 
 interface SessionMetadataProps {
   dateTime: string;
@@ -8,25 +9,42 @@ interface SessionMetadataProps {
   patientName?: string;
   clinicianName?: string;
   variant: 'patient' | 'clinician';
+  timezone?: string;
 }
 
-// Utility functions with proper null/undefined checks
-function formatSessionDate(dateTime: string | undefined | null): string {
+// Utility functions with proper timezone support
+function formatSessionDate(dateTime: string | undefined | null, timezone?: string): string {
   if (!dateTime) return 'No date';
   try {
-    const date = parseISO(dateTime);
-    return isValid(date) ? format(date, 'MMMM d, yyyy') : 'Invalid Date';
+    const utcDate = parseISO(dateTime);
+    if (!isValid(utcDate)) return 'Invalid Date';
+    
+    if (timezone) {
+      // Convert UTC time to the session's timezone
+      const zonedDate = utcToZonedTime(utcDate, timezone);
+      return format(zonedDate, 'MMMM d, yyyy');
+    }
+    
+    return format(utcDate, 'MMMM d, yyyy');
   } catch (error) {
     console.error('Error formatting date:', error);
     return 'Invalid Date';
   }
 }
 
-function formatSessionTime(dateTime: string | undefined | null): string {
+function formatSessionTime(dateTime: string | undefined | null, timezone?: string): string {
   if (!dateTime) return 'No time';
   try {
-    const date = parseISO(dateTime);
-    return isValid(date) ? format(date, 'h:mm a') : 'Invalid Time';
+    const utcDate = parseISO(dateTime);
+    if (!isValid(utcDate)) return 'Invalid Time';
+    
+    if (timezone) {
+      // Convert UTC time to the session's timezone
+      const zonedDate = utcToZonedTime(utcDate, timezone);
+      return format(zonedDate, 'h:mm a');
+    }
+    
+    return format(utcDate, 'h:mm a');
   } catch (error) {
     console.error('Error formatting time:', error);
     return 'Invalid Time';
@@ -39,18 +57,26 @@ export function SessionMetadata({
   patientName,
   clinicianName,
   variant,
+  timezone,
 }: SessionMetadataProps) {
+  const displayTimezone = timezone || 'UTC';
+  
   return (
     <>
       <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <Calendar size={14} />
-          <span>{formatSessionDate(dateTime)}</span>
+          <span>{formatSessionDate(dateTime, timezone)}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Clock size={14} />
           <span>
-            {formatSessionTime(dateTime)} ({duration} min)
+            {formatSessionTime(dateTime, timezone)} ({duration} min)
+            {timezone && (
+              <span className="ml-1 text-xs text-gray-500">
+                {displayTimezone}
+              </span>
+            )}
           </span>
         </div>
       </div>

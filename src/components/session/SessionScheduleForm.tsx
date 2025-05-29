@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "./DateTimePicker";
@@ -45,6 +46,8 @@ export function SessionScheduleForm({
   }, [formData.date, formData.patientId]);
 
   const handleSubmit = async () => {
+    console.log("🕐 Submitting session with timezone:", formData.timezone);
+    
     if (!formData.date) {
       toast({ title: "Missing Date", description: "Please select a date", variant: "destructive" });
       return;
@@ -52,6 +55,11 @@ export function SessionScheduleForm({
 
     if (!isPatientView && !formData.patientId) {
       toast({ title: "Missing Patient", description: "Please select a patient", variant: "destructive" });
+      return;
+    }
+
+    if (!formData.timezone) {
+      toast({ title: "Missing Timezone", description: "Please select a timezone", variant: "destructive" });
       return;
     }
 
@@ -79,7 +87,10 @@ export function SessionScheduleForm({
 
       <TimezoneSelector
         value={formData.timezone}
-        onChange={(tz) => setFormData(prev => ({ ...prev, timezone: tz }))}
+        onChange={(tz) => {
+          console.log("🌍 Timezone changed to:", tz);
+          setFormData(prev => ({ ...prev, timezone: tz }));
+        }}
       />
 
       <div className="flex justify-end space-x-2 pt-4">
