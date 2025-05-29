@@ -30,7 +30,7 @@ export function useMessageService() {
         throw new Error(`Failed to save message: ${error.message}`);
       }
 
-      // Handle exercise tracking logic
+      // Handle exercise tracking logic only for new messages
       if (role === 'assistant' && isExerciseRecommendation(message)) {
         const exerciseText = extractExerciseFromText(message);
         await logExercise(user.id, exerciseText);
@@ -45,6 +45,7 @@ export function useMessageService() {
       }
         
     } catch (error) {
+      console.error('Error saving message:', error);
       toast({
         variant: 'destructive',
         title: 'Error saving message',

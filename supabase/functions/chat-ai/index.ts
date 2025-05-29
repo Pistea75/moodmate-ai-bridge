@@ -46,20 +46,6 @@ serve(async (req) => {
       );
     }
 
-    // Get the latest user message
-    const latestUserMessage = messages[messages.length - 1];
-    
-    // Log user message to database
-    if (latestUserMessage && latestUserMessage.role === 'user') {
-      await supabase
-        .from('ai_chat_logs')
-        .insert({
-          patient_id: userId,
-          role: 'user',
-          message: latestUserMessage.content
-        });
-    }
-
     // Use the provided system prompt or fall back to default
     const finalSystemPrompt = systemPrompt || 
       'You are Dr. Martinez, a compassionate mental health assistant. Provide supportive and professional responses to the patient.';
@@ -86,15 +72,6 @@ serve(async (req) => {
     }
     
     const reply = data.choices[0].message;
-
-    // Log assistant's message to database
-    await supabase
-      .from('ai_chat_logs')
-      .insert({
-        patient_id: userId,
-        role: 'assistant',
-        message: reply.content
-      });
 
     return new Response(JSON.stringify({ reply }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

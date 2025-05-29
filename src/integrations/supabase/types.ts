@@ -544,6 +544,10 @@ export type Database = {
       }
     }
     Functions: {
+      check_session_conflict: {
+        Args: { _clinician_id: string; _start: string; _end: string }
+        Returns: boolean
+      }
       get_patient_mood_summaries: {
         Args: { clinician_uuid: string }
         Returns: {
