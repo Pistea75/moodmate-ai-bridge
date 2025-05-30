@@ -19,6 +19,18 @@ export interface ScheduleSessionParams {
 }
 
 /**
+ * Interface for session insert payload
+ */
+interface SessionInsertPayload {
+  scheduled_time: string;
+  duration_minutes: number;
+  timezone: string;
+  status: string;
+  patient_id?: string;
+  clinician_id?: string;
+}
+
+/**
  * Schedules a new therapy session with proper timezone handling
  * @param params - Session parameters
  * @returns Object with success status
@@ -101,23 +113,17 @@ export const scheduleSession = async ({
     throw new Error("This time slot is already booked. Please select another time.");
   }
   
-  // Create the payload with only valid, non-empty values
-  const payload: Record<string, any> = {
+  // Create the payload with proper typing
+  const payload: SessionInsertPayload = {
     scheduled_time: utcDateTime.toISOString(),
     duration_minutes: 50,
-    timezone: timezone,
-    status: "scheduled"
+    timezone,
+    status: 'scheduled',
+    ...(finalPatientId && finalPatientId.trim() !== '' ? { patient_id: finalPatientId } : {}),
+    ...(finalClinicianId && finalClinicianId.trim() !== '' ? { clinician_id: finalClinicianId } : {}),
   };
 
-  if (finalPatientId && finalPatientId.trim() !== "") {
-    payload.patient_id = finalPatientId;
-  }
-
-  if (finalClinicianId && finalClinicianId.trim() !== "") {
-    payload.clinician_id = finalClinicianId;
-  }
-
-  console.log("🧠 Final payload:", payload);
+  console.log("🧠 Final validated payload:", payload);
 
   const { error } = await supabase.from("sessions").insert(payload);
   
