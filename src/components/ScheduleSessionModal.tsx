@@ -150,6 +150,16 @@ export function ScheduleSessionModal({
       console.log("👨‍⚕️ Using clinician ID:", finalClinicianId);
       console.log("🏥 Using patient ID:", finalPatientId);
 
+      // Log the final payload preview before submission
+      console.log("📋 Final payload preview:", {
+        date: scheduledDate.toISOString(),
+        time: formData.time,
+        patientId: finalPatientId,
+        clinicianId: finalClinicianId,
+        timezone: formData.timezone,
+        isPatientView
+      });
+
       await scheduleSession({
         date: scheduledDate.toISOString(),
         time: formData.time,

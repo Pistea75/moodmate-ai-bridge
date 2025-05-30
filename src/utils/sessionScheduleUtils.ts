@@ -102,16 +102,23 @@ export const scheduleSession = async ({
   }
   
   // Create the payload with only valid, non-empty values
-  const payload = {
-    patient_id: finalPatientId,
-    clinician_id: finalClinicianId,
+  const payload: any = {
     scheduled_time: utcDateTime.toISOString(), // Store in UTC
     status: "scheduled" as const,
     duration_minutes: 50,
     timezone: timezone, // Store the original timezone for display
   };
   
-  console.log("📤 Insert payload:", payload);
+  // Only add IDs if they are valid and non-empty
+  if (finalPatientId && finalPatientId.trim() !== '') {
+    payload.patient_id = finalPatientId;
+  }
+  
+  if (finalClinicianId && finalClinicianId.trim() !== '') {
+    payload.clinician_id = finalClinicianId;
+  }
+  
+  console.log("🧠 Insert payload to Supabase:", payload);
   
   const { error } = await supabase.from("sessions").insert(payload);
   
