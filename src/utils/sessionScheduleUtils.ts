@@ -31,6 +31,14 @@ interface SessionInsertPayload {
 }
 
 /**
+ * Validates if a string is a valid UUID format
+ */
+const isValidUUID = (uuid: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+};
+
+/**
  * Schedules a new therapy session with proper timezone handling
  * @param params - Session parameters
  * @returns Object with success status
@@ -71,6 +79,11 @@ export const scheduleSession = async ({
   let finalClinicianId = clinicianId;
   let finalPatientId = patientId;
   
+  console.log("🔍 Initial IDs received:");
+  console.log("  - patientId:", patientId, "Type:", typeof patientId);
+  console.log("  - clinicianId:", clinicianId, "Type:", typeof clinicianId);
+  console.log("  - isPatientView:", isPatientView);
+  
   // For patient view, we need to find the clinician based on referral code
   if (isPatientView) {
     console.log("Patient view detected, resolving clinician ID...");
@@ -85,15 +98,33 @@ export const scheduleSession = async ({
     }
   }
   
-  // Validate that we have both required IDs and they're not empty
-  if (!finalClinicianId || finalClinicianId.trim() === '') {
+  console.log("🔍 Final IDs before validation:");
+  console.log("  - finalPatientId:", finalPatientId, "Type:", typeof finalPatientId);
+  console.log("  - finalClinicianId:", finalClinicianId, "Type:", typeof finalClinicianId);
+  
+  // Strict validation for UUID values
+  if (!finalClinicianId || finalClinicianId.trim() === '' || finalClinicianId === 'undefined' || finalClinicianId === 'null') {
+    console.error("❌ Invalid clinician ID:", finalClinicianId);
     throw new Error("Missing or invalid clinician information");
   }
   
-  if (!finalPatientId || finalPatientId.trim() === '') {
+  if (!finalPatientId || finalPatientId.trim() === '' || finalPatientId === 'undefined' || finalPatientId === 'null') {
+    console.error("❌ Invalid patient ID:", finalPatientId);
     throw new Error("Missing or invalid patient information");
   }
   
+  // Additional UUID format validation
+  if (!isValidUUID(finalClinicianId)) {
+    console.error("❌ Clinician ID is not a valid UUID:", finalClinicianId);
+    throw new Error("Invalid clinician ID format");
+  }
+  
+  if (!isValidUUID(finalPatientId)) {
+    console.error("❌ Patient ID is not a valid UUID:", finalPatientId);
+    throw new Error("Invalid patient ID format");
+  }
+  
+  console.log("✅ UUID validation passed");
   console.log("Final validation - Clinician ID:", finalClinicianId);
   console.log("Final validation - Patient ID:", finalPatientId);
   
@@ -113,26 +144,15 @@ export const scheduleSession = async ({
     throw new Error("This time slot is already booked. Please select another time.");
   }
   
-  // Create the payload with proper validation and logging
+  // Create the payload with validated UUIDs
   const payload: SessionInsertPayload = {
     scheduled_time: utcDateTime.toISOString(),
     duration_minutes: 50,
     timezone,
     status: 'scheduled',
+    patient_id: finalPatientId,
+    clinician_id: finalClinicianId,
   };
-
-  // Validate and conditionally add UUIDs only if they're non-empty strings
-  if (finalPatientId && finalPatientId.trim() !== '') {
-    payload.patient_id = finalPatientId;
-  } else {
-    console.warn('⚠️ No valid patient_id passed!');
-  }
-
-  if (finalClinicianId && finalClinicianId.trim() !== '') {
-    payload.clinician_id = finalClinicianId;
-  } else {
-    console.warn('⚠️ No valid clinician_id passed!');
-  }
 
   console.log("🧠 Final validated payload:", payload);
 

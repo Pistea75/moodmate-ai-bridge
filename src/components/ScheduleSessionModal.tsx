@@ -129,37 +129,43 @@ export function ScheduleSessionModal({
         throw new Error("No authenticated user found");
       }
       
-      // Validate and set IDs properly
+      // Validate and set IDs properly with strict checks
       let finalClinicianId: string | undefined;
       let finalPatientId: string | undefined;
       
       if (isPatientView) {
         // For patient view, the current user is the patient
         finalPatientId = user.id;
+        console.log("👨‍🏥 Patient view - setting patient ID to current user:", finalPatientId);
         // clinicianId will be resolved in the scheduleSession utility
       } else {
         // For clinician view, the current user is the clinician
         finalClinicianId = user.id;
-        // Validate that a patient was selected
-        if (!formData.patientId || formData.patientId.trim() === '') {
+        console.log("👩‍⚕️ Clinician view - setting clinician ID to current user:", finalClinicianId);
+        
+        // Validate that a patient was selected and is valid
+        if (!formData.patientId || formData.patientId.trim() === '' || formData.patientId === 'undefined') {
           throw new Error("Please select a patient");
         }
         finalPatientId = formData.patientId;
+        console.log("🏥 Selected patient ID:", finalPatientId);
       }
       
-      // Runtime guard before sending
+      // Additional runtime guards before sending
       if (!isPatientView) {
-        if (!finalPatientId || finalPatientId.trim() === "") {
+        if (!finalPatientId || finalPatientId.trim() === "" || finalPatientId === 'undefined') {
+          console.error("❌ Invalid patient ID detected:", finalPatientId);
           throw new Error("Missing valid patient ID");
         }
 
-        if (!finalClinicianId || finalClinicianId.trim() === "") {
+        if (!finalClinicianId || finalClinicianId.trim() === "" || finalClinicianId === 'undefined') {
+          console.error("❌ Invalid clinician ID detected:", finalClinicianId);
           throw new Error("Missing valid clinician ID");
         }
       }
       
-      console.log("👨‍⚕️ Using clinician ID:", finalClinicianId);
-      console.log("🏥 Using patient ID:", finalPatientId);
+      console.log("👨‍⚕️ Final clinician ID:", finalClinicianId);
+      console.log("🏥 Final patient ID:", finalPatientId);
 
       // Log the final payload preview before submission
       console.log("📋 Final payload preview:", {
