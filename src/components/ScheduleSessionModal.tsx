@@ -147,6 +147,17 @@ export function ScheduleSessionModal({
         finalPatientId = formData.patientId;
       }
       
+      // Runtime guard before sending
+      if (!isPatientView) {
+        if (!finalPatientId || finalPatientId.trim() === "") {
+          throw new Error("Missing valid patient ID");
+        }
+
+        if (!finalClinicianId || finalClinicianId.trim() === "") {
+          throw new Error("Missing valid clinician ID");
+        }
+      }
+      
       console.log("👨‍⚕️ Using clinician ID:", finalClinicianId);
       console.log("🏥 Using patient ID:", finalPatientId);
 
