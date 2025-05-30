@@ -113,15 +113,26 @@ export const scheduleSession = async ({
     throw new Error("This time slot is already booked. Please select another time.");
   }
   
-  // Create the payload with proper typing
+  // Create the payload with proper validation and logging
   const payload: SessionInsertPayload = {
     scheduled_time: utcDateTime.toISOString(),
     duration_minutes: 50,
     timezone,
     status: 'scheduled',
-    ...(finalPatientId && finalPatientId.trim() !== '' ? { patient_id: finalPatientId } : {}),
-    ...(finalClinicianId && finalClinicianId.trim() !== '' ? { clinician_id: finalClinicianId } : {}),
   };
+
+  // Validate and conditionally add UUIDs only if they're non-empty strings
+  if (finalPatientId && finalPatientId.trim() !== '') {
+    payload.patient_id = finalPatientId;
+  } else {
+    console.warn('⚠️ No valid patient_id passed!');
+  }
+
+  if (finalClinicianId && finalClinicianId.trim() !== '') {
+    payload.clinician_id = finalClinicianId;
+  } else {
+    console.warn('⚠️ No valid clinician_id passed!');
+  }
 
   console.log("🧠 Final validated payload:", payload);
 
