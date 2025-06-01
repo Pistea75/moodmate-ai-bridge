@@ -12,7 +12,7 @@ import { ExerciseTrackingCard } from '@/components/patient/ExerciseTrackingCard'
 export default function PatientDashboard() {
   return (
     <PatientLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 bg-background min-h-screen">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <div className="flex gap-2">

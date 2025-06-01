@@ -27,8 +27,8 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
       />
       
       {/* Main Content */}
-      <main className="flex-1 pt-16 md:pt-0 md:ml-64">
-        <div className="container mx-auto px-4 py-6">
+      <main className="flex-1 pt-16 md:pt-0 md:ml-64 bg-background">
+        <div className="container mx-auto px-4 py-6 bg-background min-h-screen">
           {children}
         </div>
       </main>

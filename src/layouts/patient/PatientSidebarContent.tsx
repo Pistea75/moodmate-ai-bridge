@@ -13,9 +13,9 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
   const location = useLocation();
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-background">
       {/* Header */}
-      <div className="p-6 border-b bg-white">
+      <div className="p-6 border-b bg-background">
         <Link to="/patient/dashboard" className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
             <span className="font-bold text-primary-foreground text-sm">M</span>
@@ -28,7 +28,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 bg-white">
+      <nav className="flex-1 p-4 bg-background">
         <div className="space-y-2">
           {patientNavItems.map((item) => (
             <Link
@@ -48,7 +48,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t bg-white">
+      <div className="p-4 border-t bg-background">
         <LogoutButton variant="ghost" className="w-full justify-start text-sm" />
       </div>
     </div>
