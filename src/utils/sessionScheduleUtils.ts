@@ -102,33 +102,30 @@ export const scheduleSession = async ({
   console.log("  - finalPatientId:", finalPatientId, "Type:", typeof finalPatientId);
   console.log("  - finalClinicianId:", finalClinicianId, "Type:", typeof finalClinicianId);
   
-  // Strict validation for UUID values
-  if (!finalClinicianId || finalClinicianId.trim() === '' || finalClinicianId === 'undefined' || finalClinicianId === 'null') {
+  // Strict validation for UUID values - reject invalid values
+  if (!finalClinicianId || 
+      finalClinicianId.trim() === '' || 
+      finalClinicianId === 'undefined' || 
+      finalClinicianId === 'null' ||
+      !isValidUUID(finalClinicianId)) {
     console.error("❌ Invalid clinician ID:", finalClinicianId);
     throw new Error("Missing or invalid clinician information");
   }
   
-  if (!finalPatientId || finalPatientId.trim() === '' || finalPatientId === 'undefined' || finalPatientId === 'null') {
+  if (!finalPatientId || 
+      finalPatientId.trim() === '' || 
+      finalPatientId === 'undefined' || 
+      finalPatientId === 'null' ||
+      !isValidUUID(finalPatientId)) {
     console.error("❌ Invalid patient ID:", finalPatientId);
     throw new Error("Missing or invalid patient information");
-  }
-  
-  // Additional UUID format validation
-  if (!isValidUUID(finalClinicianId)) {
-    console.error("❌ Clinician ID is not a valid UUID:", finalClinicianId);
-    throw new Error("Invalid clinician ID format");
-  }
-  
-  if (!isValidUUID(finalPatientId)) {
-    console.error("❌ Patient ID is not a valid UUID:", finalPatientId);
-    throw new Error("Invalid patient ID format");
   }
   
   console.log("✅ UUID validation passed");
   console.log("Final validation - Clinician ID:", finalClinicianId);
   console.log("Final validation - Patient ID:", finalPatientId);
   
-  // Check for conflicts
+  // Check for conflicts using the updated database structure
   const { data: conflictData, error: conflictError } = await supabase
     .from("sessions")
     .select("*")
@@ -144,22 +141,29 @@ export const scheduleSession = async ({
     throw new Error("This time slot is already booked. Please select another time.");
   }
   
-  // Create the payload with validated UUIDs
+  // Create the payload with validated UUIDs - only include valid IDs
   const payload: SessionInsertPayload = {
     scheduled_time: utcDateTime.toISOString(),
     duration_minutes: 50,
     timezone,
     status: 'scheduled',
-    patient_id: finalPatientId,
-    clinician_id: finalClinicianId,
   };
+
+  // Only add IDs if they are valid UUIDs
+  if (finalPatientId && isValidUUID(finalPatientId)) {
+    payload.patient_id = finalPatientId;
+  }
+
+  if (finalClinicianId && isValidUUID(finalClinicianId)) {
+    payload.clinician_id = finalClinicianId;
+  }
 
   console.log("🧠 Final validated payload:", payload);
 
   const { error } = await supabase.from("sessions").insert(payload);
   
   if (error) {
-    console.error("Error creating session:", error);
+    console.error("❌ Database error creating session:", error);
     throw new Error(`Error scheduling session: ${error.message}`);
   }
   

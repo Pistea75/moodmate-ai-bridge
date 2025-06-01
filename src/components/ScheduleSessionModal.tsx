@@ -129,7 +129,7 @@ export function ScheduleSessionModal({
         throw new Error("No authenticated user found");
       }
       
-      // Validate and set IDs properly with strict checks
+      // Set IDs based on view type
       let finalClinicianId: string | undefined;
       let finalPatientId: string | undefined;
       
@@ -143,40 +143,15 @@ export function ScheduleSessionModal({
         finalClinicianId = user.id;
         console.log("👩‍⚕️ Clinician view - setting clinician ID to current user:", finalClinicianId);
         
-        // Validate that a patient was selected and is valid
-        if (!formData.patientId || formData.patientId.trim() === '' || formData.patientId === 'undefined') {
+        // Validate that a patient was selected
+        if (!formData.patientId || formData.patientId.trim() === '') {
           throw new Error("Please select a patient");
         }
         finalPatientId = formData.patientId;
         console.log("🏥 Selected patient ID:", finalPatientId);
       }
-      
-      // Additional runtime guards before sending
-      if (!isPatientView) {
-        if (!finalPatientId || finalPatientId.trim() === "" || finalPatientId === 'undefined') {
-          console.error("❌ Invalid patient ID detected:", finalPatientId);
-          throw new Error("Missing valid patient ID");
-        }
 
-        if (!finalClinicianId || finalClinicianId.trim() === "" || finalClinicianId === 'undefined') {
-          console.error("❌ Invalid clinician ID detected:", finalClinicianId);
-          throw new Error("Missing valid clinician ID");
-        }
-      }
-      
-      console.log("👨‍⚕️ Final clinician ID:", finalClinicianId);
-      console.log("🏥 Final patient ID:", finalPatientId);
-
-      // Log the final payload preview before submission
-      console.log("📋 Final payload preview:", {
-        date: scheduledDate.toISOString(),
-        time: formData.time,
-        patientId: finalPatientId,
-        clinicianId: finalClinicianId,
-        timezone: formData.timezone,
-        isPatientView
-      });
-
+      // Call the updated scheduleSession utility
       await scheduleSession({
         date: scheduledDate.toISOString(),
         time: formData.time,
