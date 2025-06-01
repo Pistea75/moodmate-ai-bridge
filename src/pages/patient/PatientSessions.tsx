@@ -2,8 +2,8 @@
 import PatientLayout from '../../layouts/PatientLayout';
 import { SessionList } from '@/components/session/SessionList';
 import { PatientSessionHeader } from '@/components/session/PatientSessionHeader';
-import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
-import { usePatientSessions } from '@/hooks/usePatientSessionsList'; // Import the list-specific hook
+import { ScheduleSessionModal } from '@/components/ScheduleSessionModal'; // Use the working modal
+import { usePatientSessions } from '@/hooks/usePatientSessionsList';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
@@ -53,7 +53,7 @@ export default function PatientSessions() {
         />
       </div>
 
-      {/* Schedule Session Modal - using the unified component with isPatientView=true */}
+      {/* Schedule Session Modal - using the working component with isPatientView=true */}
       <ScheduleSessionModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

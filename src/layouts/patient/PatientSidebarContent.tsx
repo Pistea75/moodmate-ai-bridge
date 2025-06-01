@@ -1,50 +1,56 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PatientNavItems } from './PatientNavItems';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useAuth } from '@/contexts/AuthContext';
 import { LogoutButton } from '@/components/LogoutButton';
+import { Separator } from '@/components/ui/separator';
 
 type PatientSidebarContentProps = {
   patientName: React.ReactNode;
 };
 
 export function PatientSidebarContent({ patientName }: PatientSidebarContentProps) {
-  const { user } = useAuth();
-  
-  // Get first letter of name for avatar fallback
-  const getInitial = () => {
-    const name = user?.user_metadata?.first_name || '';
-    return name.charAt(0).toUpperCase() || 'P';
-  };
+  const location = useLocation();
+  const navItems = PatientNavItems();
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-4 py-6">
-        <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
-          M
-        </div>
-        <h3 className="text-xl font-bold">MoodMate</h3>
-      </div>
-      <div className="flex-1 overflow-auto py-2">
-        <PatientNavItems />
-      </div>
-      
-      {/* Profile section at bottom */}
-      <div className="mt-auto border-t pt-4 px-3 pb-4">
-        <Link to="/patient/profile" className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback>{getInitial()}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">{patientName}</span>
-            <span className="text-xs text-muted-foreground">Patient</span>
+    <div className="flex flex-col h-full bg-white">
+      {/* Header */}
+      <div className="p-6 border-b bg-white">
+        <Link to="/patient/dashboard" className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+            <span className="font-bold text-primary-foreground text-sm">M</span>
           </div>
+          <span className="text-lg font-semibold text-primary">MoodMate</span>
         </Link>
-        <div className="mt-2">
-          <LogoutButton className="w-full justify-start text-sm" />
+        {patientName && (
+          <p className="text-sm text-muted-foreground mt-2">Welcome, {patientName}</p>
+        )}
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 bg-white">
+        <div className="space-y-2">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                location.pathname === item.path
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              <item.icon className="h-4 w-4" />
+              <span>{item.name}</span>
+            </Link>
+          ))}
         </div>
+      </nav>
+
+      {/* Footer */}
+      <div className="p-4 border-t bg-white">
+        <LogoutButton variant="ghost" className="w-full justify-start text-sm" />
       </div>
     </div>
   );

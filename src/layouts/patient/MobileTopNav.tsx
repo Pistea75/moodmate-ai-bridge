@@ -22,7 +22,7 @@ export function MobileTopNav({ patientFullName, isOpen, setIsOpen }: MobileTopNa
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72">
+          <SheetContent side="left" className="p-0 w-72 bg-white border-r">
             <PatientSidebarContent patientName={patientFullName} />
           </SheetContent>
         </Sheet>

@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { User, Home, Calendar, MessageSquare, BarChart, ListCheck, Users, Bot } from "lucide-react";
 import { Button } from "./ui/button";
@@ -55,19 +54,19 @@ export function MainNav() {
                 </Avatar>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64">
-              <SheetHeader>
+            <SheetContent side="left" className="w-64 bg-white p-0">
+              <SheetHeader className="p-6 border-b bg-white">
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
-              <nav className="mt-4">
+              <nav className="p-4 bg-white">
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1 ${
                       location.pathname === item.path 
                         ? 'bg-primary text-primary-foreground' 
-                        : 'hover:bg-accent'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     }`}
                   >
                     <item.icon className="h-5 w-5" />
