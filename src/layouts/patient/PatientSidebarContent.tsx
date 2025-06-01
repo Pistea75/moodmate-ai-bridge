@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { PatientNavItems } from './PatientNavItems';
+import { patientNavItems } from './PatientNavItems';
 import { LogoutButton } from '@/components/LogoutButton';
 import { Separator } from '@/components/ui/separator';
 
@@ -11,7 +11,6 @@ type PatientSidebarContentProps = {
 
 export function PatientSidebarContent({ patientName }: PatientSidebarContentProps) {
   const location = useLocation();
-  const navItems = PatientNavItems();
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -31,7 +30,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
       {/* Navigation */}
       <nav className="flex-1 p-4 bg-white">
         <div className="space-y-2">
-          {navItems.map((item) => (
+          {patientNavItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
