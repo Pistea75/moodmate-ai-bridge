@@ -1,5 +1,5 @@
 
-import { format, isBefore, isSameDay, addMinutes } from "date-fns";
+import { format, isBefore, isSameDay, addMinutes, parseISO, isValid } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, 
   AlertDialogFooter, AlertDialogCancel, AlertDialogAction 
 } from "@/components/ui/alert-dialog";
-import { SessionRecapModal } from "@/components/clinician/SessionRecapModal";
 
 export type PatientSession = {
   id: string;
@@ -33,10 +32,24 @@ interface SessionListProps {
   onSessionDelete?: () => void;
 }
 
-// Helper function to format session date in proper timezone
+// Helper function to safely parse and format session date
 function formatSessionDate(dateTime: string, timezone?: string): string {
+  if (!dateTime) return 'No date';
+  
   try {
-    const utcDate = new Date(dateTime);
+    // First try to parse as ISO string
+    let utcDate = parseISO(dateTime);
+    
+    // If that fails, try creating a new Date
+    if (!isValid(utcDate)) {
+      utcDate = new Date(dateTime);
+    }
+    
+    // If still invalid, return error message
+    if (!isValid(utcDate)) {
+      console.error('Invalid date value:', dateTime);
+      return 'Invalid Date';
+    }
     
     if (timezone) {
       const zonedDate = toZonedTime(utcDate, timezone);
@@ -45,15 +58,29 @@ function formatSessionDate(dateTime: string, timezone?: string): string {
     
     return format(utcDate, 'PPP');
   } catch (error) {
-    console.error('Error formatting date:', error);
+    console.error('Error formatting date:', error, 'Input:', dateTime);
     return 'Invalid Date';
   }
 }
 
-// Helper function to format session time in proper timezone
+// Helper function to safely parse and format session time
 function formatSessionTime(dateTime: string, timezone?: string): string {
+  if (!dateTime) return 'No time';
+  
   try {
-    const utcDate = new Date(dateTime);
+    // First try to parse as ISO string
+    let utcDate = parseISO(dateTime);
+    
+    // If that fails, try creating a new Date
+    if (!isValid(utcDate)) {
+      utcDate = new Date(dateTime);
+    }
+    
+    // If still invalid, return error message
+    if (!isValid(utcDate)) {
+      console.error('Invalid time value:', dateTime);
+      return 'Invalid Time';
+    }
     
     if (timezone) {
       const zonedDate = toZonedTime(utcDate, timezone);
@@ -62,7 +89,7 @@ function formatSessionTime(dateTime: string, timezone?: string): string {
     
     return format(utcDate, 'p');
   } catch (error) {
-    console.error('Error formatting time:', error);
+    console.error('Error formatting time:', error, 'Input:', dateTime);
     return 'Invalid Time';
   }
 }
@@ -76,16 +103,34 @@ export function SessionList({
 }: SessionListProps) {
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
   
-  // Filter sessions for the selected date
-  const filteredSessions = sessions.filter((session) =>
-    isSameDay(new Date(session.scheduled_time), date)
-  );
+  // Filter sessions for the selected date with safe date parsing
+  const filteredSessions = sessions.filter((session) => {
+    try {
+      const sessionDate = parseISO(session.scheduled_time);
+      if (!isValid(sessionDate)) {
+        console.warn('Invalid session date:', session.scheduled_time);
+        return false;
+      }
+      return isSameDay(sessionDate, date);
+    } catch (error) {
+      console.error('Error filtering session:', error, session);
+      return false;
+    }
+  });
 
   // Check if a session is past (includes session duration)
   const isPast = (sessionDate: string, durationMinutes: number = 30) => {
-    const sessionTime = new Date(sessionDate);
-    const sessionEndTime = addMinutes(sessionTime, durationMinutes);
-    return isBefore(sessionEndTime, new Date());
+    try {
+      const sessionTime = parseISO(sessionDate);
+      if (!isValid(sessionTime)) {
+        return false; // If we can't parse the date, assume it's not past
+      }
+      const sessionEndTime = addMinutes(sessionTime, durationMinutes);
+      return isBefore(sessionEndTime, new Date());
+    } catch (error) {
+      console.error('Error checking if session is past:', error);
+      return false;
+    }
   };
   
   const handleDeleteSession = async (sessionId: string) => {
@@ -100,7 +145,6 @@ export function SessionList({
       
       await deleteSession(sessionId);
       
-      // After successful deletion, call the callback to refresh the session list
       if (onSessionDelete) {
         onSessionDelete();
       }
@@ -172,7 +216,6 @@ export function SessionList({
                 </span>
               </div>
               
-              {/* Display session notes if they exist */}
               {session.notes && (
                 <div className="mt-2 pt-2 border-t text-sm text-muted-foreground">
                   <p>{session.notes}</p>
