@@ -47,9 +47,29 @@ export function SessionScheduleForm({
 
   const handleSubmit = async () => {
     console.log("🕐 Submitting session with timezone:", formData.timezone);
+    console.log("📅 Form data being submitted:", formData);
     
+    // Validate date
     if (!formData.date) {
       toast({ title: "Missing Date", description: "Please select a date", variant: "destructive" });
+      return;
+    }
+
+    if (isNaN(formData.date.getTime())) {
+      toast({ title: "Invalid Date", description: "Please select a valid date", variant: "destructive" });
+      return;
+    }
+
+    // Validate time
+    if (!formData.time || formData.time.trim() === '') {
+      toast({ title: "Missing Time", description: "Please select a time", variant: "destructive" });
+      return;
+    }
+
+    // Validate time format
+    const timeMatch = formData.time.match(/^(\d{1,2}):(\d{2})$/);
+    if (!timeMatch) {
+      toast({ title: "Invalid Time", description: "Please select a valid time format (HH:MM)", variant: "destructive" });
       return;
     }
 

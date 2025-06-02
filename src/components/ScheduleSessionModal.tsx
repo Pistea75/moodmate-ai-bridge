@@ -93,9 +93,30 @@ export function ScheduleSessionModal({
       if (!formData.timezone) {
         throw new Error("Please select a timezone");
       }
+
+      if (!formData.time || formData.time.trim() === '') {
+        throw new Error("Please select a time");
+      }
       
+      // Validate date is a valid Date object
+      if (isNaN(formData.date.getTime())) {
+        throw new Error("Invalid date selected");
+      }
+
+      // Validate and parse time
+      const timeMatch = formData.time.match(/^(\d{1,2}):(\d{2})$/);
+      if (!timeMatch) {
+        throw new Error("Invalid time format. Please select a valid time.");
+      }
+
+      const hours = parseInt(timeMatch[1], 10);
+      const minutes = parseInt(timeMatch[2], 10);
+
+      if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+        throw new Error("Invalid time values. Please select a valid time.");
+      }
+
       const selectedDate = formData.date;
-      const [hours, minutes] = formData.time.split(":").map(Number);
 
       // Create a date object representing the local date and time selected
       const scheduledDate = new Date(
@@ -107,14 +128,23 @@ export function ScheduleSessionModal({
         0,
         0
       );
+
+      // Debug logging
+      console.log("🧪 Constructed scheduledDate:", scheduledDate);
+      console.log("🧪 Is valid date:", !isNaN(scheduledDate.getTime()));
+      console.log("📅 Selected local date and time:", scheduledDate.toLocaleString());
+      console.log("📅 Selected timezone:", formData.timezone);
+
+      // Validate the constructed date
+      if (isNaN(scheduledDate.getTime())) {
+        throw new Error("Failed to create valid scheduled date. Please check your date and time selection.");
+      }
       
       // Check if the time slot is already booked
       if (bookedSlots[formData.time]) {
         throw new Error("This time slot is already booked. Please select another time.");
       }
       
-      console.log("📅 Selected local date and time:", scheduledDate.toLocaleString());
-      console.log("📅 Selected timezone:", formData.timezone);
       console.log("🔄 Scheduling session with isPatientView:", isPatientView);
 
       // Get the current user
@@ -150,6 +180,9 @@ export function ScheduleSessionModal({
         finalPatientId = formData.patientId;
         console.log("🏥 Selected patient ID:", finalPatientId);
       }
+
+      // Final validation before calling scheduleSession
+      console.log("Final datetime:", scheduledDate.toISOString());
 
       // Call the updated scheduleSession utility
       await scheduleSession({

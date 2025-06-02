@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { MoodLogModal } from '@/components/patient/MoodLogModal';
 import { MoodChartView } from './MoodChartView';
 import { MoodChartDateFilter } from './MoodChartDateFilter';
 import { ChartData, MoodEntry as MoodChartEntry, parseEntries, ViewMode } from './MoodChartUtils';
@@ -118,6 +119,10 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
     fetchMoodData();
   }, [view, patientId, dateRange]);
 
+  const handleMoodLogComplete = () => {
+    fetchMoodData(); // Refresh the chart data when a new mood is logged
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
@@ -140,9 +145,10 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
             Daily
           </Button>
           {showLogButton && (
-            <Button variant="default" size="sm">
-              Log Mood
-            </Button>
+            <MoodLogModal 
+              onLogComplete={handleMoodLogComplete}
+              trigger={<Button variant="default" size="sm">Log Mood</Button>}
+            />
           )}
         </div>
       </div>
