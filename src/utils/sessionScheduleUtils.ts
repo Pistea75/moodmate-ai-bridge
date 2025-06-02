@@ -5,11 +5,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import { resolvePatientSessionDetails } from "./clinicianPatientUtils";
 import { 
-  parseGMTOffset, 
   validateScheduleParams, 
   validateUserIds, 
   isValidUUID 
 } from "./sessionValidationUtils";
+import { createUTCFromLocalDateTime } from "./sessionDateUtils";
 
 /**
  * Interface for session scheduling parameters
@@ -49,30 +49,8 @@ export const scheduleSession = async ({
   // Validate input parameters
   const { inputDate, hours, minutes } = validateScheduleParams(date, time, timezone);
   
-  // Create local date with the specified time
-  const localDateTime = new Date(
-    inputDate.getFullYear(),
-    inputDate.getMonth(),
-    inputDate.getDate(),
-    hours,
-    minutes,
-    0,
-    0
-  );
-  
-  console.log("📅 Local date/time constructed:", localDateTime.toLocaleString());
-  console.log("🌍 Selected timezone:", timezone);
-  
-  // Convert to UTC based on the selected timezone
-  const timezoneOffsetMinutes = parseGMTOffset(timezone);
-  const utcDateTime = new Date(localDateTime.getTime() - (timezoneOffsetMinutes * 60 * 1000));
-  
-  // Validate the final UTC date
-  if (isNaN(utcDateTime.getTime())) {
-    throw new Error("Failed to create valid UTC date");
-  }
-  
-  console.log("🌐 Converted to UTC:", utcDateTime.toISOString());
+  // Create UTC date from local date/time and timezone
+  const utcDateTime = createUTCFromLocalDateTime(inputDate, hours, minutes, timezone);
   
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
