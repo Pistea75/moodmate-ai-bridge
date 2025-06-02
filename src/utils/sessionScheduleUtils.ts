@@ -4,7 +4,6 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { resolvePatientSessionDetails } from "./clinicianPatientUtils";
-import { fromZonedTime } from "date-fns-tz";
 
 /**
  * Interface for session scheduling parameters
@@ -39,6 +38,20 @@ const isValidUUID = (uuid: string): boolean => {
 };
 
 /**
+ * Converts GMT offset string to minutes
+ */
+const parseGMTOffset = (timezone: string): number => {
+  const match = timezone.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
+  if (!match) return 0;
+  
+  const sign = match[1] === '+' ? 1 : -1;
+  const hours = parseInt(match[2], 10);
+  const minutes = parseInt(match[3] || '0', 10);
+  
+  return sign * (hours * 60 + minutes);
+};
+
+/**
  * Schedules a new therapy session with proper timezone handling
  * @param params - Session parameters
  * @returns Object with success status
@@ -55,18 +68,42 @@ export const scheduleSession = async ({
     throw new Error("Missing required fields: date, time, or timezone");
   }
   
-  // Parse the local date and time
-  const localDateTime = new Date(date);
+  // Parse the input date and time components
+  const inputDate = new Date(date);
   const [hours, minutes] = time.split(":").map(Number);
   
-  // Set the time on the date
-  localDateTime.setHours(hours, minutes, 0, 0);
+  // Validate the input date
+  if (isNaN(inputDate.getTime())) {
+    throw new Error("Invalid date provided");
+  }
   
-  console.log("📅 Local date/time selected:", localDateTime.toLocaleString());
+  // Validate time components
+  if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+    throw new Error("Invalid time format");
+  }
+  
+  // Create local date with the specified time
+  const localDateTime = new Date(
+    inputDate.getFullYear(),
+    inputDate.getMonth(),
+    inputDate.getDate(),
+    hours,
+    minutes,
+    0,
+    0
+  );
+  
+  console.log("📅 Local date/time constructed:", localDateTime.toLocaleString());
   console.log("🌍 Selected timezone:", timezone);
   
-  // Convert the local time to UTC using the selected timezone
-  const utcDateTime = fromZonedTime(localDateTime, timezone);
+  // Convert to UTC based on the selected timezone
+  const timezoneOffsetMinutes = parseGMTOffset(timezone);
+  const utcDateTime = new Date(localDateTime.getTime() - (timezoneOffsetMinutes * 60 * 1000));
+  
+  // Validate the final UTC date
+  if (isNaN(utcDateTime.getTime())) {
+    throw new Error("Failed to create valid UTC date");
+  }
   
   console.log("🌐 Converted to UTC:", utcDateTime.toISOString());
   
