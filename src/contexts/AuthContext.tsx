@@ -10,9 +10,9 @@ interface AuthContextType {
   user: User | null;
   userRole: UserRole;
   loading: boolean;
-  isLoading: boolean; // Add missing property
+  isLoading: boolean;
   signOut: () => Promise<void>;
-  deleteAccount: () => Promise<void>; // Add missing property
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -86,7 +86,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Error fetching user role:', error);
         setUserRole(null);
       } else {
-        // Fix type error by ensuring proper type casting
         const role = data?.role as UserRole;
         setUserRole(role || null);
       }
@@ -120,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user, 
       userRole, 
       loading, 
-      isLoading: loading, // Provide both for compatibility
+      isLoading: loading,
       signOut,
       deleteAccount
     }}>

@@ -3,7 +3,6 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { patientNavItems } from './PatientNavItems';
 import { LogoutButton } from '@/components/LogoutButton';
-import { Separator } from '@/components/ui/separator';
 
 type PatientSidebarContentProps = {
   patientName: React.ReactNode;

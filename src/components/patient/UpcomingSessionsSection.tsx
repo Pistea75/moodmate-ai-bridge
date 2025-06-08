@@ -12,7 +12,7 @@ export function UpcomingSessionsSection() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Upcoming Sessions</h2>
+        <h2 className="text-lg font-semibold text-foreground">Upcoming Sessions</h2>
         <Skeleton className="h-16 w-full" />
       </div>
     );
@@ -20,16 +20,16 @@ export function UpcomingSessionsSection() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Upcoming Sessions</h2>
+      <h2 className="text-lg font-semibold text-foreground">Upcoming Sessions</h2>
       {upcomingSession ? (
-        <div className="bg-white border rounded-lg p-4 shadow-sm">
+        <div className="bg-card border rounded-lg p-4 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
-              <CalendarDays className="h-5 w-5 text-blue-600" />
+              <CalendarDays className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
-              <h3 className="font-medium text-gray-900">Therapy Session</h3>
-              <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+              <h3 className="font-medium text-card-foreground">Therapy Session</h3>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                 <span className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   {format(new Date(upcomingSession.scheduled_time), 'MMM d, yyyy')} at{' '}
@@ -41,8 +41,8 @@ export function UpcomingSessionsSection() {
           </div>
         </div>
       ) : (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-          <p className="text-gray-600">No upcoming sessions scheduled</p>
+        <div className="bg-muted/50 border border-border rounded-lg p-6 text-center">
+          <p className="text-muted-foreground">No upcoming sessions scheduled</p>
         </div>
       )}
     </div>
