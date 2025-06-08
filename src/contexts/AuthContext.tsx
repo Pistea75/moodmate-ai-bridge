@@ -10,7 +10,9 @@ interface AuthContextType {
   user: User | null;
   userRole: UserRole;
   loading: boolean;
+  isLoading: boolean; // Add missing property
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>; // Add missing property
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -84,7 +86,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Error fetching user role:', error);
         setUserRole(null);
       } else {
-        setUserRole(data?.role || null);
+        // Fix type error by ensuring proper type casting
+        const role = data?.role as UserRole;
+        setUserRole(role || null);
       }
     } catch (error) {
       console.error('Unexpected error fetching user role:', error);
@@ -99,8 +103,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const deleteAccount = async () => {
+    if (!user) throw new Error('No user logged in');
+    
+    const { error } = await supabase.functions.invoke('delete-user', {
+      body: { userId: user.id }
+    });
+    
+    if (error) throw error;
+    
+    await signOut();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, userRole, loading, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      userRole, 
+      loading, 
+      isLoading: loading, // Provide both for compatibility
+      signOut,
+      deleteAccount
+    }}>
       {children}
     </AuthContext.Provider>
   );
