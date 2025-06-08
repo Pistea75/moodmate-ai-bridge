@@ -1,6 +1,8 @@
+
 import { Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { AuthProvider } from './contexts/AuthContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Features from './pages/Features';
@@ -37,49 +39,53 @@ import TestPage from './pages/TestPage';
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Routes>
-          
-          
-          <Route path="/" element={<Landing />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/help" element={<HelpCenter />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/security" element={<Security />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup/patient" element={<SignupPatient />} />
-          <Route path="/signup/clinician" element={<SignupClinician />} />
-          
-          <Route path="/patient/dashboard" element={<ProtectedRoute requiredRole="patient"><PatientDashboard /></ProtectedRoute>} />
-          <Route path="/patient/chat" element={<ProtectedRoute requiredRole="patient"><PatientChat /></ProtectedRoute>} />
-          <Route path="/patient/tasks" element={<ProtectedRoute requiredRole="patient"><PatientTasks /></ProtectedRoute>} />
-          <Route path="/patient/sessions" element={<ProtectedRoute requiredRole="patient"><PatientSessions /></ProtectedRoute>} />
-          <Route path="/patient/insights" element={<ProtectedRoute requiredRole="patient"><PatientInsights /></ProtectedRoute>} />
-          <Route path="/patient/settings" element={<ProtectedRoute requiredRole="patient"><PatientSettings /></ProtectedRoute>} />
-          <Route path="/patient/profile" element={<ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>} />
-          
-          <Route path="/clinician/dashboard" element={<ProtectedRoute requiredRole="clinician"><ClinicianDashboard /></ProtectedRoute>} />
-          <Route path="/clinician/patients" element={<ProtectedRoute requiredRole="clinician"><Patients /></ProtectedRoute>} />
-          <Route path="/clinician/patients/:patientId" element={<ProtectedRoute requiredRole="clinician"><PatientDetail /></ProtectedRoute>} />
-          <Route path="/clinician/sessions" element={<ProtectedRoute requiredRole="clinician"><ClinicianSessions /></ProtectedRoute>} />
-          <Route path="/clinician/tasks" element={<ProtectedRoute requiredRole="clinician"><ClinicianTasks /></ProtectedRoute>} />
-          <Route path="/clinician/reports" element={<ProtectedRoute requiredRole="clinician"><ClinicianReports /></ProtectedRoute>} />
-          <Route path="/clinician/settings" element={<ProtectedRoute requiredRole="clinician"><ClinicianSettings /></ProtectedRoute>} />
-          <Route path="/clinician/profile" element={<ProtectedRoute requiredRole="clinician"><ClinicianProfile /></ProtectedRoute>} />
-          <Route path="/clinician/train-ai" element={<ProtectedRoute requiredRole="clinician"><TrainAI /></ProtectedRoute>} />
-          
-          <Route path="*" element={<NotFound />} />
-          <Route path="/test" element={<TestPage />} />
-        </Routes>
-        <Toaster />
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup/patient" element={<SignupPatient />} />
+            <Route path="/signup/clinician" element={<SignupClinician />} />
+            
+            {/* Protected patient routes */}
+            <Route path="/patient/dashboard" element={<ProtectedRoute requiredRole="patient"><PatientDashboard /></ProtectedRoute>} />
+            <Route path="/patient/chat" element={<ProtectedRoute requiredRole="patient"><PatientChat /></ProtectedRoute>} />
+            <Route path="/patient/tasks" element={<ProtectedRoute requiredRole="patient"><PatientTasks /></ProtectedRoute>} />
+            <Route path="/patient/sessions" element={<ProtectedRoute requiredRole="patient"><PatientSessions /></ProtectedRoute>} />
+            <Route path="/patient/insights" element={<ProtectedRoute requiredRole="patient"><PatientInsights /></ProtectedRoute>} />
+            <Route path="/patient/settings" element={<ProtectedRoute requiredRole="patient"><PatientSettings /></ProtectedRoute>} />
+            <Route path="/patient/profile" element={<ProtectedRoute requiredRole="patient"><PatientProfile /></ProtectedRoute>} />
+            
+            {/* Protected clinician routes */}
+            <Route path="/clinician/dashboard" element={<ProtectedRoute requiredRole="clinician"><ClinicianDashboard /></ProtectedRoute>} />
+            <Route path="/clinician/patients" element={<ProtectedRoute requiredRole="clinician"><Patients /></ProtectedRoute>} />
+            <Route path="/clinician/patients/:patientId" element={<ProtectedRoute requiredRole="clinician"><PatientDetail /></ProtectedRoute>} />
+            <Route path="/clinician/sessions" element={<ProtectedRoute requiredRole="clinician"><ClinicianSessions /></ProtectedRoute>} />
+            <Route path="/clinician/tasks" element={<ProtectedRoute requiredRole="clinician"><ClinicianTasks /></ProtectedRoute>} />
+            <Route path="/clinician/reports" element={<ProtectedRoute requiredRole="clinician"><ClinicianReports /></ProtectedRoute>} />
+            <Route path="/clinician/settings" element={<ProtectedRoute requiredRole="clinician"><ClinicianSettings /></ProtectedRoute>} />
+            <Route path="/clinician/profile" element={<ProtectedRoute requiredRole="clinician"><ClinicianProfile /></ProtectedRoute>} />
+            <Route path="/clinician/train-ai" element={<ProtectedRoute requiredRole="clinician"><TrainAI /></ProtectedRoute>} />
+            
+            {/* Catch all route */}
+            <Route path="*" element={<NotFound />} />
+            <Route path="/test" element={<TestPage />} />
+          </Routes>
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
