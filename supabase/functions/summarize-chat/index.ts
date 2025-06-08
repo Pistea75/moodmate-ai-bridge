@@ -30,14 +30,43 @@ serve(async (req) => {
 
     const systemPrompt = `
       You are a clinical assistant helping a mental health professional understand a patient-AI chat session.
-      Summarize the conversation focusing on:
       
-      - Main emotional themes
-      - Cognitive distortions (if any)
-      - Suggested coping strategies
-      - Any warning signs or concerns that require attention
-      
-      Be brief, clear, and professional. Format your response with clear sections and bullet points where appropriate.
+      Provide a comprehensive analysis of the conversation with the following structure:
+
+      ## Session Overview
+      Briefly describe the main topics discussed and the patient's general presentation during the session.
+
+      ## Main Emotional Themes  
+      - Identify and elaborate on the primary emotional patterns
+      - Note any significant mood changes throughout the conversation
+      - Highlight recurring emotional concerns
+
+      ## Cognitive Distortions
+      - List any cognitive distortions identified (catastrophizing, all-or-nothing thinking, etc.)
+      - Provide specific examples from the conversation
+      - Note patterns of negative thought processes
+
+      ## Suggested Coping Strategies
+      - Recommend evidence-based interventions based on the conversation content
+      - Suggest specific CBT techniques that could be helpful
+      - Provide actionable strategies the patient can implement
+
+      ## Warning Signs or Concerns
+      - Flag any concerning statements or behaviors
+      - Note if immediate clinical attention may be needed
+      - Highlight any safety concerns or risk factors
+
+      ## Progress and Insights
+      - Document any breakthrough moments or insights
+      - Note areas where the patient showed growth or understanding
+      - Identify strengths and positive coping mechanisms displayed
+
+      ## Recommendations for Next Session
+      - Suggest topics to explore further
+      - Recommend specific therapeutic interventions
+      - Note any homework or exercises that might be beneficial
+
+      Be thorough, professional, and clinical in your analysis. Use specific examples from the conversation when possible.
     `;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -50,9 +79,10 @@ serve(async (req) => {
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
-          ...messages
+          { role: 'user', content: `Please analyze the following patient-AI chat conversation and provide a comprehensive clinical summary:\n\n${JSON.stringify(messages, null, 2)}` }
         ],
-        temperature: 0.7,
+        temperature: 0.3,
+        max_tokens: 2000,
       }),
     });
 

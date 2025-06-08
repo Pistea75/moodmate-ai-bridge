@@ -1,172 +1,115 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
+
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-type UserRole = 'patient' | 'clinician';
+type UserRole = 'patient' | 'clinician' | null;
 
-interface UserData {
-  firstName?: string;
-  lastName?: string;
-  language?: string;
-  role?: UserRole;
-  [key: string]: any;
-}
-
-type AuthContextType = {
+interface AuthContextType {
   user: User | null;
-  session: Session | null;
-  userRole: UserRole | null;
-  signUp: (email: string, password: string, userData: UserData) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  userRole: UserRole;
+  loading: boolean;
   signOut: () => Promise<void>;
-  deleteAccount: () => Promise<void>;
-  isLoading: boolean;
-};
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [userRole, setUserRole] = useState<UserRole>(null);
+  const [loading, setLoading] = useState(true);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          const role = session.user.user_metadata?.role as UserRole;
-          setUserRole(role);
-          
-          if (event === 'SIGNED_IN') {
-            toast({
-              title: "Welcome",
-              description: "You are now signed in.",
-            });
-            
-            if (role === 'clinician') {
-              navigate('/clinician/dashboard');
-            } else {
-              navigate('/patient/dashboard');
-            }
-          }
-        } else if (event === 'SIGNED_OUT') {
-          setUserRole(null);
-          toast({
-            title: "Signed out",
-            description: "You have been signed out successfully.",
-          });
-          navigate('/login');
-        }
-      }
-    );
-
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      } else {
+        setUserRole(null);
+        setLoading(false);
+        setHasInitialized(true);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, !!session?.user);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        const role = session.user.user_metadata?.role as UserRole;
-        setUserRole(role);
+        await fetchUserRole(session.user.id);
+      } else {
+        setUserRole(null);
+        setLoading(false);
+        
+        // Only redirect to login on sign out, not on initial load or tab focus
+        if (event === 'SIGNED_OUT' && hasInitialized) {
+          navigate('/login');
+        }
       }
-      
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, hasInitialized]);
 
-  const signUp = async (email: string, password: string, userData: UserData) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: userData.firstName && userData.lastName 
-            ? `${userData.firstName} ${userData.lastName}` 
-            : userData.firstName || 'Unknown User',
-          language: userData.language || 'en',
-          role: userData.role || 'patient'
-        }
+  // Only redirect to dashboard on initial authentication, not on every auth state change
+  useEffect(() => {
+    if (hasInitialized && user && userRole && !loading) {
+      const isOnLoginPage = location.pathname === '/login';
+      const isOnSignupPage = location.pathname.startsWith('/signup');
+      const isOnPublicPage = ['/', '/features', '/about', '/contact', '/privacy', '/terms'].includes(location.pathname);
+      
+      // Only redirect if user is on a public page, login, or signup page
+      if (isOnLoginPage || isOnSignupPage || isOnPublicPage) {
+        const dashboardPath = userRole === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
+        navigate(dashboardPath, { replace: true });
       }
-    });
-    
-    if (error) throw error;
-  };
+    }
+  }, [user, userRole, loading, hasInitialized, navigate, location.pathname]);
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (error) throw error;
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        setUserRole(null);
+      } else {
+        setUserRole(data?.role || null);
+      }
+    } catch (error) {
+      console.error('Unexpected error fetching user role:', error);
+      setUserRole(null);
+    } finally {
+      setLoading(false);
+      setHasInitialized(true);
+    }
   };
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error: any) {
-      throw error;
-    }
-  };
-
-  const deleteAccount = async () => {
-    try {
-      if (!user) throw new Error("No user is currently logged in");
-      
-      const { error } = await supabase.auth.admin.deleteUser(user.id);
-      
-      if (error) {
-        console.error("Error deleting user through admin API:", error);
-        
-        const { error: deleteError } = await supabase.functions.invoke('delete-user', {
-          body: { userId: user.id },
-        });
-        
-        if (deleteError) {
-          console.error("Error in delete-user function:", deleteError);
-          throw new Error("Could not fully delete account. Please contact support.");
-        }
-      }
-      
-      await supabase.auth.signOut();
-    } catch (error: any) {
-      toast({
-        title: "Account Deletion Failed",
-        description: error.message || "Unable to delete account. Please try again or contact support.",
-        variant: "destructive"
-      });
-      throw error;
-    }
+    await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      session, 
-      userRole,
-      signUp, 
-      signIn, 
-      signOut,
-      deleteAccount,
-      isLoading
-    }}>
+    <AuthContext.Provider value={{ user, userRole, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}

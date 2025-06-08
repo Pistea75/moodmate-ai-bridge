@@ -13,7 +13,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
   const location = useLocation();
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background border-r">
       {/* Header */}
       <div className="p-6 border-b bg-background">
         <Link to="/patient/dashboard" className="flex items-center gap-2">
@@ -37,7 +37,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 location.pathname === item.path
                   ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  : 'text-foreground hover:text-primary hover:bg-muted'
               }`}
             >
               <item.icon className="h-4 w-4" />
@@ -49,7 +49,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
 
       {/* Footer */}
       <div className="p-4 border-t bg-background">
-        <LogoutButton variant="ghost" className="w-full justify-start text-sm" />
+        <LogoutButton variant="ghost" className="w-full justify-start text-sm text-foreground hover:text-primary" />
       </div>
     </div>
   );

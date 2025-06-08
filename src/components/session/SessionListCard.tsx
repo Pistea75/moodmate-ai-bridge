@@ -23,20 +23,29 @@ function formatSessionDate(dateTime: string, timezone?: string): string {
   if (!dateTime) return 'No date';
   
   try {
+    // Try parsing as ISO string first
     let utcDate = parseISO(dateTime);
     
+    // If that fails, try as regular Date constructor
     if (!isValid(utcDate)) {
       utcDate = new Date(dateTime);
     }
     
+    // Final validation
     if (!isValid(utcDate)) {
       console.error('Invalid date value:', dateTime);
       return 'Invalid Date';
     }
     
-    if (timezone) {
-      const zonedDate = toZonedTime(utcDate, timezone);
-      return format(zonedDate, 'PPP');
+    // If timezone is provided, convert to that timezone
+    if (timezone && timezone !== 'UTC') {
+      try {
+        const zonedDate = toZonedTime(utcDate, timezone);
+        return format(zonedDate, 'PPP');
+      } catch (tzError) {
+        console.warn('Timezone conversion failed, using UTC:', tzError);
+        return format(utcDate, 'PPP');
+      }
     }
     
     return format(utcDate, 'PPP');
@@ -51,20 +60,29 @@ function formatSessionTime(dateTime: string, timezone?: string): string {
   if (!dateTime) return 'No time';
   
   try {
+    // Try parsing as ISO string first
     let utcDate = parseISO(dateTime);
     
+    // If that fails, try as regular Date constructor
     if (!isValid(utcDate)) {
       utcDate = new Date(dateTime);
     }
     
+    // Final validation
     if (!isValid(utcDate)) {
       console.error('Invalid time value:', dateTime);
       return 'Invalid Time';
     }
     
-    if (timezone) {
-      const zonedDate = toZonedTime(utcDate, timezone);
-      return format(zonedDate, 'p');
+    // If timezone is provided, convert to that timezone
+    if (timezone && timezone !== 'UTC') {
+      try {
+        const zonedDate = toZonedTime(utcDate, timezone);
+        return format(zonedDate, 'p');
+      } catch (tzError) {
+        console.warn('Timezone conversion failed, using UTC:', tzError);
+        return format(utcDate, 'p');
+      }
     }
     
     return format(utcDate, 'p');
