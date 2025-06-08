@@ -35,10 +35,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (!mounted) return;
         
-        setUser(session?.user ?? null);
         if (session?.user) {
+          setUser(session.user);
           await fetchUserRole(session.user.id);
         } else {
+          setUser(null);
           setUserRole(null);
           setLoading(false);
           setHasInitialized(true);
@@ -61,11 +62,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!mounted) return;
       
       console.log('Auth state changed:', event, !!session?.user);
-      setUser(session?.user ?? null);
       
       if (session?.user) {
+        setUser(session.user);
         await fetchUserRole(session.user.id);
       } else {
+        setUser(null);
         setUserRole(null);
         setLoading(false);
         

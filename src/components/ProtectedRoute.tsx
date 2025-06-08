@@ -33,7 +33,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     return () => clearTimeout(timer);
   }, []);
 
-  // Show nothing while checking authentication or context isn't ready
+  // Show loading while checking authentication or context isn't ready
   if (isLoading || !isReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
