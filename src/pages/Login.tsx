@@ -53,6 +53,13 @@ export default function Login() {
 
   const displayError = error || authError;
   
+  // Helper function to get error message
+  const getErrorMessage = (error: typeof displayError): string => {
+    if (!error) return '';
+    if (typeof error === 'string') return error;
+    return error.message || 'An unexpected error occurred';
+  };
+  
   return (
     <MainLayout>
       <div className="min-h-[calc(100vh-88px)] flex items-center justify-center px-4">
@@ -77,7 +84,7 @@ export default function Login() {
             {displayError && (
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{displayError.message || displayError}</AlertDescription>
+                <AlertDescription>{getErrorMessage(displayError)}</AlertDescription>
               </Alert>
             )}
             
