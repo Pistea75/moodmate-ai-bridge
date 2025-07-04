@@ -8,16 +8,14 @@ type ClinicianLayoutProps = {
 
 export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background">
       {/* Navigation */}
       <MainNav />
       
       {/* Main Content */}
-      <main className="flex-1 bg-background">
-        <div className="container mx-auto px-4 py-6 min-h-screen">
-          <div className="text-foreground">
-            {children}
-          </div>
+      <main className="flex-1 pt-16 md:pt-0 bg-background">
+        <div className="container mx-auto px-4 py-6 bg-background min-h-screen">
+          {children}
         </div>
       </main>
     </div>

@@ -35,15 +35,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Error fetching user role:', error);
-        return null;
+        setUserRole(null);
       } else {
         const role = data?.role as UserRole;
         console.log('User role fetched:', role);
-        return role || null;
+        setUserRole(role || null);
       }
     } catch (error) {
       console.error('Unexpected error fetching user role:', error);
-      return null;
+      setUserRole(null);
     }
   };
 
@@ -60,10 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user) {
           console.log('Session found, setting user:', session.user.id);
           setUser(session.user);
-          const role = await fetchUserRole(session.user.id);
-          if (mounted) {
-            setUserRole(role);
-          }
+          await fetchUserRole(session.user.id);
         } else {
           console.log('No session found');
           setUser(null);
@@ -90,11 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (session?.user) {
         setUser(session.user);
-        const role = await fetchUserRole(session.user.id);
-        if (mounted) {
-          setUserRole(role);
-          setLoading(false);
-        }
+        await fetchUserRole(session.user.id);
+        setLoading(false);
       } else {
         setUser(null);
         setUserRole(null);
