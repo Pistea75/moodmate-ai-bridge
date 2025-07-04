@@ -21,7 +21,7 @@ export function useAuthFlow() {
       if (error.message?.includes('Email not confirmed')) {
         message = 'Please check your email and confirm your account before logging in.';
       } else if (error.message?.includes('Invalid login credentials')) {
-        message = 'Invalid email or password.';
+        message = 'Invalid email or password. Please check your credentials and try again.';
       } else if (error.message?.includes('User already registered')) {
         message = 'This email is already registered. Please try logging in instead.';
       } else if (error.message?.includes('Password should be')) {
@@ -30,6 +30,13 @@ export function useAuthFlow() {
                 error.message?.includes('Database error') ||
                 error.message?.includes('error in Supabase function')) {
         message = 'There was a technical issue during registration. Please try again with a different email or contact support.';
+      } else if (error.message?.includes('Network error') || 
+                error.message?.includes('fetch')) {
+        message = 'Network connection issue. Please check your internet connection and try again.';
+      } else if (error.message?.includes('Too many requests')) {
+        message = 'Too many login attempts. Please wait a few minutes before trying again.';
+      } else if (error.message?.includes('Unable to validate email address')) {
+        message = 'Please enter a valid email address.';
       } else if (error.message) {
         message = error.message;
       }
@@ -50,13 +57,29 @@ export function useAuthFlow() {
       setIsLoading(true);
       clearError();
       
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
+      // Basic validation
+      if (!email || !password) {
+        throw new Error('Please enter both email and password.');
+      }
+      
+      if (!email.includes('@')) {
+        throw new Error('Please enter a valid email address.');
+      }
+      
+      console.log('Starting sign in process...');
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
         password,
       });
 
       if (error) throw error;
+      
+      if (!data.user) {
+        throw new Error('Login failed. Please try again.');
+      }
 
+      console.log('Sign in successful');
       toast({
         title: "Success",
         description: "You have successfully logged in.",
@@ -64,6 +87,7 @@ export function useAuthFlow() {
       
       return true;
     } catch (error: any) {
+      console.error('Sign in error:', error);
       handleAuthError(error);
       return false;
     } finally {
@@ -75,6 +99,15 @@ export function useAuthFlow() {
     try {
       setIsLoading(true);
       clearError();
+      
+      // Basic validation
+      if (!email || !password) {
+        throw new Error('Please enter both email and password.');
+      }
+      
+      if (password.length < 6) {
+        throw new Error('Password should be at least 6 characters long.');
+      }
       
       // Create a new cleaned metadata object rather than modifying the original
       const cleanedMetadata = { ...metadata };
@@ -92,7 +125,7 @@ export function useAuthFlow() {
       console.log('Signing up with metadata:', cleanedMetadata);
       
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim().toLowerCase(),
         password,
         options: {
           data: cleanedMetadata,

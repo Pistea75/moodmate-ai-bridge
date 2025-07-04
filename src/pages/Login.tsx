@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthFlow } from '../hooks/useAuthFlow';
 import MainLayout from '../layouts/MainLayout';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2, Wifi, WifiOff } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,24 +12,46 @@ import { Input } from '@/components/ui/input';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { user } = useAuth();
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const { user, userRole, authError } = useAuth();
   const navigate = useNavigate();
   const { isLoading, error, signIn, clearError } = useAuthFlow();
   
+  // Monitor connection status
   useEffect(() => {
-    if (user) {
-      if (user.user_metadata?.role === 'clinician') {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+  
+  useEffect(() => {
+    if (user && userRole) {
+      if (userRole === 'clinician') {
         navigate('/clinician/dashboard');
       } else {
         navigate('/patient/dashboard');
       }
     }
-  }, [user, navigate]);
+  }, [user, userRole, navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isOnline) {
+      return;
+    }
+    
     await signIn(email, password);
   };
+
+  const displayError = error || authError;
   
   return (
     <MainLayout>
@@ -42,10 +65,19 @@ export default function Login() {
           </div>
           
           <div className="bg-white rounded-xl shadow-sm border p-6">
-            {error && (
+            {!isOnline && (
+              <Alert variant="destructive" className="mb-6">
+                <WifiOff className="h-4 w-4" />
+                <AlertDescription>
+                  You're offline. Please check your internet connection.
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {displayError && (
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error.message}</AlertDescription>
+                <AlertDescription>{displayError.message || displayError}</AlertDescription>
               </Alert>
             )}
             
@@ -63,7 +95,7 @@ export default function Login() {
                     required
                     className="w-full"
                     placeholder="you@example.com"
-                    disabled={isLoading}
+                    disabled={isLoading || !isOnline}
                   />
                 </div>
                 
@@ -84,16 +116,23 @@ export default function Login() {
                     required
                     className="w-full"
                     placeholder="••••••••"
-                    disabled={isLoading}
+                    disabled={isLoading || !isOnline}
                   />
                 </div>
                 
                 <Button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || !isOnline}
                   className="w-full bg-mood-purple hover:bg-mood-purple-secondary"
                 >
-                  {isLoading ? 'Signing in...' : 'Sign In'}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
                 </Button>
               </div>
             </form>
@@ -107,15 +146,25 @@ export default function Login() {
               </p>
             </div>
             
-            <div className="mt-8 pt-6 border-t text-center">
-              <div className="inline-flex items-center">
-                <span className="text-sm text-muted-foreground mr-3">Language:</span>
-                <select className="bg-white border px-2 py-1 rounded-md text-sm">
-                  <option value="en">English</option>
-                  <option value="es">Español</option>
-                  <option value="fr">Français</option>
-                  <option value="de">Deutsch</option>
-                </select>
+            <div className="mt-8 pt-6 border-t">
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center">
+                  <span className="text-sm text-muted-foreground mr-3">Language:</span>
+                  <select className="bg-white border px-2 py-1 rounded-md text-sm">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center text-sm text-muted-foreground">
+                  {isOnline ? (
+                    <><Wifi className="h-4 w-4 mr-1 text-green-500" />Online</>
+                  ) : (
+                    <><WifiOff className="h-4 w-4 mr-1 text-red-500" />Offline</>
+                  )}
+                </div>
               </div>
             </div>
           </div>

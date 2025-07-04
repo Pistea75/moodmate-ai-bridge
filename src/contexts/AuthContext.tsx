@@ -13,6 +13,8 @@ interface AuthContextType {
   isLoading: boolean;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  authError: string | null;
+  retryAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,34 +23,61 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const fetchUserRole = async (userId: string) => {
+  const fetchUserRole = async (userId: string, attempt: number = 1): Promise<UserRole> => {
     try {
-      console.log('Fetching user role for:', userId);
+      console.log(`Fetching user role for: ${userId} (attempt ${attempt})`);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching user role:', error);
-        setUserRole(null);
-      } else {
-        const role = data?.role as UserRole;
-        console.log('User role fetched:', role);
-        setUserRole(role || null);
+        if (attempt < 3) {
+          // Retry up to 3 times with exponential backoff
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          return fetchUserRole(userId, attempt + 1);
+        }
+        throw error;
       }
+
+      const role = data?.role as UserRole;
+      console.log('User role fetched:', role);
+      return role || null;
     } catch (error) {
-      console.error('Unexpected error fetching user role:', error);
-      setUserRole(null);
+      console.error('Failed to fetch user role after retries:', error);
+      if (attempt >= 3) {
+        setAuthError('Unable to load user information. Please try again.');
+      }
+      return null;
+    }
+  };
+
+  const retryAuth = async () => {
+    if (!user) return;
+    
+    setAuthError(null);
+    setRetryCount(prev => prev + 1);
+    
+    try {
+      const role = await fetchUserRole(user.id);
+      setUserRole(role);
+    } catch (error) {
+      console.error('Retry auth failed:', error);
+      setAuthError('Authentication retry failed. Please refresh the page.');
     }
   };
 
   useEffect(() => {
     let mounted = true;
+    let roleTimeout: NodeJS.Timeout;
 
     const initializeAuth = async () => {
       try {
@@ -60,7 +89,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user) {
           console.log('Session found, setting user:', session.user.id);
           setUser(session.user);
-          await fetchUserRole(session.user.id);
+          
+          // Set a timeout for role fetching to prevent indefinite loading
+          roleTimeout = setTimeout(() => {
+            if (mounted && !userRole) {
+              console.warn('Role fetching timed out');
+              setAuthError('Loading user information is taking longer than expected.');
+              setLoading(false);
+            }
+          }, 10000); // 10 second timeout
+          
+          const role = await fetchUserRole(session.user.id);
+          if (mounted) {
+            setUserRole(role);
+            clearTimeout(roleTimeout);
+          }
         } else {
           console.log('No session found');
           setUser(null);
@@ -71,6 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mounted) {
           setUser(null);
           setUserRole(null);
+          setAuthError('Failed to initialize authentication. Please refresh the page.');
         }
       } finally {
         if (mounted) {
@@ -84,11 +128,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!mounted) return;
       
       console.log('Auth state changed:', event, !!session?.user);
+      setAuthError(null); // Clear any previous errors
       
       if (session?.user) {
         setUser(session.user);
-        await fetchUserRole(session.user.id);
-        setLoading(false);
+        setLoading(true); // Set loading while fetching role
+        
+        const role = await fetchUserRole(session.user.id);
+        if (mounted) {
+          setUserRole(role);
+          setLoading(false);
+        }
       } else {
         setUser(null);
         setUserRole(null);
@@ -105,9 +155,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mounted = false;
+      if (roleTimeout) clearTimeout(roleTimeout);
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, retryCount]);
 
   // Handle redirects after authentication
   useEffect(() => {
@@ -123,6 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, userRole, loading, navigate, location.pathname]);
 
   const signOut = async () => {
+    setAuthError(null);
     await supabase.auth.signOut();
   };
 
@@ -145,7 +197,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading, 
       isLoading: loading,
       signOut,
-      deleteAccount
+      deleteAccount,
+      authError,
+      retryAuth
     }}>
       {children}
     </AuthContext.Provider>
