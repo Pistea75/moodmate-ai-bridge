@@ -21,86 +21,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
-  const [hasInitialized, setHasInitialized] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    let mounted = true;
-
-    // Get initial session
-    const initializeAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!mounted) return;
-        
-        if (session?.user) {
-          setUser(session.user);
-          await fetchUserRole(session.user.id);
-        } else {
-          setUser(null);
-          setUserRole(null);
-          setLoading(false);
-          setHasInitialized(true);
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        if (mounted) {
-          setUser(null);
-          setUserRole(null);
-          setLoading(false);
-          setHasInitialized(true);
-        }
-      }
-    };
-
-    initializeAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return;
-      
-      console.log('Auth state changed:', event, !!session?.user);
-      
-      if (session?.user) {
-        setUser(session.user);
-        await fetchUserRole(session.user.id);
-      } else {
-        setUser(null);
-        setUserRole(null);
-        setLoading(false);
-        
-        // Only redirect to login on sign out, not on initial load or tab focus
-        if (event === 'SIGNED_OUT' && hasInitialized) {
-          navigate('/login');
-        }
-      }
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, [navigate, hasInitialized]);
-
-  // Only redirect to dashboard on initial authentication, not on every auth state change
-  useEffect(() => {
-    if (hasInitialized && user && userRole && !loading) {
-      const isOnLoginPage = location.pathname === '/login';
-      const isOnSignupPage = location.pathname.startsWith('/signup');
-      const isOnPublicPage = ['/', '/features', '/about', '/contact', '/privacy', '/terms'].includes(location.pathname);
-      
-      // Only redirect if user is on a public page, login, or signup page
-      if (isOnLoginPage || isOnSignupPage || isOnPublicPage) {
-        const dashboardPath = userRole === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
-        navigate(dashboardPath, { replace: true });
-      }
-    }
-  }, [user, userRole, loading, hasInitialized, navigate, location.pathname]);
-
   const fetchUserRole = async (userId: string) => {
     try {
+      console.log('Fetching user role for:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('role')
@@ -112,16 +38,89 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUserRole(null);
       } else {
         const role = data?.role as UserRole;
+        console.log('User role fetched:', role);
         setUserRole(role || null);
       }
     } catch (error) {
       console.error('Unexpected error fetching user role:', error);
       setUserRole(null);
-    } finally {
-      setLoading(false);
-      setHasInitialized(true);
     }
   };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        console.log('Initializing auth...');
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+        
+        if (session?.user) {
+          console.log('Session found, setting user:', session.user.id);
+          setUser(session.user);
+          await fetchUserRole(session.user.id);
+        } else {
+          console.log('No session found');
+          setUser(null);
+          setUserRole(null);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setUser(null);
+          setUserRole(null);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+      
+      console.log('Auth state changed:', event, !!session?.user);
+      
+      if (session?.user) {
+        setUser(session.user);
+        await fetchUserRole(session.user.id);
+        setLoading(false);
+      } else {
+        setUser(null);
+        setUserRole(null);
+        setLoading(false);
+        
+        // Only redirect on explicit sign out
+        if (event === 'SIGNED_OUT') {
+          navigate('/login');
+        }
+      }
+    });
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  // Handle redirects after authentication
+  useEffect(() => {
+    if (!loading && user && userRole) {
+      const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
+      
+      if (isOnPublicPage) {
+        const dashboardPath = userRole === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
+        console.log('Redirecting authenticated user to:', dashboardPath);
+        navigate(dashboardPath, { replace: true });
+      }
+    }
+  }, [user, userRole, loading, navigate, location.pathname]);
 
   const signOut = async () => {
     await supabase.auth.signOut();

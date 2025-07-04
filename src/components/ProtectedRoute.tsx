@@ -1,7 +1,6 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useEffect, useState } from 'react';
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -9,32 +8,13 @@ type ProtectedRouteProps = {
 };
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const [isReady, setIsReady] = useState(false);
   const location = useLocation();
-  
-  // Add error boundary for auth context
-  let user, userRole, isLoading;
-  try {
-    const authContext = useAuth();
-    user = authContext.user;
-    userRole = authContext.userRole;
-    isLoading = authContext.isLoading;
-  } catch (error) {
-    console.error('Auth context error:', error);
-    return <Navigate to="/login" state={{ from: location.pathname }} />;
-  }
+  const { user, userRole, isLoading } = useAuth();
 
-  useEffect(() => {
-    // Small delay to ensure context is fully initialized
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
+  console.log('ProtectedRoute - Loading:', isLoading, 'User:', !!user, 'UserRole:', userRole, 'RequiredRole:', requiredRole);
 
-  // Show loading while checking authentication or context isn't ready
-  if (isLoading || !isReady) {
+  // Show loading while checking authentication
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -47,20 +27,23 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
 
   // Redirect to login if not authenticated
   if (!user) {
-    return <Navigate to="/login" state={{ from: location.pathname }} />;
+    console.log('No user, redirecting to login');
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
   // If route requires specific role, verify it
   if (requiredRole && userRole !== requiredRole) {
-    // Redirect to appropriate dashboard or login
+    console.log('Role mismatch, redirecting. User role:', userRole, 'Required:', requiredRole);
+    // Redirect to appropriate dashboard
     if (userRole === 'patient') {
-      return <Navigate to="/patient/dashboard" />;
+      return <Navigate to="/patient/dashboard" replace />;
     } else if (userRole === 'clinician') {
-      return <Navigate to="/clinician/dashboard" />;
+      return <Navigate to="/clinician/dashboard" replace />;
     } else {
-      return <Navigate to="/login" />;
+      return <Navigate to="/login" replace />;
     }
   }
 
+  console.log('ProtectedRoute - Rendering children');
   return <>{children}</>;
 }
