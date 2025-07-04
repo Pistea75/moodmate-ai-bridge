@@ -15,7 +15,19 @@ import { useState } from "react";
 export function MainNav() {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { user, userRole } = useAuth();
+  
+  // Safely use auth context with fallback
+  let user = null;
+  let userRole = null;
+  
+  try {
+    const auth = useAuth();
+    user = auth.user;
+    userRole = auth.userRole;
+  } catch (error) {
+    console.log('MainNav: Auth context not available, using fallback');
+  }
+  
   const { themeColor } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   
