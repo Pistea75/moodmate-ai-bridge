@@ -48,15 +48,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw error;
       }
 
-      const role = data?.role as UserRole;
+      // If no profile exists, create one with default role
+      if (!data) {
+        console.log('No profile found, creating default profile...');
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            role: 'patient',
+            first_name: '',
+            last_name: '',
+            language: 'en'
+          });
+        
+        if (insertError) {
+          console.error('Error creating default profile:', insertError);
+          throw insertError;
+        }
+        
+        return 'patient';
+      }
+
+      const role = data.role as UserRole;
       console.log('User role fetched:', role);
-      return role || null;
+      return role || 'patient'; // Fallback to patient if role is somehow null
     } catch (error) {
       console.error('Failed to fetch user role after retries:', error);
       if (attempt >= 3) {
         setAuthError('Unable to load user information. Please try again.');
       }
-      return null;
+      return 'patient'; // Fallback to patient role
     }
   };
 
@@ -90,14 +111,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('Session found, setting user:', session.user.id);
           setUser(session.user);
           
-          // Set a timeout for role fetching to prevent indefinite loading
+          // Set a shorter timeout for role fetching (5 seconds instead of 10)
           roleTimeout = setTimeout(() => {
             if (mounted && !userRole) {
-              console.warn('Role fetching timed out');
-              setAuthError('Loading user information is taking longer than expected.');
+              console.warn('Role fetching timed out, using fallback');
+              setUserRole('patient'); // Fallback to patient role
               setLoading(false);
             }
-          }, 10000); // 10 second timeout
+          }, 5000);
           
           const role = await fetchUserRole(session.user.id);
           if (mounted) {

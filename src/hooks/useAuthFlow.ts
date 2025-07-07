@@ -37,6 +37,8 @@ export function useAuthFlow() {
         message = 'Too many login attempts. Please wait a few minutes before trying again.';
       } else if (error.message?.includes('Unable to validate email address')) {
         message = 'Please enter a valid email address.';
+      } else if (error.message?.includes('row-level security policy')) {
+        message = 'Account setup incomplete. Please contact support if this issue persists.';
       } else if (error.message) {
         message = error.message;
       }
@@ -111,6 +113,11 @@ export function useAuthFlow() {
       
       // Create a new cleaned metadata object rather than modifying the original
       const cleanedMetadata = { ...metadata };
+      
+      // Ensure role is always set with default fallback
+      if (!cleanedMetadata.role) {
+        cleanedMetadata.role = 'patient';
+      }
       
       // Process referral code if it exists
       if (cleanedMetadata.referral_code) {

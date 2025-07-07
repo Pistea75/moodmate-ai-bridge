@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthFlow } from '../hooks/useAuthFlow';
 import MainLayout from '../layouts/MainLayout';
-import { AlertCircle, Loader2, Wifi, WifiOff } from 'lucide-react';
+import { AlertCircle, Loader2, Wifi, WifiOff, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [loginSuccess, setLoginSuccess] = useState(false);
   const { user, userRole, authError } = useAuth();
   const navigate = useNavigate();
   const { isLoading, error, signIn, clearError } = useAuthFlow();
@@ -33,11 +34,14 @@ export default function Login() {
   
   useEffect(() => {
     if (user && userRole) {
-      if (userRole === 'clinician') {
-        navigate('/clinician/dashboard');
-      } else {
-        navigate('/patient/dashboard');
-      }
+      setLoginSuccess(true);
+      setTimeout(() => {
+        if (userRole === 'clinician') {
+          navigate('/clinician/dashboard');
+        } else {
+          navigate('/patient/dashboard');
+        }
+      }, 1500); // Show success message briefly before redirecting
     }
   }, [user, userRole, navigate]);
   
@@ -48,7 +52,10 @@ export default function Login() {
       return;
     }
     
-    await signIn(email, password);
+    const success = await signIn(email, password);
+    if (success) {
+      setLoginSuccess(true);
+    }
   };
 
   const displayError = error || authError;
@@ -59,6 +66,28 @@ export default function Login() {
     if (typeof error === 'string') return error;
     return error.message || 'An unexpected error occurred';
   };
+
+  // Show success state
+  if (loginSuccess) {
+    return (
+      <MainLayout>
+        <div className="min-h-[calc(100vh-88px)] flex items-center justify-center px-4">
+          <div className="w-full max-w-md text-center">
+            <div className="bg-white rounded-xl shadow-sm border p-8">
+              <div className="flex justify-center mb-4">
+                <CheckCircle className="h-16 w-16 text-green-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-green-600 mb-2">Login Successful!</h2>
+              <p className="text-muted-foreground mb-4">
+                Welcome back! Redirecting you to your dashboard...
+              </p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
   
   return (
     <MainLayout>
@@ -84,7 +113,11 @@ export default function Login() {
             {displayError && (
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{getErrorMessage(displayError)}</AlertDescription>
+                <AlertDescription>
+                  <strong>Login Failed</strong>
+                  <br />
+                  {getErrorMessage(displayError)}
+                </AlertDescription>
               </Alert>
             )}
             
@@ -131,6 +164,7 @@ export default function Login() {
                   type="submit"
                   disabled={isLoading || !isOnline}
                   className="w-full bg-mood-purple hover:bg-mood-purple-secondary"
+                  size="lg"
                 >
                   {isLoading ? (
                     <>
@@ -147,7 +181,7 @@ export default function Login() {
             <div className="mt-6 text-center text-sm">
               <p className="text-muted-foreground">
                 Don't have an account yet?{' '}
-                <Link to="/" className="text-mood-purple hover:underline">
+                <Link to="/" className="text-mood-purple hover:underline font-medium">
                   Sign up
                 </Link>
               </p>
