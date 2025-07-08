@@ -84,20 +84,13 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // If we have a user but no role yet, show a more specific loading state
+  // Simple loading state if no role yet
   if (!userRole) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center max-w-md mx-auto p-6">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Setting up your account...</p>
-          <p className="mt-2 text-sm text-muted-foreground">Loading your profile information</p>
-          <div className="mt-4">
-            <Button variant="outline" onClick={retryAuth} size="sm">
-              <RefreshCw className="h-3 w-3 mr-2" />
-              Retry
-            </Button>
-          </div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );

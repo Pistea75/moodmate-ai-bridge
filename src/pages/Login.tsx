@@ -13,8 +13,8 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [loginSuccess, setLoginSuccess] = useState(false);
-  const { user, userRole, authError } = useAuth();
+  const [showSuccess, setShowSuccess] = useState(false);
+  const { user, authError } = useAuth();
   const navigate = useNavigate();
   const { isLoading, error, signIn, clearError } = useAuthFlow();
   
@@ -32,18 +32,12 @@ export default function Login() {
     };
   }, []);
   
+  // Show success message when user is logged in
   useEffect(() => {
-    if (user && userRole) {
-      setLoginSuccess(true);
-      setTimeout(() => {
-        if (userRole === 'clinician') {
-          navigate('/clinician/dashboard');
-        } else {
-          navigate('/patient/dashboard');
-        }
-      }, 1500); // Show success message briefly before redirecting
+    if (user) {
+      setShowSuccess(true);
     }
-  }, [user, userRole, navigate]);
+  }, [user]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +48,7 @@ export default function Login() {
     
     const success = await signIn(email, password);
     if (success) {
-      setLoginSuccess(true);
+      setShowSuccess(true);
     }
   };
 
@@ -68,7 +62,7 @@ export default function Login() {
   };
 
   // Show success state
-  if (loginSuccess) {
+  if (showSuccess && user) {
     return (
       <MainLayout>
         <div className="min-h-[calc(100vh-88px)] flex items-center justify-center px-4">
