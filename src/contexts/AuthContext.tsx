@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -71,6 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+    let roleCache = new Map<string, string>(); // Cache to prevent duplicate fetches
 
     const initializeAuth = async () => {
       try {
@@ -83,25 +83,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('✅ Session found, setting user:', session.user.id);
           setUser(session.user);
           
-          // Set optimistic role and redirect immediately
-          setUserRole('patient');
-          
-          const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
-          if (isOnPublicPage) {
-            redirectToDashboard('patient');
-          }
-          
-          // Fetch actual role in background
-          fetchUserRole(session.user.id)
-            .then((role) => {
-              if (mounted) {
-                setUserRole(role as UserRole);
-                setAuthError(null);
+          // Fetch role only once per user
+          if (!roleCache.has(session.user.id)) {
+            const role = await fetchUserRole(session.user.id);
+            roleCache.set(session.user.id, role);
+            
+            if (mounted) {
+              setUserRole(role as UserRole);
+              setAuthError(null);
+              
+              // Only redirect if on public pages
+              const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
+              if (isOnPublicPage) {
+                redirectToDashboard(role);
               }
-            })
-            .catch((err) => {
-              console.warn("Role fetch failed, using fallback:", err.message);
-            });
+            }
+          }
         } else {
           console.log('ℹ️ No session found');
           setUser(null);
@@ -122,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
       
       console.log('🔄 Auth state changed:', event, !!session?.user);
@@ -132,30 +129,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(user);
         setLoading(false);
         
-        // Optimistic fallback - redirect immediately
-        setUserRole('patient');
-        redirectToDashboard('patient');
-        
-        // Fetch role in background (won't block UI)
-        fetchUserRole(user.id)
-          .then((role) => {
+        // Only fetch role if not already cached
+        if (!roleCache.has(user.id)) {
+          try {
+            const role = await fetchUserRole(user.id);
+            roleCache.set(user.id, role);
+            
             if (mounted) {
               setUserRole(role as UserRole);
               setAuthError(null);
+              redirectToDashboard(role);
             }
-          })
-          .catch((err) => {
-            console.warn("Role fetch failed, using fallback:", err.message);
-          });
+          } catch (err) {
+            console.warn("Role fetch failed during sign in:", err);
+            if (mounted) {
+              setUserRole('patient');
+              setAuthError(null);
+              redirectToDashboard('patient');
+            }
+          }
+        } else {
+          // Use cached role
+          const cachedRole = roleCache.get(user.id)!;
+          setUserRole(cachedRole as UserRole);
+          redirectToDashboard(cachedRole);
+        }
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setUserRole(null);
         setLoading(false);
         setAuthError(null);
+        roleCache.clear(); // Clear cache on sign out
         navigate('/login', { replace: true });
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         setUser(session.user);
         setAuthError(null);
+        // Don't refetch role on token refresh, keep existing role
       }
     });
 
