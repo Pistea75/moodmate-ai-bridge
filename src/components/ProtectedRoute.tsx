@@ -12,12 +12,12 @@ type ProtectedRouteProps = {
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
   const location = useLocation();
-  const { user, userRole, isLoading, authError, retryAuth } = useAuth();
+  const { user, userRole, loading, authError, retryAuth } = useAuth();
 
-  console.log('ProtectedRoute - Loading:', isLoading, 'User:', !!user, 'UserRole:', userRole, 'RequiredRole:', requiredRole, 'Error:', authError);
+  console.log('ProtectedRoute - Loading:', loading, 'User:', !!user, 'UserRole:', userRole, 'RequiredRole:', requiredRole, 'Error:', authError);
 
-  // Show enhanced loading while checking authentication
-  if (isLoading) {
+  // Show loading while checking authentication
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center max-w-md mx-auto p-6">
@@ -35,7 +35,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     );
   }
 
-  // Show enhanced error state with better recovery options
+  // Show error state with recovery options
   if (authError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -84,13 +84,13 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Simple loading state if no role yet
+  // Show loading if no role yet (but user exists)
   if (!userRole) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center max-w-md mx-auto p-6">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
+          <p className="mt-4 text-muted-foreground">Setting up your profile...</p>
         </div>
       </div>
     );

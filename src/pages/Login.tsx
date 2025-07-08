@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthFlow } from '../hooks/useAuthFlow';
 import MainLayout from '../layouts/MainLayout';
@@ -15,7 +15,6 @@ export default function Login() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showSuccess, setShowSuccess] = useState(false);
   const { user, authError } = useAuth();
-  const navigate = useNavigate();
   const { isLoading, error, signIn, clearError } = useAuthFlow();
   
   // Monitor connection status
@@ -32,7 +31,7 @@ export default function Login() {
     };
   }, []);
   
-  // Show success message when user is logged in
+  // Show success when user is logged in
   useEffect(() => {
     if (user) {
       setShowSuccess(true);
