@@ -41,14 +41,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         console.error('Error fetching user role:', error);
         if (attempt < 3) {
-          // Retry up to 3 times with exponential backoff
           await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
           return fetchUserRole(userId, attempt + 1);
         }
         throw error;
       }
 
-      // If no profile exists, create one with default role
       if (!data) {
         console.log('No profile found, creating default profile...');
         const { error: insertError } = await supabase
@@ -70,13 +68,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const role = data.role as UserRole;
-      console.log('User role fetched:', role);
-      return role || 'patient'; // Fallback to patient if role is somehow null
+      console.log('User role fetched successfully:', role);
+      return role || 'patient';
     } catch (error) {
-      console.error('Failed to fetch user role after retries:', error);
-      if (attempt >= 3) {
-        setAuthError('Unable to load user information. Please try again.');
-      }
+      console.error('Failed to fetch user role:', error);
       return 'patient'; // Fallback to patient role
     }
   };
@@ -98,7 +93,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    let roleTimeout: NodeJS.Timeout;
 
     const initializeAuth = async () => {
       try {
@@ -111,19 +105,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('Session found, setting user:', session.user.id);
           setUser(session.user);
           
-          // Set a shorter timeout for role fetching (5 seconds instead of 10)
-          roleTimeout = setTimeout(() => {
-            if (mounted && !userRole) {
-              console.warn('Role fetching timed out, using fallback');
-              setUserRole('patient'); // Fallback to patient role
-              setLoading(false);
-            }
-          }, 5000);
-          
           const role = await fetchUserRole(session.user.id);
           if (mounted) {
             setUserRole(role);
-            clearTimeout(roleTimeout);
           }
         } else {
           console.log('No session found');
@@ -144,31 +128,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
       
       console.log('Auth state changed:', event, !!session?.user);
-      setAuthError(null); // Clear any previous errors
       
-      if (session?.user) {
+      if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user);
-        setLoading(true); // Set loading while fetching role
+        setLoading(true);
         
-        const role = await fetchUserRole(session.user.id);
-        if (mounted) {
-          setUserRole(role);
-          setLoading(false);
+        try {
+          const role = await fetchUserRole(session.user.id);
+          if (mounted) {
+            setUserRole(role);
+            setAuthError(null);
+          }
+        } catch (error) {
+          console.error('Error fetching role after sign in:', error);
+          if (mounted) {
+            setAuthError('Failed to load user profile. Please try again.');
+          }
+        } finally {
+          if (mounted) {
+            setLoading(false);
+          }
         }
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setUserRole(null);
         setLoading(false);
-        
-        // Only redirect on explicit sign out
-        if (event === 'SIGNED_OUT') {
-          navigate('/login');
-        }
+        setAuthError(null);
+        navigate('/login');
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        setUser(session.user);
+        setAuthError(null);
       }
     });
 
@@ -176,7 +169,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mounted = false;
-      if (roleTimeout) clearTimeout(roleTimeout);
       subscription.unsubscribe();
     };
   }, [navigate, retryCount]);
