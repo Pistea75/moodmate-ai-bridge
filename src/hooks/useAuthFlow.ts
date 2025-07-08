@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -13,7 +12,7 @@ export function useAuthFlow() {
   const [error, setError] = useState<AuthError | null>(null);
 
   const handleAuthError = (error: any) => {
-    console.error('Auth error:', error);
+    console.error('🔴 Auth error:', error);
     let message = 'An unexpected error occurred';
     
     if (typeof error === 'object' && error.message) {
@@ -63,7 +62,7 @@ export function useAuthFlow() {
         throw new Error('Please enter a valid email address.');
       }
       
-      console.log('Starting sign in process...');
+      console.log('🔄 Starting sign in process...');
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
@@ -76,7 +75,7 @@ export function useAuthFlow() {
         throw new Error('Login failed. Please try again.');
       }
 
-      console.log('Sign in successful');
+      console.log('✅ Sign in successful - auth state change will handle redirect');
       toast({
         title: "Success",
         description: "You have successfully logged in.",
@@ -84,7 +83,7 @@ export function useAuthFlow() {
       
       return true;
     } catch (error: any) {
-      console.error('Sign in error:', error);
+      console.error('🔴 Sign in error:', error);
       handleAuthError(error);
       return false;
     } finally {

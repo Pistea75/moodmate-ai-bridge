@@ -39,12 +39,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user role:', error);
+        console.error('🔴 Failed to fetch user role:', error.message);
         if (attempt < 3) {
           await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
           return fetchUserRole(userId, attempt + 1);
         }
-        throw error;
+        // Allow login to continue with default role instead of throwing
+        console.warn('Using fallback role: patient');
+        return 'patient';
       }
 
       if (!data) {
@@ -60,20 +62,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         
         if (insertError) {
-          console.error('Error creating default profile:', insertError);
-          throw insertError;
+          console.error('🔴 Error creating default profile:', insertError.message);
+          // Continue with default role instead of throwing
+          return 'patient';
         }
         
         return 'patient';
       }
 
       const role = data.role as UserRole;
-      console.log('User role fetched successfully:', role);
+      console.log('✅ User role fetched successfully:', role);
       return role || 'patient';
     } catch (error) {
-      console.error('Failed to fetch user role:', error);
+      console.error('🔴 Failed to fetch user role:', error);
       return 'patient'; // Fallback to patient role
     }
+  };
+
+  const redirectToDashboard = (role: UserRole) => {
+    if (!role) return;
+    
+    const dashboardPath = role === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
+    console.log('🔄 Redirecting to dashboard:', dashboardPath);
+    navigate(dashboardPath, { replace: true });
   };
 
   const retryAuth = async () => {
@@ -85,8 +96,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const role = await fetchUserRole(user.id);
       setUserRole(role);
+      redirectToDashboard(role);
     } catch (error) {
-      console.error('Retry auth failed:', error);
+      console.error('🔴 Retry auth failed:', error);
       setAuthError('Authentication retry failed. Please refresh the page.');
     }
   };
@@ -96,26 +108,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const initializeAuth = async () => {
       try {
-        console.log('Initializing auth...');
+        console.log('🔄 Initializing auth...');
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!mounted) return;
         
         if (session?.user) {
-          console.log('Session found, setting user:', session.user.id);
+          console.log('✅ Session found, setting user:', session.user.id);
           setUser(session.user);
           
           const role = await fetchUserRole(session.user.id);
           if (mounted) {
             setUserRole(role);
+            setAuthError(null);
+            
+            // Redirect if on public page
+            const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
+            if (isOnPublicPage) {
+              redirectToDashboard(role);
+            }
           }
         } else {
-          console.log('No session found');
+          console.log('ℹ️ No session found');
           setUser(null);
           setUserRole(null);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('🔴 Error initializing auth:', error);
         if (mounted) {
           setUser(null);
           setUserRole(null);
@@ -128,10 +147,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
+    // Set up auth state listener with redirect logic
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
       
-      console.log('Auth state changed:', event, !!session?.user);
+      console.log('🔄 Auth state changed:', event, !!session?.user);
       
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user);
@@ -142,9 +162,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (mounted) {
             setUserRole(role);
             setAuthError(null);
+            // Redirect to dashboard after successful sign in
+            redirectToDashboard(role);
           }
         } catch (error) {
-          console.error('Error fetching role after sign in:', error);
+          console.error('🔴 Error fetching role after sign in:', error);
           if (mounted) {
             setAuthError('Failed to load user profile. Please try again.');
           }
@@ -171,20 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, retryCount]);
-
-  // Handle redirects after authentication
-  useEffect(() => {
-    if (!loading && user && userRole) {
-      const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
-      
-      if (isOnPublicPage) {
-        const dashboardPath = userRole === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
-        console.log('Redirecting authenticated user to:', dashboardPath);
-        navigate(dashboardPath, { replace: true });
-      }
-    }
-  }, [user, userRole, loading, navigate, location.pathname]);
+  }, [navigate, location.pathname, retryCount]);
 
   const signOut = async () => {
     setAuthError(null);
