@@ -1,104 +1,109 @@
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { 
   Calendar, 
-  UserPlus, 
-  MessageSquare, 
+  Plus, 
+  Users, 
   FileText, 
-  Bell, 
-  Settings,
-  Plus,
-  Download
+  MessageSquare,
+  Bell
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNotificationService } from "@/hooks/useNotificationService";
 
 interface QuickActionsProps {
-  onScheduleSession: () => void;
-  onAddTask: () => void;
+  onScheduleSession?: () => void;
+  onAddTask?: () => void;
 }
 
 export function QuickActions({ onScheduleSession, onAddTask }: QuickActionsProps) {
-  const navigate = useNavigate();
+  const { createTestNotifications } = useNotificationService();
 
-  const actions = [
-    {
-      icon: Calendar,
-      label: "Schedule Session",
-      description: "Book a new therapy session",
-      onClick: onScheduleSession,
-      color: "bg-blue-500 hover:bg-blue-600",
-    },
-    {
-      icon: Plus,
-      label: "Add Task",
-      description: "Create a new task for patients",
-      onClick: onAddTask,
-      color: "bg-green-500 hover:bg-green-600",
-    },
-    {
-      icon: UserPlus,
-      label: "View Patients",
-      description: "Manage patient profiles",
-      onClick: () => navigate("/clinician/patients"),
-      color: "bg-purple-500 hover:bg-purple-600",
-    },
-    {
-      icon: FileText,
-      label: "Generate Report",
-      description: "Create patient reports",
-      onClick: () => navigate("/clinician/reports"),
-      color: "bg-orange-500 hover:bg-orange-600",
-    },
-    {
-      icon: MessageSquare,
-      label: "AI Training",
-      description: "Customize AI responses",
-      onClick: () => navigate("/clinician/train-ai"),
-      color: "bg-pink-500 hover:bg-pink-600",
-    },
-    {
-      icon: Download,
-      label: "Export Data",
-      description: "Download patient data",
-      onClick: () => {
-        // Mock export functionality
-        const element = document.createElement("a");
-        const file = new Blob(['Patient Data Export - ' + new Date().toLocaleDateString()], {type: 'text/plain'});
-        element.href = URL.createObjectURL(file);
-        element.download = "patient-data-export.txt";
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
-      },
-      color: "bg-teal-500 hover:bg-teal-600",
-    },
-  ];
+  const handleScheduleSession = () => {
+    console.log('Schedule session clicked');
+    onScheduleSession?.();
+  };
+
+  const handleAddTask = () => {
+    console.log('Add task clicked');
+    onAddTask?.();
+  };
+
+  const handleViewPatients = () => {
+    console.log('View patients clicked');
+    window.location.href = '/clinician/patients';
+  };
+
+  const handleCreateReport = () => {
+    console.log('Create report clicked');
+    window.location.href = '/clinician/reports';
+  };
+
+  const handleAIChat = () => {
+    console.log('AI Chat clicked');
+    // Navigate to AI chat or open modal
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Settings className="h-5 w-5" />
-          Quick Actions
-        </CardTitle>
+        <CardTitle>Quick Actions</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {actions.map((action, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              className={`h-auto p-4 flex flex-col items-start space-y-2 hover:shadow-md transition-all ${action.color} hover:text-white border-0`}
-              onClick={action.onClick}
-            >
-              <action.icon className="h-5 w-5" />
-              <div className="text-left">
-                <div className="font-medium text-sm">{action.label}</div>
-                <div className="text-xs opacity-75">{action.description}</div>
-              </div>
-            </Button>
-          ))}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <Button 
+            variant="outline" 
+            className="flex flex-col items-center gap-2 h-auto py-4"
+            onClick={handleScheduleSession}
+          >
+            <Calendar className="h-5 w-5" />
+            <span className="text-xs">Schedule Session</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="flex flex-col items-center gap-2 h-auto py-4"
+            onClick={handleAddTask}
+          >
+            <Plus className="h-5 w-5" />
+            <span className="text-xs">Add Task</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="flex flex-col items-center gap-2 h-auto py-4"
+            onClick={handleViewPatients}
+          >
+            <Users className="h-5 w-5" />
+            <span className="text-xs">View Patients</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="flex flex-col items-center gap-2 h-auto py-4"
+            onClick={handleCreateReport}
+          >
+            <FileText className="h-5 w-5" />
+            <span className="text-xs">Create Report</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="flex flex-col items-center gap-2 h-auto py-4"
+            onClick={handleAIChat}
+          >
+            <MessageSquare className="h-5 w-5" />
+            <span className="text-xs">AI Chat</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="flex flex-col items-center gap-2 h-auto py-4"
+            onClick={createTestNotifications}
+          >
+            <Bell className="h-5 w-5" />
+            <span className="text-xs">Test Notifications</span>
+          </Button>
         </div>
       </CardContent>
     </Card>
