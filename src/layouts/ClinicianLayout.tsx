@@ -23,9 +23,7 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
       />
       
       {/* Sidebar for Desktop */}
-      <DesktopSidebar 
-        clinicianName={<span className="text-foreground">{clinicianFullName}</span>} 
-      />
+      <DesktopSidebar />
       
       {/* Main Content */}
       <main className="flex-1 pt-16 md:pt-0 md:ml-64 bg-background">
