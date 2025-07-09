@@ -2,18 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Tables } from '@/integrations/supabase/types';
 
-export interface Notification {
-  id: string;
-  type: 'session' | 'task' | 'alert' | 'message' | 'system';
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high';
-  is_read: boolean;
-  metadata: any;
-  created_at: string;
-  updated_at: string;
-}
+// Use the database type directly from Supabase
+export type Notification = Tables<'notifications'>;
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);

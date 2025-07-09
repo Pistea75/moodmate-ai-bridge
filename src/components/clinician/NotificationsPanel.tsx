@@ -151,7 +151,7 @@ export function NotificationsPanel() {
               return (
                 <div
                   key={notification.id}
-                  className={`p-3 rounded-lg border transition-all hover:shadow-sm cursor-pointer ${
+                  className={`p-3 rounded-lg border transition-all hover:shadow-sm cursor-pointer group ${
                     !notification.is_read ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
                   }`}
                   onClick={() => !notification.is_read && markAsRead(notification.id)}
