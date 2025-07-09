@@ -6,12 +6,11 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ClinicianSidebarContent } from './ClinicianSidebarContent';
 
 type MobileTopNavProps = {
-  clinicianName: React.ReactNode;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export function MobileTopNav({ clinicianName, isOpen, setIsOpen }: MobileTopNavProps) {
+export function MobileTopNav({ isOpen, setIsOpen }: MobileTopNavProps) {
   return (
     <div className="fixed top-0 left-0 w-full h-16 border-b bg-background z-50 md:hidden flex items-center justify-between px-4">
       <div className="flex items-center">

@@ -17,7 +17,6 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
     <div className="flex min-h-screen bg-background">
       {/* Mobile Top Nav */}
       <MobileTopNav 
-        clinicianName={<span className="text-foreground">{clinicianFullName}</span>} 
         isOpen={isOpen} 
         setIsOpen={setIsOpen}
       />
