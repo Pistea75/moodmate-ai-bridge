@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { DashboardStats } from '@/components/clinician/DashboardStats';
-import { QuickActions } from '@/components/clinician/QuickActions';
+import { EnhancedQuickActions } from '@/components/clinician/EnhancedQuickActions';
 import { NotificationsPanel } from '@/components/clinician/NotificationsPanel';
 import { DashboardInsights } from '@/components/clinician/DashboardInsights';
 import { OnboardingTooltips } from '@/components/clinician/OnboardingTooltips';
@@ -12,6 +12,7 @@ import { ClinicianTasks } from '@/components/clinician/ClinicianTasks';
 import { AddTaskDialog } from '@/components/clinician/AddTaskDialog';
 import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
 import { RecentReports } from '@/components/clinician/RecentReports';
+import { RiskAlertBanner } from '@/components/clinician/RiskAlertBanner';
 import { useDashboardData } from '@/hooks/useDashboardData';
 
 export default function ClinicianDashboard() {
@@ -54,12 +55,14 @@ export default function ClinicianDashboard() {
 
   const handleSessionScheduled = () => {
     setShowScheduleSessionModal(false);
-    // Refresh sessions data if needed
   };
 
   return (
     <ClinicianLayout>
-      <div className="container mx-auto px-4 py-6 space-y-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+        {/* Risk Alert Banner */}
+        <RiskAlertBanner />
+
         {/* Enhanced Header Section */}
         <div id="dashboard-header" className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -98,9 +101,9 @@ export default function ClinicianDashboard() {
           loadingTasks={loadingTasks}
         />
 
-        {/* Quick Actions */}
+        {/* Enhanced Quick Actions */}
         <div id="quick-actions">
-          <QuickActions 
+          <EnhancedQuickActions 
             onScheduleSession={handleScheduleSession}
             onAddTask={() => setShowAddTaskDialog(true)}
           />
