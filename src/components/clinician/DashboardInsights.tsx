@@ -22,64 +22,10 @@ interface Insight {
   trend?: 'up' | 'down' | 'stable';
 }
 
-const mockInsights: Insight[] = [
-  {
-    id: '1',
-    type: 'positive',
-    icon: Heart,
-    title: 'Mood Improvement',
-    description: 'Overall patient mood scores increased by 15% this week',
-    metric: '+15%',
-    trend: 'up',
-  },
-  {
-    id: '2',
-    type: 'positive',
-    icon: Target,
-    title: 'Task Completion',
-    description: '89% of assigned tasks were completed on time',
-    metric: '89%',
-    trend: 'up',
-  },
-  {
-    id: '3',
-    type: 'neutral',
-    icon: Clock,
-    title: 'Session Duration',
-    description: 'Average session length is 52 minutes, within optimal range',
-    metric: '52 min',
-    trend: 'stable',
-  },
-  {
-    id: '4',
-    type: 'negative',
-    icon: Users,
-    title: 'Attendance Rate',
-    description: 'Session attendance dropped to 85% this week',
-    metric: '85%',
-    trend: 'down',
-  },
-  {
-    id: '5',
-    type: 'positive',
-    icon: Brain,
-    title: 'AI Engagement',
-    description: 'Patients are using AI chat 23% more frequently',
-    metric: '+23%',
-    trend: 'up',
-  },
-  {
-    id: '6',
-    type: 'positive',
-    icon: Award,
-    title: 'Patient Progress',
-    description: '12 patients achieved their monthly goals',
-    metric: '12',
-    trend: 'up',
-  },
-];
-
 export function DashboardInsights() {
+  // Empty state - no sample data
+  const insights: Insight[] = [];
+
   const getInsightColor = (type: string) => {
     switch (type) {
       case 'positive': return 'text-green-600';
@@ -115,33 +61,41 @@ export function DashboardInsights() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {mockInsights.map((insight) => {
-            const Icon = insight.icon;
-            return (
-              <div
-                key={insight.id}
-                className="p-4 rounded-lg border hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Icon className={`h-5 w-5 ${getInsightColor(insight.type)}`} />
-                    <h4 className="font-medium text-sm">{insight.title}</h4>
+        {insights.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>No insights available yet.</p>
+            <p className="text-sm">Insights will appear as you gather more patient data.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {insights.map((insight) => {
+              const Icon = insight.icon;
+              return (
+                <div
+                  key={insight.id}
+                  className="p-4 rounded-lg border hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Icon className={`h-5 w-5 ${getInsightColor(insight.type)}`} />
+                      <h4 className="font-medium text-sm">{insight.title}</h4>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {insight.metric && (
+                        <Badge variant={getBadgeVariant(insight.type)} className="text-xs">
+                          {insight.metric}
+                        </Badge>
+                      )}
+                      {insight.trend && getTrendIcon(insight.trend)}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {insight.metric && (
-                      <Badge variant={getBadgeVariant(insight.type)} className="text-xs">
-                        {insight.metric}
-                      </Badge>
-                    )}
-                    {insight.trend && getTrendIcon(insight.trend)}
-                  </div>
+                  <p className="text-sm text-muted-foreground">{insight.description}</p>
                 </div>
-                <p className="text-sm text-muted-foreground">{insight.description}</p>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
