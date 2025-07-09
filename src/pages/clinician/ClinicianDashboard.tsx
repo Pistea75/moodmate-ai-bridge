@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
-import { DashboardStats } from '@/components/clinician/DashboardStats';
+import { DashboardKPIs } from '@/components/clinician/DashboardKPIs';
 import { EnhancedQuickActions } from '@/components/clinician/EnhancedQuickActions';
 import { NotificationsPanel } from '@/components/clinician/NotificationsPanel';
 import { DashboardInsights } from '@/components/clinician/DashboardInsights';
@@ -91,8 +91,8 @@ export default function ClinicianDashboard() {
           </div>
         </div>
 
-        {/* Enhanced Dashboard Stats */}
-        <DashboardStats
+        {/* Dashboard KPIs */}
+        <DashboardKPIs
           patientCount={patients.length}
           sessionCount={upcomingSessions.length}
           pendingTaskCount={pendingTaskCount}
