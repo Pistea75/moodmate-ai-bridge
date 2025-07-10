@@ -115,6 +115,8 @@ export function useSessionScheduling({
         patientId: finalPatientId,
         clinicianId: finalClinicianId,
         timezone: formData.timezone,
+        sessionType: formData.sessionType,
+        recordingEnabled: formData.recordingEnabled,
         isPatientView,
       });
 

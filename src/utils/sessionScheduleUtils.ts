@@ -20,6 +20,8 @@ export interface ScheduleSessionParams {
   patientId?: string;
   clinicianId?: string;
   timezone: string;
+  sessionType?: 'online' | 'in_person';
+  recordingEnabled?: boolean;
   isPatientView: boolean;
 }
 
@@ -33,6 +35,11 @@ interface SessionInsertPayload {
   status: string;
   patient_id?: string;
   clinician_id?: string;
+  session_type?: string;
+  recording_enabled?: boolean;
+  recording_status?: string;
+  transcription_status?: string;
+  ai_report_status?: string;
 }
 
 /**
@@ -44,6 +51,8 @@ export const scheduleSession = async ({
   patientId, 
   clinicianId,
   timezone,
+  sessionType,
+  recordingEnabled,
   isPatientView 
 }: ScheduleSessionParams) => {
   // Validate input parameters
@@ -97,6 +106,11 @@ export const scheduleSession = async ({
     duration_minutes: 50,
     timezone,
     status: 'scheduled',
+    session_type: sessionType || 'in_person',
+    recording_enabled: recordingEnabled || false,
+    recording_status: 'none',
+    transcription_status: 'none',
+    ai_report_status: 'none'
   };
 
   // Only add IDs if they are valid UUIDs

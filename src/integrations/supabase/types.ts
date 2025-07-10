@@ -433,41 +433,125 @@ export type Database = {
           },
         ]
       }
+      session_recordings: {
+        Row: {
+          created_at: string | null
+          duration_seconds: number | null
+          file_path: string
+          file_size: number | null
+          id: string
+          recording_ended_at: string | null
+          recording_started_at: string | null
+          session_id: string
+          transcription_job_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          recording_ended_at?: string | null
+          recording_started_at?: string | null
+          session_id: string
+          transcription_job_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          recording_ended_at?: string | null
+          recording_started_at?: string | null
+          session_id?: string
+          transcription_job_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_recordings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
+          ai_report_id: string | null
+          ai_report_status: string | null
           clinician_id: string | null
           created_at: string | null
           duration_minutes: number
           id: string
           notes: string | null
           patient_id: string | null
+          recording_enabled: boolean | null
+          recording_file_path: string | null
+          recording_status: string | null
           scheduled_time: string
+          session_type: string | null
           status: string | null
           timezone: string | null
+          transcription_status: string | null
+          transcription_text: string | null
+          video_call_room_id: string | null
+          video_call_url: string | null
         }
         Insert: {
+          ai_report_id?: string | null
+          ai_report_status?: string | null
           clinician_id?: string | null
           created_at?: string | null
           duration_minutes: number
           id?: string
           notes?: string | null
           patient_id?: string | null
+          recording_enabled?: boolean | null
+          recording_file_path?: string | null
+          recording_status?: string | null
           scheduled_time: string
+          session_type?: string | null
           status?: string | null
           timezone?: string | null
+          transcription_status?: string | null
+          transcription_text?: string | null
+          video_call_room_id?: string | null
+          video_call_url?: string | null
         }
         Update: {
+          ai_report_id?: string | null
+          ai_report_status?: string | null
           clinician_id?: string | null
           created_at?: string | null
           duration_minutes?: number
           id?: string
           notes?: string | null
           patient_id?: string | null
+          recording_enabled?: boolean | null
+          recording_file_path?: string | null
+          recording_status?: string | null
           scheduled_time?: string
+          session_type?: string | null
           status?: string | null
           timezone?: string | null
+          transcription_status?: string | null
+          transcription_text?: string | null
+          video_call_room_id?: string | null
+          video_call_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sessions_ai_report_id_fkey"
+            columns: ["ai_report_id"]
+            isOneToOne: false
+            referencedRelation: "ai_chat_reports"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sessions_clinician_id_fkey"
             columns: ["clinician_id"]

@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "./DateTimePicker";
 import { TimezoneSelector } from "./TimezoneSelector";
 import { PatientSelector } from "./PatientSelector";
+import { SessionTypeSelector } from "./SessionTypeSelector";
 import { getCurrentTimezone } from "@/utils/sessionUtils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,6 +12,8 @@ export interface SessionFormData {
   time: string;
   patientId: string;
   timezone: string;
+  sessionType: 'online' | 'in_person';
+  recordingEnabled: boolean;
 }
 
 interface SessionScheduleFormProps {
@@ -36,7 +38,9 @@ export function SessionScheduleForm({
     date: new Date(),
     time: "09:00",
     patientId: "",
-    timezone: getCurrentTimezone()
+    timezone: getCurrentTimezone(),
+    sessionType: 'online',
+    recordingEnabled: true
   });
 
   useEffect(() => {
@@ -111,6 +115,13 @@ export function SessionScheduleForm({
           console.log("🌍 Timezone changed to:", tz);
           setFormData(prev => ({ ...prev, timezone: tz }));
         }}
+      />
+
+      <SessionTypeSelector
+        sessionType={formData.sessionType}
+        recordingEnabled={formData.recordingEnabled}
+        onSessionTypeChange={(type) => setFormData(prev => ({ ...prev, sessionType: type }))}
+        onRecordingEnabledChange={(enabled) => setFormData(prev => ({ ...prev, recordingEnabled: enabled }))}
       />
 
       <div className="flex justify-end space-x-2 pt-4">
