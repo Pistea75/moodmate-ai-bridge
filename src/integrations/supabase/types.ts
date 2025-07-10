@@ -371,15 +371,58 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_risk_assessments: {
+        Row: {
+          ai_assessment: string | null
+          assessed_at: string
+          clinician_id: string
+          created_at: string
+          data_points: Json | null
+          id: string
+          patient_id: string
+          risk_level: string
+          risk_score: number
+          updated_at: string
+        }
+        Insert: {
+          ai_assessment?: string | null
+          assessed_at?: string
+          clinician_id: string
+          created_at?: string
+          data_points?: Json | null
+          id?: string
+          patient_id: string
+          risk_level: string
+          risk_score: number
+          updated_at?: string
+        }
+        Update: {
+          ai_assessment?: string | null
+          assessed_at?: string
+          clinician_id?: string
+          created_at?: string
+          data_points?: Json | null
+          id?: string
+          patient_id?: string
+          risk_level?: string
+          risk_score?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
           first_name: string | null
           id: string
           language: string | null
+          last_active_at: string | null
           last_name: string | null
+          onboarding_completed: boolean | null
+          onboarding_step: number | null
           referral_code: string | null
           role: string
+          status: string | null
           updated_at: string | null
         }
         Insert: {
@@ -387,9 +430,13 @@ export type Database = {
           first_name?: string | null
           id?: string
           language?: string | null
+          last_active_at?: string | null
           last_name?: string | null
+          onboarding_completed?: boolean | null
+          onboarding_step?: number | null
           referral_code?: string | null
           role?: string
+          status?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -397,9 +444,13 @@ export type Database = {
           first_name?: string | null
           id?: string
           language?: string | null
+          last_active_at?: string | null
           last_name?: string | null
+          onboarding_completed?: boolean | null
+          onboarding_step?: number | null
           referral_code?: string | null
           role?: string
+          status?: string | null
           updated_at?: string | null
         }
         Relationships: []
