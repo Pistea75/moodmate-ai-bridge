@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,21 +33,22 @@ const mockRiskAssessments: (RiskAssessment & { patientId: string; patientName: s
   {
     patientId: '1',
     patientName: 'Sarah Johnson',
-    score: 85,
+    score: 25,
     level: 'critical',
     factors: {
       moodTrend: -25,
       sessionAttendance: 40,
       taskCompletion: 30,
-      socialEngagement: 20,
-      sleepQuality: 35
+      communicationFrequency: 20,
+      lastMoodScore: 20,
+      triggerFrequency: 35
     },
     recommendations: [
       'Immediate safety assessment required',
       'Consider increasing session frequency',
       'Coordinate with crisis intervention team'
     ],
-    lastUpdated: new Date()
+    lastUpdated: new Date().toISOString()
   },
   {
     patientId: '2',
@@ -59,15 +59,16 @@ const mockRiskAssessments: (RiskAssessment & { patientId: string; patientName: s
       moodTrend: -15,
       sessionAttendance: 70,
       taskCompletion: 60,
-      socialEngagement: 45,
-      sleepQuality: 50
+      communicationFrequency: 45,
+      lastMoodScore: 50,
+      triggerFrequency: 50
     },
     recommendations: [
       'Review current treatment plan',
       'Increase check-in frequency',
       'Consider additional support resources'
     ],
-    lastUpdated: new Date()
+    lastUpdated: new Date().toISOString()
   }
 ];
 
