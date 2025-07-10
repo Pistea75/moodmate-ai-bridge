@@ -1,14 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageSquare, Send, Phone, Mail, Users, Bell } from 'lucide-react';
+import { MessageSquare, Send, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { MessageList } from './communication/MessageList';
+import { ComposeMessage } from './communication/ComposeMessage';
+import { ContactsList } from './communication/ContactsList';
 
 interface Message {
   id: string;
@@ -69,15 +68,12 @@ export function CommunicationHub() {
       const { data: user } = await supabase.auth.getUser();
       if (!user?.user) return;
 
-      // In a real implementation, you'd have a messages table
-      // For now, we'll use notifications as a proxy
       const { data: notifications } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', user.user.id)
         .order('created_at', { ascending: false });
 
-      // Transform notifications to messages format with proper status typing
       const messageData: Message[] = notifications?.map(notif => ({
         id: notif.id,
         sender_id: 'system',
@@ -106,8 +102,6 @@ export function CommunicationHub() {
 
       const selectedPatientData = patients.find(p => p.id === selectedPatient);
       
-      // In a real implementation, you'd send to a messages table
-      // For now, we'll create a notification for the patient
       await supabase
         .from('notifications')
         .insert({
@@ -133,15 +127,11 @@ export function CommunicationHub() {
     }
   };
 
-  const getMessageIcon = (type: string) => {
-    switch (type) {
-      case 'alert':
-        return <Bell className="h-4 w-4 text-red-500" />;
-      case 'reminder':
-        return <Phone className="h-4 w-4 text-blue-500" />;
-      default:
-        return <MessageSquare className="h-4 w-4 text-green-500" />;
-    }
+  const handleMessagePatient = (patientId: string) => {
+    setSelectedPatient(patientId);
+    // Switch to compose tab
+    const composeTab = document.querySelector('[data-value="compose"]') as HTMLElement;
+    composeTab?.click();
   };
 
   return (
@@ -178,31 +168,7 @@ export function CommunicationHub() {
               <CardTitle>Recent Messages</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {messages.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No messages yet. Start a conversation with your patients.
-                  </div>
-                ) : (
-                  messages.map((message) => (
-                    <div key={message.id} className="flex items-start gap-3 p-4 border rounded-lg">
-                      {getMessageIcon(message.type)}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium">{message.sender_name}</span>
-                          <Badge variant={message.status === 'read' ? 'secondary' : 'default'}>
-                            {message.status}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(message.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{message.content}</p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+              <MessageList messages={messages} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -212,42 +178,16 @@ export function CommunicationHub() {
             <CardHeader>
               <CardTitle>Send Message</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Recipient</label>
-                <select
-                  value={selectedPatient}
-                  onChange={(e) => setSelectedPatient(e.target.value)}
-                  className="w-full mt-1 p-2 border rounded-md"
-                >
-                  <option value="">Select a patient...</option>
-                  {patients.map((patient) => (
-                    <option key={patient.id} value={patient.id}>
-                      {patient.first_name} {patient.last_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium">Message</label>
-                <Textarea
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message here..."
-                  className="mt-1"
-                  rows={4}
-                />
-              </div>
-              
-              <Button 
-                onClick={sendMessage} 
-                disabled={loading || !selectedPatient || !newMessage.trim()}
-                className="w-full"
-              >
-                <Send className="h-4 w-4 mr-2" />
-                {loading ? 'Sending...' : 'Send Message'}
-              </Button>
+            <CardContent>
+              <ComposeMessage
+                patients={patients}
+                selectedPatient={selectedPatient}
+                setSelectedPatient={setSelectedPatient}
+                newMessage={newMessage}
+                setNewMessage={setNewMessage}
+                onSendMessage={sendMessage}
+                loading={loading}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -258,38 +198,7 @@ export function CommunicationHub() {
               <CardTitle>Patient Contacts</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {patients.map((patient) => (
-                  <div key={patient.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-medium">
-                          {patient.first_name?.[0]}{patient.last_name?.[0]}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium">{patient.first_name} {patient.last_name}</p>
-                        <p className="text-sm text-muted-foreground">Patient</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          setSelectedPatient(patient.id);
-                          // Switch to compose tab
-                          const composeTab = document.querySelector('[data-value="compose"]') as HTMLElement;
-                          composeTab?.click();
-                        }}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-1" />
-                        Message
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ContactsList patients={patients} onMessagePatient={handleMessagePatient} />
             </CardContent>
           </Card>
         </TabsContent>

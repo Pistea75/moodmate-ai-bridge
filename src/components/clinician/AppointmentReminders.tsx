@@ -1,13 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bell, Clock, Mail, MessageSquare, Calendar } from 'lucide-react';
+import { Bell, Clock, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ReminderSettingsComponent } from './reminders/ReminderSettings';
+import { UpcomingSessionsList } from './reminders/UpcomingSessionsList';
 
 interface ReminderSettings {
   id: string;
@@ -122,7 +120,6 @@ export function AppointmentReminders() {
       const session = upcomingSessions.find(s => s.id === sessionId);
       if (!session) return;
 
-      // Create a test notification
       await supabase
         .from('notifications')
         .insert({
@@ -146,24 +143,6 @@ export function AppointmentReminders() {
     }
   };
 
-  const getTimingLabel = (timing: string) => {
-    switch (timing) {
-      case '24h': return '24 hours before';
-      case '2h': return '2 hours before';
-      case '30m': return '30 minutes before';
-      default: return timing;
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'email': return <Mail className="h-4 w-4" />;
-      case 'sms': return <MessageSquare className="h-4 w-4" />;
-      case 'push': return <Bell className="h-4 w-4" />;
-      default: return <Bell className="h-4 w-4" />;
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -177,7 +156,6 @@ export function AppointmentReminders() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Reminder Settings */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -185,57 +163,16 @@ export function AppointmentReminders() {
               Reminder Settings
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {reminderSettings.map((setting) => (
-              <div key={setting.id} className="p-4 border rounded-lg space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getTypeIcon(setting.type)}
-                    <span className="font-medium capitalize">{setting.type} Reminder</span>
-                  </div>
-                  <Switch
-                    checked={setting.enabled}
-                    onCheckedChange={() => toggleReminder(setting.id)}
-                  />
-                </div>
-                
-                {setting.enabled && (
-                  <>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Select value={setting.type} onValueChange={(value: 'email' | 'sms' | 'push') => updateReminderType(setting.id, value)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="email">Email</SelectItem>
-                          <SelectItem value="sms">SMS</SelectItem>
-                          <SelectItem value="push">Push Notification</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      
-                      <Select value={setting.timing} onValueChange={(value: '24h' | '2h' | '30m') => updateReminderTiming(setting.id, value)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="24h">24 hours before</SelectItem>
-                          <SelectItem value="2h">2 hours before</SelectItem>
-                          <SelectItem value="30m">30 minutes before</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="text-sm text-muted-foreground bg-muted p-2 rounded">
-                      {setting.message}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+          <CardContent>
+            <ReminderSettingsComponent 
+              settings={reminderSettings}
+              onToggle={toggleReminder}
+              onUpdateType={updateReminderType}
+              onUpdateTiming={updateReminderTiming}
+            />
           </CardContent>
         </Card>
 
-        {/* Upcoming Sessions */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -244,42 +181,11 @@ export function AppointmentReminders() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {upcomingSessions.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No upcoming sessions in the next 7 days
-                </div>
-              ) : (
-                upcomingSessions.map((session) => (
-                  <div key={session.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{session.patient_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(session.scheduled_time).toLocaleDateString()} at{' '}
-                        {new Date(session.scheduled_time).toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{session.session_type}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {session.reminder_sent && (
-                        <Badge variant="secondary">Reminder Sent</Badge>
-                      )}
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => sendTestReminder(session.id)}
-                        disabled={loading}
-                      >
-                        Test Reminder
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+            <UpcomingSessionsList 
+              sessions={upcomingSessions}
+              onSendTestReminder={sendTestReminder}
+              loading={loading}
+            />
           </CardContent>
         </Card>
       </div>
