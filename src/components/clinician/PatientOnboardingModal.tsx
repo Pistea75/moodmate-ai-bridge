@@ -391,7 +391,11 @@ export function PatientOnboardingModal({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                {React.createElement(ONBOARDING_STEPS[activeStep - 1]?.icon, { className: "h-5 w-5" })}
+                {(() => {
+                  const step = ONBOARDING_STEPS[activeStep - 1];
+                  const IconComponent = step?.icon;
+                  return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
+                })()}
                 {ONBOARDING_STEPS[activeStep - 1]?.title}
               </CardTitle>
             </CardHeader>

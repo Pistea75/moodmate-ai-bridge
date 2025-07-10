@@ -413,45 +413,63 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           first_name: string | null
           id: string
+          initial_assessment: string | null
           language: string | null
           last_active_at: string | null
           last_name: string | null
           onboarding_completed: boolean | null
           onboarding_step: number | null
+          phone: string | null
           referral_code: string | null
           role: string
           status: string | null
+          treatment_goals: string | null
           updated_at: string | null
+          welcome_message: string | null
         }
         Insert: {
           created_at?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           first_name?: string | null
           id?: string
+          initial_assessment?: string | null
           language?: string | null
           last_active_at?: string | null
           last_name?: string | null
           onboarding_completed?: boolean | null
           onboarding_step?: number | null
+          phone?: string | null
           referral_code?: string | null
           role?: string
           status?: string | null
+          treatment_goals?: string | null
           updated_at?: string | null
+          welcome_message?: string | null
         }
         Update: {
           created_at?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           first_name?: string | null
           id?: string
+          initial_assessment?: string | null
           language?: string | null
           last_active_at?: string | null
           last_name?: string | null
           onboarding_completed?: boolean | null
           onboarding_step?: number | null
+          phone?: string | null
           referral_code?: string | null
           role?: string
           status?: string | null
+          treatment_goals?: string | null
           updated_at?: string | null
+          welcome_message?: string | null
         }
         Relationships: []
       }

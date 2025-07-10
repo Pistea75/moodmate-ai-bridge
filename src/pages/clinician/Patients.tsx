@@ -151,7 +151,7 @@ export default function Patients() {
       const processedPatients: PatientCardData[] = (patientsData || [])
         .map(link => link.profiles)
         .filter(Boolean)
-        .map(patient => {
+        .map((patient: any) => {
           const latestMood = latestMoodMap[patient.id];
           const latestRisk = latestRiskMap[patient.id];
           
