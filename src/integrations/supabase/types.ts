@@ -549,20 +549,69 @@ export type Database = {
           },
         ]
       }
+      session_templates: {
+        Row: {
+          clinician_id: string
+          created_at: string
+          default_notes: string | null
+          description: string | null
+          duration_minutes: number
+          id: string
+          name: string
+          outcome_metrics: Json | null
+          preparation_checklist: string[] | null
+          session_type: string
+          updated_at: string
+        }
+        Insert: {
+          clinician_id: string
+          created_at?: string
+          default_notes?: string | null
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          name: string
+          outcome_metrics?: Json | null
+          preparation_checklist?: string[] | null
+          session_type?: string
+          updated_at?: string
+        }
+        Update: {
+          clinician_id?: string
+          created_at?: string
+          default_notes?: string | null
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          name?: string
+          outcome_metrics?: Json | null
+          preparation_checklist?: string[] | null
+          session_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           ai_report_id: string | null
           ai_report_status: string | null
+          attendance_status: string | null
           clinician_id: string | null
           created_at: string | null
           duration_minutes: number
+          homework_assigned: string | null
           id: string
+          next_session_focus: string | null
           notes: string | null
+          outcome_notes: string | null
+          outcome_rating: number | null
           patient_id: string | null
           recording_enabled: boolean | null
           recording_file_path: string | null
           recording_status: string | null
+          reminder_sent_at: string | null
           scheduled_time: string
+          session_template_id: string | null
           session_type: string | null
           status: string | null
           timezone: string | null
@@ -574,16 +623,23 @@ export type Database = {
         Insert: {
           ai_report_id?: string | null
           ai_report_status?: string | null
+          attendance_status?: string | null
           clinician_id?: string | null
           created_at?: string | null
           duration_minutes: number
+          homework_assigned?: string | null
           id?: string
+          next_session_focus?: string | null
           notes?: string | null
+          outcome_notes?: string | null
+          outcome_rating?: number | null
           patient_id?: string | null
           recording_enabled?: boolean | null
           recording_file_path?: string | null
           recording_status?: string | null
+          reminder_sent_at?: string | null
           scheduled_time: string
+          session_template_id?: string | null
           session_type?: string | null
           status?: string | null
           timezone?: string | null
@@ -595,16 +651,23 @@ export type Database = {
         Update: {
           ai_report_id?: string | null
           ai_report_status?: string | null
+          attendance_status?: string | null
           clinician_id?: string | null
           created_at?: string | null
           duration_minutes?: number
+          homework_assigned?: string | null
           id?: string
+          next_session_focus?: string | null
           notes?: string | null
+          outcome_notes?: string | null
+          outcome_rating?: number | null
           patient_id?: string | null
           recording_enabled?: boolean | null
           recording_file_path?: string | null
           recording_status?: string | null
+          reminder_sent_at?: string | null
           scheduled_time?: string
+          session_template_id?: string | null
           session_type?: string | null
           status?: string | null
           timezone?: string | null
@@ -647,6 +710,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_session_template_id_fkey"
+            columns: ["session_template_id"]
+            isOneToOne: false
+            referencedRelation: "session_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -759,6 +829,10 @@ export type Database = {
       check_session_conflict: {
         Args: { _clinician_id: string; _start: string; _end: string }
         Returns: boolean
+      }
+      check_upcoming_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       get_patient_mood_summaries: {
         Args: { clinician_uuid: string }

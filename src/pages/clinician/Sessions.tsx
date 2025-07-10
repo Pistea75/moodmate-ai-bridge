@@ -7,8 +7,12 @@ import { isSameDay, isBefore, addMinutes } from "date-fns";
 import { SessionTabs } from "@/components/SessionTabs";
 import { SessionHeader } from "@/components/SessionHeader";
 import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
+import { SessionTemplateSelector } from "@/components/session/SessionTemplateSelector";
+import { SessionOutcomeModal } from "@/components/session/SessionOutcomeModal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, FileText, Star, Users, Clock, TrendingUp, Calendar, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // ✅ Enhanced Session Type with recording info
 interface SessionWithPatient {
@@ -39,7 +43,20 @@ export default function Sessions() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
+  const [openTemplateModal, setOpenTemplateModal] = useState(false);
+  const [openOutcomeModal, setOpenOutcomeModal] = useState<{
+    open: boolean;
+    sessionId: string;
+    patientName: string;
+    sessionType: string;
+  }>({ open: false, sessionId: '', patientName: '', sessionType: '' });
   const [error, setError] = useState<string | null>(null);
+  const [sessionStats, setSessionStats] = useState({
+    totalThisWeek: 0,
+    completedToday: 0,
+    upcomingToday: 0,
+    averageRating: 0
+  });
 
   const fetchSessions = useCallback(async () => {
     setLoading(true);
@@ -63,8 +80,47 @@ export default function Sessions() {
         });
       } else {
         console.log("Fetched sessions:", data);
-        // Set the state with new data, this will trigger a re-render
         setSessions((data || []) as SessionWithPatient[]);
+        
+        // Calculate session statistics
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        
+        const sessionsData = (data || []) as SessionWithPatient[];
+        
+        const totalThisWeek = sessionsData.filter(s => {
+          const sessionDate = new Date(s.scheduled_time);
+          return sessionDate >= weekStart;
+        }).length;
+        
+        const completedToday = sessionsData.filter(s => {
+          const sessionDate = new Date(s.scheduled_time);
+          return isSameDay(sessionDate, today) && s.status === 'completed';
+        }).length;
+        
+        const upcomingToday = sessionsData.filter(s => {
+          const sessionDate = new Date(s.scheduled_time);
+          return isSameDay(sessionDate, today) && new Date(s.scheduled_time) > now;
+        }).length;
+        
+        const ratingsQuery = await supabase
+          .from('sessions')
+          .select('outcome_rating')
+          .not('outcome_rating', 'is', null);
+          
+        const ratings = ratingsQuery.data || [];
+        const averageRating = ratings.length > 0 
+          ? ratings.reduce((sum, session) => sum + (session.outcome_rating || 0), 0) / ratings.length 
+          : 0;
+        
+        setSessionStats({
+          totalThisWeek,
+          completedToday,
+          upcomingToday,
+          averageRating: Math.round(averageRating * 10) / 10
+        });
       }
     } catch (err) {
       console.error("Unexpected error fetching sessions:", err);
@@ -123,9 +179,97 @@ export default function Sessions() {
     await fetchSessions();
   };
 
+  const handleTemplateSelect = (template: any) => {
+    // Open the schedule modal with the template pre-filled
+    setOpenModal(true);
+  };
+
+  const handleRecordOutcome = (sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (session) {
+      setOpenOutcomeModal({
+        open: true,
+        sessionId,
+        patientName: `${session.patient.first_name} ${session.patient.last_name}`,
+        sessionType: session.session_type || 'individual'
+      });
+    }
+  };
+
   return (
     <ClinicianLayout>
       <div className="space-y-6">
+        {/* Enhanced Header with Statistics */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Clock className="h-8 w-8 text-blue-600" />
+              Sessions
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Manage appointments and track session outcomes
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setOpenTemplateModal(true)}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Templates
+            </Button>
+          </div>
+        </div>
+
+        {/* Session Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Week</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{sessionStats.totalThisWeek}</div>
+              <p className="text-xs text-muted-foreground">Total sessions</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Completed Today</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{sessionStats.completedToday}</div>
+              <p className="text-xs text-muted-foreground">Sessions finished</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Upcoming Today</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{sessionStats.upcomingToday}</div>
+              <p className="text-xs text-muted-foreground">Sessions remaining</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+              <Star className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">
+                {sessionStats.averageRating || '--'}/5
+              </div>
+              <p className="text-xs text-muted-foreground">Session outcomes</p>
+            </CardContent>
+          </Card>
+        </div>
+
         <SessionHeader 
           onScheduleSession={() => setOpenModal(true)}
           selectedDate={selectedDate}
@@ -158,6 +302,27 @@ export default function Sessions() {
             });
             setOpenModal(false);
             fetchSessions();
+          }}
+        />
+
+        <SessionTemplateSelector
+          open={openTemplateModal}
+          onClose={() => setOpenTemplateModal(false)}
+          onSelectTemplate={handleTemplateSelect}
+        />
+
+        <SessionOutcomeModal
+          open={openOutcomeModal.open}
+          onClose={() => setOpenOutcomeModal({ open: false, sessionId: '', patientName: '', sessionType: '' })}
+          sessionId={openOutcomeModal.sessionId}
+          patientName={openOutcomeModal.patientName}
+          sessionType={openOutcomeModal.sessionType}
+          onComplete={() => {
+            fetchSessions();
+            toast({
+              title: "Session Outcome Recorded",
+              description: "Session has been successfully updated with outcome data."
+            });
           }}
         />
       </div>
