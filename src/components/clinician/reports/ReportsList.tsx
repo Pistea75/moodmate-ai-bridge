@@ -1,7 +1,8 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Download, Eye, Trash2, MessageSquare, Video, Users, Mic } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
@@ -30,6 +31,27 @@ export function ReportsList({
   deletingReportId,
   onRefresh
 }: ReportsListProps) {
+  const getReportIcon = (reportType: string) => {
+    switch (reportType) {
+      case 'session_recording':
+        return <Video className="h-4 w-4 text-blue-600" />;
+      case 'ai_chat':
+      default:
+        return <MessageSquare className="h-4 w-4 text-green-600" />;
+    }
+  };
+
+  const getReportTypeLabel = (reportType: string) => {
+    switch (reportType) {
+      case 'session_recording':
+        return 'Session Report';
+      case 'ai_chat':
+        return 'Chat Report';
+      default:
+        return reportType || 'Report';
+    }
+  };
+
   const handleDownload = (report: any) => {
     if (!report.content) {
       toast.error("This report has no content to download.");
@@ -75,7 +97,7 @@ export function ReportsList({
         </p>
         {reports.length === 0 && (
           <p className="text-sm text-muted-foreground mt-2">
-            Reports will appear here after patients generate AI chat summaries.
+            Reports will appear here after patients generate AI chat summaries or after sessions with recording are completed and processed.
           </p>
         )}
       </Card>
@@ -87,12 +109,28 @@ export function ReportsList({
       {reports.map((report) => (
         <Card key={report.id} className="p-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{formatReportTitle(report)}</h3>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Type: {report.report_type}</span>
-                <span>•</span>
-                <span>Status: {report.status}</span>
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-gray-50 rounded-lg">
+                {getReportIcon(report.report_type)}
+              </div>
+              <div>
+                <h3 className="font-medium">{formatReportTitle(report)}</h3>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                  <Badge variant="outline" className="text-xs">
+                    {getReportTypeLabel(report.report_type)}
+                  </Badge>
+                  <span>•</span>
+                  <span>Status: {report.status}</span>
+                  {report.session_type && (
+                    <>
+                      <span>•</span>
+                      <div className="flex items-center gap-1">
+                        {report.session_type === 'online' ? <Video className="h-3 w-3" /> : <Users className="h-3 w-3" />}
+                        <span className="capitalize">{report.session_type?.replace('_', ' ')}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex gap-2">

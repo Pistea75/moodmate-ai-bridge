@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SessionRecordingControls } from './SessionRecordingControls';
+import { VideoCallInterface } from './VideoCallInterface';
 import { 
   Calendar, 
   Clock, 
@@ -310,13 +311,19 @@ export function EnhancedSessionCard({
 
         {/* Session Controls */}
         {showControls && isUpcoming && isToday && (
-          <div className="pt-2 border-t">
-            {!showRecordingControls ? (
-              <Button onClick={handleStartSession} className="w-full gap-2">
-                <Play className="h-4 w-4" />
-                Start Session
-              </Button>
-            ) : (
+          <div className="pt-2 border-t space-y-3">
+            {/* Video Call Interface for Online Sessions */}
+            {session.sessionType === 'online' && !showRecordingControls && (
+              <VideoCallInterface
+                sessionId={session.id}
+                patientName={session.patientName}
+                scheduledTime={session.dateTime}
+                onCallStarted={() => setShowRecordingControls(true)}
+              />
+            )}
+            
+            {/* Recording Controls */}
+            {showRecordingControls ? (
               <SessionRecordingControls
                 sessionId={session.id}
                 sessionType={session.sessionType || 'in_person'}
@@ -324,6 +331,11 @@ export function EnhancedSessionCard({
                 recordingStatus={session.recordingStatus || 'none'}
                 onSessionUpdate={onSessionUpdate || (() => {})}
               />
+            ) : session.sessionType === 'in_person' && (
+              <Button onClick={handleStartSession} className="w-full gap-2">
+                <Play className="h-4 w-4" />
+                Start Session
+              </Button>
             )}
           </div>
         )}

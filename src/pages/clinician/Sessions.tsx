@@ -10,7 +10,7 @@ import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal"
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-// ✅ Custom Type
+// ✅ Enhanced Session Type with recording info
 interface SessionWithPatient {
   id: string;
   scheduled_time: string;
@@ -18,6 +18,15 @@ interface SessionWithPatient {
   status?: string;
   notes?: string;
   patient_id: string;
+  timezone?: string;
+  session_type?: 'online' | 'in_person';
+  recording_enabled?: boolean;
+  recording_status?: string;
+  transcription_status?: string;
+  ai_report_status?: string;
+  ai_report_id?: string;
+  video_call_url?: string;
+  video_call_room_id?: string;
   patient: {
     first_name: string;
     last_name: string;

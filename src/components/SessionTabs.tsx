@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SessionCard } from "@/components/SessionCard";
+import { EnhancedSessionCard } from "@/components/session/EnhancedSessionCard";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, 
   AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -70,7 +70,7 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
             ) : (
               filtered[type].map((session: any) => (
                 <div key={session.id} className="relative">
-                  <SessionCard
+                  <EnhancedSessionCard
                     session={{
                       id: session.id,
                       title: `Session with ${session.patient?.first_name || 'Patient'}`,
@@ -80,10 +80,17 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
                         `${session.patient.first_name || ''} ${session.patient.last_name || ''}`.trim() : 
                         'Unknown Patient',
                       status: session.status || 'upcoming',
-                      notes: session.notes,
-                      timezone: session.timezone // Pass timezone for proper display
+                      timezone: session.timezone,
+                      sessionType: session.session_type || 'in_person',
+                      recordingEnabled: session.recording_enabled || false,
+                      recordingStatus: session.recording_status || 'none',
+                      transcriptionStatus: session.transcription_status || 'none',
+                      aiReportStatus: session.ai_report_status || 'none'
                     }}
-                    variant="clinician"
+                    variant="default"
+                    showControls={type === 'upcoming'}
+                    onSessionUpdate={onSessionDelete}
+                    onDelete={onSessionDelete}
                   />
                   
                   <div className="absolute top-4 right-4 flex gap-2">
@@ -94,39 +101,6 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
                         initialNotes={session.notes || ''}
                         onSaved={onSessionDelete} // Use the same callback to refresh sessions
                       />
-                    )}
-                    
-                    {/* Delete button for non-past sessions */}
-                    {type !== 'past' && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Session</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete this session? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={() => handleDeleteSession(session.id)}
-                              disabled={deletingSessionId === session.id}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              {deletingSessionId === session.id ? "Deleting..." : "Delete"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
                     )}
                   </div>
                 </div>
