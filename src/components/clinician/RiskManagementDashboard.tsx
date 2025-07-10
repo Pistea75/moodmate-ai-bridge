@@ -1,273 +1,308 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  AlertTriangle, 
+  TrendingDown, 
+  Users, 
+  Clock,
+  Brain,
+  Heart,
+  Shield,
+  Bell,
+  Eye,
+  CheckCircle
+} from 'lucide-react';
 import { PatientRiskCard } from './PatientRiskCard';
-import { calculateRiskScore, RiskAssessment } from '@/lib/utils/riskScoring';
-import { supabase } from '@/integrations/supabase/client';
-import { Search, Filter, AlertTriangle, Users } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { RiskAssessment } from '@/lib/utils/riskScoring';
 
-interface PatientRiskData {
+interface RiskAlert {
   id: string;
-  name: string;
-  riskAssessment: RiskAssessment;
+  patientId: string;
+  patientName: string;
+  type: 'mood_decline' | 'missed_sessions' | 'low_engagement' | 'crisis_indicators';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  message: string;
+  timestamp: Date;
+  acknowledged: boolean;
 }
 
-export function RiskManagementDashboard() {
-  const [patients, setPatients] = useState<PatientRiskData[]>([]);
-  const [filteredPatients, setFilteredPatients] = useState<PatientRiskData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [riskFilter, setRiskFilter] = useState<string>('all');
-  const { toast } = useToast();
-
-  useEffect(() => {
-    fetchPatientsRiskData();
-  }, []);
-
-  useEffect(() => {
-    filterPatients();
-  }, [patients, searchTerm, riskFilter]);
-
-  const fetchPatientsRiskData = async () => {
-    try {
-      setLoading(true);
-      
-      // Get current user's patients
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: patientLinks } = await supabase
-        .from('patient_clinician_links')
-        .select(`
-          patient_id,
-          profiles!patient_clinician_links_patient_id_fkey (
-            id,
-            first_name,
-            last_name
-          )
-        `)
-        .eq('clinician_id', user.id);
-
-      if (!patientLinks) return;
-
-      const patientsRiskData: PatientRiskData[] = [];
-
-      for (const link of patientLinks) {
-        const patientId = link.patient_id;
-        const profile = link.profiles as any;
-        
-        if (!profile) continue;
-
-        // Fetch patient data for risk calculation
-        const [moodData, sessionData, taskData, chatData] = await Promise.all([
-          supabase
-            .from('mood_entries')
-            .select('*')
-            .eq('patient_id', patientId)
-            .order('created_at', { ascending: false })
-            .limit(50),
-          supabase
-            .from('sessions')
-            .select('*')
-            .eq('patient_id', patientId)
-            .order('scheduled_time', { ascending: false })
-            .limit(20),
-          supabase
-            .from('tasks')
-            .select('*')
-            .eq('patient_id', patientId)
-            .order('inserted_at', { ascending: false })
-            .limit(30),
-          supabase
-            .from('ai_chat_logs')
-            .select('*')
-            .eq('patient_id', patientId)
-            .order('created_at', { ascending: false })
-            .limit(100)
-        ]);
-
-        const riskAssessment = calculateRiskScore(
-          moodData.data || [],
-          sessionData.data || [],
-          taskData.data || [],
-          chatData.data || []
-        );
-
-        patientsRiskData.push({
-          id: patientId,
-          name: `${profile.first_name} ${profile.last_name}`,
-          riskAssessment
-        });
-      }
-
-      // Sort by risk score (highest risk first)
-      patientsRiskData.sort((a, b) => a.riskAssessment.score - b.riskAssessment.score);
-      
-      setPatients(patientsRiskData);
-    } catch (error) {
-      console.error('Error fetching patient risk data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load patient risk data",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterPatients = () => {
-    let filtered = patients;
-
-    if (searchTerm) {
-      filtered = filtered.filter(patient =>
-        patient.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (riskFilter !== 'all') {
-      filtered = filtered.filter(patient =>
-        patient.riskAssessment.level === riskFilter
-      );
-    }
-
-    setFilteredPatients(filtered);
-  };
-
-  const getRiskStats = () => {
-    const stats = {
-      total: patients.length,
-      critical: patients.filter(p => p.riskAssessment.level === 'critical').length,
-      high: patients.filter(p => p.riskAssessment.level === 'high').length,
-      medium: patients.filter(p => p.riskAssessment.level === 'medium').length,
-      low: patients.filter(p => p.riskAssessment.level === 'low').length,
-    };
-    return stats;
-  };
-
-  const stats = getRiskStats();
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-6 bg-gray-200 rounded"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+const mockRiskAssessments: (RiskAssessment & { patientId: string; patientName: string })[] = [
+  {
+    patientId: '1',
+    patientName: 'Sarah Johnson',
+    score: 85,
+    level: 'critical',
+    factors: {
+      moodTrend: -25,
+      sessionAttendance: 40,
+      taskCompletion: 30,
+      socialEngagement: 20,
+      sleepQuality: 35
+    },
+    recommendations: [
+      'Immediate safety assessment required',
+      'Consider increasing session frequency',
+      'Coordinate with crisis intervention team'
+    ],
+    lastUpdated: new Date()
+  },
+  {
+    patientId: '2',
+    patientName: 'Mike Chen',
+    score: 65,
+    level: 'high',
+    factors: {
+      moodTrend: -15,
+      sessionAttendance: 70,
+      taskCompletion: 60,
+      socialEngagement: 45,
+      sleepQuality: 50
+    },
+    recommendations: [
+      'Review current treatment plan',
+      'Increase check-in frequency',
+      'Consider additional support resources'
+    ],
+    lastUpdated: new Date()
   }
+];
+
+const mockAlerts: RiskAlert[] = [
+  {
+    id: '1',
+    patientId: '1',
+    patientName: 'Sarah Johnson',
+    type: 'mood_decline',
+    severity: 'critical',
+    message: 'Mood scores have declined significantly over the past week',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    acknowledged: false
+  },
+  {
+    id: '2',
+    patientId: '2',
+    patientName: 'Mike Chen',
+    type: 'missed_sessions',
+    severity: 'high',
+    message: 'Missed 2 consecutive sessions without notice',
+    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+    acknowledged: false
+  }
+];
+
+export function RiskManagementDashboard() {
+  const [riskAssessments, setRiskAssessments] = useState(mockRiskAssessments);
+  const [alerts, setAlerts] = useState(mockAlerts);
+  const [loading, setLoading] = useState(false);
+
+  const acknowledgeAlert = (alertId: string) => {
+    setAlerts(prev => prev.map(alert => 
+      alert.id === alertId ? { ...alert, acknowledged: true } : alert
+    ));
+  };
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'bg-red-100 text-red-700 border-red-200';
+      case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'low': return 'bg-green-100 text-green-700 border-green-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getAlertIcon = (type: string) => {
+    switch (type) {
+      case 'mood_decline': return <TrendingDown className="h-4 w-4" />;
+      case 'missed_sessions': return <Clock className="h-4 w-4" />;
+      case 'low_engagement': return <Users className="h-4 w-4" />;
+      case 'crisis_indicators': return <AlertTriangle className="h-4 w-4" />;
+      default: return <AlertTriangle className="h-4 w-4" />;
+    }
+  };
+
+  const criticalPatients = riskAssessments.filter(p => p.level === 'critical');
+  const highRiskPatients = riskAssessments.filter(p => p.level === 'high');
+  const unacknowledgedAlerts = alerts.filter(a => !a.acknowledged);
 
   return (
     <div className="space-y-6">
-      {/* Risk Statistics */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <Shield className="h-7 w-7 text-red-600" />
+            Risk Management Dashboard
+          </h2>
+          <p className="text-muted-foreground">Monitor and manage patient risk factors</p>
+        </div>
+        <Button variant="outline">
+          <Brain className="h-4 w-4 mr-2" />
+          Run Risk Assessment
+        </Button>
+      </div>
+
+      {/* Alert Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="border-red-200 bg-red-50">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Patients</p>
-                <p className="text-2xl font-bold">{stats.total}</p>
-              </div>
-              <Users className="h-8 w-8 text-blue-500" />
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+              <span className="font-medium text-red-700">Critical Risk</span>
             </div>
+            <p className="text-2xl font-bold text-red-900 mt-2">{criticalPatients.length}</p>
           </CardContent>
         </Card>
-        
-        <Card>
+
+        <Card className="border-orange-200 bg-orange-50">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Critical Risk</p>
-                <p className="text-2xl font-bold text-red-600">{stats.critical}</p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-red-500" />
+            <div className="flex items-center gap-2">
+              <TrendingDown className="h-5 w-5 text-orange-600" />
+              <span className="font-medium text-orange-700">High Risk</span>
             </div>
+            <p className="text-2xl font-bold text-orange-900 mt-2">{highRiskPatients.length}</p>
           </CardContent>
         </Card>
-        
-        <Card>
+
+        <Card className="border-yellow-200 bg-yellow-50">
           <CardContent className="p-6">
-            <div>
-              <p className="text-sm text-muted-foreground">High Risk</p>
-              <p className="text-2xl font-bold text-orange-600">{stats.high}</p>
+            <div className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-yellow-600" />
+              <span className="font-medium text-yellow-700">Active Alerts</span>
             </div>
+            <p className="text-2xl font-bold text-yellow-900 mt-2">{unacknowledgedAlerts.length}</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
-            <div>
-              <p className="text-sm text-muted-foreground">Low Risk</p>
-              <p className="text-2xl font-bold text-green-600">{stats.low}</p>
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              <span className="font-medium text-blue-700">Total Monitored</span>
             </div>
+            <p className="text-2xl font-bold text-blue-900 mt-2">{riskAssessments.length}</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search patients..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={riskFilter} onValueChange={setRiskFilter}>
-              <SelectTrigger className="w-full md:w-48">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filter by risk" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Risk Levels</SelectItem>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={fetchPatientsRiskData}>
-              Refresh Data
-            </Button>
+      <Tabs defaultValue="alerts" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="alerts" className="flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            Active Alerts
+            {unacknowledgedAlerts.length > 0 && (
+              <Badge variant="destructive" className="ml-1">
+                {unacknowledgedAlerts.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="patients">High-Risk Patients</TabsTrigger>
+          <TabsTrigger value="trends">Risk Trends</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="alerts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Risk Alerts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {alerts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No active alerts</p>
+                  <p className="text-sm">All patients are within normal risk parameters</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {alerts.map((alert) => (
+                    <div
+                      key={alert.id}
+                      className={`p-4 rounded-lg border ${getSeverityColor(alert.severity)} ${
+                        alert.acknowledged ? 'opacity-60' : ''
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                          {getAlertIcon(alert.type)}
+                          <div>
+                            <h4 className="font-medium">{alert.patientName}</h4>
+                            <p className="text-sm mt-1">{alert.message}</p>
+                            <p className="text-xs mt-2 opacity-70">
+                              {alert.timestamp.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={getSeverityColor(alert.severity)}>
+                            {alert.severity.toUpperCase()}
+                          </Badge>
+                          {!alert.acknowledged && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => acknowledgeAlert(alert.id)}
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Acknowledge
+                            </Button>
+                          )}
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-4 w-4 mr-1" />
+                            View Patient
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="patients">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {riskAssessments
+              .filter(assessment => assessment.level === 'critical' || assessment.level === 'high')
+              .map((assessment) => (
+                <PatientRiskCard
+                  key={assessment.patientId}
+                  patientId={assessment.patientId}
+                  patientName={assessment.patientName}
+                  riskAssessment={assessment}
+                  onViewDetails={() => console.log('View details for', assessment.patientName)}
+                />
+              ))}
           </div>
-        </CardContent>
-      </Card>
+          {riskAssessments.filter(a => a.level === 'critical' || a.level === 'high').length === 0 && (
+            <Card>
+              <CardContent className="p-8 text-center text-muted-foreground">
+                <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No high-risk patients identified</p>
+                <p className="text-sm">All patients are within acceptable risk parameters</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
-      {/* Patient Risk Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredPatients.map((patient) => (
-          <PatientRiskCard
-            key={patient.id}
-            patientId={patient.id}
-            patientName={patient.name}
-            riskAssessment={patient.riskAssessment}
-            onViewDetails={() => window.location.href = `/clinician/patients/${patient.id}`}
-          />
-        ))}
-      </div>
-
-      {filteredPatients.length === 0 && !loading && (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <p className="text-muted-foreground">No patients found matching your criteria.</p>
-          </CardContent>
-        </Card>
-      )}
+        <TabsContent value="trends">
+          <Card>
+            <CardHeader>
+              <CardTitle>Risk Trends Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Risk trends analysis coming soon</p>
+                <p className="text-sm">Historical risk data and predictive analytics</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
