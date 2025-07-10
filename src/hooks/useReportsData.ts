@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAiChatReports } from '@/hooks/useAiChatReports';
 import { supabase } from '@/integrations/supabase/client';
@@ -145,7 +144,13 @@ export function useReportsData() {
     return `${typePrefix}${patientName} - ${date}`;
   };
 
-  const handleDelete = async (reportId: string) => {
+  const onViewReport = (report: any) => {
+    // Create a modal or navigate to view the report
+    console.log('Viewing report:', report);
+    // This would typically open a modal or navigate to a detailed view
+  };
+
+  const onDeleteReport = async (reportId: string) => {
     try {
       setDeletingReportId(reportId);
       
@@ -169,7 +174,7 @@ export function useReportsData() {
     }
   };
 
-  const handleRefresh = () => {
+  const onRefresh = () => {
     console.log('Refreshing reports...');
     fetchChatReports();
     fetchSessionReports();
@@ -183,8 +188,12 @@ export function useReportsData() {
     patientNames,
     deletingReportId,
     formatReportTitle,
-    handleDelete,
-    handleRefresh,
-    fetchReports: handleRefresh
+    onViewReport,
+    onDeleteReport,
+    onRefresh,
+    // Keep the old naming for backward compatibility
+    handleDelete: onDeleteReport,
+    handleRefresh: onRefresh,
+    fetchReports: onRefresh
   };
 }

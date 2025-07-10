@@ -77,14 +77,14 @@ export function CommunicationHub() {
         .eq('user_id', user.user.id)
         .order('created_at', { ascending: false });
 
-      // Transform notifications to messages format
-      const messageData = notifications?.map(notif => ({
+      // Transform notifications to messages format with proper status typing
+      const messageData: Message[] = notifications?.map(notif => ({
         id: notif.id,
         sender_id: 'system',
         recipient_id: user.user.id,
         content: notif.description,
         type: notif.type as 'message' | 'reminder' | 'alert',
-        status: notif.is_read ? 'read' : 'delivered' as const,
+        status: (notif.is_read ? 'read' : 'delivered') as 'sent' | 'delivered' | 'read',
         created_at: notif.created_at,
         sender_name: 'System',
         recipient_name: 'You'
