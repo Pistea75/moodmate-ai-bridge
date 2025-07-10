@@ -1,184 +1,318 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PatientSelector } from '@/components/session/PatientSelector';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
 
-interface TaskFormProps {
-  isEdit: boolean;
-  initialTask?: {
-    id: string | null;
-    title: string;
-    description: string;
-    due_date: string;
-    patient_id: string;
-  };
-  onSave: () => void;
-  onCancel: () => void;
+interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  due_date?: string;
+  completed: boolean;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  category: string;
+  patient_id?: string;
+  clinician_id: string;
 }
 
-export function TaskForm({ isEdit, initialTask, onSave, onCancel }: TaskFormProps) {
+interface Patient {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface TaskFormProps {
+  open: boolean;
+  onClose: () => void;
+  onTaskCreated: () => void;
+  task?: Task | null;
+}
+
+const taskCategories = [
+  'Assessment',
+  'CBT',
+  'Coping Skills',
+  'Education',
+  'Goal Setting',
+  'Homework',
+  'Mindfulness',
+  'Social Skills',
+  'Treatment Planning',
+  'Other'
+];
+
+export function TaskForm({ open, onClose, onTaskCreated, task }: TaskFormProps) {
   const [formData, setFormData] = useState({
-    id: null as string | null,
     title: '',
     description: '',
     due_date: '',
-    patient_id: '',
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
+    category: '',
+    patient_id: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [dueDate, setDueDate] = useState<Date>();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (initialTask) {
+    if (task) {
       setFormData({
-        id: initialTask.id,
-        title: initialTask.title,
-        description: initialTask.description,
-        due_date: initialTask.due_date,
-        patient_id: initialTask.patient_id,
+        title: task.title,
+        description: task.description || '',
+        due_date: task.due_date || '',
+        priority: task.priority,
+        category: task.category || '',
+        patient_id: task.patient_id || ''
       });
+      if (task.due_date) {
+        setDueDate(new Date(task.due_date));
+      }
+    } else {
+      // Reset form for new task
+      setFormData({
+        title: '',
+        description: '',
+        due_date: '',
+        priority: 'medium',
+        category: '',
+        patient_id: ''
+      });
+      setDueDate(undefined);
     }
-  }, [initialTask]);
+  }, [task]);
 
-  const handleCreateOrUpdateTask = async () => {
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
     try {
-      setIsSubmitting(true);
-      setError(null);
-      
-      const { data: user } = await supabase.auth.getUser();
+      const { data: currentUser } = await supabase.auth.getUser();
+      if (!currentUser.user) return;
 
-      if (isEdit && formData.id) {
+      const { data, error } = await supabase
+        .from('patient_clinician_links')
+        .select(`
+          patient_id,
+          profiles!patient_clinician_links_patient_id_fkey(
+            id,
+            first_name,
+            last_name
+          )
+        `)
+        .eq('clinician_id', currentUser.user.id);
+
+      if (error) throw error;
+
+      const patientsData = (data || [])
+        .map(link => link.profiles)
+        .filter(Boolean) as Patient[];
+      
+      setPatients(patientsData);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a task title',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: currentUser } = await supabase.auth.getUser();
+      if (!currentUser.user) throw new Error('Not authenticated');
+
+      const taskData = {
+        ...formData,
+        due_date: dueDate ? format(dueDate, 'yyyy-MM-dd') : null,
+        clinician_id: currentUser.user.id,
+        patient_id: formData.patient_id || null
+      };
+
+      if (task) {
+        // Update existing task
         const { error } = await supabase
           .from('tasks')
-          .update({
-            title: formData.title,
-            description: formData.description,
-            due_date: formData.due_date,
-            patient_id: formData.patient_id,
-          })
-          .eq('id', formData.id)
-          .eq('clinician_id', user.user?.id);
+          .update(taskData)
+          .eq('id', task.id);
 
-        if (error) throw new Error(error.message);
-        
+        if (error) throw error;
+
         toast({
-          title: "Task updated",
-          description: "The task has been updated successfully",
+          title: 'Success',
+          description: 'Task updated successfully'
         });
       } else {
-        const { error } = await supabase.from('tasks').insert({
-          title: formData.title,
-          description: formData.description,
-          due_date: formData.due_date,
-          completed: false,
-          patient_id: formData.patient_id,
-          clinician_id: user.user?.id,
-        });
+        // Create new task
+        const { error } = await supabase
+          .from('tasks')
+          .insert([taskData]);
 
-        if (error) throw new Error(error.message);
-        
+        if (error) throw error;
+
         toast({
-          title: "Task created",
-          description: "The new task has been created successfully",
+          title: 'Success',
+          description: 'Task created successfully'
         });
       }
 
-      onSave();
-    } catch (err: any) {
-      console.error(isEdit ? 'Update failed:' : 'Create failed:', err.message);
-      setError(err.message || 'An unexpected error occurred');
+      onTaskCreated();
+      onClose();
+    } catch (error: any) {
+      console.error('Error saving task:', error);
       toast({
-        variant: "destructive",
-        title: isEdit ? "Failed to update task" : "Failed to create task",
-        description: err.message || 'An unexpected error occurred',
+        title: 'Error',
+        description: error.message || 'Failed to save task',
+        variant: 'destructive'
       });
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <DialogContent className="sm:max-w-[500px]">
-      <DialogHeader>
-        <DialogTitle className="text-xl font-semibold">
-          {isEdit ? 'Edit Task' : 'Create New Task'}
-        </DialogTitle>
-      </DialogHeader>
-      
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      
-      <div className="space-y-4 p-4">
-        {/* Patient Selection - First */}
-        <div className="space-y-2">
-          <PatientSelector 
-            value={formData.patient_id} 
-            onChange={(value) => setFormData({ ...formData, patient_id: value })}
-          />
-        </div>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{task ? 'Edit Task' : 'Create New Task'}</DialogTitle>
+        </DialogHeader>
         
-        {/* Title - Second */}
-        <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
-          <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Task title"
-          />
-        </div>
-        
-        {/* Description - Third */}
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Task description"
-            className="min-h-[100px]"
-          />
-        </div>
-        
-        {/* Due Date - Fourth */}
-        <div className="space-y-2">
-          <Label htmlFor="due_date">Due Date</Label>
-          <Input
-            id="due_date"
-            type="date"
-            value={formData.due_date}
-            onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-          />
-        </div>
-        
-        <Button 
-          className="w-full mt-6" 
-          onClick={handleCreateOrUpdateTask}
-          disabled={isSubmitting || !formData.title || !formData.patient_id || !formData.due_date}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {isEdit ? 'Updating...' : 'Creating...'}
-            </>
-          ) : (
-            isEdit ? 'Update Task' : 'Create Task'
-          )}
-        </Button>
-      </div>
-    </DialogContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="title">Task Title *</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Enter task title"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Enter task description or instructions"
+              rows={3}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="priority">Priority</Label>
+              <Select
+                value={formData.priority}
+                onValueChange={(value: 'low' | 'medium' | 'high' | 'urgent') =>
+                  setFormData(prev => ({ ...prev, priority: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {taskCategories.map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="patient">Assign to Patient (Optional)</Label>
+            <Select
+              value={formData.patient_id}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, patient_id: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select patient" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">No patient (General task)</SelectItem>
+                {patients.map(patient => (
+                  <SelectItem key={patient.id} value={patient.id}>
+                    {patient.first_name} {patient.last_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Due Date (Optional)</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dueDate ? format(dueDate, 'PPP') : 'Select due date'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dueDate}
+                  onSelect={setDueDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Saving...' : task ? 'Update Task' : 'Create Task'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
