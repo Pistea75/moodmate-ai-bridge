@@ -9,7 +9,8 @@ import {
   BarChart3,
   AlertTriangle,
   Brain,
-  Zap
+  Zap,
+  ClipboardList
 } from "lucide-react";
 
 interface EnhancedQuickActionsProps {
@@ -62,6 +63,13 @@ export function EnhancedQuickActions({ onScheduleSession, onAddTask }: EnhancedQ
       color: 'bg-pink-50 hover:bg-pink-100 text-pink-700'
     },
     {
+      title: 'View Reports',
+      description: 'Patient chat reports',
+      icon: ClipboardList,
+      onClick: () => window.location.href = '/clinician/reports',
+      color: 'bg-cyan-50 hover:bg-cyan-100 text-cyan-700'
+    },
+    {
       title: 'Create Report',
       description: 'Generate insights',
       icon: FileText,
@@ -75,7 +83,7 @@ export function EnhancedQuickActions({ onScheduleSession, onAddTask }: EnhancedQ
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Zap className="h-5 w-5" />
-          Enhanced Quick Actions
+          Quick Actions
         </CardTitle>
       </CardHeader>
       <CardContent>

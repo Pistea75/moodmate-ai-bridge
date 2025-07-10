@@ -64,7 +64,7 @@ export default function ClinicianDashboard() {
         <RiskAlertBanner />
 
         {/* Enhanced Header Section */}
-        <div id="dashboard-header" className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border">
+        <div id="dashboard-header" className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -110,9 +110,9 @@ export default function ClinicianDashboard() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Left Column */}
-          <div className="xl:col-span-2 space-y-8">
+          <div className="xl:col-span-2 space-y-6">
             {/* Upcoming Sessions */}
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <UpcomingSessions 
@@ -135,7 +135,7 @@ export default function ClinicianDashboard() {
           </div>
 
           {/* Right Column */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Notifications Panel */}
             <div id="notifications">
               <NotificationsPanel />
