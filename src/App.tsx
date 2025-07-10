@@ -66,8 +66,8 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <AuthProvider>
-            <Router>
+          <Router>
+            <AuthProvider>
               <div className="min-h-screen bg-background">
                 <MainNav />
                 <Routes>
@@ -206,8 +206,8 @@ function App() {
                 </Routes>
                 <Toaster />
               </div>
-            </Router>
-          </AuthProvider>
+            </AuthProvider>
+          </Router>
         </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
