@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,6 @@ import {
   Calendar, 
   Activity,
   AlertTriangle,
-  CheckCircle,
   Clock,
   MoreHorizontal,
   MessageSquare,
@@ -120,7 +120,7 @@ export function PatientCard({
 
       toast({
         title: 'Risk Assessment Complete',
-        description: `Risk level: ${data.summary.riskLevel}`
+        description: `Risk level: ${data?.summary?.riskLevel || 'Assessment completed'}`
       });
 
       onAssessRisk(patient.id);
@@ -239,14 +239,14 @@ export function PatientCard({
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-yellow-600" />
               <span className="text-sm text-yellow-800">
-                Onboarding incomplete ({patient.onboarding_step}/5 steps)
+                Onboarding incomplete ({patient.onboarding_step || 0}/5 steps)
               </span>
             </div>
           </div>
         )}
 
         {/* Risk Assessment Alert */}
-        {patient.riskLevel === 'HIGH' || patient.riskLevel === 'CRITICAL' && (
+        {(patient.riskLevel === 'HIGH' || patient.riskLevel === 'CRITICAL') && (
           <div className="mt-3 p-2 bg-red-50 rounded-lg border border-red-200">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-red-600" />

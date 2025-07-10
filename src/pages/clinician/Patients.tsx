@@ -65,37 +65,61 @@ export default function Patients() {
   const fetchPatients = useCallback(async () => {
     try {
       setLoading(true);
+      console.log('Fetching patients...');
       
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) throw new Error('Not authenticated');
 
-      // Fetch patients linked to this clinician
-      const { data: patientsData, error: patientsError } = await supabase
+      console.log('Current user:', currentUser.user.id);
+
+      // First, get patient IDs linked to this clinician
+      const { data: linkData, error: linkError } = await supabase
         .from('patient_clinician_links')
-        .select(`
-          patient_id,
-          profiles!patient_clinician_links_patient_id_fkey (
-            id,
-            first_name,
-            last_name,
-            status,
-            last_active_at,
-            onboarding_completed,
-            onboarding_step
-          )
-        `)
+        .select('patient_id')
         .eq('clinician_id', currentUser.user.id);
 
-      if (patientsError) throw patientsError;
+      if (linkError) {
+        console.error('Error fetching patient links:', linkError);
+        throw linkError;
+      }
+
+      console.log('Patient links found:', linkData);
+
+      if (!linkData || linkData.length === 0) {
+        console.log('No patients linked to this clinician');
+        setPatients([]);
+        setLoading(false);
+        return;
+      }
+
+      const patientIds = linkData.map(link => link.patient_id).filter(Boolean);
+      console.log('Patient IDs:', patientIds);
+
+      // Get patient profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', patientIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      console.log('Profiles data:', profilesData);
 
       // Get emails from users table
-      const patientIds = patientsData?.map(link => link.patient_id) || [];
       const { data: emailsData, error: emailsError } = await supabase
         .from('users')
         .select('id, email')
         .in('id', patientIds);
 
-      if (emailsError) throw emailsError;
+      if (emailsError) {
+        console.error('Error fetching emails:', emailsError);
+        // Don't throw here, emails are optional
+      }
+
+      console.log('Emails data:', emailsData);
 
       // Get latest mood scores and risk assessments
       const [moodData, riskData, sessionsData] = await Promise.all([
@@ -121,6 +145,10 @@ export default function Patients() {
           .in('patient_id', patientIds)
           .gte('scheduled_time', new Date().toISOString())
       ]);
+
+      console.log('Mood data:', moodData);
+      console.log('Risk data:', riskData);
+      console.log('Sessions data:', sessionsData);
 
       // Create lookup maps
       const emailMap = (emailsData || []).reduce((acc, user) => {
@@ -148,9 +176,7 @@ export default function Patients() {
       }, {} as Record<string, number>);
 
       // Process and combine all data
-      const processedPatients: PatientCardData[] = (patientsData || [])
-        .map(link => link.profiles)
-        .filter(Boolean)
+      const processedPatients: PatientCardData[] = (profilesData || [])
         .map((patient: any) => {
           const latestMood = latestMoodMap[patient.id];
           const latestRisk = latestRiskMap[patient.id];
@@ -166,6 +192,7 @@ export default function Patients() {
           };
         });
 
+      console.log('Processed patients:', processedPatients);
       setPatients(processedPatients);
     } catch (error: any) {
       console.error('Error fetching patients:', error);
@@ -195,6 +222,18 @@ export default function Patients() {
         .eq('clinician_id', currentUser.user.id);
 
       const patientIds = patientLinks?.map(link => link.patient_id) || [];
+
+      if (patientIds.length === 0) {
+        setStats({
+          totalPatients: 0,
+          activeThisWeek: 0,
+          atRiskPatients: 0,
+          pendingOnboarding: 0,
+          avgMoodScore: 0,
+          upcomingSessions: 0
+        });
+        return;
+      }
 
       const [profileStats, moodStats, sessionStats, riskStats] = await Promise.all([
         // Profile statistics
