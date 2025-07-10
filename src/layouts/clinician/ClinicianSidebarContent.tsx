@@ -12,7 +12,8 @@ import {
   BarChart3,
   AlertTriangle,
   Brain,
-  CheckSquare
+  CheckSquare,
+  User
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClinicianProfile } from './useClinicianProfile';
@@ -128,6 +129,20 @@ export function ClinicianSidebarContent() {
 
       {/* Footer */}
       <div className="p-4 border-t border-border space-y-2">
+        <NavLink
+          to="/clinician/profile"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full ${
+              isActive
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+            }`
+          }
+        >
+          <User className="h-4 w-4" />
+          Profile
+        </NavLink>
+        
         <NavLink
           to="/clinician/settings"
           className={({ isActive }) =>
