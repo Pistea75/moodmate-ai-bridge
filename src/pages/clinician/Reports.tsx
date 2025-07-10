@@ -9,14 +9,24 @@ import { ReportsFilters } from '@/components/clinician/reports/ReportsFilters';
 import { ReportsList } from '@/components/clinician/reports/ReportsList';
 import { ReportBuilder } from '@/components/clinician/reports/ReportBuilder';
 import { ReportScheduler } from '@/components/clinician/reports/ReportScheduler';
+import { useReportsData } from '@/hooks/useReportsData';
 
 export default function Reports() {
-  const [activeTab, setActiveTab] = useState('existing');
-  const [filters, setFilters] = useState({
-    dateRange: { from: undefined, to: undefined },
-    reportType: 'all',
-    status: 'all'
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  
+  const {
+    reports,
+    loading,
+    error,
+    formatReportTitle,
+    onViewReport,
+    onDeleteReport,
+    deletingReportId,
+    onRefresh
+  } = useReportsData();
+
+  const reportTypes = Array.from(new Set(reports.map(r => r.report_type).filter(Boolean)));
 
   return (
     <ClinicianLayout>
@@ -51,38 +61,47 @@ export default function Reports() {
               <CardTitle className="text-sm font-medium text-gray-600">Total Reports</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">24</div>
-              <p className="text-xs text-gray-500">+3 this week</p>
+              <div className="text-2xl font-bold text-blue-600">{reports.length}</div>
+              <p className="text-xs text-gray-500">Generated reports</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Scheduled</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">This Week</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">8</div>
-              <p className="text-xs text-gray-500">Automated reports</p>
+              <div className="text-2xl font-bold text-green-600">
+                {reports.filter(r => {
+                  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                  return new Date(r.created_at || '') > weekAgo;
+                }).length}
+              </div>
+              <p className="text-xs text-gray-500">Recent reports</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">This Month</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Completed</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">12</div>
-              <p className="text-xs text-gray-500">Generated reports</p>
+              <div className="text-2xl font-bold text-orange-600">
+                {reports.filter(r => r.status === 'completed').length}
+              </div>
+              <p className="text-xs text-gray-500">Finished reports</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Shared</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Processing</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">6</div>
-              <p className="text-xs text-gray-500">With patients/colleagues</p>
+              <div className="text-2xl font-bold text-purple-600">
+                {reports.filter(r => r.status === 'processing').length}
+              </div>
+              <p className="text-xs text-gray-500">In progress</p>
             </CardContent>
           </Card>
         </div>
@@ -109,8 +128,25 @@ export default function Reports() {
           </TabsList>
 
           <TabsContent value="existing" className="space-y-6">
-            <ReportsFilters filters={filters} setFilters={setFilters} />
-            <ReportsList filters={filters} />
+            <ReportsFilters 
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              typeFilter={typeFilter}
+              onTypeFilterChange={setTypeFilter}
+              reportTypes={reportTypes}
+            />
+            <ReportsList 
+              reports={reports}
+              loading={loading}
+              error={error}
+              searchTerm={searchTerm}
+              typeFilter={typeFilter}
+              formatReportTitle={formatReportTitle}
+              onViewReport={onViewReport}
+              onDeleteReport={onDeleteReport}
+              deletingReportId={deletingReportId}
+              onRefresh={onRefresh}
+            />
           </TabsContent>
 
           <TabsContent value="builder">

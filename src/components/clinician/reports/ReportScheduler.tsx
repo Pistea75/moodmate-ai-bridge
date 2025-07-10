@@ -8,14 +8,23 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Clock, Mail, Calendar } from 'lucide-react';
 
+type FrequencyType = 'daily' | 'weekly' | 'monthly';
+
 interface ScheduledReport {
   id: string;
   name: string;
   type: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
+  frequency: FrequencyType;
   recipients: string[];
   enabled: boolean;
   nextRun: Date;
+}
+
+interface NewReportConfig {
+  name: string;
+  type: string;
+  frequency: FrequencyType;
+  recipients: string;
 }
 
 export function ReportScheduler() {
@@ -31,15 +40,24 @@ export function ReportScheduler() {
     }
   ]);
 
-  const [newReport, setNewReport] = useState({
+  const [newReport, setNewReport] = useState<NewReportConfig>({
     name: '',
     type: '',
-    frequency: 'weekly' as const,
+    frequency: 'weekly',
     recipients: ''
   });
 
   const handleAddSchedule = () => {
     if (!newReport.name || !newReport.type) return;
+
+    const getDaysToAdd = (frequency: FrequencyType): number => {
+      switch (frequency) {
+        case 'daily': return 1;
+        case 'weekly': return 7;
+        case 'monthly': return 30;
+        default: return 7;
+      }
+    };
 
     const schedule: ScheduledReport = {
       id: Date.now().toString(),
@@ -48,7 +66,7 @@ export function ReportScheduler() {
       frequency: newReport.frequency,
       recipients: newReport.recipients.split(',').map(email => email.trim()),
       enabled: true,
-      nextRun: new Date(Date.now() + (newReport.frequency === 'daily' ? 1 : newReport.frequency === 'weekly' ? 7 : 30) * 24 * 60 * 60 * 1000)
+      nextRun: new Date(Date.now() + getDaysToAdd(newReport.frequency) * 24 * 60 * 60 * 1000)
     };
 
     setScheduledReports(prev => [...prev, schedule]);
@@ -59,6 +77,10 @@ export function ReportScheduler() {
     setScheduledReports(prev => prev.map(report => 
       report.id === id ? { ...report, enabled: !report.enabled } : report
     ));
+  };
+
+  const handleFrequencyChange = (value: string) => {
+    setNewReport(prev => ({ ...prev, frequency: value as FrequencyType }));
   };
 
   return (
@@ -98,7 +120,7 @@ export function ReportScheduler() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Frequency</Label>
-              <Select value={newReport.frequency} onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setNewReport(prev => ({ ...prev, frequency: value }))}>
+              <Select value={newReport.frequency} onValueChange={handleFrequencyChange}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
