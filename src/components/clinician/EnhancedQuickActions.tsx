@@ -6,14 +6,11 @@ import {
   Plus, 
   Users, 
   FileText, 
-  MessageSquare,
-  Bell,
   BarChart3,
   AlertTriangle,
   Brain,
   Zap
 } from "lucide-react";
-import { useNotificationService } from "@/hooks/useNotificationService";
 
 interface EnhancedQuickActionsProps {
   onScheduleSession?: () => void;
@@ -21,8 +18,6 @@ interface EnhancedQuickActionsProps {
 }
 
 export function EnhancedQuickActions({ onScheduleSession, onAddTask }: EnhancedQuickActionsProps) {
-  const { createTestNotifications } = useNotificationService();
-
   const quickActions = [
     {
       title: 'Schedule Session',
@@ -72,13 +67,6 @@ export function EnhancedQuickActions({ onScheduleSession, onAddTask }: EnhancedQ
       icon: FileText,
       onClick: () => window.location.href = '/clinician/reports',
       color: 'bg-teal-50 hover:bg-teal-100 text-teal-700'
-    },
-    {
-      title: 'Quick Actions',
-      description: 'Automation tools',
-      icon: Zap,
-      onClick: createTestNotifications,
-      color: 'bg-yellow-50 hover:bg-yellow-100 text-yellow-700'
     }
   ];
 
