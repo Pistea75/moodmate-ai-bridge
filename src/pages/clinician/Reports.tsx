@@ -1,105 +1,143 @@
 
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileText, TrendingUp, Calendar, Settings, Download } from 'lucide-react';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
-import { useState, useEffect } from 'react';
-import { ReportViewerModal } from '@/components/clinician/ReportViewerModal';
-import { ReportsHeader } from '@/components/clinician/reports/ReportsHeader';
 import { ReportsFilters } from '@/components/clinician/reports/ReportsFilters';
 import { ReportsList } from '@/components/clinician/reports/ReportsList';
-import { ReportsDebugInfo } from '@/components/clinician/reports/ReportsDebugInfo';
-import { useReportsData } from '@/hooks/useReportsData';
+import { ReportBuilder } from '@/components/clinician/reports/ReportBuilder';
+import { ReportScheduler } from '@/components/clinician/reports/ReportScheduler';
 
 export default function Reports() {
-  const {
-    reports,
-    loading,
-    error,
-    patientNames,
-    deletingReportId,
-    formatReportTitle,
-    handleDelete,
-    handleRefresh
-  } = useReportsData();
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [selectedReport, setSelectedReport] = useState<any | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-
-  // Debug logging
-  useEffect(() => {
-    console.log('Reports page - loading:', loading);
-    console.log('Reports page - error:', error);
-    console.log('Reports page - reports count:', reports.length);
-    console.log('Reports page - reports data:', reports);
-  }, [loading, error, reports]);
-
-  // Extract unique report types for the filter dropdown
-  const reportTypes = [...new Set(reports.map(report => report.report_type))].filter(Boolean);
-
-  const filteredReports = reports.filter(report => {
-    const patientName = patientNames[report.patient_id] || '';
-    const reportTitle = formatReportTitle(report);
-    const matchesSearch = reportTitle.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          report.report_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          patientName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = typeFilter === 'all' || report.report_type === typeFilter;
-    return matchesSearch && matchesType;
+  const [activeTab, setActiveTab] = useState('existing');
+  const [filters, setFilters] = useState({
+    dateRange: { from: undefined, to: undefined },
+    reportType: 'all',
+    status: 'all'
   });
-
-  const handleViewReport = (report: any) => {
-    setSelectedReport(report);
-    setModalOpen(true);
-  };
-
-  const handleDownload = (report: any) => {
-    // This function is now handled in ReportsList component
-  };
 
   return (
     <ClinicianLayout>
       <div className="space-y-6">
-        <ReportsHeader loading={loading} onRefresh={handleRefresh} />
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <FileText className="h-8 w-8 text-blue-600" />
+              Reports & Analytics
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Generate insights, track progress, and export patient data
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Export All
+            </Button>
+            <Button>
+              <FileText className="h-4 w-4 mr-2" />
+              Quick Report
+            </Button>
+          </div>
+        </div>
 
-        <ReportsFilters
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          typeFilter={typeFilter}
-          onTypeFilterChange={setTypeFilter}
-          reportTypes={reportTypes}
-        />
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Reports</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">24</div>
+              <p className="text-xs text-gray-500">+3 this week</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Scheduled</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">8</div>
+              <p className="text-xs text-gray-500">Automated reports</p>
+            </CardContent>
+          </Card>
 
-        <ReportsDebugInfo
-          loading={loading}
-          error={error}
-          reportsCount={reports.length}
-          filteredCount={filteredReports.length}
-        />
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">This Month</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">12</div>
+              <p className="text-xs text-gray-500">Generated reports</p>
+            </CardContent>
+          </Card>
 
-        <ReportsList
-          reports={filteredReports}
-          loading={loading}
-          error={error}
-          searchTerm={searchTerm}
-          typeFilter={typeFilter}
-          formatReportTitle={formatReportTitle}
-          onViewReport={handleViewReport}
-          onDeleteReport={handleDelete}
-          deletingReportId={deletingReportId}
-          onRefresh={handleRefresh}
-        />
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Shared</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-600">6</div>
+              <p className="text-xs text-gray-500">With patients/colleagues</p>
+            </CardContent>
+          </Card>
+        </div>
 
-        <ReportViewerModal
-          open={modalOpen}
-          onClose={() => {
-            setModalOpen(false);
-            setSelectedReport(null);
-          }}
-          report={selectedReport ? { ...selectedReport, title: formatReportTitle(selectedReport) } : null}
-          onDownload={(report) => {
-            // The download functionality is handled in ReportsList component
-            // This is kept for compatibility with the modal
-          }}
-        />
+        {/* Main Content */}
+        <Tabs defaultValue="existing" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="existing" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Existing Reports
+            </TabsTrigger>
+            <TabsTrigger value="builder" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Report Builder
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="scheduled" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Scheduled
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="existing" className="space-y-6">
+            <ReportsFilters filters={filters} setFilters={setFilters} />
+            <ReportsList filters={filters} />
+          </TabsContent>
+
+          <TabsContent value="builder">
+            <ReportBuilder />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Analytics Dashboard</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12">
+                  <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Advanced Analytics</h3>
+                  <p className="text-gray-600">
+                    Comprehensive analytics dashboard with patient outcome trends, comparative analysis, and predictive insights.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="scheduled">
+            <ReportScheduler />
+          </TabsContent>
+        </Tabs>
       </div>
     </ClinicianLayout>
   );
