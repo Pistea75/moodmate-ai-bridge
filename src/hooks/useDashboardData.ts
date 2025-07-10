@@ -5,6 +5,8 @@ import { startOfDay, endOfDay, isAfter } from 'date-fns';
 import { useClinicianTasks } from '@/hooks/useClinicianTasks';
 
 export function useDashboardData() {
+  console.log('🔄 useDashboardData hook initializing');
+  
   const [patients, setPatients] = useState<any[]>([]);
   const [sessionsToday, setSessionsToday] = useState<any[]>([]);
   const [loadingPatients, setLoadingPatients] = useState(true);
@@ -20,51 +22,83 @@ export function useDashboardData() {
   } = useClinicianTasks();
 
   useEffect(() => {
+    console.log('🔄 useDashboardData useEffect triggered');
+    
     const fetchPatients = async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name')
-        .eq('role', 'patient');
-      
-      setPatients(data || []);
-      if (data && data.length > 0) {
-        setSelectedPatient(data[0].id);
+      try {
+        console.log('📝 Fetching patients...');
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .eq('role', 'patient');
+        
+        if (error) {
+          console.error('❌ Error fetching patients:', error);
+        } else {
+          console.log('✅ Patients fetched:', data?.length || 0);
+          setPatients(data || []);
+          if (data && data.length > 0) {
+            setSelectedPatient(data[0].id);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Exception fetching patients:', error);
+      } finally {
+        setLoadingPatients(false);
       }
-      setLoadingPatients(false);
     };
 
     const fetchSessionsToday = async () => {
-      const { data } = await supabase
-        .from('sessions')
-        .select(`
-          id,
-          scheduled_time,
-          duration_minutes,
-          patient:patient_id (
+      try {
+        console.log('📅 Fetching sessions...');
+        const { data, error } = await supabase
+          .from('sessions')
+          .select(`
             id,
-            first_name,
-            last_name
-          )
-        `)
-        .gte('scheduled_time', startOfDay(new Date()).toISOString())
-        .lte('scheduled_time', endOfDay(new Date()).toISOString());
-      
-      setSessionsToday(data || []);
-      setLoadingSessions(false);
+            scheduled_time,
+            duration_minutes,
+            patient:patient_id (
+              id,
+              first_name,
+              last_name
+            )
+          `)
+          .gte('scheduled_time', startOfDay(new Date()).toISOString())
+          .lte('scheduled_time', endOfDay(new Date()).toISOString());
+        
+        if (error) {
+          console.error('❌ Error fetching sessions:', error);
+        } else {
+          console.log('✅ Sessions fetched:', data?.length || 0);
+          setSessionsToday(data || []);
+        }
+      } catch (error) {
+        console.error('❌ Exception fetching sessions:', error);
+      } finally {
+        setLoadingSessions(false);
+      }
     };
 
     const fetchClinicianProfile = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', data.user.id)
-          .single();
-        
-        if (profile) {
-          setClinicianName(profile.first_name || '');
+      try {
+        console.log('👤 Fetching clinician profile...');
+        const { data: user } = await supabase.auth.getUser();
+        if (user?.user) {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', user.user.id)
+            .single();
+          
+          if (error) {
+            console.error('❌ Error fetching clinician profile:', error);
+          } else if (profile) {
+            console.log('✅ Clinician profile fetched:', profile);
+            setClinicianName(profile.first_name || '');
+          }
         }
+      } catch (error) {
+        console.error('❌ Exception fetching clinician profile:', error);
       }
     };
 
@@ -86,6 +120,14 @@ export function useDashboardData() {
       completed: task.completed
     }));
   };
+
+  console.log('📊 useDashboardData returning:', {
+    patients: patients.length,
+    sessionsToday: sessionsToday.length,
+    upcomingSessions: upcomingSessions.length,
+    tasks: tasks.length,
+    clinicianName
+  });
 
   return {
     patients,

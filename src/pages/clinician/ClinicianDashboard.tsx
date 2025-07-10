@@ -16,6 +16,8 @@ import { RiskAlertBanner } from '@/components/clinician/RiskAlertBanner';
 import { useDashboardData } from '@/hooks/useDashboardData';
 
 export default function ClinicianDashboard() {
+  console.log('🔄 ClinicianDashboard rendering');
+  
   const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
   const [showScheduleSessionModal, setShowScheduleSessionModal] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '' });
@@ -35,6 +37,16 @@ export default function ClinicianDashboard() {
     formatTasksForComponent,
     pendingTaskCount
   } = useDashboardData();
+
+  console.log('📊 Dashboard data:', {
+    patients: patients.length,
+    upcomingSessions: upcomingSessions.length,
+    tasks: tasks.length,
+    clinicianName,
+    loadingPatients,
+    loadingSessions,
+    loadingTasks
+  });
 
   const handleAddTask = async () => {
     if (!newTask.title) return;
@@ -59,124 +71,134 @@ export default function ClinicianDashboard() {
 
   return (
     <ClinicianLayout>
-      <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
-        {/* Risk Alert Banner */}
-        <RiskAlertBanner />
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+          {/* Debug info - remove this after testing */}
+          <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+            <p className="font-bold">Debug Info:</p>
+            <p>Patients: {patients.length} | Sessions: {upcomingSessions.length} | Tasks: {tasks.length}</p>
+            <p>Loading - Patients: {loadingPatients ? 'Yes' : 'No'} | Sessions: {loadingSessions ? 'Yes' : 'No'} | Tasks: {loadingTasks ? 'Yes' : 'No'}</p>
+            <p>Clinician: {clinicianName || 'Not loaded'}</p>
+          </div>
 
-        {/* Enhanced Header Section */}
-        <div id="dashboard-header" className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome back, Dr. {clinicianName || 'Doctor'}
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Here's your practice overview for {new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">
-                {new Date().toLocaleTimeString('en-US', { 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
-                })}
+          {/* Risk Alert Banner */}
+          <RiskAlertBanner />
+
+          {/* Enhanced Header Section */}
+          <div id="dashboard-header" className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Welcome back, Dr. {clinicianName || 'Doctor'}
+                </h1>
+                <p className="text-gray-600 text-lg">
+                  Here's your practice overview for {new Date().toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </p>
               </div>
-              <div className="text-sm text-gray-500">Current Time</div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-blue-600">
+                  {new Date().toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </div>
+                <div className="text-sm text-gray-500">Current Time</div>
+              </div>
             </div>
+          </div>
+
+          {/* Dashboard KPIs */}
+          <DashboardKPIs
+            patientCount={patients.length}
+            sessionCount={upcomingSessions.length}
+            pendingTaskCount={pendingTaskCount}
+            loadingPatients={loadingPatients}
+            loadingSessions={loadingSessions}
+            loadingTasks={loadingTasks}
+          />
+
+          {/* Enhanced Quick Actions */}
+          <div id="quick-actions">
+            <EnhancedQuickActions 
+              onScheduleSession={handleScheduleSession}
+              onAddTask={() => setShowAddTaskDialog(true)}
+            />
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Left Column */}
+            <div className="xl:col-span-2 space-y-6">
+              {/* Upcoming Sessions */}
+              <div className="bg-white rounded-xl shadow-sm border p-6">
+                <UpcomingSessions 
+                  sessions={upcomingSessions}
+                  loading={loadingSessions}
+                />
+              </div>
+
+              {/* Dashboard Insights */}
+              <DashboardInsights />
+
+              {/* Patient Spotlight */}
+              <div id="patient-spotlight" className="bg-white rounded-xl shadow-sm border p-6">
+                <PatientSpotlight 
+                  selectedPatient={selectedPatient}
+                  patients={patients}
+                  onPatientSelect={setSelectedPatient}
+                />
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-6">
+              {/* Notifications Panel */}
+              <div id="notifications">
+                <NotificationsPanel />
+              </div>
+
+              {/* Clinician Tasks */}
+              <div className="bg-white rounded-xl shadow-sm border p-6">
+                <ClinicianTasks
+                  tasks={formatTasksForComponent(tasks)}
+                  loadingTasks={loadingTasks}
+                  onAddTaskClick={() => setShowAddTaskDialog(true)}
+                  onTaskUpdate={updateTaskCompletion}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Reports */}
+          <div className="bg-white rounded-xl shadow-sm border p-6">
+            <RecentReports patients={patients} />
           </div>
         </div>
 
-        {/* Dashboard KPIs */}
-        <DashboardKPIs
-          patientCount={patients.length}
-          sessionCount={upcomingSessions.length}
-          pendingTaskCount={pendingTaskCount}
-          loadingPatients={loadingPatients}
-          loadingSessions={loadingSessions}
-          loadingTasks={loadingTasks}
+        {/* Onboarding Tooltips */}
+        <OnboardingTooltips />
+
+        {/* Modals */}
+        <AddTaskDialog
+          open={showAddTaskDialog}
+          onOpenChange={setShowAddTaskDialog}
+          newTask={newTask}
+          onTaskChange={setNewTask}
+          onAddTask={handleAddTask}
         />
 
-        {/* Enhanced Quick Actions */}
-        <div id="quick-actions">
-          <EnhancedQuickActions 
-            onScheduleSession={handleScheduleSession}
-            onAddTask={() => setShowAddTaskDialog(true)}
-          />
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Left Column */}
-          <div className="xl:col-span-2 space-y-6">
-            {/* Upcoming Sessions */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <UpcomingSessions 
-                sessions={upcomingSessions}
-                loading={loadingSessions}
-              />
-            </div>
-
-            {/* Dashboard Insights */}
-            <DashboardInsights />
-
-            {/* Patient Spotlight */}
-            <div id="patient-spotlight" className="bg-white rounded-xl shadow-sm border p-6">
-              <PatientSpotlight 
-                selectedPatient={selectedPatient}
-                patients={patients}
-                onPatientSelect={setSelectedPatient}
-              />
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Notifications Panel */}
-            <div id="notifications">
-              <NotificationsPanel />
-            </div>
-
-            {/* Clinician Tasks */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <ClinicianTasks
-                tasks={formatTasksForComponent(tasks)}
-                loadingTasks={loadingTasks}
-                onAddTaskClick={() => setShowAddTaskDialog(true)}
-                onTaskUpdate={updateTaskCompletion}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Reports */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-          <RecentReports patients={patients} />
-        </div>
+        <ScheduleSessionModal
+          open={showScheduleSessionModal}
+          onClose={() => setShowScheduleSessionModal(false)}
+          onScheduled={handleSessionScheduled}
+          isPatientView={false}
+        />
       </div>
-
-      {/* Onboarding Tooltips */}
-      <OnboardingTooltips />
-
-      {/* Modals */}
-      <AddTaskDialog
-        open={showAddTaskDialog}
-        onOpenChange={setShowAddTaskDialog}
-        newTask={newTask}
-        onTaskChange={setNewTask}
-        onAddTask={handleAddTask}
-      />
-
-      <ScheduleSessionModal
-        open={showScheduleSessionModal}
-        onClose={() => setShowScheduleSessionModal(false)}
-        onScheduled={handleSessionScheduled}
-        isPatientView={false}
-      />
     </ClinicianLayout>
   );
 }
