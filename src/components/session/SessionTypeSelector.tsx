@@ -27,50 +27,44 @@ export function SessionTypeSelector({
   disabled = false
 }: SessionTypeSelectorProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div>
         <Label className="text-sm font-medium mb-2 block">Session Type</Label>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="flex gap-2">
           {/* Online Session Option */}
           <Card 
-            className={`cursor-pointer transition-all border ${
+            className={`cursor-pointer transition-all border flex-1 ${
               sessionType === 'online' 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => !disabled && onSessionTypeChange('online')}
           >
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2">
-                <Video className={`h-4 w-4 ${
+            <CardContent className="p-2">
+              <div className="flex items-center gap-1 justify-center">
+                <Video className={`h-3 w-3 ${
                   sessionType === 'online' ? 'text-blue-600' : 'text-gray-600'
                 }`} />
-                <span className="font-medium text-sm">Online Video Call</span>
-                {sessionType === 'online' && (
-                  <Badge variant="default" className="ml-auto text-xs">Selected</Badge>
-                )}
+                <span className="text-xs">Online</span>
               </div>
             </CardContent>
           </Card>
 
           {/* In-Person Session Option */}
           <Card 
-            className={`cursor-pointer transition-all border ${
+            className={`cursor-pointer transition-all border flex-1 ${
               sessionType === 'in_person' 
                 ? 'border-green-500 bg-green-50' 
                 : 'border-gray-200 hover:border-gray-300'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => !disabled && onSessionTypeChange('in_person')}
           >
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2">
-                <Users className={`h-4 w-4 ${
+            <CardContent className="p-2">
+              <div className="flex items-center gap-1 justify-center">
+                <Users className={`h-3 w-3 ${
                   sessionType === 'in_person' ? 'text-green-600' : 'text-gray-600'
                 }`} />
-                <span className="font-medium text-sm">In-Person Meeting</span>
-                {sessionType === 'in_person' && (
-                  <Badge variant="secondary" className="ml-auto text-xs">Selected</Badge>
-                )}
+                <span className="text-xs">In-Person</span>
               </div>
             </CardContent>
           </Card>
@@ -78,16 +72,16 @@ export function SessionTypeSelector({
       </div>
 
       {/* Recording Options */}
-      <div className="border rounded-lg p-3 bg-gray-50">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
+      <div className="border rounded-md p-2 bg-gray-50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
             {recordingEnabled ? (
-              <Mic className="h-4 w-4 text-red-500" />
+              <Mic className="h-3 w-3 text-red-500" />
             ) : (
-              <MicOff className="h-4 w-4 text-gray-500" />
+              <MicOff className="h-3 w-3 text-gray-500" />
             )}
-            <Label htmlFor="recording-enabled" className="text-sm font-medium">
-              Enable Recording & AI Analysis
+            <Label htmlFor="recording-enabled" className="text-xs">
+              Record & AI Analysis
             </Label>
           </div>
           <Switch
@@ -95,16 +89,9 @@ export function SessionTypeSelector({
             checked={recordingEnabled}
             onCheckedChange={onRecordingEnabledChange}
             disabled={disabled}
+            className="scale-75"
           />
         </div>
-
-        {recordingEnabled && (
-          <div className="text-xs text-gray-600 space-y-1">
-            <p>• Recording will be automatically transcribed and analyzed</p>
-            <p>• AI will generate session insights and reports</p>
-            <p>• Files are automatically deleted after processing</p>
-          </div>
-        )}
       </div>
     </div>
   );

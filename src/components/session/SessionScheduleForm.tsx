@@ -96,7 +96,7 @@ export function SessionScheduleForm({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {!isPatientView && (
         <PatientSelector value={formData.patientId} onChange={(v) => setFormData(prev => ({ ...prev, patientId: v }))} />
       )}
@@ -109,22 +109,24 @@ export function SessionScheduleForm({
         bookedSlots={bookedSlots}
       />
 
-      <TimezoneSelector
-        value={formData.timezone}
-        onChange={(tz) => {
-          console.log("🌍 Timezone changed to:", tz);
-          setFormData(prev => ({ ...prev, timezone: tz }));
-        }}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <TimezoneSelector
+          value={formData.timezone}
+          onChange={(tz) => {
+            console.log("🌍 Timezone changed to:", tz);
+            setFormData(prev => ({ ...prev, timezone: tz }));
+          }}
+        />
 
-      <SessionTypeSelector
-        sessionType={formData.sessionType}
-        recordingEnabled={formData.recordingEnabled}
-        onSessionTypeChange={(type) => setFormData(prev => ({ ...prev, sessionType: type }))}
-        onRecordingEnabledChange={(enabled) => setFormData(prev => ({ ...prev, recordingEnabled: enabled }))}
-      />
+        <SessionTypeSelector
+          sessionType={formData.sessionType}
+          recordingEnabled={formData.recordingEnabled}
+          onSessionTypeChange={(type) => setFormData(prev => ({ ...prev, sessionType: type }))}
+          onRecordingEnabledChange={(enabled) => setFormData(prev => ({ ...prev, recordingEnabled: enabled }))}
+        />
+      </div>
 
-      <div className="flex justify-end space-x-2 pt-4">
+      <div className="flex justify-end space-x-2 pt-2">
         <Button variant="outline" onClick={onCancel}>Cancel</Button>
         <Button
           onClick={handleSubmit}
