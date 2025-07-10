@@ -101,27 +101,34 @@ export function TaskForm({ open, onClose, onTaskCreated, task }: TaskFormProps) 
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) return;
 
-      const { data, error } = await supabase
+      // First get the patient IDs linked to this clinician
+      const { data: links, error: linksError } = await supabase
         .from('patient_clinician_links')
-        .select(`
-          patient_id,
-          profiles!patient_clinician_links_patient_id_fkey(
-            id,
-            first_name,
-            last_name
-          )
-        `)
+        .select('patient_id')
         .eq('clinician_id', currentUser.user.id);
 
-      if (error) throw error;
+      if (linksError) throw linksError;
 
-      const patientsData = (data || [])
-        .map(link => link.profiles)
-        .filter(Boolean) as Patient[];
+      if (!links || links.length === 0) {
+        setPatients([]);
+        return;
+      }
+
+      // Then get the patient profiles
+      const patientIds = links.map(link => link.patient_id).filter(Boolean);
       
-      setPatients(patientsData);
+      const { data: patientsData, error: patientsError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', patientIds)
+        .eq('role', 'patient');
+
+      if (patientsError) throw patientsError;
+
+      setPatients(patientsData || []);
     } catch (error) {
       console.error('Error fetching patients:', error);
+      setPatients([]);
     }
   };
 
