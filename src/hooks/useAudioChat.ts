@@ -6,7 +6,7 @@ import { useMessageService } from "./audioChat/useMessageService";
 import { useAIService } from "./audioChat/useAIService";
 import { Message } from "./audioChat/types";
 
-export function useAudioChat(baseSystemPrompt: string, patientId?: string) {
+export function useAudioChat(baseSystemPrompt: string, patientId?: string, isClinicianView: boolean = false) {
   const personalizedSystemPrompt = usePersonalization(baseSystemPrompt);
   const { 
     messages, 
@@ -38,7 +38,8 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string) {
       messageText, 
       conversationHistory, 
       personalizedSystemPrompt,
-      setConversationHistory
+      setConversationHistory,
+      isClinicianView
     );
     
     // Add AI response to chat

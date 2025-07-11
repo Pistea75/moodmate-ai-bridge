@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -34,7 +33,7 @@ export function AudioChatInterface({
     isLoading,
     isFetchingHistory,
     handleSendMessage
-  } = useAudioChat(systemPrompt, selectedPatientId || patientId);
+  } = useAudioChat(systemPrompt, selectedPatientId || patientId, isClinicianView);
 
   const handleSendAudio = async (audioBlob: Blob) => {
     // For now, we'll convert audio to text placeholder

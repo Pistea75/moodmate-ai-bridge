@@ -14,7 +14,8 @@ export function useAIService() {
     messageContent: string, 
     conversationHistory: ConversationMessage[], 
     personalizedSystemPrompt: string,
-    setConversationHistory: (history: ConversationMessage[]) => void
+    setConversationHistory: (history: ConversationMessage[]) => void,
+    isClinicianView: boolean = false
   ) => {
     if (!user) {
       toast({
@@ -33,7 +34,8 @@ export function useAIService() {
         body: {
           messages: updatedHistory,
           systemPrompt: personalizedSystemPrompt,
-          userId: user.id
+          userId: user.id,
+          isClinicianView: isClinicianView
         }
       });
 
