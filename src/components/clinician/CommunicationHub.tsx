@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageSquare, Send, Users } from 'lucide-react';
@@ -28,16 +28,24 @@ interface Patient {
 }
 
 export function CommunicationHub() {
+  const location = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<string>('');
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('messages');
 
   useEffect(() => {
     fetchPatients();
     fetchMessages();
-  }, []);
+    
+    // Check if we have a pre-selected patient from navigation state
+    if (location.state?.selectedPatientId) {
+      setSelectedPatient(location.state.selectedPatientId);
+      setActiveTab('compose'); // Switch to compose tab
+    }
+  }, [location.state]);
 
   const fetchPatients = async () => {
     try {
@@ -129,9 +137,7 @@ export function CommunicationHub() {
 
   const handleMessagePatient = (patientId: string) => {
     setSelectedPatient(patientId);
-    // Switch to compose tab
-    const composeTab = document.querySelector('[data-value="compose"]') as HTMLElement;
-    composeTab?.click();
+    setActiveTab('compose');
   };
 
   return (
@@ -146,7 +152,7 @@ export function CommunicationHub() {
         </div>
       </div>
 
-      <Tabs defaultValue="messages" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
           <TabsTrigger value="messages" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
