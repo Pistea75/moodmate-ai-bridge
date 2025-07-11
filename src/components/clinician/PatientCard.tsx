@@ -137,30 +137,31 @@ export function PatientCard({
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-12 w-12">
+    <Card className="hover:shadow-md transition-shadow h-full">
+      <CardContent className="p-4 h-full flex flex-col">
+        {/* Header with patient info and actions */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <Avatar className="h-12 w-12 flex-shrink-0">
               <AvatarFallback className="bg-blue-100 text-blue-600 font-semibold">
                 {getInitials(patient.first_name, patient.last_name)}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <h3 className="font-semibold text-lg">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-lg truncate">
                 {patient.first_name && patient.last_name 
                   ? `${patient.first_name} ${patient.last_name}`
                   : 'Unnamed Patient'
                 }
               </h3>
               <div className="flex items-center gap-1 text-sm text-gray-600">
-                <Mail className="h-3 w-3" />
-                <span>{patient.email}</span>
+                <Mail className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{patient.email}</span>
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Badge className={getStatusColor(patient.status)}>
               {patient.status.replace('_', ' ')}
             </Badge>
@@ -172,7 +173,7 @@ export function PatientCard({
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -201,70 +202,74 @@ export function PatientCard({
         </div>
 
         {/* Patient Stats */}
-        <div className="grid grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-3 gap-3 text-sm mb-4">
           <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-blue-500" />
-            <div>
-              <p className="text-gray-600">Last Mood</p>
-              <p className="font-medium">
+            <Activity className="h-4 w-4 text-blue-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-gray-600 text-xs">Last Mood</p>
+              <p className="font-medium truncate">
                 {patient.lastMoodScore ? `${patient.lastMoodScore}/10` : 'No data'}
               </p>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-green-500" />
-            <div>
-              <p className="text-gray-600">Sessions</p>
-              <p className="font-medium">
+            <Calendar className="h-4 w-4 text-green-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-gray-600 text-xs">Sessions</p>
+              <p className="font-medium truncate">
                 {patient.upcomingSessionsCount || 0} upcoming
               </p>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-orange-500" />
-            <div>
-              <p className="text-gray-600">Last Active</p>
-              <p className="font-medium">
+            <Clock className="h-4 w-4 text-orange-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-gray-600 text-xs">Last Active</p>
+              <p className="font-medium truncate">
                 {formatLastActive(patient.last_active_at)}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Onboarding Status */}
-        {!patient.onboarding_completed && (
-          <div className="mt-3 p-2 bg-yellow-50 rounded-lg border border-yellow-200">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              <span className="text-sm text-yellow-800">
-                Onboarding incomplete ({patient.onboarding_step || 0}/5 steps)
-              </span>
+        {/* Alerts */}
+        <div className="space-y-2 mb-4 flex-1">
+          {/* Onboarding Status */}
+          {!patient.onboarding_completed && (
+            <div className="p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600 flex-shrink-0" />
+                <span className="text-sm text-yellow-800">
+                  Onboarding incomplete ({patient.onboarding_step || 0}/5 steps)
+                </span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Risk Assessment Alert */}
-        {(patient.riskLevel === 'HIGH' || patient.riskLevel === 'CRITICAL') && (
-          <div className="mt-3 p-2 bg-red-50 rounded-lg border border-red-200">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-800">
-                {patient.riskLevel} risk - Consider immediate attention
-              </span>
+          {/* Risk Assessment Alert */}
+          {(patient.riskLevel === 'HIGH' || patient.riskLevel === 'CRITICAL') && (
+            <div className="p-2 bg-red-50 rounded-lg border border-red-200">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                <span className="text-sm text-red-800">
+                  {patient.riskLevel} risk - Consider immediate attention
+                </span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Quick Actions */}
-        <div className="mt-4 flex gap-2">
+        <div className="flex gap-2 mt-auto">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => onViewProfile(patient.id)}
             className="flex-1"
           >
+            <User className="h-4 w-4 mr-2" />
             View Profile
           </Button>
           <Button 
@@ -272,6 +277,7 @@ export function PatientCard({
             size="sm" 
             onClick={handleQuickRiskAssess}
             disabled={isAssessing}
+            className="flex-shrink-0"
           >
             <Brain className="h-4 w-4" />
           </Button>
