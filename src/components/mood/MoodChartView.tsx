@@ -42,15 +42,22 @@ export function MoodChartView({ data, view }: MoodChartViewProps) {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}
-            margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+            margin={{ top: 15, right: 20, left: 10, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-            <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+            <XAxis 
+              dataKey="label" 
+              tick={{ fontSize: 12 }}
+              axisLine={false}
+              tickLine={false}
+            />
             <YAxis
               domain={[1, 5]}
               ticks={[1, 2, 3, 4, 5]}
               tickFormatter={(val) => MOOD_LABELS[val - 1]}
               tick={{ fontSize: 12 }}
+              axisLine={false}
+              tickLine={false}
             />
             <Tooltip content={<MoodChartTooltip />} />
             <Line
