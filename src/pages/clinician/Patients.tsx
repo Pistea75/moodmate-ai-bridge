@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Filter, Search, Users, AlertTriangle } from 'lucide-react';
@@ -155,14 +154,6 @@ export default function Patients() {
     });
   };
 
-  const handleEmailPatient = (email: string) => {
-    window.open(`mailto:${email}`, '_blank');
-  };
-
-  const handleCallPatient = (phone: string) => {
-    window.open(`tel:${phone}`, '_blank');
-  };
-
   const handleFiltersChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
   };
@@ -303,8 +294,6 @@ export default function Patients() {
                 onAssessRisk={handleAssessRisk}
                 onStartOnboarding={handleStartOnboarding}
                 onMessagePatient={handleMessagePatient}
-                onEmailPatient={handleEmailPatient}
-                onCallPatient={handleCallPatient}
               />
             ))}
           </div>
