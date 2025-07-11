@@ -5,7 +5,7 @@ import { Mic } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface VoiceInputModeProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -32,11 +32,11 @@ export function VoiceInputMode({ onSendMessage, isLoading }: VoiceInputModeProps
     }
   };
 
-  const handleStopRecording = () => {
+  const handleStopRecording = async () => {
     setIsRecording(false);
     // This is a placeholder for actual speech-to-text functionality
     const transcribedText = "Voice message transcription would appear here";
-    onSendMessage(transcribedText);
+    await onSendMessage(transcribedText);
   };
 
   return (

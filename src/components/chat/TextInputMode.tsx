@@ -5,16 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 
 interface TextInputModeProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string) => Promise<void>;
   isLoading: boolean;
 }
 
 export function TextInputMode({ onSendMessage, isLoading }: TextInputModeProps) {
   const [newMessage, setNewMessage] = useState('');
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (newMessage.trim() && !isLoading) {
-      onSendMessage(newMessage);
+      await onSendMessage(newMessage);
       setNewMessage('');
     }
   };

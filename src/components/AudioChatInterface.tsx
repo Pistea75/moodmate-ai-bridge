@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,9 +11,18 @@ import { VoiceInputMode } from './chat/VoiceInputMode';
 interface AudioChatInterfaceProps {
   isClinicianView?: boolean;
   selectedPatientId?: string | null;
+  clinicianName?: string;
+  systemPrompt?: string;
+  patientId?: string;
 }
 
-export function AudioChatInterface({ isClinicianView = false, selectedPatientId }: AudioChatInterfaceProps) {
+export function AudioChatInterface({ 
+  isClinicianView = false, 
+  selectedPatientId,
+  clinicianName = 'AI Assistant',
+  systemPrompt = "You are a supportive mental health assistant.",
+  patientId
+}: AudioChatInterfaceProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [inputMode, setInputMode] = useState<'text' | 'voice'>('text');
@@ -22,17 +32,14 @@ export function AudioChatInterface({ isClinicianView = false, selectedPatientId 
   const {
     messages,
     isLoading,
-    sendMessage,
-    sendAudioMessage,
-    playAudioResponse
-  } = useAudioChat(selectedPatientId);
-
-  const handleSendMessage = async (message: string) => {
-    await sendMessage(message);
-  };
+    isFetchingHistory,
+    handleSendMessage
+  } = useAudioChat(systemPrompt, selectedPatientId || patientId);
 
   const handleSendAudio = async (audioBlob: Blob) => {
-    await sendAudioMessage(audioBlob);
+    // For now, we'll convert audio to text placeholder
+    // In a real implementation, you'd use speech-to-text service
+    await handleSendMessage("Voice message transcription would appear here");
   };
 
   const startRecording = async () => {
@@ -68,12 +75,20 @@ export function AudioChatInterface({ isClinicianView = false, selectedPatientId 
     }
   };
 
+  if (isFetchingHistory) {
+    return (
+      <Card className="flex items-center justify-center h-[600px] w-full max-w-4xl mx-auto">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="flex flex-col h-[600px] w-full max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <h2 className="text-lg font-semibold">
-          {isClinicianView ? 'AI Training Chat' : 'AI Mental Health Assistant'}
+          {isClinicianView ? 'AI Training Chat' : `Chat with Dr. ${clinicianName}`}
         </h2>
         <div className="flex items-center gap-2">
           <Button
@@ -95,7 +110,7 @@ export function AudioChatInterface({ isClinicianView = false, selectedPatientId 
 
       {/* Messages */}
       <div className="flex-1 overflow-hidden">
-        <MessageList messages={messages} isLoading={isLoading} />
+        <MessageList messages={messages} clinicianName={clinicianName} />
       </div>
 
       {/* Input */}
@@ -103,14 +118,12 @@ export function AudioChatInterface({ isClinicianView = false, selectedPatientId 
         {inputMode === 'text' ? (
           <TextInputMode
             onSendMessage={handleSendMessage}
-            disabled={isLoading}
+            isLoading={isLoading}
           />
         ) : (
           <VoiceInputMode
-            isRecording={isRecording}
-            onStartRecording={startRecording}
-            onStopRecording={stopRecording}
-            disabled={isLoading}
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
           />
         )}
       </div>
