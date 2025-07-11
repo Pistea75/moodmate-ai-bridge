@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,10 +12,8 @@ import {
   AlertTriangle,
   Clock,
   MoreHorizontal,
-  MessageSquare,
   UserPlus,
-  Brain,
-  Phone
+  Brain
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
@@ -139,41 +138,6 @@ export function PatientCard({
     }
   };
 
-  const handleEmailContact = () => {
-    if (patient.email) {
-      window.location.href = `mailto:${patient.email}`;
-    } else {
-      toast({
-        title: 'No Email Available',
-        description: 'This patient does not have an email address on file.',
-        variant: 'destructive'
-      });
-    }
-  };
-
-  const handlePhoneContact = () => {
-    if (patient.phone) {
-      window.location.href = `tel:${patient.phone}`;
-    } else {
-      toast({
-        title: 'No Phone Number Available',
-        description: 'This patient does not have a phone number on file.',
-        variant: 'destructive'
-      });
-    }
-  };
-
-  const handleChatPatient = () => {
-    if (onMessagePatient) {
-      onMessagePatient(patient.id);
-    } else {
-      toast({
-        title: 'Chat Feature Coming Soon',
-        description: 'In-platform messaging will be available soon.',
-      });
-    }
-  };
-
   return (
     <Card className="hover:shadow-md transition-shadow h-full">
       <CardContent className="p-4 h-full flex flex-col">
@@ -196,12 +160,6 @@ export function PatientCard({
                 <Mail className="h-3 w-3 flex-shrink-0" />
                 <span className="truncate">{patient.email}</span>
               </div>
-              {patient.phone && (
-                <div className="flex items-center gap-1 text-sm text-gray-600">
-                  <Phone className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate">{patient.phone}</span>
-                </div>
-              )}
             </div>
           </div>
           
@@ -301,62 +259,17 @@ export function PatientCard({
           )}
         </div>
 
-        {/* Contact and Action Buttons */}
+        {/* Action Buttons */}
         <div className="space-y-2 mt-auto">
-          {/* Contact Buttons Row */}
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleEmailContact}
-              className="flex-1 min-w-0"
-              disabled={!patient.email}
-            >
-              <Mail className="h-4 w-4 mr-1" />
-              <span className="truncate">Email</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handlePhoneContact}
-              className="flex-1 min-w-0"
-              disabled={!patient.phone}
-            >
-              <Phone className="h-4 w-4 mr-1" />
-              <span className="truncate">Call</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleChatPatient}
-              className="flex-1 min-w-0"
-            >
-              <MessageSquare className="h-4 w-4 mr-1" />
-              <span className="truncate">Chat</span>
-            </Button>
-          </div>
-          
-          {/* Main Action Buttons Row */}
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => onViewProfile(patient.id)}
-              className="flex-1"
-            >
-              <User className="h-4 w-4 mr-2" />
-              View Profile
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleQuickRiskAssess}
-              disabled={isAssessing}
-              className="flex-shrink-0"
-            >
-              <Brain className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onViewProfile(patient.id)}
+            className="w-full"
+          >
+            <User className="h-4 w-4 mr-2" />
+            View Profile
+          </Button>
         </div>
       </CardContent>
     </Card>
