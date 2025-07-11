@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Filter, Search, Users, AlertTriangle } from 'lucide-react';
@@ -16,11 +17,18 @@ export default function Patients() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<PatientCardData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [riskFilter, setRiskFilter] = useState<string>('all');
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  
+  // Updated filters to match PatientFilters interface
+  const [filters, setFilters] = useState({
+    search: '',
+    status: 'all',
+    riskLevel: 'all',
+    lastActiveFilter: 'all',
+    moodScoreRange: 'all',
+    onboardingStatus: 'all'
+  });
 
   useEffect(() => {
     fetchPatients();
@@ -147,13 +155,36 @@ export default function Patients() {
     });
   };
 
+  const handleEmailPatient = (email: string) => {
+    window.open(`mailto:${email}`, '_blank');
+  };
+
+  const handleCallPatient = (phone: string) => {
+    window.open(`tel:${phone}`, '_blank');
+  };
+
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      search: '',
+      status: 'all',
+      riskLevel: 'all',
+      lastActiveFilter: 'all',
+      moodScoreRange: 'all',
+      onboardingStatus: 'all'
+    });
+  };
+
   const filteredPatients = patients.filter(patient => {
-    const matchesSearch = searchTerm === '' || 
-      `${patient.first_name} ${patient.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = filters.search === '' || 
+      `${patient.first_name} ${patient.last_name}`.toLowerCase().includes(filters.search.toLowerCase()) ||
+      patient.email.toLowerCase().includes(filters.search.toLowerCase());
     
-    const matchesStatus = statusFilter === 'all' || patient.status === statusFilter;
-    const matchesRisk = riskFilter === 'all' || patient.riskLevel === riskFilter;
+    const matchesStatus = filters.status === 'all' || patient.status === filters.status;
+    const matchesRisk = filters.riskLevel === 'all' || patient.riskLevel === filters.riskLevel;
     
     return matchesSearch && matchesStatus && matchesRisk;
   });
@@ -236,24 +267,14 @@ export default function Patients() {
           </Card>
         </div>
 
-        {/* Search and Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search patients by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <PatientFilters
-            statusFilter={statusFilter}
-            riskFilter={riskFilter}
-            onStatusFilterChange={setStatusFilter}
-            onRiskFilterChange={setRiskFilter}
-          />
-        </div>
+        {/* Filters */}
+        <PatientFilters
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          onReset={handleResetFilters}
+          patientCount={patients.length}
+          filteredCount={filteredPatients.length}
+        />
 
         {/* Patient Cards Grid */}
         {filteredPatients.length === 0 ? (
@@ -262,7 +283,7 @@ export default function Patients() {
               <Users className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">No patients found</h3>
               <p className="text-muted-foreground text-center mb-4">
-                {searchTerm || statusFilter !== 'all' || riskFilter !== 'all'
+                {filters.search || filters.status !== 'all' || filters.riskLevel !== 'all'
                   ? 'Try adjusting your search criteria or filters.'
                   : 'Start by adding your first patient to begin monitoring their progress.'}
               </p>
@@ -282,6 +303,8 @@ export default function Patients() {
                 onAssessRisk={handleAssessRisk}
                 onStartOnboarding={handleStartOnboarding}
                 onMessagePatient={handleMessagePatient}
+                onEmailPatient={handleEmailPatient}
+                onCallPatient={handleCallPatient}
               />
             ))}
           </div>
@@ -289,12 +312,14 @@ export default function Patients() {
 
         {/* Onboarding Modal */}
         <PatientOnboardingModal
-          isOpen={showOnboardingModal}
+          open={showOnboardingModal}
           onClose={() => {
             setShowOnboardingModal(false);
             setSelectedPatientId(null);
           }}
-          patientId={selectedPatientId}
+          patientId={selectedPatientId || ''}
+          patientName={selectedPatientId ? patients.find(p => p.id === selectedPatientId)?.first_name + ' ' + patients.find(p => p.id === selectedPatientId)?.last_name || '' : ''}
+          currentStep={selectedPatientId ? patients.find(p => p.id === selectedPatientId)?.onboarding_step || 1 : 1}
           onComplete={() => {
             setShowOnboardingModal(false);
             setSelectedPatientId(null);
