@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from 'react';
 import { Search, Plus, Users, RefreshCw, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -95,7 +94,7 @@ export default function Patients() {
       const patientIds = linkData.map(link => link.patient_id).filter(Boolean);
       console.log('Patient IDs:', patientIds);
 
-      // Get patient profiles
+      // Get patient profiles with email included
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -107,19 +106,6 @@ export default function Patients() {
       }
 
       console.log('Profiles data:', profilesData);
-
-      // Get emails from users table
-      const { data: emailsData, error: emailsError } = await supabase
-        .from('users')
-        .select('id, email')
-        .in('id', patientIds);
-
-      if (emailsError) {
-        console.error('Error fetching emails:', emailsError);
-        // Don't throw here, emails are optional
-      }
-
-      console.log('Emails data:', emailsData);
 
       // Get latest mood scores and risk assessments
       const [moodData, riskData, sessionsData] = await Promise.all([
@@ -151,11 +137,6 @@ export default function Patients() {
       console.log('Sessions data:', sessionsData);
 
       // Create lookup maps
-      const emailMap = (emailsData || []).reduce((acc, user) => {
-        acc[user.id] = user.email;
-        return acc;
-      }, {} as Record<string, string>);
-
       const latestMoodMap = (moodData.data || []).reduce((acc, mood) => {
         if (!acc[mood.patient_id] || mood.created_at > acc[mood.patient_id].created_at) {
           acc[mood.patient_id] = mood;
@@ -183,7 +164,7 @@ export default function Patients() {
           
           return {
             ...patient,
-            email: emailMap[patient.id] || 'No email',
+            email: patient.email || 'No email available',
             lastMoodScore: latestMood?.mood_score,
             lastMoodDate: latestMood?.created_at,
             upcomingSessionsCount: sessionCountMap[patient.id] || 0,

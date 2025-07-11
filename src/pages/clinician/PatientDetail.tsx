@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -16,6 +17,7 @@ import { PatientSessionRecap } from '@/components/clinician/PatientSessionRecap'
 import { PatientMoodAlertFeed } from '@/components/clinician/PatientMoodAlertFeed';
 import { PatientAIChatLogs } from '@/components/clinician/PatientAIChatLogs';
 import { AIPersonalizationModal } from '@/components/clinician/AIPersonalizationModal';
+import { PatientInfoCard } from '@/components/clinician/PatientInfoCard';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface PatientProfile {
@@ -45,17 +47,10 @@ export default function PatientDetail() {
           return;
         }
 
-        // Fetch patient profile data
+        // Fetch patient profile data including email
         const { data: patientData, error: patientError } = await supabase
           .from('profiles')
-          .select('*')
-          .eq('id', patientId)
-          .single();
-
-        // Separately fetch email from users table
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('email')
+          .select('id, first_name, last_name, email, language')
           .eq('id', patientId)
           .single();
 
@@ -63,12 +58,11 @@ export default function PatientDetail() {
           console.error('Error fetching patient:', patientError);
           setError(patientError.message);
         } else if (patientData) {
-          // Create the patient profile with all required fields
           setPatient({
             id: patientData.id,
             first_name: patientData.first_name || '',
             last_name: patientData.last_name || '',
-            email: userData?.email || 'No email available',
+            email: patientData.email || 'No email available',
             language: patientData.language || '',
           });
         }
@@ -130,6 +124,12 @@ export default function PatientDetail() {
         </div>
 
         <div className="grid gap-6">
+          {/* Patient Info Card */}
+          <PatientInfoCard 
+            email={patient.email} 
+            language={patient.language} 
+          />
+          
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
             <PatientMoodSection patientId={patientId as string} patientName={patientFullName} />
             <div className="grid gap-6">

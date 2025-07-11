@@ -15,7 +15,7 @@ export function PatientInfoCard({ email, language }: PatientProfileProps) {
           <h2 className="font-semibold text-xl">Personal Information</h2>
           <div className="mt-2 space-y-2">
             <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">Email:</span> {email}
+              <span className="font-medium text-foreground">Email:</span> {email || 'Not available'}
             </p>
             <p className="text-muted-foreground">
               <span className="font-medium text-foreground">Language:</span> {language || 'Not specified'}

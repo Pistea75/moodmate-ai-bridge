@@ -413,6 +413,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string | null
+          email: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           first_name: string | null
@@ -433,6 +434,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           first_name?: string | null
@@ -453,6 +455,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           first_name?: string | null
@@ -843,6 +846,10 @@ export type Database = {
           avg_mood: number
           last_entry: string
         }[]
+      }
+      sync_user_email: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {
