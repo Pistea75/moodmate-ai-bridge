@@ -73,14 +73,6 @@ export default function ClinicianDashboard() {
     <ClinicianLayout>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
-          {/* Debug info - remove this after testing */}
-          <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
-            <p className="font-bold">Debug Info:</p>
-            <p>Patients: {patients.length} | Sessions: {upcomingSessions.length} | Tasks: {tasks.length}</p>
-            <p>Loading - Patients: {loadingPatients ? 'Yes' : 'No'} | Sessions: {loadingSessions ? 'Yes' : 'No'} | Tasks: {loadingTasks ? 'Yes' : 'No'}</p>
-            <p>Clinician: {clinicianName || 'Not loaded'}</p>
-          </div>
-
           {/* Risk Alert Banner */}
           <RiskAlertBanner />
 

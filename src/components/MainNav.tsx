@@ -16,12 +16,12 @@ export function MainNav() {
   const navItems = userRole === 'clinician' ? clinicianNavItems : patientNavItems;
   const username = user?.user_metadata?.full_name || 'User';
 
-  // Mobile navigation for clinician
-  if (isLoggedIn && userRole === 'clinician' && isMobile) {
-    return <MobileNavigation navItems={navItems} username={username} />;
+  // For clinician views, don't render MainNav since ClinicianLayout handles its own navigation
+  if (isLoggedIn && userRole === 'clinician') {
+    return null;
   }
 
-  // Desktop navigation for clinician, patient, and public pages
+  // Desktop navigation for patient and public pages only
   return (
     <DesktopNavigation 
       isLoggedIn={isLoggedIn} 

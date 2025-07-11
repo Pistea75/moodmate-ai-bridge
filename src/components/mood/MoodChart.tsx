@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -29,8 +28,6 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
   const { toast } = useToast();
 
   const fetchMoodData = async () => {
-    // If patient ID is provided, fetch that specific patient's data (for clinician view)
-    // Otherwise, fetch the current user's data (for patient view)
     let query = supabase
       .from('mood_entries')
       .select('mood_score, created_at, triggers, notes')
@@ -51,7 +48,6 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
       query = query.eq('patient_id', userData.user.id);
     }
 
-    // Apply date filters if set
     if (dateRange.start) {
       query = query.gte('created_at', dateRange.start.toISOString());
     }
@@ -70,13 +66,11 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
       return;
     }
 
-    // Convert the entries to the expected format for MoodChartUtils
     const parsedEntries = entries ? entries.map(entry => ({
       ...entry,
-      triggers: entry.triggers || [] // Ensure triggers is always an array
+      triggers: entry.triggers || []
     })) as MoodChartEntry[] : [];
     
-    // Pass date range for dynamic chart generation
     const chartDateRange = dateRange.start && dateRange.end ? {
       start: dateRange.start,
       end: dateRange.end
@@ -86,11 +80,9 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
     setData(parsed);
   };
 
-  // Auto-update every day at midnight or when component mounts
   useEffect(() => {
     fetchMoodData();
     
-    // Set up interval to refresh data daily
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -99,15 +91,13 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
     const msUntilMidnight = tomorrow.getTime() - now.getTime();
     
     const timeoutId = setTimeout(() => {
-      // Update to new "last 7 days" range at midnight
       const newRange = getLastSevenDays();
       setDateRange({ start: newRange.start, end: newRange.end });
       
-      // Set up daily interval
       const intervalId = setInterval(() => {
         const updatedRange = getLastSevenDays();
         setDateRange({ start: updatedRange.start, end: updatedRange.end });
-      }, 24 * 60 * 60 * 1000); // 24 hours
+      }, 24 * 60 * 60 * 1000);
       
       return () => clearInterval(intervalId);
     }, msUntilMidnight);
@@ -120,13 +110,13 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
   }, [view, patientId, dateRange]);
 
   const handleMoodLogComplete = () => {
-    fetchMoodData(); // Refresh the chart data when a new mood is logged
+    fetchMoodData();
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-        <h3 className="font-semibold">Mood Timeline</h3>
+    <div className="bg-white rounded-xl shadow-sm border p-6 w-full">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
+        <h3 className="font-semibold text-lg">Mood Timeline</h3>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -153,14 +143,16 @@ export function MoodChart({ patientId, showLogButton = false }: MoodChartProps) 
         </div>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-6">
         <MoodChartDateFilter 
           dateRange={dateRange}
           onDateRangeChange={setDateRange}
         />
       </div>
 
-      <MoodChartView data={data} view={view} />
+      <div className="mt-4">
+        <MoodChartView data={data} view={view} />
+      </div>
     </div>
   );
 }
