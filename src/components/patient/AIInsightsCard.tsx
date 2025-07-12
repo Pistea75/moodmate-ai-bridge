@@ -25,43 +25,16 @@ export function AIInsightsCard() {
     try {
       setLoading(true);
       
-      // Get recent mood data
-      const { data: moodData } = await supabase
-        .from('mood_entries')
-        .select('mood_score, triggers, notes')
-        .eq('patient_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(7);
+      // Call AI service to generate personalized insight
+      const { data, error } = await supabase.functions.invoke('generate-insights', {
+        body: { patientId: user.id }
+      });
 
-      // Get recent tasks
-      const { data: taskData } = await supabase
-        .from('tasks')
-        .select('title, completed, due_date')
-        .eq('patient_id', user.id)
-        .order('inserted_at', { ascending: false })
-        .limit(5);
-
-      if (moodData && moodData.length > 0) {
-        const avgMood = moodData.reduce((sum, entry) => sum + entry.mood_score, 0) / moodData.length;
-        const completedTasks = taskData?.filter(task => task.completed).length || 0;
-        const totalTasks = taskData?.length || 0;
-        
-        let insightText = '';
-        if (avgMood >= 7) {
-          insightText = `✨ You're doing great! Your mood has been positive this week (${avgMood.toFixed(1)}/10). `;
-        } else if (avgMood >= 4) {
-          insightText = `💪 Your mood has been steady this week. Consider what small steps might help you feel even better. `;
-        } else {
-          insightText = `🌱 I notice your mood has been lower recently. Remember, it's okay to have difficult days. `;
-        }
-
-        if (totalTasks > 0) {
-          insightText += `You've completed ${completedTasks}/${totalTasks} tasks this week. `;
-        }
-
-        setInsight(insightText + "Would you like to chat about how you're feeling?");
+      if (error) {
+        console.error('Error from AI service:', error);
+        setInsight("I'm here to support you on your mental health journey. Feel free to chat with me anytime!");
       } else {
-        setInsight("Welcome! I'm here to support your mental health journey. Let's start by tracking how you're feeling today.");
+        setInsight(data.insight || "I'm here to support you on your mental health journey. Feel free to chat with me anytime!");
       }
     } catch (error) {
       console.error('Error generating insight:', error);

@@ -89,33 +89,34 @@ export function AIGoalSetting() {
     
     setGeneratingSuggestions(true);
     try {
-      // Get recent user data for context
-      const { data: moodData } = await supabase
-        .from('mood_entries')
-        .select('mood_score, triggers')
-        .eq('patient_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(7);
+      // Call AI service to generate personalized goal suggestions
+      const { data, error } = await supabase.functions.invoke('generate-goal-suggestions', {
+        body: { patientId: user.id }
+      });
 
-      const { data: taskData } = await supabase
-        .from('tasks')
-        .select('title, completed')
-        .eq('patient_id', user.id)
-        .order('inserted_at', { ascending: false })
-        .limit(10);
-
-      // Generate AI suggestions based on data
-      const suggestions = [
-        'Improve daily mood consistency',
-        'Increase task completion rate',
-        'Practice mindfulness regularly',
-        'Build a morning routine',
-        'Connect with support network weekly'
-      ];
-
-      setAiSuggestions(suggestions);
+      if (error) {
+        console.error('Error from AI service:', error);
+        // Fallback suggestions
+        setAiSuggestions([
+          'Track your mood daily for one week',
+          'Practice deep breathing for 5 minutes daily',
+          'Complete at least 3 assigned tasks this week',
+          'Take a 10-minute walk when feeling stressed',
+          'Write down one positive thing each day'
+        ]);
+      } else {
+        setAiSuggestions(data.suggestions || []);
+      }
     } catch (error) {
       console.error('Error generating AI suggestions:', error);
+      // Fallback suggestions
+      setAiSuggestions([
+        'Track your mood daily for one week',
+        'Practice deep breathing for 5 minutes daily', 
+        'Complete at least 3 assigned tasks this week',
+        'Take a 10-minute walk when feeling stressed',
+        'Write down one positive thing each day'
+      ]);
     } finally {
       setGeneratingSuggestions(false);
     }
