@@ -206,6 +206,13 @@ export default function PatientDetail() {
     }
   };
 
+  const getPatientName = () => {
+    if (patient?.first_name && patient?.last_name) {
+      return `${patient.first_name} ${patient.last_name}`;
+    }
+    return 'Unnamed Patient';
+  };
+
   if (loading) {
     return (
       <ClinicianLayout>
@@ -253,10 +260,7 @@ export default function PatientDetail() {
               </Avatar>
               <div>
                 <h1 className="text-2xl font-bold">
-                  {patient.first_name && patient.last_name 
-                    ? `${patient.first_name} ${patient.last_name}`
-                    : 'Unnamed Patient'
-                  }
+                  {getPatientName()}
                 </h1>
                 <div className="flex items-center gap-2">
                   <Badge className={getStatusColor(patient.status)}>
@@ -339,7 +343,7 @@ export default function PatientDetail() {
           </TabsList>
 
           <TabsContent value="mood" className="space-y-4">
-            <PatientMoodSection patientId={patientId!} />
+            <PatientMoodSection patientId={patientId!} patientName={getPatientName()} />
           </TabsContent>
 
           <TabsContent value="tasks" className="space-y-4">
