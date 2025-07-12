@@ -107,7 +107,7 @@ export function ClinicianSidebarContent() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-6 space-y-2">
+      <nav className="flex-1 p-6 space-y-1">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -115,7 +115,7 @@ export function ClinicianSidebarContent() {
             className={({ isActive }) =>
               `flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 isActive
-                  ? 'bg-primary text-primary-foreground shadow-md'
+                  ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               }`
             }
@@ -127,13 +127,13 @@ export function ClinicianSidebarContent() {
       </nav>
 
       {/* Footer */}
-      <div className="p-6 border-t border-border space-y-2">
+      <div className="p-6 border-t border-border space-y-1">
         <NavLink
           to="/clinician/profile"
           className={({ isActive }) =>
             `flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 w-full ${
               isActive
-                ? 'bg-primary text-primary-foreground shadow-md'
+                ? 'bg-primary text-primary-foreground'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`
           }
@@ -147,7 +147,7 @@ export function ClinicianSidebarContent() {
           className={({ isActive }) =>
             `flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 w-full ${
               isActive
-                ? 'bg-primary text-primary-foreground shadow-md'
+                ? 'bg-primary text-primary-foreground'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`
           }
