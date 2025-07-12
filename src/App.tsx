@@ -19,7 +19,7 @@ import PatientDashboard from "./pages/patient/PatientDashboard";
 import PatientChat from "./pages/patient/PatientChat";
 import PatientTasks from "./pages/patient/PatientTasks";
 import PatientSessions from "./pages/patient/PatientSessions";
-import { PatientReports } from "./components/patient/PatientReports";
+
 import PatientProfile from "./pages/patient/PatientProfile";
 import PatientGoals from './pages/patient/Goals';
 
@@ -90,11 +90,6 @@ function App() {
               <Route path="/patient/sessions" element={
                 <ProtectedRoute>
                   <PatientSessions />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/reports" element={
-                <ProtectedRoute>
-                  <PatientReports />
                 </ProtectedRoute>
               } />
               <Route path="/patient/profile" element={

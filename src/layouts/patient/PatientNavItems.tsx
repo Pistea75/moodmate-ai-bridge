@@ -6,7 +6,6 @@ import {
   CheckSquare, 
   Calendar, 
   User, 
-  FileText,
   Target 
 } from 'lucide-react';
 
@@ -40,11 +39,6 @@ export const patientNavItems = [
     title: 'Sessions',
     href: '/patient/sessions',
     icon: Calendar,
-  },
-  {
-    title: 'Reports',
-    href: '/patient/reports',
-    icon: FileText,
   },
   {
     title: 'Profile',
