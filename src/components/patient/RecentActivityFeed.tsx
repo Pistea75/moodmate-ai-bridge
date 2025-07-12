@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, CheckCircle, MessageSquare, Heart, Target } from 'lucide-react';
@@ -65,7 +64,7 @@ export function RecentActivityFeed() {
           type: 'task',
           title: task.completed ? `Completed: ${task.title}` : `Task: ${task.title}`,
           description: task.description || 'No description',
-          timestamp: task.completed ? task.updated_at || task.inserted_at : task.inserted_at,
+          timestamp: task.completed ? task.inserted_at : task.inserted_at,
           status: task.completed ? 'completed' : 'pending'
         });
       });

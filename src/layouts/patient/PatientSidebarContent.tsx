@@ -31,16 +31,16 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
         <div className="space-y-2">
           {patientNavItems.map((item) => (
             <Link
-              key={item.path}
-              to={item.path}
+              key={item.href}
+              to={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === item.path
+                location.pathname === item.href
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-foreground hover:text-primary hover:bg-muted'
               }`}
             >
               <item.icon className="h-4 w-4" />
-              <span>{item.name}</span>
+              <span>{item.title}</span>
             </Link>
           ))}
         </div>

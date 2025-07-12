@@ -98,10 +98,11 @@ export function EnhancedPatientDashboard() {
       </div>
 
       {/* Mood Log Modal */}
-      <MoodLogModal 
-        isOpen={showMoodModal} 
-        onClose={() => setShowMoodModal(false)} 
-      />
+      {showMoodModal && (
+        <MoodLogModal 
+          onLogComplete={() => setShowMoodModal(false)} 
+        />
+      )}
     </div>
   );
 }
