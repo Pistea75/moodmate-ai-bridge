@@ -1,9 +1,9 @@
 
 import PatientLayout from '../../layouts/PatientLayout';
-import { MoodChartView } from '@/components/mood/MoodChartView';
+import { MoodChart } from '@/components/mood/MoodChart';
 import { MoodLogModal } from '@/components/patient/MoodLogModal';
 import { Button } from '@/components/ui/button';
-import { Heart, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PatientMood() {
@@ -26,7 +26,7 @@ export default function PatientMood() {
         </div>
         
         <div className="grid gap-6">
-          <MoodChartView />
+          <MoodChart showLogButton={false} />
         </div>
 
         {showMoodModal && (
