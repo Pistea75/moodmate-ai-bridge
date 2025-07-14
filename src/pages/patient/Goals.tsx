@@ -5,19 +5,21 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Goals() {
   const { t } = useLanguage();
-  
+
   return (
     <PatientLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">{t('goalsProgress')}</h1>
-            <p className="text-muted-foreground">
-              {t('setTrackGoalsAI')}
-            </p>
-          </div>
+        {/* Header */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border shadow-sm">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {t('goalsProgress')}
+          </h1>
+          <p className="text-gray-600 text-lg">
+            {t('setTrackGoalsAI')}
+          </p>
         </div>
-        
+
+        {/* AI Goal Setting Component */}
         <AIGoalSetting />
       </div>
     </PatientLayout>

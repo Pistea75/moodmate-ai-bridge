@@ -1,14 +1,14 @@
 
-import { format } from 'date-fns';
-import { Clock, Trash2, RefreshCcw } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Skeleton } from '@/components/ui/skeleton';
-import { usePatientTasks } from '@/hooks/usePatientTasks';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { AlertCircle, CheckSquare, RefreshCw, Trash2 } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   AlertDialog,
@@ -20,151 +20,233 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+} from "@/components/ui/alert-dialog";
+
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  due_date: string;
+  completed: boolean;
+}
 
 export default function PatientTasks() {
-  const { tasks, loading, error, toggleTaskCompletion, deleteTask, fetchTasks } = usePatientTasks();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
-  // Debug logs
-  console.log('Tasks from hook:', tasks);
-  console.log('Loading:', loading);
-  console.log('Error:', error);
+  const fetchTasks = async () => {
+    if (!user) return;
 
-  // Function to check if a task is overdue
-  const isOverdue = (dateString: string, completed: boolean) => {
-    const today = new Date();
-    const dueDate = new Date(dateString);
-    today.setHours(0, 0, 0, 0);
-    dueDate.setHours(0, 0, 0, 0);
-    return dueDate < today && !completed;
-  };
-
-  const handleToggleCompletion = async (taskId: string, currentState: boolean) => {
     try {
-      console.log(`Toggle completion for task ${taskId} from ${currentState} to ${!currentState}`);
-      setUpdatingId(taskId); // Set loading state
-      await toggleTaskCompletion(taskId, !currentState);
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('patient_id', user.id)
+        .order('due_date', { ascending: true });
+
+      if (error) throw error;
+      setTasks(data || []);
+    } catch (error: any) {
+      console.error('Error fetching tasks:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch tasks. Please try again.",
+      });
     } finally {
-      setUpdatingId(null); // Clear loading state
+      setLoading(false);
     }
   };
 
-  const handleDelete = async (taskId: string) => {
-    setDeletingId(taskId);
+  const updateTaskCompletion = async (taskId: string, completed: boolean) => {
     try {
-      await deleteTask(taskId);
-    } finally {
-      setDeletingId(null);
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId ? { ...task, completed } : task
+        )
+      );
+
+      toast({
+        title: completed ? "Task completed!" : "Task marked incomplete",
+        description: "Task status updated successfully.",
+      });
+    } catch (error: any) {
+      console.error('Error updating task:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update task. Please try again.",
+      });
     }
   };
+
+  const deleteTask = async (taskId: string) => {
+    try {
+      setDeleting(taskId);
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+      toast({
+        title: "Task deleted",
+        description: "Task has been successfully deleted.",
+      });
+    } catch (error: any) {
+      console.error('Error deleting task:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete task. Please try again.",
+      });
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const isOverdue = (dueDate: string) => {
+    return new Date(dueDate) < new Date() && !tasks.find(t => t.due_date === dueDate)?.completed;
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, [user]);
 
   return (
     <PatientLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{t('myTasks')}</h1>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => fetchTasks()}
-            className="gap-2"
-          >
-            <RefreshCcw className="h-4 w-4" />
-            {t('refresh')}
-          </Button>
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border shadow-sm">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {t('myTasks')}
+              </h1>
+              <p className="text-gray-600 text-lg">
+                {tasks.length === 0 ? t('noTasksAssigned') : `${tasks.filter(t => t.completed).length} of ${tasks.length} tasks completed`}
+              </p>
+            </div>
+            <Button 
+              onClick={fetchTasks}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {t('refresh')}
+            </Button>
+          </div>
         </div>
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
-        )}
-
+        {/* Tasks List */}
         {loading ? (
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white border rounded-lg p-4">
-                <div className="flex items-start gap-4">
-                  <Skeleton className="h-5 w-5 rounded-full" />
-                  <div className="flex-1">
-                    <Skeleton className="h-6 w-3/4 mb-2" />
-                    <Skeleton className="h-4 w-4/5 mb-2" />
-                    <div className="flex items-center gap-4 mt-2">
-                      <Skeleton className="h-4 w-24" />
-                    </div>
+            {[1, 2, 3].map(i => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
+        ) : tasks.length === 0 ? (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <CheckSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {t('noTasksAssigned')}
+              </h3>
+              <p className="text-gray-500">
+                Your clinician will assign tasks to help with your mental health journey.
+              </p>
+            </CardContent>
+          </Card>
         ) : (
-          <div className="grid gap-4">
-            {tasks.length === 0 && (
-              <div className="text-center py-8 bg-muted/30 rounded-lg border border-muted">
-                <p className="text-muted-foreground">{t('noTasksAssigned')}</p>
-              </div>
-            )}
-
+          <div className="space-y-4">
             {tasks.map((task) => (
-              <Card key={task.id} className={`p-4 ${isOverdue(task.due_date, task.completed) ? 'border-destructive/40' : ''}`}>
-                <div className="flex items-start gap-4">
-                  <Checkbox
-                    id={`task-${task.id}`}
-                    checked={task.completed}
-                    onCheckedChange={() => handleToggleCompletion(task.id, task.completed)}
-                    className={`mt-1 ${updatingId === task.id ? 'opacity-50' : ''}`}
-                    disabled={updatingId === task.id}
-                  />
-                  <div className="flex-1">
-                    <label
-                      htmlFor={`task-${task.id}`}
-                      className={`font-medium cursor-pointer ${task.completed ? 'line-through text-muted-foreground' : ''}`}
-                    >
-                      {task.title}
-                    </label>
-                    <p className={`text-sm text-muted-foreground mt-1 ${task.completed ? 'line-through' : ''}`}>
-                      {task.description}
-                    </p>
-                    <div className="flex items-center gap-4 mt-2 text-sm">
-                      <span className={`flex items-center gap-1 ${isOverdue(task.due_date, task.completed) ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
-                        <Clock className="h-4 w-4" />
-                        {t('due')}: {format(new Date(task.due_date), 'MMM d, yyyy')}
-                        {isOverdue(task.due_date, task.completed) && ` (${t('overdue')})`}
-                      </span>
+              <Card key={task.id} className={task.completed ? 'opacity-75' : ''}>
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <Checkbox
+                      checked={task.completed}
+                      onCheckedChange={(checked) => 
+                        updateTaskCompletion(task.id, checked as boolean)
+                      }
+                      className="mt-1"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                            {task.title}
+                          </h3>
+                          {task.description && (
+                            <p className={`text-sm mt-1 ${task.completed ? 'text-gray-400' : 'text-gray-600'}`}>
+                              {task.description}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant={isOverdue(task.due_date) ? "destructive" : "secondary"}>
+                              {isOverdue(task.due_date) && <AlertCircle className="h-3 w-3 mr-1" />}
+                              {t('due')}: {new Date(task.due_date).toLocaleDateString()}
+                              {isOverdue(task.due_date) && ` (${t('overdue')})`}
+                            </Badge>
+                          </div>
+                        </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={deleting === task.id}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              {deleting === task.id ? (
+                                <RefreshCw className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                {t('deleteTaskConfirmation')}
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteTask(task.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                {deleting === task.id ? t('deleting') : t('deleteTask')}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
                   </div>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">{t('deleteTask')}</span>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t('deleteTaskConfirmation')}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(task.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          disabled={deletingId === task.id}
-                        >
-                          {deletingId === task.id ? t('deleting') : t('delete')}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
+                </CardContent>
               </Card>
             ))}
           </div>

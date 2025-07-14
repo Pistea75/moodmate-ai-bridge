@@ -1,85 +1,56 @@
 
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { patientNavItems } from './PatientNavItems';
-import { useAuth } from '@/contexts/AuthContext';
-import { usePatientProfile } from './usePatientProfile';
+import { NavLink } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { LogOut, Settings } from 'lucide-react';
+import { PatientNavItems } from './PatientNavItems';
 
-type PatientSidebarContentProps = {
-  patientName: React.ReactNode;
-};
+interface PatientSidebarContentProps {
+  patientFullName: React.ReactNode;
+}
 
-export function PatientSidebarContent({ patientName }: PatientSidebarContentProps) {
-  const navigate = useNavigate();
-  const { signOut } = useAuth();
-  const { patientFullName } = usePatientProfile();
+export function PatientSidebarContent({ patientFullName }: PatientSidebarContentProps) {
   const { t } = useLanguage();
+  const navItems = PatientNavItems();
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      navigate('/login');
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
-
-  // Get display name safely
   const getDisplayName = () => {
-    if (patientFullName) return patientFullName;
-    if (typeof patientName === 'string') return patientName;
+    if (typeof patientFullName === 'string') {
+      return patientFullName;
+    }
+    if (React.isValidElement(patientFullName)) {
+      const content = patientFullName.props?.children;
+      return typeof content === 'string' ? content : t('patient');
+    }
     return t('patient');
   };
 
-  const displayName = getDisplayName();
-
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Logo and Title */}
-      <div className="p-6 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-            <span className="font-bold text-primary-foreground text-lg">M</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">{t('appName')}</h1>
-            <p className="text-sm text-muted-foreground">{t('patientPortal')}</p>
-          </div>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+          <span className="text-white text-sm font-medium">
+            {getDisplayName().charAt(0).toUpperCase()}
+          </span>
         </div>
-      </div>
-
-      {/* User Info */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-            <span className="text-sm font-medium text-muted-foreground">
-              {displayName.split(' ').map(n => n[0]).join('') || 'P'}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">
-              {displayName}
-            </p>
-            <p className="text-xs text-muted-foreground">{t('patient')}</p>
-          </div>
+        <div>
+          <h2 className="font-semibold text-gray-900">{getDisplayName()}</h2>
+          <p className="text-sm text-blue-600 font-medium">{t('patientPortal')}</p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
-        {patientNavItems.map((item) => (
+      <nav className="flex-1 p-4 space-y-2">
+        {navItems.map((item) => (
           <NavLink
             key={item.href}
             to={item.href}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+              cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`
+                  ? "bg-blue-100 text-blue-700 border border-blue-200"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              )
             }
           >
             <item.icon className="h-4 w-4" />
@@ -87,32 +58,6 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
           </NavLink>
         ))}
       </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-border space-y-2">
-        <NavLink
-          to="/patient/settings"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full ${
-              isActive
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`
-          }
-        >
-          <Settings className="h-4 w-4" />
-          {t('settings')}
-        </NavLink>
-        
-        <Button
-          onClick={handleSignOut}
-          variant="ghost"
-          className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
-        >
-          <LogOut className="h-4 w-4" />
-          {t('signOut')}
-        </Button>
-      </div>
     </div>
   );
 }
