@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useAuthFlow } from '../hooks/useAuthFlow';
 import MainLayout from '../layouts/MainLayout';
 import { AlertCircle, Loader2, Wifi, WifiOff, CheckCircle } from 'lucide-react';
@@ -15,6 +16,7 @@ export default function Login() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showSuccess, setShowSuccess] = useState(false);
   const { user, authError } = useAuth();
+  const { t, language, setLanguage } = useLanguage();
   const { isLoading, error, signIn, clearError } = useAuthFlow();
   
   // Monitor connection status
@@ -87,7 +89,7 @@ export default function Login() {
       <div className="min-h-[calc(100vh-88px)] flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold">Welcome Back</h1>
+            <h1 className="text-3xl font-bold">{t('welcomeBack')}</h1>
             <p className="text-muted-foreground mt-2">
               Sign in to your MoodMate account
             </p>
@@ -118,7 +120,7 @@ export default function Login() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-1">
-                    Email Address
+                    {t('email')}
                   </label>
                   <Input
                     type="email"
@@ -135,10 +137,10 @@ export default function Login() {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label htmlFor="password" className="block text-sm font-medium">
-                      Password
+                      {t('password')}
                     </label>
                     <Link to="/forgot-password" className="text-xs text-mood-purple hover:underline">
-                      Forgot password?
+                      {t('forgotPassword')}
                     </Link>
                   </div>
                   <Input
@@ -162,10 +164,10 @@ export default function Login() {
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Signing in...
+                      {t('loading')}
                     </>
                   ) : (
-                    'Sign In'
+                    t('signIn')
                   )}
                 </Button>
               </div>
@@ -184,7 +186,11 @@ export default function Login() {
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center">
                   <span className="text-sm text-muted-foreground mr-3">Language:</span>
-                  <select className="bg-white border px-2 py-1 rounded-md text-sm">
+                  <select 
+                    className="bg-white border px-2 py-1 rounded-md text-sm"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                  >
                     <option value="en">English</option>
                     <option value="es">Español</option>
                     <option value="fr">Français</option>

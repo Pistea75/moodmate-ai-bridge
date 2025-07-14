@@ -15,55 +15,57 @@ import {
   User
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useClinicianProfile } from './useClinicianProfile';
-
-const navItems = [
-  { 
-    to: '/clinician/dashboard', 
-    icon: Home, 
-    label: 'Dashboard' 
-  },
-  { 
-    to: '/clinician/patients', 
-    icon: Users, 
-    label: 'Patients' 
-  },
-  { 
-    to: '/clinician/sessions', 
-    icon: Calendar, 
-    label: 'Sessions' 
-  },
-  { 
-    to: '/clinician/tasks', 
-    icon: CheckSquare, 
-    label: 'Tasks' 
-  },
-  { 
-    to: '/clinician/analytics', 
-    icon: BarChart3, 
-    label: 'Analytics' 
-  },
-  { 
-    to: '/clinician/risk-management', 
-    icon: AlertTriangle, 
-    label: 'Risk Management' 
-  },
-  { 
-    to: '/clinician/reports', 
-    icon: FileText, 
-    label: 'Reports' 
-  },
-  { 
-    to: '/clinician/train-ai', 
-    icon: Brain, 
-    label: 'Train AI' 
-  },
-];
 
 export function ClinicianSidebarContent() {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { clinicianFullName } = useClinicianProfile();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { 
+      to: '/clinician/dashboard', 
+      icon: Home, 
+      label: t('dashboard')
+    },
+    { 
+      to: '/clinician/patients', 
+      icon: Users, 
+      label: t('patients')
+    },
+    { 
+      to: '/clinician/sessions', 
+      icon: Calendar, 
+      label: t('sessions')
+    },
+    { 
+      to: '/clinician/tasks', 
+      icon: CheckSquare, 
+      label: t('tasks')
+    },
+    { 
+      to: '/clinician/analytics', 
+      icon: BarChart3, 
+      label: t('analytics')
+    },
+    { 
+      to: '/clinician/risk-management', 
+      icon: AlertTriangle, 
+      label: 'Risk Management'
+    },
+    { 
+      to: '/clinician/reports', 
+      icon: FileText, 
+      label: t('reports')
+    },
+    { 
+      to: '/clinician/train-ai', 
+      icon: Brain, 
+      label: 'Train AI'
+    },
+  ];
 
   const handleSignOut = async () => {
     try {
@@ -139,7 +141,7 @@ export function ClinicianSidebarContent() {
           }
         >
           <User className="h-5 w-5" />
-          Profile
+          {t('profile')}
         </NavLink>
         
         <NavLink
@@ -153,7 +155,7 @@ export function ClinicianSidebarContent() {
           }
         >
           <Settings className="h-5 w-5" />
-          Settings
+          {t('settings')}
         </NavLink>
       </div>
     </div>

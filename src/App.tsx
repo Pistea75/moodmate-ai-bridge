@@ -6,6 +6,7 @@ import {
   Routes,
 } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import ClinicianDashboard from "./pages/clinician/ClinicianDashboard";
@@ -28,7 +29,8 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <ErrorBoundary>
+        <LanguageProvider>
+          <ErrorBoundary>
           <div className="min-h-screen bg-background">
             <Toaster />
             <Routes>
@@ -107,7 +109,8 @@ function App() {
               } />
             </Routes>
           </div>
-        </ErrorBoundary>
+          </ErrorBoundary>
+        </LanguageProvider>
       </AuthProvider>
     </Router>
   );
