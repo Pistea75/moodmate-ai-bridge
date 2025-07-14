@@ -6,6 +6,7 @@
 @layer base {
   :root {
     /* Base */
+    --page-background: 0 0% 100%;
     --background: hsl(var(--page-background));
     --foreground: 240 25% 15%;
 
@@ -15,18 +16,18 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 25% 15%;
 
-    /* Theme colors will be set dynamically */
-    --primary: hsl(var(--primary));
+    /* Primary purple color matching MoodMate design */
+    --primary: 263 83% 75%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: hsl(var(--secondary));
+    --secondary: 261 28% 63%;
     --secondary-foreground: 0 0% 100%;
 
     /* Neutrals */
-    --muted: hsl(var(--muted));
+    --muted: 245 12% 95%;
     --muted-foreground: 240 3% 57%;
 
-    --accent: hsl(var(--accent));
+    --accent: 245 12% 95%;
     --accent-foreground: 240 10% 20%;
 
     --destructive: 0 84.2% 60.2%;
@@ -41,6 +42,7 @@
 
   .dark {
     /* Base */
+    --page-background: 240 22% 13%;
     --background: 240 22% 13%;
     --foreground: 0 0% 95%;
 
@@ -50,18 +52,18 @@
     --popover: 240 22% 16%;
     --popover-foreground: 0 0% 95%;
 
-    /* Theme colors will use the dynamic values but slightly darker/desaturated for dark mode */
-    --primary: hsl(var(--primary));
+    /* Primary purple color for dark mode */
+    --primary: 263 83% 75%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: hsl(var(--secondary));
+    --secondary: 261 28% 63%;
     --secondary-foreground: 0 0% 100%;
 
     /* Neutrals */
     --muted: 240 20% 22%;
     --muted-foreground: 240 10% 70%;
 
-    --accent: hsl(var(--accent));
+    --accent: 240 20% 22%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 40.6%;
