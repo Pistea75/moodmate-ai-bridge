@@ -12,7 +12,7 @@ export function WellnessStreakCard() {
     currentStreak: 7,
     longestStreak: 14,
     weeklyTarget: 5,
-    achievements: ['mood_tracker', 'task_master', 'session_regular']
+    achievements: ['mood_tracker', 'task_master', 'session_regular'] as const
   };
 
   const achievementIcons = {

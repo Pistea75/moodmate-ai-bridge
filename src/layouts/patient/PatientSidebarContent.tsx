@@ -27,6 +27,15 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
     }
   };
 
+  // Get display name safely
+  const getDisplayName = () => {
+    if (patientFullName) return patientFullName;
+    if (typeof patientName === 'string') return patientName;
+    return t('patient');
+  };
+
+  const displayName = getDisplayName();
+
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Logo and Title */}
@@ -47,12 +56,12 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
             <span className="text-sm font-medium text-muted-foreground">
-              {patientFullName?.split(' ').map(n => n[0]).join('') || patientName?.toString().split(' ').map(n => n[0]).join('') || 'P'}
+              {displayName.split(' ').map(n => n[0]).join('') || 'P'}
             </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">
-              {patientFullName || patientName || t('patient')}
+              {displayName}
             </p>
             <p className="text-xs text-muted-foreground">{t('patient')}</p>
           </div>

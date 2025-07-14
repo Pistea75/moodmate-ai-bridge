@@ -65,6 +65,7 @@ export interface Translations {
   weeklyProgress: string;
   upcomingAppointments: string;
   completedTasks: string;
+  tasksCompleted: string;
   
   // Settings
   accountSettings: string;
@@ -233,6 +234,7 @@ const translations: Record<string, Translations> = {
     weeklyProgress: 'Weekly Progress',
     upcomingAppointments: 'Upcoming Appointments',
     completedTasks: 'Completed Tasks',
+    tasksCompleted: 'Tasks Completed',
     
     // Settings
     accountSettings: 'Account Settings',
@@ -398,6 +400,7 @@ const translations: Record<string, Translations> = {
     weeklyProgress: 'Progreso Semanal',
     upcomingAppointments: 'Próximas Citas',
     completedTasks: 'Tareas Completadas',
+    tasksCompleted: 'Tareas Completadas',
     
     // Settings
     accountSettings: 'Configuración de Cuenta',
@@ -563,6 +566,7 @@ const translations: Record<string, Translations> = {
     weeklyProgress: 'Progrès Hebdomadaire',
     upcomingAppointments: 'Rendez-vous à Venir',
     completedTasks: 'Tâches Terminées',
+    tasksCompleted: 'Tâches Terminées',
     
     // Settings
     accountSettings: 'Paramètres du Compte',
@@ -728,6 +732,7 @@ const translations: Record<string, Translations> = {
     weeklyProgress: 'Wöchentlicher Fortschritt',
     upcomingAppointments: 'Bevorstehende Termine',
     completedTasks: 'Erledigte Aufgaben',
+    tasksCompleted: 'Erledigte Aufgaben',
     
     // Settings
     accountSettings: 'Kontoeinstellungen',
