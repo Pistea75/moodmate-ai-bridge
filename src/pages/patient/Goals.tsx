@@ -1,16 +1,19 @@
 
 import PatientLayout from '../../layouts/PatientLayout';
 import { AIGoalSetting } from '@/components/patient/AIGoalSetting';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Goals() {
+  const { t } = useLanguage();
+  
   return (
     <PatientLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Goals & Progress</h1>
+            <h1 className="text-2xl font-bold">{t('goalsProgress')}</h1>
             <p className="text-muted-foreground">
-              Set and track your mental health goals with AI assistance.
+              {t('setTrackGoalsAI')}
             </p>
           </div>
         </div>

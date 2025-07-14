@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { usePatientTasks } from '@/hooks/usePatientTasks';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,7 @@ export default function PatientTasks() {
   const { tasks, loading, error, toggleTaskCompletion, deleteTask, fetchTasks } = usePatientTasks();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   // Debug logs
   console.log('Tasks from hook:', tasks);
@@ -64,7 +66,7 @@ export default function PatientTasks() {
     <PatientLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">My Tasks</h1>
+          <h1 className="text-2xl font-bold">{t('myTasks')}</h1>
           <Button 
             variant="outline" 
             size="sm"
@@ -72,7 +74,7 @@ export default function PatientTasks() {
             className="gap-2"
           >
             <RefreshCcw className="h-4 w-4" />
-            Refresh
+            {t('refresh')}
           </Button>
         </div>
 
@@ -104,7 +106,7 @@ export default function PatientTasks() {
           <div className="grid gap-4">
             {tasks.length === 0 && (
               <div className="text-center py-8 bg-muted/30 rounded-lg border border-muted">
-                <p className="text-muted-foreground">No tasks assigned yet.</p>
+                <p className="text-muted-foreground">{t('noTasksAssigned')}</p>
               </div>
             )}
 
@@ -131,8 +133,8 @@ export default function PatientTasks() {
                     <div className="flex items-center gap-4 mt-2 text-sm">
                       <span className={`flex items-center gap-1 ${isOverdue(task.due_date, task.completed) ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
                         <Clock className="h-4 w-4" />
-                        Due: {format(new Date(task.due_date), 'MMM d, yyyy')}
-                        {isOverdue(task.due_date, task.completed) && " (overdue)"}
+                        {t('due')}: {format(new Date(task.due_date), 'MMM d, yyyy')}
+                        {isOverdue(task.due_date, task.completed) && ` (${t('overdue')})`}
                       </span>
                     </div>
                   </div>
@@ -140,24 +142,24 @@ export default function PatientTasks() {
                     <AlertDialogTrigger asChild>
                       <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete task</span>
+                        <span className="sr-only">{t('deleteTask')}</span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will permanently delete this task. This action cannot be undone.
+                          {t('deleteTaskConfirmation')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => handleDelete(task.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           disabled={deletingId === task.id}
                         >
-                          {deletingId === task.id ? 'Deleting...' : 'Delete'}
+                          {deletingId === task.id ? t('deleting') : t('delete')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

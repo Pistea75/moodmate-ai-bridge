@@ -6,42 +6,48 @@ import {
   CheckSquare, 
   Calendar, 
   User, 
-  Target 
+  Target,
+  TrendingUp
 } from 'lucide-react';
 
 export const patientNavItems = [
   {
-    title: 'Dashboard',
+    title: 'dashboard',
     href: '/patient/dashboard',
     icon: Home,
   },
   {
-    title: 'AI Chat',
+    title: 'aiChat',
     href: '/patient/chat',
     icon: MessageSquare,
   },
   {
-    title: 'Mood Tracking',
+    title: 'mood',
     href: '/patient/mood',
     icon: Heart,
   },
   {
-    title: 'Tasks',
+    title: 'tasks',
     href: '/patient/tasks',
     icon: CheckSquare,
   },
   {
-    title: 'Goals',
+    title: 'goals',
     href: '/patient/goals',
     icon: Target,
   },
   {
-    title: 'Sessions',
+    title: 'insights',
+    href: '/patient/insights',
+    icon: TrendingUp,
+  },
+  {
+    title: 'sessions',
     href: '/patient/sessions',
     icon: Calendar,
   },
   {
-    title: 'Profile',
+    title: 'profile',
     href: '/patient/profile',
     icon: User,
   },

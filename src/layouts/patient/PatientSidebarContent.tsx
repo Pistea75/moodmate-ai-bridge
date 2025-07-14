@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { patientNavItems } from './PatientNavItems';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePatientProfile } from './usePatientProfile';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LogOut, Settings } from 'lucide-react';
 
 type PatientSidebarContentProps = {
@@ -15,6 +16,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { patientFullName } = usePatientProfile();
+  const { t } = useLanguage();
 
   const handleSignOut = async () => {
     try {
@@ -34,8 +36,8 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
             <span className="font-bold text-primary-foreground text-lg">M</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">MoodMate</h1>
-            <p className="text-sm text-muted-foreground">Patient Portal</p>
+            <h1 className="text-xl font-bold text-foreground">{t('appName')}</h1>
+            <p className="text-sm text-muted-foreground">{t('patientPortal')}</p>
           </div>
         </div>
       </div>
@@ -50,9 +52,9 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">
-              {patientFullName || patientName || 'Patient'}
+              {patientFullName || patientName || t('patient')}
             </p>
-            <p className="text-xs text-muted-foreground">Patient</p>
+            <p className="text-xs text-muted-foreground">{t('patient')}</p>
           </div>
         </div>
       </div>
@@ -72,7 +74,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
             }
           >
             <item.icon className="h-4 w-4" />
-            {item.title}
+            {t(item.title)}
           </NavLink>
         ))}
       </nav>
@@ -90,7 +92,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
           }
         >
           <Settings className="h-4 w-4" />
-          Settings
+          {t('settings')}
         </NavLink>
         
         <Button
@@ -99,7 +101,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
           className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
         >
           <LogOut className="h-4 w-4" />
-          Sign Out
+          {t('signOut')}
         </Button>
       </div>
     </div>

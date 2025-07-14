@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -128,6 +127,46 @@ export interface Translations {
   
   // App Name
   appName: string;
+
+  // New Patient Dashboard Translations
+  quickActions: string;
+  logMood: string;
+  viewTasks: string;
+  aiChat: string;
+  progressOverview: string;
+  weeklyGoals: string;
+  moodStability: string;
+  sessionAttendance: string;
+  improvingWell: string;
+  wellnessStreak: string;
+  daysInARow: string;
+  longestStreak: string;
+  weeklyTarget: string;
+  recentAchievements: string;
+  mood_tracker: string;
+  task_master: string;
+  session_regular: string;
+  dailyInspiration: string;
+  patient: string;
+  goalsProgress: string;
+  setTrackGoalsAI: string;
+  moodTracking: string;
+  trackMoodPatternsOverTime: string;
+  myTasks: string;
+  refresh: string;
+  noTasksAssigned: string;
+  due: string;
+  overdue: string;
+  deleteTask: string;
+  areYouSure: string;
+  deleteTaskConfirmation: string;
+  deleting: string;
+  weeklyMoodSummary: string;
+  moodStableThisWeek: string;
+  activityImpact: string;
+  exercisePositiveImpact: string;
+  moodTrends: string;
+  aiPersonalizedByClinician: string;
 }
 
 // Translation data
@@ -256,6 +295,46 @@ const translations: Record<string, Translations> = {
     
     // App Name
     appName: 'MoodMate',
+    
+    // New Patient Dashboard Translations
+    quickActions: 'Quick Actions',
+    logMood: 'Log Mood',
+    viewTasks: 'View Tasks',
+    aiChat: 'AI Chat',
+    progressOverview: 'Progress Overview',
+    weeklyGoals: 'Weekly Goals',
+    moodStability: 'Mood Stability',
+    sessionAttendance: 'Session Attendance',
+    improvingWell: 'Improving Well!',
+    wellnessStreak: 'Wellness Streak',
+    daysInARow: 'days in a row',
+    longestStreak: 'Longest Streak',
+    weeklyTarget: 'Weekly Target',
+    recentAchievements: 'Recent Achievements',
+    mood_tracker: 'Mood Tracker',
+    task_master: 'Task Master',
+    session_regular: 'Session Regular',
+    dailyInspiration: 'Daily Inspiration',
+    patient: 'Patient',
+    goalsProgress: 'Goals & Progress',
+    setTrackGoalsAI: 'Set and track your mental health goals with AI assistance.',
+    moodTracking: 'Mood Tracking',
+    trackMoodPatternsOverTime: 'Track and monitor your mood patterns over time.',
+    myTasks: 'My Tasks',
+    refresh: 'Refresh',
+    noTasksAssigned: 'No tasks assigned yet.',
+    due: 'Due',
+    overdue: 'overdue',
+    deleteTask: 'Delete task',
+    areYouSure: 'Are you sure?',
+    deleteTaskConfirmation: 'This will permanently delete this task. This action cannot be undone.',
+    deleting: 'Deleting...',
+    weeklyMoodSummary: 'Weekly Mood Summary',
+    moodStableThisWeek: 'Your mood has been more stable this week compared to last week. Great progress!',
+    activityImpact: 'Activity Impact',
+    exercisePositiveImpact: 'Exercise sessions seem to positively impact your mood. Consider maintaining this routine.',
+    moodTrends: 'Mood Trends',
+    aiPersonalizedByClinician: 'AI behavior personalized by your clinician'
   },
   es: {
     // Navigation
@@ -381,6 +460,46 @@ const translations: Record<string, Translations> = {
     
     // App Name
     appName: 'MoodMate',
+    
+    // New Patient Dashboard Translations
+    quickActions: 'Acciones Rápidas',
+    logMood: 'Registrar Estado de Ánimo',
+    viewTasks: 'Ver Tareas',
+    aiChat: 'Chat IA',
+    progressOverview: 'Resumen de Progreso',
+    weeklyGoals: 'Objetivos Semanales',
+    moodStability: 'Estabilidad del Estado de Ánimo',
+    sessionAttendance: 'Asistencia a Sesiones',
+    improvingWell: '¡Mejorando Bien!',
+    wellnessStreak: 'Racha de Bienestar',
+    daysInARow: 'días seguidos',
+    longestStreak: 'Racha Más Larga',
+    weeklyTarget: 'Objetivo Semanal',
+    recentAchievements: 'Logros Recientes',
+    mood_tracker: 'Seguidor de Estado de Ánimo',
+    task_master: 'Maestro de Tareas',
+    session_regular: 'Regular en Sesiones',
+    dailyInspiration: 'Inspiración Diaria',
+    patient: 'Paciente',
+    goalsProgress: 'Objetivos y Progreso',
+    setTrackGoalsAI: 'Establece y rastrea tus objetivos de salud mental con asistencia de IA.',
+    moodTracking: 'Seguimiento del Estado de Ánimo',
+    trackMoodPatternsOverTime: 'Rastrea y monitorea tus patrones de estado de ánimo a lo largo del tiempo.',
+    myTasks: 'Mis Tareas',
+    refresh: 'Actualizar',
+    noTasksAssigned: 'Aún no hay tareas asignadas.',
+    due: 'Vence',
+    overdue: 'vencida',
+    deleteTask: 'Eliminar tarea',
+    areYouSure: '¿Estás seguro?',
+    deleteTaskConfirmation: 'Esto eliminará permanentemente esta tarea. Esta acción no se puede deshacer.',
+    deleting: 'Eliminando...',
+    weeklyMoodSummary: 'Resumen Semanal del Estado de Ánimo',
+    moodStableThisWeek: 'Tu estado de ánimo ha sido más estable esta semana comparado con la semana pasada. ¡Gran progreso!',
+    activityImpact: 'Impacto de la Actividad',
+    exercisePositiveImpact: 'Las sesiones de ejercicio parecen impactar positivamente tu estado de ánimo. Considera mantener esta rutina.',
+    moodTrends: 'Tendencias del Estado de Ánimo',
+    aiPersonalizedByClinician: 'Comportamiento de la IA personalizado por tu médico'
   },
   fr: {
     // Navigation
@@ -506,6 +625,46 @@ const translations: Record<string, Translations> = {
     
     // App Name
     appName: 'MoodMate',
+    
+    // New Patient Dashboard Translations
+    quickActions: 'Actions Rapides',
+    logMood: 'Enregistrer Humeur',
+    viewTasks: 'Voir les Tâches',
+    aiChat: 'Chat IA',
+    progressOverview: 'Aperçu des Progrès',
+    weeklyGoals: 'Objectifs Hebdomadaires',
+    moodStability: 'Stabilité de l\'Humeur',
+    sessionAttendance: 'Présence aux Sessions',
+    improvingWell: 'Amélioration Excellente!',
+    wellnessStreak: 'Série de Bien-être',
+    daysInARow: 'jours d\'affilée',
+    longestStreak: 'Plus Longue Série',
+    weeklyTarget: 'Objectif Hebdomadaire',
+    recentAchievements: 'Réalisations Récentes',
+    mood_tracker: 'Suiveur d\'Humeur',
+    task_master: 'Maître des Tâches',
+    session_regular: 'Régulier en Sessions',
+    dailyInspiration: 'Inspiration Quotidienne',
+    patient: 'Patient',
+    goalsProgress: 'Objectifs et Progrès',
+    setTrackGoalsAI: 'Définissez et suivez vos objectifs de santé mentale avec l\'assistance IA.',
+    moodTracking: 'Suivi de l\'Humeur',
+    trackMoodPatternsOverTime: 'Suivez et surveillez vos schémas d\'humeur au fil du temps.',
+    myTasks: 'Mes Tâches',
+    refresh: 'Actualiser',
+    noTasksAssigned: 'Aucune tâche assignée pour le moment.',
+    due: 'Échéance',
+    overdue: 'en retard',
+    deleteTask: 'Supprimer la tâche',
+    areYouSure: 'Êtes-vous sûr?',
+    deleteTaskConfirmation: 'Cela supprimera définitivement cette tâche. Cette action ne peut pas être annulée.',
+    deleting: 'Suppression...',
+    weeklyMoodSummary: 'Résumé Hebdomadaire de l\'Humeur',
+    moodStableThisWeek: 'Votre humeur a été plus stable cette semaine par rapport à la semaine dernière. Excellent progrès!',
+    activityImpact: 'Impact de l\'Activité',
+    exercisePositiveImpact: 'Les sessions d\'exercice semblent impacter positivement votre humeur. Considérez maintenir cette routine.',
+    moodTrends: 'Tendances de l\'Humeur',
+    aiPersonalizedByClinician: 'Comportement de l\'IA personnalisé par votre médecin'
   },
   de: {
     // Navigation
@@ -631,6 +790,46 @@ const translations: Record<string, Translations> = {
     
     // App Name
     appName: 'MoodMate',
+    
+    // New Patient Dashboard Translations
+    quickActions: 'Schnellaktionen',
+    logMood: 'Stimmung Protokollieren',
+    viewTasks: 'Aufgaben Anzeigen',
+    aiChat: 'KI Chat',
+    progressOverview: 'Fortschrittsübersicht',
+    weeklyGoals: 'Wöchentliche Ziele',
+    moodStability: 'Stimmungsstabilität',
+    sessionAttendance: 'Sitzungsteilnahme',
+    improvingWell: 'Gut Verbessernd!',
+    wellnessStreak: 'Wellness-Serie',
+    daysInARow: 'Tage in Folge',
+    longestStreak: 'Längste Serie',
+    weeklyTarget: 'Wöchentliches Ziel',
+    recentAchievements: 'Aktuelle Erfolge',
+    mood_tracker: 'Stimmungsverfolger',
+    task_master: 'Aufgabenmeister',
+    session_regular: 'Sitzungsregulär',
+    dailyInspiration: 'Tägliche Inspiration',
+    patient: 'Patient',
+    goalsProgress: 'Ziele und Fortschritt',
+    setTrackGoalsAI: 'Setzen und verfolgen Sie Ihre psychischen Gesundheitsziele mit KI-Unterstützung.',
+    moodTracking: 'Stimmungsverfolgung',
+    trackMoodPatternsOverTime: 'Verfolgen und überwachen Sie Ihre Stimmungsmuster über die Zeit.',
+    myTasks: 'Meine Aufgaben',
+    refresh: 'Aktualisieren',
+    noTasksAssigned: 'Noch keine Aufgaben zugewiesen.',
+    due: 'Fällig',
+    overdue: 'überfällig',
+    deleteTask: 'Aufgabe löschen',
+    areYouSure: 'Sind Sie sicher?',
+    deleteTaskConfirmation: 'Dies wird diese Aufgabe dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.',
+    deleting: 'Löschen...',
+    weeklyMoodSummary: 'Wöchentliche Stimmungsübersicht',
+    moodStableThisWeek: 'Ihre Stimmung war diese Woche stabiler im Vergleich zur letzten Woche. Großer Fortschritt!',
+    activityImpact: 'Aktivitätseinfluss',
+    exercisePositiveImpact: 'Übungssitzungen scheinen Ihre Stimmung positiv zu beeinflussen. Erwägen Sie, diese Routine beizubehalten.',
+    moodTrends: 'Stimmungstrends',
+    aiPersonalizedByClinician: 'KI-Verhalten, das von Ihrem Arzt personalisiert wurde'
   },
 };
 

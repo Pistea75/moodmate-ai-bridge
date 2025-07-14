@@ -10,8 +10,12 @@ import {
   MessageSquare, 
   Plus,
   TrendingUp,
-  Activity
+  Activity,
+  Target,
+  Award,
+  Zap
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { AIInsightsCard } from './AIInsightsCard';
 import { MoodAnalyticsCard } from './MoodAnalyticsCard';
 import { RecentActivityFeed } from './RecentActivityFeed';
@@ -22,17 +26,32 @@ import { TasksCompletedCard } from './TasksCompletedCard';
 import { UpcomingSessionsCard } from './UpcomingSessionsCard';
 import { ExerciseTrackingCard } from './ExerciseTrackingCard';
 import { MoodLogModal } from './MoodLogModal';
+import { ProgressOverviewCard } from './ProgressOverviewCard';
+import { WellnessStreakCard } from './WellnessStreakCard';
+import { MotivationalQuoteCard } from './MotivationalQuoteCard';
 
 export function EnhancedPatientDashboard() {
+  const { t } = useLanguage();
   const [showMoodModal, setShowMoodModal] = useState(false);
 
   return (
     <div className="space-y-6">
-      {/* Welcome Section with AI Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <AIInsightsCard />
-        <ChatNowCard />
+      {/* Welcome Section with Motivational Quote */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <AIInsightsCard />
+        </div>
+        <MotivationalQuoteCard />
       </div>
+
+      {/* Wellness Streak and Progress Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <WellnessStreakCard />
+        <ProgressOverviewCard />
+      </div>
+
+      {/* AI Chat Now */}
+      <ChatNowCard />
 
       {/* Trigger Suggestions */}
       <TriggerSuggestion />
@@ -42,7 +61,7 @@ export function EnhancedPatientDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Quick Actions
+            {t('quickActions')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -53,7 +72,7 @@ export function EnhancedPatientDashboard() {
               variant="outline"
             >
               <Heart className="h-5 w-5" />
-              <span className="text-xs">Log Mood</span>
+              <span className="text-xs">{t('logMood')}</span>
             </Button>
             <Button 
               className="h-16 flex-col gap-2"
@@ -61,7 +80,7 @@ export function EnhancedPatientDashboard() {
               onClick={() => window.location.href = '/patient/tasks'}
             >
               <CheckSquare className="h-5 w-5" />
-              <span className="text-xs">View Tasks</span>
+              <span className="text-xs">{t('viewTasks')}</span>
             </Button>
             <Button 
               className="h-16 flex-col gap-2"
@@ -69,7 +88,7 @@ export function EnhancedPatientDashboard() {
               onClick={() => window.location.href = '/patient/sessions'}
             >
               <Calendar className="h-5 w-5" />
-              <span className="text-xs">Sessions</span>
+              <span className="text-xs">{t('sessions')}</span>
             </Button>
             <Button 
               className="h-16 flex-col gap-2"
@@ -77,7 +96,7 @@ export function EnhancedPatientDashboard() {
               onClick={() => window.location.href = '/patient/chat'}
             >
               <MessageSquare className="h-5 w-5" />
-              <span className="text-xs">AI Chat</span>
+              <span className="text-xs">{t('aiChat')}</span>
             </Button>
           </div>
         </CardContent>
