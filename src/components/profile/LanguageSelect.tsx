@@ -39,7 +39,7 @@ export function LanguageSelect({ form }: LanguageSelectProps) {
           >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Select a language" />
+                <SelectValue placeholder={t('selectALanguage')} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>

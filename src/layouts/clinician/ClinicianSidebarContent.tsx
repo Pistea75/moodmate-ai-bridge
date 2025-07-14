@@ -55,7 +55,7 @@ export function ClinicianSidebarContent() {
     { 
       to: '/clinician/risk-management', 
       icon: AlertTriangle, 
-      label: 'Risk Management'
+      label: t('riskManagement')
     },
     { 
       to: '/clinician/reports', 
@@ -65,7 +65,7 @@ export function ClinicianSidebarContent() {
     { 
       to: '/clinician/train-ai', 
       icon: Brain, 
-      label: 'Train AI'
+      label: t('trainAI')
     },
   ];
 
@@ -88,7 +88,7 @@ export function ClinicianSidebarContent() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">MoodMate</h1>
-            <p className="text-sm text-muted-foreground">Clinician Portal</p>
+            <p className="text-sm text-muted-foreground">{t('clinicianPortal')}</p>
           </div>
         </div>
       </div>

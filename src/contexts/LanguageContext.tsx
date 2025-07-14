@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,6 +38,11 @@ export interface Translations {
   firstName: string;
   lastName: string;
   preferredLanguage: string;
+  myProfile: string;
+  professionalInformation: string;
+  personalInformation: string;
+  specialization: string;
+  licenseNumber: string;
   
   // Common
   loading: string;
@@ -50,6 +56,27 @@ export interface Translations {
   upcomingSessions: string;
   activeTasks: string;
   recentActivity: string;
+  
+  // Settings
+  accountSettings: string;
+  languageSettings: string;
+  notificationSettings: string;
+  privacySettings: string;
+  
+  // Forms
+  selectLanguage: string;
+  selectALanguage: string;
+  
+  // Sidebar
+  clinicianPortal: string;
+  patientPortal: string;
+  riskManagement: string;
+  trainAI: string;
+  
+  // General
+  welcome: string;
+  pleaseWait: string;
+  noDataAvailable: string;
 }
 
 // Translation data
@@ -88,6 +115,11 @@ const translations: Record<string, Translations> = {
     firstName: 'First Name',
     lastName: 'Last Name',
     preferredLanguage: 'Preferred Language',
+    myProfile: 'My Profile',
+    professionalInformation: 'Professional Information',
+    personalInformation: 'Personal Information',
+    specialization: 'Specialization',
+    licenseNumber: 'License Number',
     
     // Common
     loading: 'Loading...',
@@ -101,6 +133,27 @@ const translations: Record<string, Translations> = {
     upcomingSessions: 'Upcoming Sessions',
     activeTasks: 'Active Tasks',
     recentActivity: 'Recent Activity',
+    
+    // Settings
+    accountSettings: 'Account Settings',
+    languageSettings: 'Language Settings',
+    notificationSettings: 'Notification Settings',
+    privacySettings: 'Privacy Settings',
+    
+    // Forms
+    selectLanguage: 'Select a language',
+    selectALanguage: 'Select a language',
+    
+    // Sidebar
+    clinicianPortal: 'Clinician Portal',
+    patientPortal: 'Patient Portal',
+    riskManagement: 'Risk Management',
+    trainAI: 'Train AI',
+    
+    // General
+    welcome: 'Welcome',
+    pleaseWait: 'Please wait',
+    noDataAvailable: 'No data available',
   },
   es: {
     // Navigation
@@ -136,6 +189,11 @@ const translations: Record<string, Translations> = {
     firstName: 'Nombre',
     lastName: 'Apellido',
     preferredLanguage: 'Idioma Preferido',
+    myProfile: 'Mi Perfil',
+    professionalInformation: 'Información Profesional',
+    personalInformation: 'Información Personal',
+    specialization: 'Especialización',
+    licenseNumber: 'Número de Licencia',
     
     // Common
     loading: 'Cargando...',
@@ -149,6 +207,27 @@ const translations: Record<string, Translations> = {
     upcomingSessions: 'Próximas Sesiones',
     activeTasks: 'Tareas Activas',
     recentActivity: 'Actividad Reciente',
+    
+    // Settings
+    accountSettings: 'Configuración de Cuenta',
+    languageSettings: 'Configuración de Idioma',
+    notificationSettings: 'Configuración de Notificaciones',
+    privacySettings: 'Configuración de Privacidad',
+    
+    // Forms
+    selectLanguage: 'Selecciona un idioma',
+    selectALanguage: 'Selecciona un idioma',
+    
+    // Sidebar
+    clinicianPortal: 'Portal del Médico',
+    patientPortal: 'Portal del Paciente',
+    riskManagement: 'Gestión de Riesgos',
+    trainAI: 'Entrenar IA',
+    
+    // General
+    welcome: 'Bienvenido',
+    pleaseWait: 'Por favor espera',
+    noDataAvailable: 'No hay datos disponibles',
   },
   fr: {
     // Navigation
@@ -184,6 +263,11 @@ const translations: Record<string, Translations> = {
     firstName: 'Prénom',
     lastName: 'Nom de famille',
     preferredLanguage: 'Langue Préférée',
+    myProfile: 'Mon Profil',
+    professionalInformation: 'Informations Professionnelles',
+    personalInformation: 'Informations Personnelles',
+    specialization: 'Spécialisation',
+    licenseNumber: 'Numéro de Licence',
     
     // Common
     loading: 'Chargement...',
@@ -197,6 +281,27 @@ const translations: Record<string, Translations> = {
     upcomingSessions: 'Sessions à Venir',
     activeTasks: 'Tâches Actives',
     recentActivity: 'Activité Récente',
+    
+    // Settings
+    accountSettings: 'Paramètres du Compte',
+    languageSettings: 'Paramètres de Langue',
+    notificationSettings: 'Paramètres de Notification',
+    privacySettings: 'Paramètres de Confidentialité',
+    
+    // Forms
+    selectLanguage: 'Sélectionner une langue',
+    selectALanguage: 'Sélectionner une langue',
+    
+    // Sidebar
+    clinicianPortal: 'Portail Clinicien',
+    patientPortal: 'Portail Patient',
+    riskManagement: 'Gestion des Risques',
+    trainAI: 'Former l\'IA',
+    
+    // General
+    welcome: 'Bienvenue',
+    pleaseWait: 'Veuillez patienter',
+    noDataAvailable: 'Aucune donnée disponible',
   },
   de: {
     // Navigation
@@ -232,6 +337,11 @@ const translations: Record<string, Translations> = {
     firstName: 'Vorname',
     lastName: 'Nachname',
     preferredLanguage: 'Bevorzugte Sprache',
+    myProfile: 'Mein Profil',
+    professionalInformation: 'Berufliche Informationen',
+    personalInformation: 'Persönliche Informationen',
+    specialization: 'Spezialisierung',
+    licenseNumber: 'Lizenznummer',
     
     // Common
     loading: 'Laden...',
@@ -245,6 +355,27 @@ const translations: Record<string, Translations> = {
     upcomingSessions: 'Bevorstehende Sitzungen',
     activeTasks: 'Aktive Aufgaben',
     recentActivity: 'Letzte Aktivität',
+    
+    // Settings
+    accountSettings: 'Kontoeinstellungen',
+    languageSettings: 'Spracheinstellungen',
+    notificationSettings: 'Benachrichtigungseinstellungen',
+    privacySettings: 'Datenschutzeinstellungen',
+    
+    // Forms
+    selectLanguage: 'Sprache auswählen',
+    selectALanguage: 'Sprache auswählen',
+    
+    // Sidebar
+    clinicianPortal: 'Arzt-Portal',
+    patientPortal: 'Patienten-Portal',
+    riskManagement: 'Risikomanagement',
+    trainAI: 'KI Trainieren',
+    
+    // General
+    welcome: 'Willkommen',
+    pleaseWait: 'Bitte warten',
+    noDataAvailable: 'Keine Daten verfügbar',
   },
 };
 
