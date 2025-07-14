@@ -51,11 +51,21 @@ export interface Translations {
   close: string;
   confirm: string;
   
-  // Dashboard
+  // Dashboard - General
   totalPatients: string;
   upcomingSessions: string;
   activeTasks: string;
   recentActivity: string;
+  welcomeBackMessage: string;
+  mentalHealthOverview: string;
+  
+  // Dashboard - Patient
+  patientDashboard: string;
+  yourMentalHealthOverview: string;
+  todaysMood: string;
+  weeklyProgress: string;
+  upcomingAppointments: string;
+  completedTasks: string;
   
   // Settings
   accountSettings: string;
@@ -77,6 +87,47 @@ export interface Translations {
   welcome: string;
   pleaseWait: string;
   noDataAvailable: string;
+  
+  // Common UI Text
+  viewAll: string;
+  seeMore: string;
+  showLess: string;
+  today: string;
+  thisWeek: string;
+  thisMonth: string;
+  
+  // Status and Labels
+  active: string;
+  completed: string;
+  pending: string;
+  scheduled: string;
+  cancelled: string;
+  
+  // Time and Dates
+  morning: string;
+  afternoon: string;
+  evening: string;
+  yesterday: string;
+  tomorrow: string;
+  
+  // Actions and Buttons
+  scheduleSession: string;
+  addTask: string;
+  viewDetails: string;
+  editProfile: string;
+  changePassword: string;
+  logout: string;
+  
+  // Navigation Items
+  mood: string;
+  chat: string;
+  goals: string;
+  insights: string;
+  treatmentPlans: string;
+  resourceLibrary: string;
+  
+  // App Name
+  appName: string;
 }
 
 // Translation data
@@ -128,11 +179,21 @@ const translations: Record<string, Translations> = {
     close: 'Close',
     confirm: 'Confirm',
     
-    // Dashboard
+    // Dashboard - General
     totalPatients: 'Total Patients',
     upcomingSessions: 'Upcoming Sessions',
     activeTasks: 'Active Tasks',
     recentActivity: 'Recent Activity',
+    welcomeBackMessage: 'Welcome back!',
+    mentalHealthOverview: 'Here\'s your mental health overview.',
+    
+    // Dashboard - Patient
+    patientDashboard: 'Dashboard',
+    yourMentalHealthOverview: 'Welcome back! Here\'s your mental health overview.',
+    todaysMood: 'Today\'s Mood',
+    weeklyProgress: 'Weekly Progress',
+    upcomingAppointments: 'Upcoming Appointments',
+    completedTasks: 'Completed Tasks',
     
     // Settings
     accountSettings: 'Account Settings',
@@ -154,6 +215,47 @@ const translations: Record<string, Translations> = {
     welcome: 'Welcome',
     pleaseWait: 'Please wait',
     noDataAvailable: 'No data available',
+    
+    // Common UI Text
+    viewAll: 'View All',
+    seeMore: 'See More',
+    showLess: 'Show Less',
+    today: 'Today',
+    thisWeek: 'This Week',
+    thisMonth: 'This Month',
+    
+    // Status and Labels
+    active: 'Active',
+    completed: 'Completed',
+    pending: 'Pending',
+    scheduled: 'Scheduled',
+    cancelled: 'Cancelled',
+    
+    // Time and Dates
+    morning: 'Morning',
+    afternoon: 'Afternoon',
+    evening: 'Evening',
+    yesterday: 'Yesterday',
+    tomorrow: 'Tomorrow',
+    
+    // Actions and Buttons
+    scheduleSession: 'Schedule Session',
+    addTask: 'Add Task',
+    viewDetails: 'View Details',
+    editProfile: 'Edit Profile',
+    changePassword: 'Change Password',
+    logout: 'Logout',
+    
+    // Navigation Items
+    mood: 'Mood',
+    chat: 'Chat',
+    goals: 'Goals',
+    insights: 'Insights',
+    treatmentPlans: 'Treatment Plans',
+    resourceLibrary: 'Resource Library',
+    
+    // App Name
+    appName: 'MoodMate',
   },
   es: {
     // Navigation
@@ -202,11 +304,21 @@ const translations: Record<string, Translations> = {
     close: 'Cerrar',
     confirm: 'Confirmar',
     
-    // Dashboard
+    // Dashboard - General
     totalPatients: 'Total de Pacientes',
     upcomingSessions: 'Próximas Sesiones',
     activeTasks: 'Tareas Activas',
     recentActivity: 'Actividad Reciente',
+    welcomeBackMessage: '¡Bienvenido de vuelta!',
+    mentalHealthOverview: 'Aquí está tu resumen de salud mental.',
+    
+    // Dashboard - Patient
+    patientDashboard: 'Panel de Control',
+    yourMentalHealthOverview: '¡Bienvenido de vuelta! Aquí está tu resumen de salud mental.',
+    todaysMood: 'Estado de Ánimo de Hoy',
+    weeklyProgress: 'Progreso Semanal',
+    upcomingAppointments: 'Próximas Citas',
+    completedTasks: 'Tareas Completadas',
     
     // Settings
     accountSettings: 'Configuración de Cuenta',
@@ -228,6 +340,47 @@ const translations: Record<string, Translations> = {
     welcome: 'Bienvenido',
     pleaseWait: 'Por favor espera',
     noDataAvailable: 'No hay datos disponibles',
+    
+    // Common UI Text
+    viewAll: 'Ver Todo',
+    seeMore: 'Ver Más',
+    showLess: 'Mostrar Menos',
+    today: 'Hoy',
+    thisWeek: 'Esta Semana',
+    thisMonth: 'Este Mes',
+    
+    // Status and Labels
+    active: 'Activo',
+    completed: 'Completado',
+    pending: 'Pendiente',
+    scheduled: 'Programado',
+    cancelled: 'Cancelado',
+    
+    // Time and Dates
+    morning: 'Mañana',
+    afternoon: 'Tarde',
+    evening: 'Noche',
+    yesterday: 'Ayer',
+    tomorrow: 'Mañana',
+    
+    // Actions and Buttons
+    scheduleSession: 'Programar Sesión',
+    addTask: 'Agregar Tarea',
+    viewDetails: 'Ver Detalles',
+    editProfile: 'Editar Perfil',
+    changePassword: 'Cambiar Contraseña',
+    logout: 'Cerrar Sesión',
+    
+    // Navigation Items
+    mood: 'Estado de Ánimo',
+    chat: 'Chat',
+    goals: 'Objetivos',
+    insights: 'Insights',
+    treatmentPlans: 'Planes de Tratamiento',
+    resourceLibrary: 'Biblioteca de Recursos',
+    
+    // App Name
+    appName: 'MoodMate',
   },
   fr: {
     // Navigation
@@ -276,11 +429,21 @@ const translations: Record<string, Translations> = {
     close: 'Fermer',
     confirm: 'Confirmer',
     
-    // Dashboard
+    // Dashboard - General
     totalPatients: 'Total des Patients',
     upcomingSessions: 'Sessions à Venir',
     activeTasks: 'Tâches Actives',
     recentActivity: 'Activité Récente',
+    welcomeBackMessage: 'Bon retour!',
+    mentalHealthOverview: 'Voici votre aperçu de santé mentale.',
+    
+    // Dashboard - Patient
+    patientDashboard: 'Tableau de Bord',
+    yourMentalHealthOverview: 'Bon retour! Voici votre aperçu de santé mentale.',
+    todaysMood: 'Humeur d\'Aujourd\'hui',
+    weeklyProgress: 'Progrès Hebdomadaire',
+    upcomingAppointments: 'Rendez-vous à Venir',
+    completedTasks: 'Tâches Terminées',
     
     // Settings
     accountSettings: 'Paramètres du Compte',
@@ -302,6 +465,47 @@ const translations: Record<string, Translations> = {
     welcome: 'Bienvenue',
     pleaseWait: 'Veuillez patienter',
     noDataAvailable: 'Aucune donnée disponible',
+    
+    // Common UI Text
+    viewAll: 'Voir Tout',
+    seeMore: 'Voir Plus',
+    showLess: 'Voir Moins',
+    today: 'Aujourd\'hui',
+    thisWeek: 'Cette Semaine',
+    thisMonth: 'Ce Mois',
+    
+    // Status and Labels
+    active: 'Actif',
+    completed: 'Terminé',
+    pending: 'En Attente',
+    scheduled: 'Programmé',
+    cancelled: 'Annulé',
+    
+    // Time and Dates
+    morning: 'Matin',
+    afternoon: 'Après-midi',
+    evening: 'Soir',
+    yesterday: 'Hier',
+    tomorrow: 'Demain',
+    
+    // Actions and Buttons
+    scheduleSession: 'Programmer Session',
+    addTask: 'Ajouter Tâche',
+    viewDetails: 'Voir Détails',
+    editProfile: 'Modifier Profil',
+    changePassword: 'Changer Mot de Passe',
+    logout: 'Déconnexion',
+    
+    // Navigation Items
+    mood: 'Humeur',
+    chat: 'Chat',
+    goals: 'Objectifs',
+    insights: 'Insights',
+    treatmentPlans: 'Plans de Traitement',
+    resourceLibrary: 'Bibliothèque de Ressources',
+    
+    // App Name
+    appName: 'MoodMate',
   },
   de: {
     // Navigation
@@ -350,11 +554,21 @@ const translations: Record<string, Translations> = {
     close: 'Schließen',
     confirm: 'Bestätigen',
     
-    // Dashboard
+    // Dashboard - General
     totalPatients: 'Patienten Gesamt',
     upcomingSessions: 'Bevorstehende Sitzungen',
     activeTasks: 'Aktive Aufgaben',
     recentActivity: 'Letzte Aktivität',
+    welcomeBackMessage: 'Willkommen zurück!',
+    mentalHealthOverview: 'Hier ist Ihre psychische Gesundheitsübersicht.',
+    
+    // Dashboard - Patient
+    patientDashboard: 'Dashboard',
+    yourMentalHealthOverview: 'Willkommen zurück! Hier ist Ihre psychische Gesundheitsübersicht.',
+    todaysMood: 'Heutige Stimmung',
+    weeklyProgress: 'Wöchentlicher Fortschritt',
+    upcomingAppointments: 'Bevorstehende Termine',
+    completedTasks: 'Erledigte Aufgaben',
     
     // Settings
     accountSettings: 'Kontoeinstellungen',
@@ -376,6 +590,47 @@ const translations: Record<string, Translations> = {
     welcome: 'Willkommen',
     pleaseWait: 'Bitte warten',
     noDataAvailable: 'Keine Daten verfügbar',
+    
+    // Common UI Text
+    viewAll: 'Alle anzeigen',
+    seeMore: 'Mehr anzeigen',
+    showLess: 'Weniger anzeigen',
+    today: 'Heute',
+    thisWeek: 'Diese Woche',
+    thisMonth: 'Dieser Monat',
+    
+    // Status and Labels
+    active: 'Aktiv',
+    completed: 'Abgeschlossen',
+    pending: 'Ausstehend',
+    scheduled: 'Geplant',
+    cancelled: 'Abgesagt',
+    
+    // Time and Dates
+    morning: 'Morgen',
+    afternoon: 'Nachmittag',
+    evening: 'Abend',
+    yesterday: 'Gestern',
+    tomorrow: 'Morgen',
+    
+    // Actions and Buttons
+    scheduleSession: 'Sitzung planen',
+    addTask: 'Aufgabe hinzufügen',
+    viewDetails: 'Details anzeigen',
+    editProfile: 'Profil bearbeiten',
+    changePassword: 'Passwort ändern',
+    logout: 'Abmelden',
+    
+    // Navigation Items
+    mood: 'Stimmung',
+    chat: 'Chat',
+    goals: 'Ziele',
+    insights: 'Erkenntnisse',
+    treatmentPlans: 'Behandlungspläne',
+    resourceLibrary: 'Ressourcenbibliothek',
+    
+    // App Name
+    appName: 'MoodMate',
   },
 };
 
