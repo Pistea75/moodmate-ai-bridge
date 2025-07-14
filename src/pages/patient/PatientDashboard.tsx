@@ -1,8 +1,10 @@
 
 import PatientLayout from '../../layouts/PatientLayout';
 import { EnhancedPatientDashboard } from '@/components/patient/EnhancedPatientDashboard';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function PatientDashboard() {
+  const { t } = useLanguage();
   return (
     <PatientLayout>
       <div className="space-y-6">
