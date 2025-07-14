@@ -83,7 +83,7 @@ export function PatientSidebarContent({ patientName }: PatientSidebarContentProp
             }
           >
             <item.icon className="h-4 w-4" />
-            {t(item.title)}
+            {t(item.title as keyof typeof t)}
           </NavLink>
         ))}
       </nav>
