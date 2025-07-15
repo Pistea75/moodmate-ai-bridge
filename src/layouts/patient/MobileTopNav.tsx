@@ -23,7 +23,7 @@ export function MobileTopNav({ patientFullName, isOpen, setIsOpen }: MobileTopNa
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72 bg-background border-r">
-            <PatientSidebarContent patientName={patientFullName} />
+            <PatientSidebarContent patientFullName={patientFullName} />
           </SheetContent>
         </Sheet>
         <div className="flex items-center gap-2">

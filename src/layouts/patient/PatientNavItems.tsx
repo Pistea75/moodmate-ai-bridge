@@ -52,3 +52,7 @@ export const patientNavItems = [
     icon: User,
   },
 ];
+
+export function PatientNavItems() {
+  return patientNavItems;
+}

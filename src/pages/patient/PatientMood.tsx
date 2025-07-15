@@ -25,13 +25,15 @@ export default function PatientMood() {
                 {t('trackMoodPatternsOverTime')}
               </p>
             </div>
-            <Button 
-              onClick={() => setShowMoodLog(true)}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              {t('logMood')}
-            </Button>
+            <MoodLogModal 
+              onLogComplete={() => setShowMoodLog(false)}
+              trigger={
+                <Button className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  {t('logMood')}
+                </Button>
+              }
+            />
           </div>
         </div>
 
@@ -43,12 +45,6 @@ export default function PatientMood() {
           </div>
           <MoodChart />
         </div>
-
-        {/* Mood Log Modal */}
-        <MoodLogModal 
-          open={showMoodLog} 
-          onOpenChange={setShowMoodLog} 
-        />
       </div>
     </PatientLayout>
   );
