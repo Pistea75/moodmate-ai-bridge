@@ -12,9 +12,11 @@ export default function PatientProfile() {
   
   return (
     <PatientLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">My Profile</h1>
+      <div className="p-8 space-y-8">
+        <div className="flex justify-between items-start">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-gray-900">My Profile</h1>
+          </div>
           <div className="flex gap-2">
             <LogoutButton />
             <DeleteProfileButton />

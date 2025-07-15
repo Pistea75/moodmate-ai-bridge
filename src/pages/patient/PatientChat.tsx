@@ -8,13 +8,13 @@ export default function PatientChat() {
 
   return (
     <PatientLayout>
-      <div className="space-y-6">
+      <div className="p-8 space-y-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border shadow-sm">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold text-gray-900">
             {t('aiChat')}
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-xl text-gray-600">
             {t('aiPersonalizedByClinician')}
           </p>
         </div>

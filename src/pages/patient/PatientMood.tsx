@@ -4,37 +4,33 @@ import { MoodChart } from '@/components/mood/MoodChart';
 import { MoodLogModal } from '@/components/patient/MoodLogModal';
 import { Button } from '@/components/ui/button';
 import { Plus, TrendingUp } from 'lucide-react';
-import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function PatientMood() {
   const { t } = useLanguage();
-  const [showMoodLog, setShowMoodLog] = useState(false);
 
   return (
     <PatientLayout>
-      <div className="space-y-6">
+      <div className="p-8 space-y-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {t('moodTracking')}
-              </h1>
-              <p className="text-gray-600 text-lg">
-                {t('trackMoodPatternsOverTime')}
-              </p>
-            </div>
-            <MoodLogModal 
-              onLogComplete={() => setShowMoodLog(false)}
-              trigger={
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  {t('logMood')}
-                </Button>
-              }
-            />
+        <div className="flex justify-between items-start">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-gray-900">
+              {t('moodTracking')}
+            </h1>
+            <p className="text-xl text-gray-600">
+              {t('trackMoodPatternsOverTime')}
+            </p>
           </div>
+          <MoodLogModal 
+            onLogComplete={() => {}}
+            trigger={
+              <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                {t('logMood')}
+              </Button>
+            }
+          />
         </div>
 
         {/* Mood Chart */}

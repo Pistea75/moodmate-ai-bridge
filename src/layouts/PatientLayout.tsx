@@ -14,7 +14,7 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
   const { patientFullName } = usePatientProfile();
   
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Mobile Top Nav */}
       <MobileTopNav 
         patientFullName={<span className="text-foreground">{patientFullName}</span>} 
@@ -28,11 +28,9 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
       />
       
       {/* Main Content */}
-      <main className="flex-1 pt-16 md:pt-0 md:ml-64 bg-background">
-        <div className="container mx-auto px-4 py-6 bg-background min-h-screen">
-          <div className="text-foreground">
-            {children}
-          </div>
+      <main className="flex-1 pt-16 md:pt-0 md:ml-64 bg-gray-50 min-h-screen">
+        <div className="w-full min-h-screen">
+          {children}
         </div>
       </main>
     </div>

@@ -2,7 +2,7 @@
 import PatientLayout from '../../layouts/PatientLayout';
 import { SessionList } from '@/components/session/SessionList';
 import { PatientSessionHeader } from '@/components/session/PatientSessionHeader';
-import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal'; // Use the working modal from session folder
+import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
 import { usePatientSessions } from '@/hooks/usePatientSessionsList';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -25,7 +25,7 @@ export default function PatientSessions() {
 
   return (
     <PatientLayout>
-      <div className="space-y-6">
+      <div className="p-8 space-y-8">
         {/* Header */}
         <PatientSessionHeader 
           date={date}
@@ -53,7 +53,7 @@ export default function PatientSessions() {
         />
       </div>
 
-      {/* Schedule Session Modal - using the working session folder component */}
+      {/* Schedule Session Modal */}
       <ScheduleSessionModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

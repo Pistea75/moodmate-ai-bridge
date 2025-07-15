@@ -25,9 +25,9 @@ export default function PatientSettings() {
 
   return (
     <PatientLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{t('settings')}</h1>
+      <div className="p-8 space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold text-gray-900">{t('settings')}</h1>
         </div>
         
         <div className="grid gap-6">

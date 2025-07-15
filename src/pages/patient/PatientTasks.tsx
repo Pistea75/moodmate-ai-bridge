@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -129,27 +128,25 @@ export default function PatientTasks() {
 
   return (
     <PatientLayout>
-      <div className="space-y-6">
+      <div className="p-8 space-y-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {t('myTasks')}
-              </h1>
-              <p className="text-gray-600 text-lg">
-                {tasks.length === 0 ? t('noTasksAssigned') : `${tasks.filter(t => t.completed).length} of ${tasks.length} tasks completed`}
-              </p>
-            </div>
-            <Button 
-              onClick={fetchTasks}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              {t('refresh')}
-            </Button>
+        <div className="flex justify-between items-start">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-gray-900">
+              {t('myTasks')}
+            </h1>
+            <p className="text-xl text-gray-600">
+              {tasks.length === 0 ? t('noTasksAssigned') : `${tasks.filter(t => t.completed).length} of ${tasks.length} tasks completed`}
+            </p>
           </div>
+          <Button 
+            onClick={fetchTasks}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            {t('refresh')}
+          </Button>
         </div>
 
         {/* Tasks List */}

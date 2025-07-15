@@ -15,13 +15,13 @@ export function EnhancedPatientDashboard() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6">
+    <div className="p-8 space-y-8">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="space-y-2">
+        <h1 className="text-4xl font-bold text-gray-900">
           {t('welcomeBackMessage')}
         </h1>
-        <p className="text-gray-600 text-lg">
+        <p className="text-xl text-gray-600">
           {t('yourMentalHealthOverview')}
         </p>
       </div>

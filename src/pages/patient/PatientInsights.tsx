@@ -33,7 +33,7 @@ export default function PatientInsights() {
   if (loading) {
     return (
       <PatientLayout>
-        <div className="space-y-6">
+        <div className="p-8 space-y-8">
           <div className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map(i => (
@@ -47,13 +47,13 @@ export default function PatientInsights() {
 
   return (
     <PatientLayout>
-      <div className="space-y-6">
+      <div className="p-8 space-y-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border shadow-sm">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold text-gray-900">
             {t('insights')}
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-xl text-gray-600">
             {t('aiPersonalizedByClinician')}
           </p>
         </div>
