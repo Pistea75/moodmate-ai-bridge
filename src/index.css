@@ -122,3 +122,45 @@
     @apply bg-white shadow-md;
   }
 }
+
+@layer utilities {
+  /* Custom animations for special effects */
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+  
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(rgba(155, 135, 245, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(155, 135, 245, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+}
