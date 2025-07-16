@@ -35,3 +35,9 @@ enabled = true
 [functions.process-session-recording]
 [functions.assess-patient-risk]
 verify_jwt = true
+[functions.text-to-speech]
+verify_jwt = true
+[functions.sentiment-analysis]
+verify_jwt = true
+[functions.ai-personalization]
+verify_jwt = true
