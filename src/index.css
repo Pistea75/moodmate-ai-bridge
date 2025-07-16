@@ -140,6 +140,14 @@
     background-size: 20px 20px;
   }
   
+  .animate-bounce-slow {
+    animation: bounce 3s infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -160,7 +168,37 @@
     }
   }
   
+  @keyframes slideInFromLeft {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideInFromRight {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
   .animate-float {
     animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-slide-in-left {
+    animation: slideInFromLeft 0.8s ease-out forwards;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInFromRight 0.8s ease-out forwards;
   }
 }
