@@ -1,65 +1,96 @@
 
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { SubscriptionCard, subscriptionPlans } from '@/components/subscription/SubscriptionCard';
+import { SubscriptionStatus } from '@/components/subscription/SubscriptionStatus';
 import { PublicNav } from '../components/PublicNav';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Pricing() {
-  const plans = [
-    {
-      name: "Basic",
-      price: "$29",
-      features: [
-        "Access to AI companion",
-        "Basic progress tracking",
-        "Message support",
-        "Limited sessions"
-      ]
-    },
-    {
-      name: "Professional",
-      price: "$99",
-      features: [
-        "Everything in Basic",
-        "Advanced analytics",
-        "Priority support",
-        "Unlimited sessions"
-      ]
-    }
-  ];
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col">
       <PublicNav />
       <div className="flex-1">
-        <div className="bg-gradient-to-b from-mood-purple/10 to-transparent py-12 md:py-20">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-b from-primary/10 to-transparent py-12 md:py-20">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">Pricing Plans</h1>
+            <h1 className="text-4xl md:text-6xl font-bold text-center mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Choose Your Mental Health Journey
+            </h1>
             <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto">
-              Choose the plan that best fits your needs
+              Unlock the power of AI-driven mental health support with our flexible pricing plans designed to fit your needs
             </p>
           </div>
         </div>
 
+        {/* Subscription Status for Logged-in Users */}
+        {user && (
+          <div className="container mx-auto px-4 py-8">
+            <SubscriptionStatus />
+          </div>
+        )}
+
+        {/* Pricing Cards */}
         <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {plans.map((plan) => (
-              <Card key={plan.name} className="p-6 border shadow-md hover:shadow-lg transition-shadow">
-                <h2 className="text-2xl font-semibold mb-2">{plan.name}</h2>
-                <p className="text-3xl font-bold mb-6">{plan.price}<span className="text-sm text-muted-foreground">/month</span></p>
-                <ul className="space-y-3 mb-6">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2">
-                      <Check className="text-mood-purple" size={18} />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button className="w-full bg-mood-purple hover:bg-mood-purple/90">Get Started</Button>
-              </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {subscriptionPlans.map((plan) => (
+              <div key={plan.id}>
+                <SubscriptionCard plan={plan} />
+              </div>
             ))}
           </div>
         </div>
+
+        {/* Features Comparison */}
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">What's Included</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🤖</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">AI Companion</h3>
+                <p className="text-muted-foreground">24/7 intelligent support that learns and adapts to your needs</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">📊</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Progress Tracking</h3>
+                <p className="text-muted-foreground">Detailed analytics and insights into your mental health journey</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🔒</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Privacy First</h3>
+                <p className="text-muted-foreground">HIPAA-compliant security with end-to-end encryption</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <div className="max-w-4xl mx-auto space-y-6">
+              <div className="border rounded-lg p-6">
+                <h3 className="font-semibold mb-2">Can I change my plan anytime?</h3>
+                <p className="text-muted-foreground">Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.</p>
+              </div>
+              <div className="border rounded-lg p-6">
+                <h3 className="font-semibold mb-2">Is there a free trial?</h3>
+                <p className="text-muted-foreground">We offer a 7-day free trial for all new users to experience our platform risk-free.</p>
+              </div>
+              <div className="border rounded-lg p-6">
+                <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
+                <p className="text-muted-foreground">We accept all major credit cards, PayPal, and bank transfers for enterprise plans.</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
       
       <footer className="border-t py-8 bg-muted/30">
