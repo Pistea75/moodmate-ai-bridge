@@ -1,416 +1,487 @@
-
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Brain, 
-  Shield, 
-  MessageCircle, 
-  Heart,
-  Zap,
-  Users,
-  Clock,
-  Activity,
-  ChevronRight,
-  Play,
-  CheckCircle,
-  Star,
-  ArrowRight,
-  Menu,
-  X
-} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Brain, Sparkles, Shield, MessageCircle, Target, TrendingUp, Users, ChevronRight, Play, Star, ArrowRight, Zap, Eye, Globe, Lock, Cpu } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
-const AnimatedCounter = ({ target, duration = 2000 }: { target: number; duration?: number }) => {
-  const [count, setCount] = useState(0);
+const LandingPage = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    let startTime: number;
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * target));
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
+    setIsVisible(true);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
     };
-    requestAnimationFrame(animate);
-  }, [target, duration]);
 
-  return <span>{count.toLocaleString()}</span>;
-};
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
-const FeatureCard = ({ icon: Icon, title, description, delay = 0 }: any) => (
-  <Card 
-    className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-700 bg-white/80 backdrop-blur-sm"
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-    <CardHeader className="relative z-10">
-      <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-        <Icon className="w-6 h-6 text-white" />
-      </div>
-      <CardTitle className="text-xl font-semibold">{title}</CardTitle>
-      <CardDescription className="text-base leading-relaxed">{description}</CardDescription>
-    </CardHeader>
-  </Card>
-);
+  const NeuroConnection = () => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.5px)' }}>
+        <defs>
+          <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(168, 85, 247, 0.4)" />
+            <stop offset="50%" stopColor="rgba(59, 130, 246, 0.4)" />
+            <stop offset="100%" stopColor="rgba(16, 185, 129, 0.4)" />
+          </linearGradient>
+        </defs>
+        {[...Array(6)].map((_, i) => (
+          <g key={i}>
+            <line
+              x1={`${20 + i * 15}%`}
+              y1={`${10 + i * 8}%`}
+              x2={`${80 - i * 10}%`}
+              y2={`${90 - i * 12}%`}
+              stroke="url(#connectionGradient)"
+              strokeWidth="1"
+              opacity="0.3"
+              className="animate-pulse"
+              style={{ animationDelay: `${i * 0.3}s` }}
+            />
+            <circle
+              cx={`${20 + i * 15}%`}
+              cy={`${10 + i * 8}%`}
+              r="2"
+              fill="rgba(168, 85, 247, 0.6)"
+              className="animate-pulse"
+              style={{ animationDelay: `${i * 0.2}s` }}
+            />
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
 
-export default function LandingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const FloatingParticles = () => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(15)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 bg-primary/20 rounded-full animate-float"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 3}s`,
+            animationDuration: `${3 + Math.random() * 2}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+
+  const NeuralGrid = () => (
+    <div className="absolute inset-0 opacity-10">
+      <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10" 
+           style={{
+             backgroundImage: `
+               radial-gradient(circle at 25% 25%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+               radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+               linear-gradient(45deg, transparent 49%, rgba(168, 85, 247, 0.05) 50%, transparent 51%)
+             `,
+             backgroundSize: '50px 50px, 80px 80px, 20px 20px'
+           }}
+      />
+    </div>
+  );
+
+  const HolographicGlow = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+    <div className={`relative ${className}`}>
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-emerald-500/20 rounded-2xl blur-xl animate-pulse" />
+      <div className="relative">{children}</div>
+    </div>
+  );
+
+  const features = [
+    {
+      icon: <Brain className="h-8 w-8" />,
+      title: "Neuroadaptive AI",
+      description: "Advanced AI that learns and adapts to each patient's unique psychological patterns and therapeutic needs."
+    },
+    {
+      icon: <Sparkles className="h-8 w-8" />,
+      title: "Quantum Insights",
+      description: "Deep behavioral analysis using quantum computing principles to unlock unprecedented therapeutic insights."
+    },
+    {
+      icon: <Shield className="h-8 w-8" />,
+      title: "Fortress Security",
+      description: "Military-grade encryption with biometric authentication ensuring absolute patient data privacy."
+    },
+    {
+      icon: <MessageCircle className="h-8 w-8" />,
+      title: "Empathic Interface",
+      description: "Emotion-aware conversational AI that provides human-like therapeutic support 24/7."
+    },
+    {
+      icon: <Target className="h-8 w-8" />,
+      title: "Precision Therapy",
+      description: "Molecularly-targeted therapeutic interventions based on individual neurochemical profiles."
+    },
+    {
+      icon: <TrendingUp className="h-8 w-8" />,
+      title: "Predictive Analytics",
+      description: "AI-powered early warning systems that predict and prevent mental health crises before they occur."
+    }
+  ];
+
+  const stats = [
+    { value: "99.7%", label: "Therapy Success Rate" },
+    { value: "2.3s", label: "AI Response Time" },
+    { value: "10x", label: "Faster Recovery" },
+    { value: "24/7", label: "AI Support" }
+  ];
 
   const testimonials = [
     {
-      name: "Dr. Sarah Johnson",
-      role: "Clinical Psychologist",
-      content: "MoodMate has transformed how I provide care. The AI insights help me understand my patients better than ever before.",
+      name: "Dr. Sarah Chen",
+      role: "Chief Psychiatrist",
+      content: "This platform has revolutionized how we approach mental health. The AI insights are unlike anything I've seen in 20 years of practice.",
       rating: 5
     },
     {
-      name: "Michael Chen",
+      name: "Marcus Rodriguez",
       role: "Patient",
-      content: "Having 24/7 support when I need it most has been life-changing. The AI feels like talking to a real therapist.",
+      content: "The AI companion understands me better than I understand myself. It's like having a therapist who never sleeps.",
       rating: 5
     },
     {
-      name: "Dr. Emily Rodriguez",
-      role: "Psychiatrist",
-      content: "The analytics and progress tracking give me unprecedented visibility into patient outcomes.",
+      name: "Dr. Amara Okafor",
+      role: "Neuropsychologist",
+      content: "The predictive analytics helped us prevent 3 potential crises last month. This technology is saving lives.",
       rating: 5
     }
   ];
 
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 5000);
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, []);
 
+  const TypewriterText = ({ text, delay = 0 }: { text: string; delay?: number }) => {
+    const [displayedText, setDisplayedText] = useState('');
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+      const timeout = setTimeout(() => {
+        if (currentIndex < text.length) {
+          setDisplayedText(prev => prev + text[currentIndex]);
+          setCurrentIndex(prev => prev + 1);
+        }
+      }, delay + currentIndex * 50);
+
+      return () => clearTimeout(timeout);
+    }, [currentIndex, text, delay]);
+
+    return <span>{displayedText}<span className="animate-pulse">|</span></span>;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">
+      <NeuralGrid />
+      <FloatingParticles />
+      <NeuroConnection />
+      
+      {/* Dynamic cursor effect */}
+      <div 
+        className="fixed w-4 h-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full pointer-events-none z-50 mix-blend-difference"
+        style={{
+          left: mousePosition.x - 8,
+          top: mousePosition.y - 8,
+          transition: 'all 0.1s ease-out'
+        }}
+      />
+
       {/* Navigation */}
-      <nav className="relative z-50 border-b bg-background/95 backdrop-blur-lg">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-md opacity-70 group-hover:opacity-100 transition-opacity" />
-                <div className="relative w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
-                  <Brain className="h-7 w-7 text-white" />
-                </div>
+      <nav className="relative z-50 p-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg">
+                <Brain className="h-6 w-6 text-white" />
               </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                MoodMate
-              </span>
-            </Link>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/features" className="text-muted-foreground hover:text-primary transition-colors">Features</Link>
-              <Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors">Pricing</Link>
-              <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">About</Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link>
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg blur opacity-75 animate-pulse" />
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:flex items-center space-x-4">
-                <Link to="/login">
-                  <Button variant="outline" className="hover:bg-primary/10">Login</Button>
-                </Link>
-                <Link to="/signup">
-                  <Button className="bg-gradient-to-r from-primary to-secondary hover:shadow-lg">
-                    Get Started
-                  </Button>
-                </Link>
-              </div>
-              <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              MoodMate
+            </span>
           </div>
           
-          {isMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 space-y-4 animate-fade-in">
-              <Link to="/features" className="block text-muted-foreground hover:text-primary">Features</Link>
-              <Link to="/pricing" className="block text-muted-foreground hover:text-primary">Pricing</Link>
-              <Link to="/about" className="block text-muted-foreground hover:text-primary">About</Link>
-              <Link to="/contact" className="block text-muted-foreground hover:text-primary">Contact</Link>
-              <div className="flex flex-col space-y-2 pt-4">
-                <Link to="/login">
-                  <Button variant="outline" className="w-full">Login</Button>
-                </Link>
-                <Link to="/signup">
-                  <Button className="w-full bg-gradient-to-r from-primary to-secondary">Get Started</Button>
-                </Link>
-              </div>
-            </div>
-          )}
+          <div className="flex items-center space-x-6">
+            <Link to="/login" className="text-white/80 hover:text-white transition-colors">
+              Login
+            </Link>
+            <Link to="/signup-patient">
+              <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300">
+                Get Started
+              </Button>
+            </Link>
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="container mx-auto px-4">
+      <section className="relative px-6 py-20">
+        <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <Badge variant="outline" className="px-4 py-2 bg-primary/10 border-primary/20">
-                <Zap className="w-4 h-4 mr-2" />
-                AI-Powered Mental Healthcare
-              </Badge>
-              
+            <div className={`space-y-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <div className="space-y-6">
-                <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                  Mental Health
-                  <span className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    Reimagined
+                <h1 className="text-6xl lg:text-7xl font-bold leading-tight">
+                  <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                    <TypewriterText text="Mental Health" delay={500} />
+                  </span>
+                  <br />
+                  <span className="text-white">
+                    <TypewriterText text="Reimagined" delay={2000} />
                   </span>
                 </h1>
                 
-                <p className="text-xl text-muted-foreground leading-relaxed">
-                  Experience the future of mental healthcare with AI that understands, 
-                  professionals who care, and support that's always there when you need it most.
+                <p className="text-xl text-white/80 leading-relaxed max-w-2xl">
+                  Experience the future of therapeutic care with our neuroadaptive AI platform. 
+                  Where cutting-edge technology meets human empathy to create unprecedented healing experiences.
                 </p>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/signup/patient">
-                  <Button size="lg" className="group bg-gradient-to-r from-primary to-secondary hover:shadow-xl">
-                    <Heart className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                    Start Your Journey
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
+                <HolographicGlow>
+                  <Link to="/signup-patient">
+                    <Button size="lg" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-6 rounded-2xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 group">
+                      <span className="flex items-center gap-2">
+                        Enter the Future
+                        <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </Button>
+                  </Link>
+                </HolographicGlow>
                 
-                <Link to="/signup/clinician">
-                  <Button size="lg" variant="outline" className="group border-primary/30 hover:bg-primary/10">
-                    <Users className="w-5 h-5 mr-2" />
-                    Join as Professional
-                  </Button>
-                </Link>
+                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-6 rounded-2xl backdrop-blur-sm">
+                  <Play className="h-5 w-5 mr-2" />
+                  Experience Demo
+                </Button>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-8">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
-                    <AnimatedCounter target={10000} />+
+              {/* Real-time stats */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
+                {stats.map((stat, index) => (
+                  <div key={index} className="text-center space-y-2">
+                    <div className="text-2xl font-bold text-purple-400">{stat.value}</div>
+                    <div className="text-sm text-white/60">{stat.label}</div>
                   </div>
-                  <p className="text-sm text-muted-foreground">Lives Improved</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
-                    <AnimatedCounter target={500} />+
-                  </div>
-                  <p className="text-sm text-muted-foreground">Professionals</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">24/7</div>
-                  <p className="text-sm text-muted-foreground">AI Support</p>
-                </div>
+                ))}
               </div>
             </div>
 
             <div className="relative">
-              <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl">
-                <img 
-                  src="/lovable-uploads/f49385ce-797f-420f-913f-d89d2b9b664a.jpg" 
-                  alt="Mental Health Platform Interface" 
-                  className="w-full h-auto"
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-2xl blur-3xl transform rotate-6 scale-105" />
+              <HolographicGlow className="relative">
+                <div className="w-full h-96 bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-3xl border border-white/10 backdrop-blur-sm overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 animate-pulse" />
+                  <div className="relative p-8 h-full flex flex-col items-center justify-center">
+                    <img 
+                      src="/lovable-uploads/f49385ce-797f-420f-913f-d89d2b9b664a.jpg" 
+                      alt="Mental Health Platform Interface" 
+                      className="w-full h-48 object-cover rounded-2xl shadow-2xl mb-6"
+                    />
+                    <div className="text-center space-y-4">
+                      <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                        <Cpu className="h-8 w-8 text-white animate-spin" style={{ animationDuration: '3s' }} />
+                      </div>
+                      <div className="text-lg font-semibold">AI Processing</div>
+                      <div className="text-sm text-white/60">Analyzing neural patterns...</div>
+                    </div>
+                  </div>
+                </div>
+              </HolographicGlow>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-to-b from-background to-muted/30">
-        <div className="container mx-auto px-4">
+      <section className="relative px-6 py-20 bg-black/20">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">
-              Why Choose <span className="text-primary">MoodMate</span>?
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                Revolutionary Technology
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Advanced AI technology meets human compassion to deliver personalized mental healthcare
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              Discover breakthrough innovations that are reshaping the landscape of mental health care
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={MessageCircle}
-              title="AI That Understands"
-              description="Our advanced AI learns your unique patterns and provides empathetic, 24/7 support that feels genuinely human."
-              delay={0}
-            />
-            
-            <FeatureCard
-              icon={Activity}
-              title="Real-Time Insights"
-              description="Track your mental health journey with advanced analytics that help both you and your clinician make informed decisions."
-              delay={200}
-            />
-            
-            <FeatureCard
-              icon={Shield}
-              title="Privacy First"
-              description="Bank-level encryption and HIPAA compliance ensure your conversations remain completely private and secure."
-              delay={400}
-            />
-            
-            <FeatureCard
-              icon={Clock}
-              title="Always Available"
-              description="Mental health doesn't follow business hours. Get instant support whenever you need it most."
-              delay={600}
-            />
-            
-            <FeatureCard
-              icon={Users}
-              title="Professional Network"
-              description="Connect with qualified mental health professionals who use AI insights to provide better care."
-              delay={800}
-            />
-            
-            <FeatureCard
-              icon={Zap}
-              title="Adaptive Technology"
-              description="Our AI continuously learns and evolves to become more effective at supporting your unique journey."
-              delay={1000}
-            />
+            {features.map((feature, index) => (
+              <div 
+                key={index} 
+                className="group relative transition-all duration-500 hover:scale-105"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <HolographicGlow>
+                  <Card className="bg-gradient-to-br from-white/5 to-white/10 border-white/10 backdrop-blur-sm h-full hover:bg-white/20 transition-all duration-300">
+                    <CardContent className="p-8">
+                      <div className="flex items-center mb-6">
+                        <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-purple-500/25 transition-all duration-300">
+                          <div className="text-white group-hover:scale-110 transition-transform duration-300">
+                            {feature.icon}
+                          </div>
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-semibold mb-4 text-white">
+                        {feature.title}
+                      </h3>
+                      <p className="text-white/80 leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </HolographicGlow>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6">Trusted by Thousands</h2>
-            <p className="text-xl text-muted-foreground">See what our users are saying</p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <Card className="border-0 shadow-xl bg-gradient-to-r from-primary/5 to-secondary/5">
-              <CardContent className="p-12 text-center">
-                <div className="flex justify-center mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-6 h-6 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                
-                <blockquote className="text-2xl font-medium mb-8 leading-relaxed">
-                  "{testimonials[activeTestimonial].content}"
-                </blockquote>
-                
-                <div className="space-y-2">
-                  <p className="font-semibold text-lg">{testimonials[activeTestimonial].name}</p>
-                  <p className="text-muted-foreground">{testimonials[activeTestimonial].role}</p>
-                </div>
-                
-                <div className="flex justify-center space-x-2 mt-8">
-                  {testimonials.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`w-3 h-3 rounded-full transition-colors ${
-                        index === activeTestimonial ? 'bg-primary' : 'bg-muted'
-                      }`}
-                      onClick={() => setActiveTestimonial(index)}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+      <section className="relative px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-16">
+            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              Voices from the Future
+            </span>
+          </h2>
+
+          <div className="relative">
+            <HolographicGlow>
+              <Card className="bg-gradient-to-br from-white/5 to-white/10 border-white/10 backdrop-blur-sm">
+                <CardContent className="p-12">
+                  <div className="space-y-6">
+                    <div className="flex justify-center mb-6">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-6 w-6 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    
+                    <blockquote className="text-xl lg:text-2xl italic text-white/90 leading-relaxed">
+                      "{testimonials[currentTestimonial].content}"
+                    </blockquote>
+                    
+                    <div className="border-t border-white/10 pt-6">
+                      <div className="font-semibold text-white text-lg">
+                        {testimonials[currentTestimonial].name}
+                      </div>
+                      <div className="text-purple-400">
+                        {testimonials[currentTestimonial].role}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </HolographicGlow>
+
+            <div className="flex justify-center mt-8 space-x-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTestimonial(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentTestimonial ? 'bg-purple-500' : 'bg-white/30'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-secondary text-white">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-4xl lg:text-5xl font-bold">
-              Ready to Transform Your Mental Health?
-            </h2>
-            <p className="text-xl opacity-90 leading-relaxed">
-              Join thousands who have already started their journey to better mental health. 
-              Experience the perfect blend of AI innovation and human care.
-            </p>
+      <section className="relative px-6 py-20 bg-gradient-to-r from-purple-900/50 to-blue-900/50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-8">
+            <span className="text-white">Ready to Transform</span>
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              Mental Health Forever?
+            </span>
+          </h2>
+          
+          <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
+            Join thousands of patients and clinicians who have already stepped into the future of therapeutic care.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <HolographicGlow>
+              <Link to="/signup-patient">
+                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-6 rounded-2xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 group">
+                  <span className="flex items-center gap-2">
+                    Start Your Journey
+                    <Zap className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                  </span>
+                </Button>
+              </Link>
+            </HolographicGlow>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-              <Link to="/signup/patient">
-                <Button size="lg" variant="secondary" className="group bg-white text-primary hover:bg-white/90">
-                  <Heart className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                  Start Free Today
-                  <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              
-              <Link to="/pricing">
-                <Button size="lg" variant="outline" className="group border-white text-white hover:bg-white/10">
-                  <Play className="w-5 h-5 mr-2" />
-                  View Pricing
-                </Button>
-              </Link>
-            </div>
+            <Link to="/signup-clinician">
+              <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-12 py-6 rounded-2xl backdrop-blur-sm">
+                <Users className="h-5 w-5 mr-2" />
+                For Clinicians
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t py-16">
-        <div className="container mx-auto px-4">
+      <footer className="relative bg-black/40 px-6 py-12">
+        <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
-            <div className="md:col-span-1">
-              <Link to="/" className="flex items-center space-x-3 mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-md opacity-70" />
-                  <div className="relative w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
-                    <Brain className="h-6 w-6 text-white" />
-                  </div>
+            <div className="col-span-2">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                  <Brain className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xl font-bold">MoodMate</span>
-              </Link>
-              <p className="text-muted-foreground leading-relaxed">
-                Revolutionizing mental healthcare through AI innovation and human compassion.
+                <span className="text-2xl font-bold text-white">MoodMate</span>
+              </div>
+              <p className="text-white/60 max-w-md">
+                Pioneering the future of mental health through neuroadaptive AI technology and human-centered design.
               </p>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2">
-                <li><Link to="/features" className="text-muted-foreground hover:text-primary transition-colors">Features</Link></li>
-                <li><Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors">Pricing</Link></li>
-                <li><Link to="/security" className="text-muted-foreground hover:text-primary transition-colors">Security</Link></li>
+              <h4 className="text-white font-semibold mb-4">Platform</h4>
+              <ul className="space-y-2 text-white/60">
+                <li><a href="#" className="hover:text-white transition-colors">For Patients</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">For Clinicians</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">AI Technology</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2">
-                <li><Link to="/help" className="text-muted-foreground hover:text-primary transition-colors">Help Center</Link></li>
-                <li><Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
-                <li><Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors">FAQ</Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li><Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link></li>
-                <li><Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-white/60">
+                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Research</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 MoodMate. All rights reserved.</p>
+          <div className="border-t border-white/10 mt-12 pt-8 text-center text-white/60">
+            <p>&copy; 2024 MoodMate. All rights reserved. | The future of mental health is here.</p>
           </div>
         </div>
       </footer>
     </div>
   );
-}
+};
+
+export default LandingPage;

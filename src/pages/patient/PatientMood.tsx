@@ -23,7 +23,10 @@ export default function PatientMood() {
             </p>
           </div>
           <MoodLogModal 
-            onLogComplete={() => {}}
+            onLogComplete={() => {
+              // Trigger chart refresh
+              window.location.reload();
+            }}
             trigger={
               <Button className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />

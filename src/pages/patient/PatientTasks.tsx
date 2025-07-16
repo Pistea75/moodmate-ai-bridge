@@ -35,7 +35,7 @@ export default function PatientTasks() {
         <div className="p-8">
           <Card className="border-red-200 bg-red-50">
             <CardContent className="p-6">
-              <p className="text-red-600">{error}</p>
+              <p className="text-red-600">{error.message || 'An error occurred'}</p>
             </CardContent>
           </Card>
         </div>
@@ -52,7 +52,7 @@ export default function PatientTasks() {
             {t('tasks')}
           </h1>
           <p className="text-xl text-gray-600">
-            {t('trackYourProgress')}
+            {t('progressOverview')}
           </p>
         </div>
 
@@ -112,8 +112,7 @@ export default function PatientTasks() {
               <CardContent>
                 <TaskList 
                   tasks={pendingTasks} 
-                  onToggleTask={toggleTaskCompletion}
-                  showCompleted={false}
+                  onTaskUpdate={toggleTaskCompletion}
                 />
               </CardContent>
             </Card>
@@ -131,8 +130,7 @@ export default function PatientTasks() {
               <CardContent>
                 <TaskList 
                   tasks={completedTasks} 
-                  onToggleTask={toggleTaskCompletion}
-                  showCompleted={true}
+                  onTaskUpdate={toggleTaskCompletion}
                 />
               </CardContent>
             </Card>
