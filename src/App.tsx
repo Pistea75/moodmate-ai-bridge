@@ -28,6 +28,9 @@ import PatientSettings from "./pages/patient/PatientSettings";
 import PatientGoals from './pages/patient/Goals';
 import SignupClinician from './pages/SignupClinician';
 import SignupPatient from './pages/SignupPatient';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Index from './pages/Index';
 
 function App() {
   return (
@@ -43,6 +46,8 @@ function App() {
               <Route path="/signup/clinician" element={<SignupClinician />} />
               <Route path="/signup/patient" element={<SignupPatient />} />
               <Route path="/signup" element={<SignupPatient />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Clinician Routes */}
               <Route path="/clinician/dashboard" element={
@@ -123,12 +128,8 @@ function App() {
                 </ProtectedRoute>
               } />
 
-              {/* Default Route */}
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <PatientDashboard />
-                </ProtectedRoute>
-              } />
+              {/* Public Routes */}
+              <Route path="/" element={<Index />} />
             </Routes>
           </div>
           </ErrorBoundary>

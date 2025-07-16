@@ -1,18 +1,10 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-);
-
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -21,220 +13,225 @@ serve(async (req) => {
   }
 
   try {
-    const { patientId, clinicianId } = await req.json();
-    
-    if (!patientId) {
-      throw new Error('Patient ID is required');
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+          detectSessionInUrl: false,
+        },
+      }
+    );
+
+    // Get the authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'No authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    console.log(`Assessing risk for patient: ${patientId}`);
-
-    // Fetch comprehensive patient data
-    const [moodData, sessionsData, tasksData, profileData] = await Promise.all([
-      // Mood entries from last 30 days
-      supabase
-        .from('mood_entries')
-        .select('mood_score, notes, triggers, created_at')
-        .eq('patient_id', patientId)
-        .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
-        .order('created_at', { ascending: false }),
-
-      // Recent sessions
-      supabase
-        .from('sessions')
-        .select('scheduled_time, status, notes, duration_minutes')
-        .eq('patient_id', patientId)
-        .gte('scheduled_time', new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString())
-        .order('scheduled_time', { ascending: false }),
-
-      // Task completion rate
-      supabase
-        .from('tasks')
-        .select('completed, due_date, created_at, title')
-        .eq('patient_id', patientId)
-        .gte('inserted_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
-
-      // Patient profile
-      supabase
-        .from('profiles')
-        .select('first_name, last_name, created_at')
-        .eq('id', patientId)
-        .single()
-    ]);
-
-    if (moodData.error) throw moodData.error;
-    if (sessionsData.error) throw sessionsData.error;
-    if (tasksData.error) throw tasksData.error;
-    if (profileData.error) throw profileData.error;
-
-    // Prepare data summary for AI analysis
-    const moodEntries = moodData.data || [];
-    const sessions = sessionsData.data || [];
-    const tasks = tasksData.data || [];
-    const profile = profileData.data;
-
-    const avgMoodScore = moodEntries.length > 0 
-      ? moodEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / moodEntries.length 
-      : null;
-
-    const recentMoodTrend = moodEntries.slice(0, 7); // Last 7 entries
-    const completedTasks = tasks.filter(task => task.completed);
-    const taskCompletionRate = tasks.length > 0 ? (completedTasks.length / tasks.length) * 100 : null;
-    const missedSessions = sessions.filter(session => session.status === 'cancelled' || session.status === 'no_show');
-
-    // Common triggers analysis
-    const allTriggers = moodEntries.flatMap(entry => entry.triggers || []);
-    const triggerCounts = allTriggers.reduce((acc, trigger) => {
-      acc[trigger] = (acc[trigger] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const dataContext = `
-Patient Risk Assessment Data for ${profile.first_name} ${profile.last_name}:
-
-MOOD DATA (Last 30 days):
-- Total mood entries: ${moodEntries.length}
-- Average mood score: ${avgMoodScore ? avgMoodScore.toFixed(1) : 'No data'}/10
-- Recent mood trend (last 7 entries): ${recentMoodTrend.map(m => m.mood_score).join(', ')}
-- Most common triggers: ${Object.entries(triggerCounts).sort(([,a], [,b]) => b - a).slice(0, 5).map(([trigger, count]) => `${trigger} (${count}x)`).join(', ')}
-
-SESSION DATA (Last 60 days):
-- Total sessions scheduled: ${sessions.length}
-- Missed/cancelled sessions: ${missedSessions.length}
-- Session attendance rate: ${sessions.length > 0 ? ((sessions.length - missedSessions.length) / sessions.length * 100).toFixed(1) : 'No data'}%
-
-TASK COMPLETION (Last 30 days):
-- Total tasks assigned: ${tasks.length}
-- Tasks completed: ${completedTasks.length}
-- Completion rate: ${taskCompletionRate !== null ? taskCompletionRate.toFixed(1) : 'No data'}%
-
-RECENT CONCERNING NOTES:
-${moodEntries.filter(entry => entry.mood_score <= 3 && entry.notes).slice(0, 3).map(entry => `- Score ${entry.mood_score}: ${entry.notes}`).join('\n')}
-    `.trim();
-
-    // Call OpenAI for risk assessment
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a clinical risk assessment AI assistant helping clinicians evaluate patient risk levels. 
-            
-            Analyze the provided patient data and provide:
-            1. Overall risk level: LOW, MODERATE, HIGH, or CRITICAL
-            2. Key risk factors identified
-            3. Specific recommendations for the clinician
-            4. Suggested intervention timeline
-            
-            Base your assessment on:
-            - Mood patterns and trends
-            - Session attendance
-            - Task completion rates
-            - Specific concerning notes or triggers
-            
-            Be clinical but not alarmist. Focus on actionable insights.`
-          },
-          {
-            role: 'user',
-            content: dataContext
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 800
-      }),
+    // Set the auth header for the request
+    supabase.auth.setSession({
+      access_token: authHeader.replace('Bearer ', ''),
+      refresh_token: '',
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
+    const { patient_id } = await req.json();
 
-    const aiResult = await response.json();
-    const riskAssessment = aiResult.choices[0].message.content;
-
-    // Extract risk level from the response
-    const riskMatch = riskAssessment.match(/risk level:\s*(LOW|MODERATE|HIGH|CRITICAL)/i);
-    const riskLevel = riskMatch ? riskMatch[1].toUpperCase() : 'MODERATE';
-
-    // Calculate risk score (0-100)
-    let riskScore = 50; // Default moderate risk
-    
-    if (avgMoodScore !== null) {
-      if (avgMoodScore <= 3) riskScore += 30;
-      else if (avgMoodScore <= 5) riskScore += 15;
-      else if (avgMoodScore >= 8) riskScore -= 10;
-    }
-
-    if (taskCompletionRate !== null) {
-      if (taskCompletionRate < 30) riskScore += 20;
-      else if (taskCompletionRate < 60) riskScore += 10;
-      else if (taskCompletionRate > 80) riskScore -= 5;
-    }
-
-    const attendanceRate = sessions.length > 0 ? ((sessions.length - missedSessions.length) / sessions.length) * 100 : 100;
-    if (attendanceRate < 50) riskScore += 25;
-    else if (attendanceRate < 70) riskScore += 10;
-
-    // Recent concerning notes
-    const recentLowMoods = moodEntries.filter(entry => entry.mood_score <= 3).length;
-    if (recentLowMoods >= 5) riskScore += 20;
-    else if (recentLowMoods >= 3) riskScore += 10;
-
-    riskScore = Math.min(100, Math.max(0, riskScore));
-
-    // Save assessment to database
-    const assessmentData = {
-      patient_id: patientId,
-      clinician_id: clinicianId,
-      risk_level: riskLevel,
-      risk_score: riskScore,
-      ai_assessment: riskAssessment,
-      data_points: {
-        avg_mood_score: avgMoodScore,
-        task_completion_rate: taskCompletionRate,
-        session_attendance_rate: attendanceRate,
-        recent_mood_entries: moodEntries.length,
-        missed_sessions: missedSessions.length
-      },
-      assessed_at: new Date().toISOString()
-    };
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        assessment: assessmentData,
-        summary: {
-          riskLevel,
-          riskScore,
-          keyFactors: {
-            avgMoodScore,
-            taskCompletionRate,
-            attendanceRate,
-            recentEntries: moodEntries.length
-          }
-        }
-      }),
-      {
+    if (!patient_id) {
+      return new Response(JSON.stringify({ error: 'patient_id is required' }), {
+        status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+      });
+    }
 
-  } catch (error: any) {
-    console.error('Error in assess-patient-risk function:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        success: false 
-      }),
-      {
+    console.log('Assessing risk for patient:', patient_id);
+
+    // Get the current user (should be a clinician)
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Fetch patient data for risk assessment
+    const { data: moodEntries, error: moodError } = await supabase
+      .from('mood_entries')
+      .select('*')
+      .eq('patient_id', patient_id)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    const { data: chatLogs, error: chatError } = await supabase
+      .from('ai_chat_logs')
+      .select('*')
+      .eq('patient_id', patient_id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    const { data: tasks, error: tasksError } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('patient_id', patient_id)
+      .order('inserted_at', { ascending: false })
+      .limit(20);
+
+    if (moodError || chatError || tasksError) {
+      console.error('Error fetching patient data:', { moodError, chatError, tasksError });
+      return new Response(JSON.stringify({ error: 'Failed to fetch patient data' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Calculate risk score based on various factors
+    let riskScore = 0;
+    let riskLevel = 'low';
+    let dataPoints = {};
+
+    // Mood analysis
+    if (moodEntries && moodEntries.length > 0) {
+      const recentMoods = moodEntries.slice(0, 7); // Last 7 entries
+      const avgMood = recentMoods.reduce((sum, entry) => sum + entry.mood_score, 0) / recentMoods.length;
+      const lowMoodCount = recentMoods.filter(entry => entry.mood_score <= 3).length;
+      
+      dataPoints.avgMood = avgMood;
+      dataPoints.lowMoodCount = lowMoodCount;
+      dataPoints.totalMoodEntries = moodEntries.length;
+
+      if (avgMood <= 3) riskScore += 30;
+      else if (avgMood <= 5) riskScore += 15;
+      
+      if (lowMoodCount >= 5) riskScore += 25;
+      else if (lowMoodCount >= 3) riskScore += 15;
+    }
+
+    // Task completion analysis
+    if (tasks && tasks.length > 0) {
+      const completedTasks = tasks.filter(task => task.completed).length;
+      const completionRate = completedTasks / tasks.length;
+      
+      dataPoints.taskCompletionRate = completionRate;
+      dataPoints.totalTasks = tasks.length;
+
+      if (completionRate < 0.3) riskScore += 20;
+      else if (completionRate < 0.6) riskScore += 10;
+    }
+
+    // Chat activity analysis
+    if (chatLogs && chatLogs.length > 0) {
+      const recentChats = chatLogs.slice(0, 10);
+      const negativeConcerns = recentChats.filter(log => 
+        log.message.toLowerCase().includes('sad') ||
+        log.message.toLowerCase().includes('depressed') ||
+        log.message.toLowerCase().includes('hopeless') ||
+        log.message.toLowerCase().includes('anxiety') ||
+        log.message.toLowerCase().includes('worry')
+      ).length;
+
+      dataPoints.recentChatActivity = recentChats.length;
+      dataPoints.negativeConcerns = negativeConcerns;
+
+      if (negativeConcerns >= 3) riskScore += 20;
+      else if (negativeConcerns >= 1) riskScore += 10;
+    }
+
+    // Determine risk level
+    if (riskScore >= 50) riskLevel = 'high';
+    else if (riskScore >= 25) riskLevel = 'medium';
+    else riskLevel = 'low';
+
+    // Generate AI assessment using OpenAI
+    let aiAssessment = '';
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    
+    if (openaiApiKey) {
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a clinical psychologist AI assistant. Provide a brief, professional assessment of patient risk based on the data provided. Focus on key concerns and recommendations.'
+              },
+              {
+                role: 'user',
+                content: `Please assess the following patient data:
+                - Risk Score: ${riskScore}
+                - Risk Level: ${riskLevel}
+                - Average Mood (last 7 entries): ${dataPoints.avgMood || 'N/A'}
+                - Low mood episodes: ${dataPoints.lowMoodCount || 0}
+                - Task completion rate: ${(dataPoints.taskCompletionRate * 100).toFixed(1) || 'N/A'}%
+                - Recent negative concerns in chat: ${dataPoints.negativeConcerns || 0}
+                
+                Provide a concise clinical assessment and recommendations.`
+              }
+            ],
+            max_tokens: 300,
+            temperature: 0.7,
+          }),
+        });
+
+        const openaiData = await response.json();
+        if (openaiData.choices && openaiData.choices[0]) {
+          aiAssessment = openaiData.choices[0].message.content;
+        }
+      } catch (error) {
+        console.error('OpenAI API error:', error);
+        aiAssessment = 'AI assessment unavailable due to API error.';
       }
-    );
+    } else {
+      aiAssessment = 'AI assessment unavailable - OpenAI API key not configured.';
+    }
+
+    // Store the risk assessment in the database
+    const { data: riskAssessment, error: insertError } = await supabase
+      .from('patient_risk_assessments')
+      .insert({
+        patient_id,
+        clinician_id: user.id,
+        risk_score: riskScore,
+        risk_level: riskLevel,
+        data_points: dataPoints,
+        ai_assessment: aiAssessment,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('Error storing risk assessment:', insertError);
+      return new Response(JSON.stringify({ error: 'Failed to store risk assessment' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Risk assessment completed:', riskAssessment);
+
+    return new Response(JSON.stringify({
+      success: true,
+      riskAssessment,
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('Error in assess-patient-risk function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
