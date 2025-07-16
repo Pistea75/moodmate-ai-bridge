@@ -30,4 +30,8 @@ enabled = true
 [functions.delete-user]
 [functions.handle_new_user]
 [functions.summarize-chat]
+[functions.generate-insights]
+[functions.generate-goal-suggestions]
+[functions.process-session-recording]
+[functions.assess-patient-risk]
 verify_jwt = false

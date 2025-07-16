@@ -1,158 +1,165 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.36.0'
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
-  
-  const body = await req.json()
-  
+
   try {
-    console.log('Processing user creation for user ID:', body.id)
-    console.log('User metadata received:', body.raw_user_meta_data)
-    
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('Missing Supabase environment variables')
-      return new Response(JSON.stringify({ error: 'Server configuration error' }), { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
+    const { userId, userMetadata } = await req.json();
+
+    if (!userId || !userMetadata) {
+      throw new Error('User ID and metadata are required');
     }
-    
-    // Create client with service role key for admin privileges
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
-    
-    // Get user data from metadata
-    const fullName = body.raw_user_meta_data?.full_name || '';
-    const language = body.raw_user_meta_data?.language || 'en';
-    const role = body.raw_user_meta_data?.role || 'patient';
-    const referralCode = body.raw_user_meta_data?.referral_code ? 
-      body.raw_user_meta_data.referral_code.trim().toUpperCase() : null;
-    
-    // Split full name into first and last name
-    const nameParts = fullName.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
-    
-    try {
-      // Check if profile already exists to prevent duplicate inserts
-      const { data: existingProfile, error: profileCheckError } = await supabase
+
+    console.log(`Processing new user: ${userId}`, userMetadata);
+
+    const {
+      first_name,
+      last_name,
+      email,
+      role,
+      language = 'en',
+      referral_code,
+      specialization,
+      license_number
+    } = userMetadata;
+
+    // Create user profile
+    const profileData = {
+      id: userId,
+      first_name: first_name || '',
+      last_name: last_name || '',
+      email: email || '',
+      role: role || 'patient',
+      language,
+      referral_code,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      onboarding_completed: false,
+      onboarding_step: 1,
+      status: 'active'
+    };
+
+    // Add clinician-specific fields
+    if (role === 'clinician') {
+      // Generate referral code for clinicians
+      if (!referral_code) {
+        profileData.referral_code = generateReferralCode();
+      }
+      
+      // Note: specialization and license_number would need to be added to profiles table
+      // For now, we'll store them in the initial_assessment field as JSON
+      if (specialization || license_number) {
+        profileData.initial_assessment = JSON.stringify({
+          specialization,
+          license_number
+        });
+      }
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .insert(profileData)
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
+      throw new Error('Failed to create user profile');
+    }
+
+    console.log('✅ Profile created successfully:', profile.id);
+
+    // Link patient to clinician if referral code provided
+    if (role === 'patient' && referral_code) {
+      const { data: clinician, error: clinicianError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('id', body.id)
-        .maybeSingle();
-        
-      if (profileCheckError) {
-        console.error('Error checking existing profile:', profileCheckError);
-        throw profileCheckError;
-      }
-      
-      if (!existingProfile) {
-        console.log('Creating new profile for user:', body.id);
-        
-        // Prepare profile data, ensuring proper format for all fields
-        const profileData = {
-          id: body.id,
-          first_name: firstName,
-          last_name: lastName,
-          language: language,
-          role: role
-        };
-        
-        // Only add referral_code if it exists and is not empty
-        if (referralCode) {
-          profileData.referral_code = referralCode;
-        }
-        
-        console.log('Profile data to be inserted:', profileData);
-        
-        // Insert user profile with service role to bypass RLS
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert(profileData);
-        
-        if (insertError) {
-          console.error('Error creating user profile:', insertError);
-          throw insertError;
-        }
-        
-        console.log('Successfully created profile for user:', body.id);
-      } else {
-        console.log('Profile already exists for user:', body.id);
-      }
-      
-      // If referral code is provided, check for a clinician profile with that code
-      if (referralCode) {
-        console.log('Processing referral code:', referralCode);
-        
-        try {
-          // Find the clinician with this referral code
-          const { data: clinicianData, error: clinicianError } = await supabase
-            .from('profiles')
-            .select('id, first_name, last_name')
-            .eq('role', 'clinician')
-            .eq('referral_code', referralCode)
-            .maybeSingle();
-          
-          if (clinicianError) {
-            console.error('Error finding clinician with referral code:', clinicianError);
-            // We still want to continue even if referral code connection fails
-          } else if (clinicianData) {
-            console.log('Found clinician for referral code:', clinicianData);
-            
-            // Update the user's metadata to include the clinician's information
-            const { error: updateError } = await supabase.auth.admin.updateUserById(
-              body.id,
-              {
-                user_metadata: {
-                  connected_clinician_id: clinicianData.id,
-                  connected_clinician_name: `${clinicianData.first_name || ''} ${clinicianData.last_name || ''}`.trim()
-                }
-              }
-            );
-            
-            if (updateError) {
-              console.error('Error updating user with clinician info:', updateError);
-            } else {
-              console.log('Successfully connected user to clinician via referral code');
-            }
-          } else {
-            console.log('No clinician found with referral code:', referralCode);
-          }
-        } catch (referralError) {
-          console.error('Error processing referral code:', referralError);
-          // Continue execution even if referral processing fails
+        .eq('referral_code', referral_code)
+        .eq('role', 'clinician')
+        .single();
+
+      if (!clinicianError && clinician) {
+        const { error: linkError } = await supabase
+          .from('patient_clinician_links')
+          .insert({
+            patient_id: userId,
+            clinician_id: clinician.id
+          });
+
+        if (linkError) {
+          console.error('Error linking patient to clinician:', linkError);
+        } else {
+          console.log('✅ Patient linked to clinician successfully');
         }
       }
-      
-      console.log('Successfully processed user profile with id:', body.id);
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    } catch (dbError) {
-      console.error('Database error processing user profile:', dbError);
-      return new Response(JSON.stringify({ error: `Database error: ${dbError.message || 'Unknown database error'}` }), { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
     }
-  } catch (err) {
-    console.error('Unexpected error processing user profile:', err);
-    return new Response(JSON.stringify({ error: err.message }), { 
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+
+    // Send welcome notification
+    const welcomeMessage = role === 'clinician' 
+      ? `Welcome to MoodMate! Your clinician account has been created successfully. Your referral code is: ${profileData.referral_code}`
+      : `Welcome to MoodMate! Your patient account has been created successfully. Start by completing your profile and tracking your first mood entry.`;
+
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert({
+        user_id: userId,
+        type: 'welcome',
+        title: 'Welcome to MoodMate!',
+        description: welcomeMessage,
+        priority: 'medium',
+        metadata: {
+          onboarding: true,
+          role: role
+        }
+      });
+
+    if (notificationError) {
+      console.error('Error creating welcome notification:', notificationError);
+    }
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        profile,
+        message: 'User processed successfully' 
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+
+  } catch (error) {
+    console.error('Error in handle_new_user function:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
+
+function generateReferralCode(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}

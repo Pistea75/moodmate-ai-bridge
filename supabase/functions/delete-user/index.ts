@@ -1,107 +1,69 @@
-
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.36.0'
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
-  // Get authorization header
-  const authHeader = req.headers.get('Authorization')
-  if (!authHeader) {
-    return new Response(
-      JSON.stringify({ error: 'No authorization header' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
-    )
-  }
-
-  // Verify JWT
   try {
-    // Create Supabase client with service role key
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('Missing Supabase environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Server configuration error' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      )
+    const { userId } = await req.json();
+
+    if (!userId) {
+      throw new Error('User ID is required');
     }
-    
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
-    
-    // Verify the JWT from the auth header
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: jwtError } = await supabase.auth.getUser(token)
-    
-    if (jwtError || !user) {
-      console.error('JWT verification error:', jwtError);
-      return new Response(
-        JSON.stringify({ error: 'Invalid JWT', details: jwtError }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
-      )
+
+    console.log(`Deleting user: ${userId}`);
+
+    // First, delete user profile and related data
+    // The cascading deletes will handle most relationships
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', userId);
+
+    if (profileError) {
+      console.error('Error deleting profile:', profileError);
+      throw new Error('Failed to delete user profile');
     }
-    
-    console.log('User authenticated:', user.id);
-    
-    // Parse request body
-    const { userId } = await req.json()
-    
-    // Check if user is trying to delete their own account
-    if (user.id !== userId) {
-      console.error('Unauthorized deletion attempt:', { authenticatedUser: user.id, targetUser: userId });
-      return new Response(
-        JSON.stringify({ error: 'You can only delete your own account' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
-      )
+
+    // Delete the user from auth
+    const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+
+    if (authError) {
+      console.error('Error deleting user from auth:', authError);
+      throw new Error('Failed to delete user from authentication');
     }
-    
-    console.log('Starting delete process for user:', userId);
-    
-    // Delete user data from tables to avoid foreign key constraints
-    try {
-      await Promise.all([
-        supabase.from('profiles').delete().eq('id', userId),
-        supabase.from('mood_entries').delete().eq('user_id', userId),
-        supabase.from('chat_reports').delete().eq('user_id', userId),
-        supabase.from('session_audio_uploads').delete().eq('user_id', userId)
-      ]);
-      console.log('Successfully deleted user data from tables');
-    } catch (dataError) {
-      console.error('Error deleting user data:', dataError);
-      // Continue with user deletion even if data deletion fails
-    }
-    
-    // Delete user
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(userId)
-    
-    if (deleteError) {
-      console.error('Error deleting user:', deleteError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to delete user', details: deleteError }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      )
-    }
-    
-    console.log('User successfully deleted:', userId);
+
+    console.log(`✅ User ${userId} deleted successfully`);
+
     return new Response(
-      JSON.stringify({ success: true, message: 'User deleted successfully' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-    )
-    
+      JSON.stringify({ message: 'User deleted successfully' }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+
   } catch (error) {
-    console.error('Unexpected error in delete-user function:', error);
+    console.error('Error in delete-user function:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-    )
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
-})
+});

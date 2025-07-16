@@ -26,6 +26,8 @@ import PatientSessions from "./pages/patient/PatientSessions";
 import PatientProfile from "./pages/patient/PatientProfile";
 import PatientSettings from "./pages/patient/PatientSettings";
 import PatientGoals from './pages/patient/Goals';
+import SignupClinician from './pages/SignupClinician';
+import SignupPatient from './pages/SignupPatient';
 
 function App() {
   return (
@@ -38,6 +40,9 @@ function App() {
             <Routes>
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
+              <Route path="/signup/clinician" element={<SignupClinician />} />
+              <Route path="/signup/patient" element={<SignupPatient />} />
+              <Route path="/signup" element={<SignupPatient />} />
 
               {/* Clinician Routes */}
               <Route path="/clinician/dashboard" element={

@@ -1,58 +1,44 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.36.0'
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
+
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { patientId } = await req.json();
-    
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    
-    if (!supabaseUrl || !supabaseKey || !openaiApiKey) {
-      throw new Error('Missing required environment variables');
+
+    if (!patientId) {
+      throw new Error('Patient ID is required');
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // Get the current user
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
-    }
+    console.log(`Generating insights for patient: ${patientId}`);
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !user) {
-      throw new Error('Invalid token');
-    }
-
-    // Fetch comprehensive patient data
-    const [
-      moodData,
-      taskData,
-      exerciseData,
-      profileData
-    ] = await Promise.all([
-      // Recent mood entries (last 14 days)
+    // Fetch patient data for insights
+    const [moodData, taskData, profileData] = await Promise.all([
+      // Recent mood entries
       supabase
         .from('mood_entries')
-        .select('mood_score, created_at, notes, triggers')
+        .select('mood_score, notes, triggers, created_at')
         .eq('patient_id', patientId)
-        .gte('created_at', new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString())
-        .order('created_at', { ascending: false }),
-      
+        .order('created_at', { ascending: false })
+        .limit(10),
+
       // Recent tasks
       supabase
         .from('tasks')
@@ -60,91 +46,75 @@ serve(async (req) => {
         .eq('patient_id', patientId)
         .order('inserted_at', { ascending: false })
         .limit(10),
-      
-      // Recent exercise logs
-      supabase
-        .from('exercise_logs')
-        .select('exercise_text, completed, completed_at')
-        .eq('patient_id', patientId)
-        .order('recommended_at', { ascending: false })
-        .limit(5),
-      
+
       // Patient profile
       supabase
         .from('profiles')
-        .select('first_name, treatment_goals, initial_assessment')
+        .select('first_name, treatment_goals')
         .eq('id', patientId)
         .single()
     ]);
 
-    // Prepare context for AI
-    const context = {
-      mood: {
-        entries: moodData.data?.map(m => ({
-          score: m.mood_score,
-          date: m.created_at,
-          notes: m.notes,
-          triggers: m.triggers
-        })) || [],
-        average: moodData.data?.length > 0 
-          ? moodData.data.reduce((sum, entry) => sum + entry.mood_score, 0) / moodData.data.length 
-          : null
-      },
-      tasks: {
-        total: taskData.data?.length || 0,
-        completed: taskData.data?.filter(t => t.completed).length || 0,
-        recent: taskData.data?.slice(0, 5).map(t => ({
-          title: t.title,
-          completed: t.completed,
-          dueDate: t.due_date
-        })) || []
-      },
-      exercises: {
-        total: exerciseData.data?.length || 0,
-        completed: exerciseData.data?.filter(e => e.completed).length || 0,
-        recent: exerciseData.data?.map(e => ({
-          text: e.exercise_text,
-          completed: e.completed
-        })) || []
-      },
-      profile: {
-        name: profileData.data?.first_name || 'there',
-        goals: profileData.data?.treatment_goals,
-        assessment: profileData.data?.initial_assessment
-      }
-    };
+    if (moodData.error || taskData.error || profileData.error) {
+      console.error('Error fetching patient data:', moodData.error || taskData.error || profileData.error);
+      throw new Error('Failed to fetch patient data');
+    }
 
-    const prompt = `You are a supportive mental health AI assistant. Based on the following patient data, provide a personalized, encouraging insight that:
+    const moods = moodData.data || [];
+    const tasks = taskData.data || [];
+    const profile = profileData.data;
 
-1. Acknowledges their recent progress or challenges
-2. Offers specific, actionable encouragement
-3. Highlights positive patterns or suggests gentle improvements
-4. Keeps a warm, supportive tone
-5. Is concise (2-3 sentences max)
+    // Calculate insights
+    const avgMood = moods.length > 0 ? moods.reduce((sum, m) => sum + m.mood_score, 0) / moods.length : null;
+    const completedTasks = tasks.filter(t => t.completed).length;
+    const taskCompletionRate = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
 
-Patient Data:
-- Name: ${context.profile.name}
-- Recent mood average: ${context.mood.average ? context.mood.average.toFixed(1) : 'No recent data'}
-- Mood entries (last 14 days): ${context.mood.entries.length}
-- Tasks completed: ${context.tasks.completed}/${context.tasks.total}
-- Treatment goals: ${context.profile.goals || 'Not specified'}
+    // Common triggers
+    const allTriggers = moods.flatMap(m => m.triggers || []);
+    const triggerCounts = allTriggers.reduce((acc, trigger) => {
+      acc[trigger] = (acc[trigger] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-Recent mood data: ${JSON.stringify(context.mood.entries.slice(0, 7))}
-Recent tasks: ${JSON.stringify(context.tasks.recent)}
+    const topTriggers = Object.entries(triggerCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 3)
+      .map(([trigger]) => trigger);
 
-Generate a personalized insight that feels genuine and supportive:`;
+    const dataContext = `
+Patient Data Summary:
+- Recent average mood: ${avgMood ? avgMood.toFixed(1) : 'No data'}/10
+- Task completion rate: ${taskCompletionRate.toFixed(1)}%
+- Common triggers: ${topTriggers.join(', ') || 'None identified'}
+- Treatment goals: ${profile?.treatment_goals || 'Not specified'}
+- Recent mood trend: ${moods.slice(0, 5).map(m => m.mood_score).join(', ')}
+`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a compassionate mental health assistant specializing in CBT techniques. Provide personalized, actionable insights based on patient data.' },
-          { role: 'user', content: prompt }
+          {
+            role: 'system',
+            content: `You are a supportive mental health AI assistant. Based on the patient data provided, generate a personalized, encouraging insight that:
+
+1. Acknowledges their progress and efforts
+2. Provides gentle guidance or encouragement
+3. Suggests practical coping strategies
+4. Remains positive and supportive
+5. Keeps the message concise (2-3 sentences)
+
+Focus on strengths, progress, and forward-looking suggestions. Avoid clinical diagnoses or medical advice.`
+          },
+          {
+            role: 'user',
+            content: `Generate a personalized insight for ${profile?.first_name || 'this patient'} based on their data:\n${dataContext}`
+          }
         ],
         temperature: 0.7,
         max_tokens: 200,
@@ -157,7 +127,7 @@ Generate a personalized insight that feels genuine and supportive:`;
     }
 
     const data = await response.json();
-    const insight = data.choices[0]?.message?.content || 'You\'re doing great by taking care of your mental health. Keep up the good work!';
+    const insight = data.choices[0]?.message?.content || 'Keep focusing on your mental health journey. You\'re doing great!';
 
     return new Response(JSON.stringify({ insight }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -167,11 +137,10 @@ Generate a personalized insight that feels genuine and supportive:`;
     console.error('Error in generate-insights function:', error);
     return new Response(
       JSON.stringify({ 
-        insight: "I'm here to support you on your mental health journey. Feel free to chat with me anytime!",
-        error: error.message 
+        insight: 'Remember to take things one day at a time. Your mental health journey is important, and every small step counts!'
       }),
-      { 
-        status: 200, // Return 200 with fallback message instead of error
+      {
+        status: 200, // Return 200 with fallback message
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
