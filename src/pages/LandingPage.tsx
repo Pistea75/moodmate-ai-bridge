@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Brain, MessageCircle, TrendingUp, Shield, Users, Heart, Zap, Clock, Target, Star } from 'lucide-react';
+import { Brain, MessageCircle, TrendingUp, Shield, Users, Heart, Zap, Clock, Target, Star, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -51,6 +51,15 @@ const LandingPage = () => {
     }
   ];
 
+  const benefits = [
+    "Improved Outcomes",
+    "Privacy-First Approach", 
+    "Better Patient Experience",
+    "24/7 Availability",
+    "Evidence-Based Care",
+    "Seamless Integration"
+  ];
+
   useEffect(() => {
     // Animate counters
     const animateCounter = (target: number, key: keyof typeof counters) => {
@@ -79,12 +88,18 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 text-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-700 via-purple-600 to-blue-700 text-white overflow-hidden relative">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] animate-pulse" />
+      </div>
+
       {/* Navigation */}
       <nav className="relative z-50 p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-400 rounded-2xl flex items-center justify-center shadow-lg">
               <Brain className="h-7 w-7 text-white" />
             </div>
             <span className="text-2xl font-bold text-white">
@@ -97,7 +112,7 @@ const LandingPage = () => {
               Login
             </Link>
             <Link to="/signup-patient">
-              <Button className="bg-cyan-400 hover:bg-cyan-500 text-purple-900 font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button className="bg-cyan-400 hover:bg-cyan-300 text-purple-900 font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
                 Start Your Journey
               </Button>
             </Link>
@@ -106,7 +121,7 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-6 py-12">
+      <section className="relative px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
@@ -124,13 +139,13 @@ const LandingPage = () => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/signup-patient">
-                  <Button size="lg" className="bg-cyan-400 hover:bg-cyan-500 text-purple-900 font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Button size="lg" className="bg-cyan-400 hover:bg-cyan-300 text-purple-900 font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 min-w-[200px]">
                     Start Your Journey
                   </Button>
                 </Link>
                 
                 <Link to="/signup-clinician">
-                  <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full backdrop-blur-sm font-semibold">
+                  <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full backdrop-blur-sm font-semibold min-w-[180px]">
                     Join as Clinician
                   </Button>
                 </Link>
@@ -153,27 +168,65 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Hero Illustration */}
+            {/* Hero Illustration - Inspired by the reference image */}
             <div className="relative flex justify-center">
-              <div className="relative w-96 h-96 bg-gradient-to-br from-cyan-400/20 to-purple-500/20 rounded-full backdrop-blur-sm border border-white/10 flex items-center justify-center">
-                <div className="w-80 h-80 bg-gradient-to-br from-cyan-300 to-purple-400 rounded-full flex items-center justify-center shadow-2xl">
-                  <div className="text-center space-y-4">
-                    <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Heart className="h-12 w-12 text-white animate-pulse" />
+              <div className="relative">
+                {/* Main illustration container */}
+                <div className="relative w-96 h-96 flex items-center justify-center">
+                  {/* Background glow */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-purple-400/30 rounded-full blur-3xl animate-pulse" />
+                  
+                  {/* Person holding AI companion - Simplified illustration */}
+                  <div className="relative z-10 text-center space-y-6">
+                    {/* Person illustration */}
+                    <div className="relative">
+                      <div className="w-48 h-64 mx-auto relative">
+                        {/* Body */}
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-40 bg-gradient-to-b from-yellow-400 to-yellow-500 rounded-t-3xl" />
+                        
+                        {/* Head */}
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-24 bg-gradient-to-b from-orange-300 to-orange-400 rounded-full" />
+                        
+                        {/* Hair */}
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-16 bg-gradient-to-b from-purple-800 to-purple-700 rounded-full" />
+                        
+                        {/* Face features */}
+                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
+                          {/* Eyes */}
+                          <div className="flex space-x-2 justify-center mb-2">
+                            <div className="w-1 h-1 bg-purple-900 rounded-full" />
+                            <div className="w-1 h-1 bg-purple-900 rounded-full" />
+                          </div>
+                          {/* Smile */}
+                          <div className="w-3 h-1 bg-purple-900 rounded-full mx-auto" />
+                        </div>
+
+                        {/* AI Companion being held */}
+                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                          <div className="w-16 h-16 bg-gradient-to-br from-cyan-300 to-cyan-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                            {/* AI face */}
+                            <div className="text-center">
+                              <div className="flex space-x-1 justify-center mb-1">
+                                <div className="w-1 h-1 bg-purple-700 rounded-full" />
+                                <div className="w-1 h-1 bg-purple-700 rounded-full" />
+                              </div>
+                              <div className="w-2 h-0.5 bg-purple-700 rounded-full mx-auto" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-white">AI Companion</h3>
-                    <p className="text-white/90 px-4">Always here for you</p>
                   </div>
                 </div>
                 
                 {/* Floating elements */}
-                <div className="absolute top-10 left-10 w-16 h-16 bg-yellow-400 rounded-2xl flex items-center justify-center shadow-lg animate-bounce">
-                  <span className="text-2xl">😊</span>
+                <div className="absolute top-10 left-10 w-16 h-16 bg-yellow-400/80 rounded-2xl flex items-center justify-center shadow-lg animate-float">
+                  <Heart className="h-8 w-8 text-purple-700" />
                 </div>
-                <div className="absolute bottom-16 right-8 w-12 h-12 bg-green-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                <div className="absolute bottom-16 right-8 w-12 h-12 bg-green-400/80 rounded-full flex items-center justify-center shadow-lg animate-bounce">
                   <Zap className="h-6 w-6 text-white" />
                 </div>
-                <div className="absolute top-1/3 right-4 w-14 h-14 bg-pink-400 rounded-xl flex items-center justify-center shadow-lg animate-bounce" style={{ animationDelay: '1s' }}>
+                <div className="absolute top-1/3 right-4 w-14 h-14 bg-pink-400/80 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
                   <MessageCircle className="h-7 w-7 text-white" />
                 </div>
               </div>
@@ -182,8 +235,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Problem/Solution Section */}
-      <section className="relative px-6 py-20 bg-gradient-to-r from-purple-800/50 to-blue-800/50 backdrop-blur-sm">
+      {/* Problem/Solution Section - Matching the reference style */}
+      <section className="relative px-6 py-16 bg-purple-800/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
             Reimagining Mental Health
@@ -191,10 +244,10 @@ const LandingPage = () => {
             <span className="text-cyan-300">Access & Continuity</span>
           </h2>
           
-          <div className="grid md:grid-cols-2 gap-8 mt-16">
+          <div className="grid md:grid-cols-2 gap-8 mt-16 max-w-6xl mx-auto">
             {problemSolutions.map((item, index) => (
-              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                <div className="text-red-300 text-lg font-semibold mb-4">
+              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all">
+                <div className="text-red-200 text-lg font-semibold mb-4">
                   {item.problem}
                 </div>
                 <div className="text-cyan-300 text-lg font-semibold">
@@ -206,15 +259,40 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Benefits Grid */}
+      <section className="relative px-6 py-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
+              Why Choose <span className="text-cyan-300">MoodMate</span>
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              Experience the future of mental healthcare with our innovative platform
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {benefits.map((benefit, index) => (
+              <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all duration-300">
+                <CardContent className="p-6 flex items-center space-x-4">
+                  <CheckCircle className="h-6 w-6 text-cyan-300 flex-shrink-0" />
+                  <span className="text-white font-medium">{benefit}</span>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="relative px-6 py-20">
+      <section className="relative px-6 py-16 bg-purple-800/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
               <span className="text-cyan-300">Revolutionary</span> Features
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Experience the future of mental healthcare with our cutting-edge AI technology
+              Cutting-edge AI technology combined with human expertise
             </p>
           </div>
 
@@ -241,7 +319,7 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative px-6 py-20 bg-gradient-to-r from-cyan-600/30 to-purple-600/30 backdrop-blur-sm">
+      <section className="relative px-6 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl font-bold mb-8 text-white">
             Ready to Transform Your
@@ -255,7 +333,7 @@ const LandingPage = () => {
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link to="/signup-patient">
-              <Button size="lg" className="bg-cyan-400 hover:bg-cyan-500 text-purple-900 font-semibold px-12 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button size="lg" className="bg-cyan-400 hover:bg-cyan-300 text-purple-900 font-semibold px-12 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
                 <Heart className="h-5 w-5 mr-2" />
                 Start Your Journey
               </Button>
@@ -272,7 +350,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-purple-900/50 backdrop-blur-sm px-6 py-12">
+      <footer className="relative bg-purple-900/50 backdrop-blur-sm px-6 py-12 border-t border-white/10">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="col-span-2">

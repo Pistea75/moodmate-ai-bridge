@@ -142,7 +142,7 @@
   }
 
   .animate-float {
-    animation: float 3s ease-in-out infinite;
+    animation: float 6s ease-in-out infinite;
   }
   
   .animate-slide-in-left {
@@ -156,6 +156,25 @@
   /* Smooth counter animation */
   .animate-counter {
     animation: countUp 2s ease-out forwards;
+  }
+
+  /* Gentle glow animation */
+  .animate-glow {
+    animation: glow 3s ease-in-out infinite alternate;
+  }
+
+  /* Smooth scale hover */
+  .hover-scale {
+    transition: transform 0.3s ease;
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  /* Gentle pulse for AI elements */
+  .ai-pulse {
+    animation: aiPulse 2s ease-in-out infinite;
   }
   
   @keyframes fadeIn {
@@ -171,16 +190,16 @@
   
   @keyframes float {
     0%, 100% {
-      transform: translateY(0px) translateX(0px);
+      transform: translateY(0px) rotate(0deg);
     }
     25% {
-      transform: translateY(-10px) translateX(5px);
+      transform: translateY(-10px) rotate(1deg);
     }
     50% {
-      transform: translateY(-5px) translateX(-3px);
+      transform: translateY(-5px) rotate(-1deg);
     }
     75% {
-      transform: translateY(-15px) translateX(3px);
+      transform: translateY(-15px) rotate(0.5deg);
     }
   }
   
@@ -217,6 +236,26 @@
     }
   }
 
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+    }
+    to {
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+    }
+  }
+
+  @keyframes aiPulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.02);
+    }
+  }
+
   /* Improved hover effects */
   .hover-glow {
     transition: all 0.3s ease;
@@ -232,5 +271,20 @@
       linear-gradient(rgba(155, 135, 245, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(155, 135, 245, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+
+  /* Gradient text effect */
+  .gradient-text {
+    background: linear-gradient(135deg, #60A5FA, #A78BFA, #F472B6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glassmorphism effect */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 }
