@@ -88,10 +88,10 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-700 via-purple-600 to-blue-700 text-white overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 text-gray-900 overflow-hidden relative">
       {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20" />
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-100/20 to-blue-100/20" />
         <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] animate-pulse" />
       </div>
 
@@ -99,20 +99,20 @@ const LandingPage = () => {
       <nav className="relative z-50 p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-400 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
               <Brain className="h-7 w-7 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">
+            <span className="text-2xl font-bold text-gray-900">
               MoodMate
             </span>
           </div>
           
           <div className="flex items-center space-x-4">
-            <Link to="/login" className="text-white/80 hover:text-white transition-colors px-4 py-2">
+            <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors px-4 py-2">
               Login
             </Link>
             <Link to="/signup-patient">
-              <Button className="bg-cyan-400 hover:bg-cyan-300 text-purple-900 font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
                 Start Your Journey
               </Button>
             </Link>
@@ -126,26 +126,26 @@ const LandingPage = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-6">
-                <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+                <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-gray-900">
                   Your AI-Powered
                   <br />
-                  <span className="text-cyan-300">Mental Health Ally</span>
+                  <span className="text-purple-600">Mental Health Ally</span>
                 </h1>
                 
-                <p className="text-xl text-white/90 leading-relaxed max-w-2xl">
+                <p className="text-xl text-gray-600 leading-relaxed max-w-2xl">
                   24/7 emotional support, real-time monitoring, and data-driven care — all in one intelligent platform.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/signup-patient">
-                  <Button size="lg" className="bg-cyan-400 hover:bg-cyan-300 text-purple-900 font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 min-w-[200px]">
+                  <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 min-w-[200px]">
                     Start Your Journey
                   </Button>
                 </Link>
                 
                 <Link to="/signup-clinician">
-                  <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full backdrop-blur-sm font-semibold min-w-[180px]">
+                  <Button size="lg" variant="outline" className="border-2 border-purple-300 text-purple-700 hover:bg-purple-50 px-8 py-4 rounded-full font-semibold min-w-[180px]">
                     Join as Clinician
                   </Button>
                 </Link>
@@ -154,38 +154,37 @@ const LandingPage = () => {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-6 pt-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-cyan-300">{counters.patients.toLocaleString()}+</div>
-                  <div className="text-sm text-white/70">Patients Helped</div>
+                  <div className="text-3xl font-bold text-purple-600">{counters.patients.toLocaleString()}+</div>
+                  <div className="text-sm text-gray-500">Patients Helped</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-cyan-300">{counters.sessions.toLocaleString()}+</div>
-                  <div className="text-sm text-white/70">AI Sessions</div>
+                  <div className="text-3xl font-bold text-purple-600">{counters.sessions.toLocaleString()}+</div>
+                  <div className="text-sm text-gray-500">AI Sessions</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-cyan-300">{counters.satisfaction}%</div>
-                  <div className="text-sm text-white/70">Satisfaction</div>
+                  <div className="text-3xl font-bold text-purple-600">{counters.satisfaction}%</div>
+                  <div className="text-sm text-gray-500">Satisfaction</div>
                 </div>
               </div>
             </div>
 
-            {/* Hero Illustration - Inspired by the reference image */}
+            {/* Hero Illustration */}
             <div className="relative flex justify-center">
               <div className="relative">
                 {/* Main illustration container */}
                 <div className="relative w-96 h-96 flex items-center justify-center">
                   {/* Background glow */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-purple-400/30 rounded-full blur-3xl animate-pulse" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-200/30 to-blue-200/30 rounded-full blur-3xl animate-pulse" />
                   
-                  {/* Person holding AI companion - Simplified illustration */}
+                  {/* AI Companion illustration */}
                   <div className="relative z-10 text-center space-y-6">
-                    {/* Person illustration */}
                     <div className="relative">
                       <div className="w-48 h-64 mx-auto relative">
                         {/* Body */}
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-40 bg-gradient-to-b from-yellow-400 to-yellow-500 rounded-t-3xl" />
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-40 bg-gradient-to-b from-purple-400 to-purple-500 rounded-t-3xl" />
                         
                         {/* Head */}
-                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-24 bg-gradient-to-b from-orange-300 to-orange-400 rounded-full" />
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-24 bg-gradient-to-b from-orange-200 to-orange-300 rounded-full" />
                         
                         {/* Hair */}
                         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-16 bg-gradient-to-b from-purple-800 to-purple-700 rounded-full" />
@@ -203,7 +202,7 @@ const LandingPage = () => {
 
                         {/* AI Companion being held */}
                         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-                          <div className="w-16 h-16 bg-gradient-to-br from-cyan-300 to-cyan-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                          <div className="w-16 h-16 bg-gradient-to-br from-blue-300 to-blue-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
                             {/* AI face */}
                             <div className="text-center">
                               <div className="flex space-x-1 justify-center mb-1">
@@ -220,13 +219,13 @@ const LandingPage = () => {
                 </div>
                 
                 {/* Floating elements */}
-                <div className="absolute top-10 left-10 w-16 h-16 bg-yellow-400/80 rounded-2xl flex items-center justify-center shadow-lg animate-float">
+                <div className="absolute top-10 left-10 w-16 h-16 bg-yellow-300/80 rounded-2xl flex items-center justify-center shadow-lg animate-float">
                   <Heart className="h-8 w-8 text-purple-700" />
                 </div>
-                <div className="absolute bottom-16 right-8 w-12 h-12 bg-green-400/80 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                <div className="absolute bottom-16 right-8 w-12 h-12 bg-green-300/80 rounded-full flex items-center justify-center shadow-lg animate-bounce">
                   <Zap className="h-6 w-6 text-white" />
                 </div>
-                <div className="absolute top-1/3 right-4 w-14 h-14 bg-pink-400/80 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
+                <div className="absolute top-1/3 right-4 w-14 h-14 bg-pink-300/80 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
                   <MessageCircle className="h-7 w-7 text-white" />
                 </div>
               </div>
@@ -235,22 +234,22 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Problem/Solution Section - Matching the reference style */}
-      <section className="relative px-6 py-16 bg-purple-800/30 backdrop-blur-sm">
+      {/* Problem/Solution Section */}
+      <section className="relative px-6 py-16 bg-purple-50/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
             Reimagining Mental Health
             <br />
-            <span className="text-cyan-300">Access & Continuity</span>
+            <span className="text-purple-600">Access & Continuity</span>
           </h2>
           
           <div className="grid md:grid-cols-2 gap-8 mt-16 max-w-6xl mx-auto">
             {problemSolutions.map((item, index) => (
-              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all">
-                <div className="text-red-200 text-lg font-semibold mb-4">
+              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-purple-100 hover:bg-white/90 transition-all shadow-lg">
+                <div className="text-red-600 text-lg font-semibold mb-4">
                   {item.problem}
                 </div>
-                <div className="text-cyan-300 text-lg font-semibold">
+                <div className="text-purple-600 text-lg font-semibold">
                   {item.solution}
                 </div>
               </div>
@@ -263,20 +262,20 @@ const LandingPage = () => {
       <section className="relative px-6 py-16">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
-              Why Choose <span className="text-cyan-300">MoodMate</span>
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+              Why Choose <span className="text-purple-600">MoodMate</span>
             </h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Experience the future of mental healthcare with our innovative platform
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all duration-300">
+              <Card key={index} className="bg-white/80 backdrop-blur-sm border-purple-100 hover:bg-white/90 transition-all duration-300 shadow-lg">
                 <CardContent className="p-6 flex items-center space-x-4">
-                  <CheckCircle className="h-6 w-6 text-cyan-300 flex-shrink-0" />
-                  <span className="text-white font-medium">{benefit}</span>
+                  <CheckCircle className="h-6 w-6 text-purple-600 flex-shrink-0" />
+                  <span className="text-gray-900 font-medium">{benefit}</span>
                 </CardContent>
               </Card>
             ))}
@@ -285,30 +284,30 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="relative px-6 py-16 bg-purple-800/30 backdrop-blur-sm">
+      <section className="relative px-6 py-16 bg-purple-50/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
-              <span className="text-cyan-300">Revolutionary</span> Features
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+              <span className="text-purple-600">Revolutionary</span> Features
             </h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Cutting-edge AI technology combined with human expertise
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+              <Card key={index} className="bg-white/80 backdrop-blur-sm border-purple-100 hover:bg-white/90 transition-all duration-300 hover:scale-105 shadow-lg">
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <div className="text-white">
                       {feature.icon}
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-white">
+                  <h3 className="text-xl font-semibold mb-3 text-gray-900">
                     {feature.title}
                   </h3>
-                  <p className="text-white/80 text-sm leading-relaxed">
+                  <p className="text-gray-600 text-sm leading-relaxed">
                     {feature.description}
                   </p>
                 </CardContent>
@@ -321,26 +320,26 @@ const LandingPage = () => {
       {/* CTA Section */}
       <section className="relative px-6 py-20">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-8 text-white">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-8 text-gray-900">
             Ready to Transform Your
             <br />
-            <span className="text-cyan-300">Mental Health Journey?</span>
+            <span className="text-purple-600">Mental Health Journey?</span>
           </h2>
           
-          <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
             Join thousands who have already discovered a new way to access quality mental healthcare.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link to="/signup-patient">
-              <Button size="lg" className="bg-cyan-400 hover:bg-cyan-300 text-purple-900 font-semibold px-12 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-12 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
                 <Heart className="h-5 w-5 mr-2" />
                 Start Your Journey
               </Button>
             </Link>
             
             <Link to="/signup-clinician">
-              <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 rounded-full backdrop-blur-sm font-semibold">
+              <Button size="lg" variant="outline" className="border-2 border-purple-300 text-purple-700 hover:bg-purple-50 px-12 py-4 rounded-full font-semibold">
                 <Users className="h-5 w-5 mr-2" />
                 For Clinicians
               </Button>
@@ -350,43 +349,43 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-purple-900/50 backdrop-blur-sm px-6 py-12 border-t border-white/10">
+      <footer className="relative bg-purple-900/10 backdrop-blur-sm px-6 py-12 border-t border-purple-100">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="col-span-2">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center">
                   <Brain className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-white">MoodMate</span>
+                <span className="text-2xl font-bold text-gray-900">MoodMate</span>
               </div>
-              <p className="text-white/70 max-w-md">
+              <p className="text-gray-600 max-w-md">
                 Revolutionizing mental healthcare through AI-powered support and human-centered design.
               </p>
             </div>
             
             <div>
-              <h4 className="text-white font-semibold mb-4">Platform</h4>
-              <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-colors">For Patients</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">For Clinicians</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">AI Technology</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+              <h4 className="text-gray-900 font-semibold mb-4">Platform</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li><a href="#" className="hover:text-gray-900 transition-colors">For Patients</a></li>
+                <li><a href="#" className="hover:text-gray-900 transition-colors">For Clinicians</a></li>
+                <li><a href="#" className="hover:text-gray-900 transition-colors">AI Technology</a></li>
+                <li><a href="#" className="hover:text-gray-900 transition-colors">Security</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              <h4 className="text-gray-900 font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li><a href="#" className="hover:text-gray-900 transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-gray-900 transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-gray-900 transition-colors">Terms</a></li>
+                <li><a href="#" className="hover:text-gray-900 transition-colors">Contact</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-white/10 mt-12 pt-8 text-center text-white/60">
+          <div className="border-t border-purple-100 mt-12 pt-8 text-center text-gray-500">
             <p>&copy; 2024 MoodMate. All rights reserved. Transforming mental healthcare with AI.</p>
           </div>
         </div>
