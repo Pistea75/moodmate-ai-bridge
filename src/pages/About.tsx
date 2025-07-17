@@ -1,9 +1,39 @@
 import { PublicNav } from '../components/PublicNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Users, Target, Award, Heart, Zap } from 'lucide-react';
+import { Brain, Users, Target, Award, Heart, Zap, Globe, Shield } from 'lucide-react';
 
 export default function About() {
+  const values = [
+    {
+      icon: Heart,
+      title: "Compassionate Care",
+      description: "Every interaction is designed with empathy and understanding at its core."
+    },
+    {
+      icon: Shield,
+      title: "Privacy First",
+      description: "Your mental health data is protected with industry-leading security measures."
+    },
+    {
+      icon: Brain,
+      title: "AI Innovation",
+      description: "Cutting-edge technology that learns and adapts to provide personalized support."
+    },
+    {
+      icon: Users,
+      title: "Human Connection",
+      description: "Technology that enhances, never replaces, the therapeutic relationship."
+    }
+  ];
+
+  const stats = [
+    { number: "10K+", label: "Active Users" },
+    { number: "50K+", label: "Mood Entries Logged" },
+    { number: "95%", label: "User Satisfaction" },
+    { number: "24/7", label: "AI Support Available" }
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-primary/5">
       <PublicNav />
@@ -25,7 +55,8 @@ export default function About() {
       </div>
 
       <div className="container mx-auto px-4 py-16">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        {/* Mission Section */}
+        <div className="grid lg:grid-cols-2 gap-16 items-center mb-16">
           <div>
             <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
             <p className="text-lg text-muted-foreground mb-6">
@@ -42,15 +73,94 @@ export default function About() {
           
           <div className="relative">
             <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl p-8 backdrop-blur-sm">
-              <div className="text-center">
-                <Heart className="w-16 h-16 text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-4">Compassionate Care</h3>
-                <p className="text-muted-foreground">
-                  Our AI is trained to provide empathetic, understanding responses that complement human therapeutic approaches.
-                </p>
+              <div className="grid grid-cols-2 gap-6">
+                {stats.map((stat, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Values Section */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-12">Our Values</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {values.map((value, index) => (
+              <Card key={index} className="text-center">
+                <CardContent className="p-6">
+                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <value.icon className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-bold mb-2">{value.title}</h3>
+                  <p className="text-sm text-muted-foreground">{value.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Team Section */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-12">Meet Our Team</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Users className="w-12 h-12 text-primary" />
+                </div>
+                <h3 className="font-bold mb-2">Dr. Sarah Chen</h3>
+                <p className="text-primary text-sm mb-2">Chief Medical Officer</p>
+                <p className="text-sm text-muted-foreground">
+                  Licensed psychiatrist with 15+ years of experience in digital mental health innovation.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Brain className="w-12 h-12 text-primary" />
+                </div>
+                <h3 className="font-bold mb-2">Alex Rodriguez</h3>
+                <p className="text-primary text-sm mb-2">CTO & Co-Founder</p>
+                <p className="text-sm text-muted-foreground">
+                  AI researcher and former Google engineer specializing in natural language processing.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Heart className="w-12 h-12 text-primary" />
+                </div>
+                <h3 className="font-bold mb-2">Maria Thompson</h3>
+                <p className="text-primary text-sm mb-2">Head of Patient Experience</p>
+                <p className="text-sm text-muted-foreground">
+                  Licensed clinical social worker focused on improving access to mental health care.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Vision Section */}
+        <div className="text-center">
+          <Card className="max-w-4xl mx-auto">
+            <CardContent className="p-8">
+              <Globe className="w-16 h-16 text-primary mx-auto mb-6" />
+              <h2 className="text-3xl font-bold mb-6">Our Vision</h2>
+              <p className="text-lg text-muted-foreground">
+                We envision a world where mental health support is accessible, personalized, and effective for everyone. 
+                Through the thoughtful integration of AI and human expertise, we're creating a future where technology 
+                empowers both patients and clinicians to achieve better mental health outcomes together.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
