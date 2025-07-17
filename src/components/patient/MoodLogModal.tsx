@@ -7,6 +7,7 @@ import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 // Import mood components
 import { moodFormSchema, MoodFormValues } from './mood/MoodFormSchema';
@@ -23,6 +24,7 @@ interface MoodLogModalProps {
 export function MoodLogModal({ onLogComplete, trigger }: MoodLogModalProps) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
   
   // Initialize form with default values
   const form = useForm<MoodFormValues>({
@@ -47,13 +49,30 @@ export function MoodLogModal({ onLogComplete, trigger }: MoodLogModalProps) {
         custom_trigger: '',
         activities: [],
       });
+      toast({
+        title: "Mood logged successfully",
+        description: "Your mood entry has been saved.",
+      });
       onLogComplete?.();
     },
     userId: user?.id,
   });
 
   const onSubmit = async (values: MoodFormValues) => {
-    await handleSubmit(values);
+    console.log('Submitting mood form with values:', values);
+    try {
+      const success = await handleSubmit(values);
+      if (!success) {
+        console.error('Failed to submit mood entry');
+      }
+    } catch (error) {
+      console.error('Error submitting mood form:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to log mood entry. Please try again.",
+      });
+    }
   };
 
   return (
@@ -90,7 +109,7 @@ export function MoodLogModal({ onLogComplete, trigger }: MoodLogModalProps) {
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="bg-mood-purple hover:bg-mood-purple/90 text-white"
+                className="bg-purple-600 hover:bg-purple-700 text-white"
               >
                 {isSubmitting ? "Submitting..." : "Submit Entry"}
               </Button>
