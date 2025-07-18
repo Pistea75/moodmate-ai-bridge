@@ -126,6 +126,17 @@ export interface Translations {
   treatmentPlans: string;
   resourceLibrary: string;
   
+  // Landing Page
+  about: string;
+  features: string;
+  pricing: string;
+  contact: string;
+  help: string;
+  faq: string;
+  privacy: string;
+  terms: string;
+  security: string;
+  
   // App Name
   appName: string;
 
@@ -295,6 +306,17 @@ const translations: Record<string, Translations> = {
     treatmentPlans: 'Treatment Plans',
     resourceLibrary: 'Resource Library',
     
+    // Landing Page
+    about: 'About',
+    features: 'Features',
+    pricing: 'Pricing',
+    contact: 'Contact',
+    help: 'Help',
+    faq: 'FAQ',
+    privacy: 'Privacy',
+    terms: 'Terms',
+    security: 'Security',
+    
     // App Name
     appName: 'MoodMate',
     
@@ -460,6 +482,17 @@ const translations: Record<string, Translations> = {
     insights: 'Insights',
     treatmentPlans: 'Planes de Tratamiento',
     resourceLibrary: 'Biblioteca de Recursos',
+    
+    // Landing Page
+    about: 'Acerca de',
+    features: 'Características',
+    pricing: 'Precios',
+    contact: 'Contacto',
+    help: 'Ayuda',
+    faq: 'Preguntas Frecuentes',
+    privacy: 'Privacidad',
+    terms: 'Términos',
+    security: 'Seguridad',
     
     // App Name
     appName: 'MoodMate',
@@ -627,6 +660,17 @@ const translations: Record<string, Translations> = {
     treatmentPlans: 'Plans de Traitement',
     resourceLibrary: 'Bibliothèque de Ressources',
     
+    // Landing Page
+    about: 'À Propos',
+    features: 'Fonctionnalités',
+    pricing: 'Tarifs',
+    contact: 'Contact',
+    help: 'Aide',
+    faq: 'FAQ',
+    privacy: 'Confidentialité',
+    terms: 'Conditions',
+    security: 'Sécurité',
+    
     // App Name
     appName: 'MoodMate',
     
@@ -792,6 +836,17 @@ const translations: Record<string, Translations> = {
     insights: 'Erkenntnisse',
     treatmentPlans: 'Behandlungspläne',
     resourceLibrary: 'Ressourcenbibliothek',
+    
+    // Landing Page
+    about: 'Über Uns',
+    features: 'Funktionen',
+    pricing: 'Preise',
+    contact: 'Kontakt',
+    help: 'Hilfe',
+    faq: 'FAQ',
+    privacy: 'Datenschutz',
+    terms: 'Bedingungen',
+    security: 'Sicherheit',
     
     // App Name
     appName: 'MoodMate',

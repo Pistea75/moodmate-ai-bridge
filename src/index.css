@@ -18,6 +18,7 @@
 
     /* Primary purple color matching MoodMate design */
     --primary: 263 83% 75%;
+    --primary-light: 263 83% 85%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 261 28% 63%;
@@ -27,7 +28,7 @@
     --muted: 245 12% 95%;
     --muted-foreground: 240 3% 57%;
 
-    --accent: 245 12% 95%;
+    --accent: 45 100% 70%;
     --accent-foreground: 240 10% 20%;
 
     --destructive: 0 84.2% 60.2%;
@@ -54,6 +55,7 @@
 
     /* Primary purple color for dark mode */
     --primary: 263 83% 75%;
+    --primary-light: 263 83% 85%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 261 28% 63%;
@@ -63,7 +65,7 @@
     --muted: 240 20% 22%;
     --muted-foreground: 240 10% 70%;
 
-    --accent: 240 20% 22%;
+    --accent: 45 100% 70%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 40.6%;

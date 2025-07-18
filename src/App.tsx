@@ -26,6 +26,8 @@ import PatientSessions from "./pages/patient/PatientSessions";
 import PatientProfile from "./pages/patient/PatientProfile";
 import PatientSettings from "./pages/patient/PatientSettings";
 import PatientGoals from './pages/patient/Goals';
+import PatientMood from './pages/patient/PatientMood';
+import PatientInsights from './pages/patient/PatientInsights';
 import SignupClinician from './pages/SignupClinician';
 import SignupPatient from './pages/SignupPatient';
 import ForgotPassword from './pages/ForgotPassword';
@@ -134,6 +136,16 @@ function App() {
               <Route path="/patient/settings" element={
                 <ProtectedRoute>
                   <PatientSettings />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/mood" element={
+                <ProtectedRoute>
+                  <PatientMood />
+                </ProtectedRoute>
+              } />
+              <Route path="/patient/insights" element={
+                <ProtectedRoute>
+                  <PatientInsights />
                 </ProtectedRoute>
               } />
 
