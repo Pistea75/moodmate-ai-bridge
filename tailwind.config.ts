@@ -53,6 +53,10 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				'hero-primary': 'hsl(var(--hero-primary))',
+				'hero-secondary': 'hsl(var(--hero-secondary))',
+				'hero-accent': 'hsl(var(--hero-accent))',
+				'hero-glow': 'hsl(var(--hero-glow))',
 				// MoodMate custom colors
                 mood: {
                     purple: {

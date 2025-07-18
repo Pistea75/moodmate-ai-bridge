@@ -38,6 +38,12 @@
     --input: 248 30% 95%;
     --ring: var(--primary);
 
+    /* Hero section colors */
+    --hero-primary: 262 83% 58%;
+    --hero-secondary: 258 90% 66%;
+    --hero-accent: 280 100% 70%;
+    --hero-glow: 200 100% 80%;
+
     --radius: 1rem;
   }
 
