@@ -1,5 +1,6 @@
 
 import { HeroSection } from '@/components/landing/HeroSection';
+import { DemoSection } from '@/components/landing/DemoSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { CTASection } from '@/components/landing/CTASection';
@@ -12,6 +13,7 @@ export default function Landing() {
       <PublicNav />
       <main>
         <HeroSection />
+        <DemoSection />
         <FeaturesSection />
         <TestimonialsSection />
         <CTASection />

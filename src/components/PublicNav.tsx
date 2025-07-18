@@ -6,27 +6,28 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
 } from "./ui/navigation-menu";
+import { Brain } from "lucide-react";
 
 export function PublicNav() {
   const location = useLocation();
   
   // Define navigation items
   const navItems = [
-    { name: "Features", path: "/features" },
     { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
+    { name: "Features", path: "/features" },
     { name: "Pricing", path: "/pricing" },
+    { name: "Contact", path: "/contact" },
+    { name: "Privacy", path: "/privacy" },
     { name: "Help", path: "/help" },
-    { name: "FAQ", path: "/faq" },
   ];
 
   return (
-    <div className="flex items-center justify-between py-4 px-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b">
-      <Link to="/" className="flex items-center gap-2">
-        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-mood-purple to-mood-purple-light flex items-center justify-center">
-          <span className="font-bold text-white">M</span>
+    <div className="flex items-center justify-between py-4 px-6 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90 sticky top-0 z-50 w-full border-b border-white/20">
+      <Link to="/" className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
+          <Brain className="h-6 w-6 text-white" />
         </div>
-        <span className="text-xl font-semibold text-mood-purple">MoodMate</span>
+        <span className="text-2xl font-bold text-gray-900">MoodMate</span>
       </Link>
 
       <NavigationMenu>
@@ -35,10 +36,10 @@ export function PublicNav() {
             <NavigationMenuItem key={item.path}>
               <Link 
                 to={item.path} 
-                className={`text-sm font-medium ${
+                className={`text-sm font-medium transition-colors ${
                   location.pathname === item.path
-                    ? "text-primary font-medium"
-                    : "text-muted-foreground hover:text-primary"
+                    ? "text-purple-600 font-semibold"
+                    : "text-gray-600 hover:text-purple-600"
                 }`}
               >
                 {item.name}
@@ -47,12 +48,12 @@ export function PublicNav() {
           ))}
           <NavigationMenuItem>
             <Link to="/login">
-              <Button variant="ghost" className="text-sm">Log in</Button>
+              <Button variant="ghost" className="text-sm text-gray-600 hover:text-purple-600">SIGN IN</Button>
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <Link to="/signup/patient">
-              <Button className="text-sm bg-mood-purple hover:bg-mood-purple/90">Sign up</Button>
+              <Button className="text-sm bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-full px-6">SIGN UP</Button>
             </Link>
           </NavigationMenuItem>
         </NavigationMenuList>

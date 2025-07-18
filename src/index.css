@@ -123,6 +123,37 @@
   .switch-thumb {
     @apply bg-white shadow-md;
   }
+
+  /* Custom slider styling */
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, #ef4444 0%, #f59e0b 25%, #10b981 50%, #3b82f6 75%, #8b5cf6 100%);
+    outline: none;
+    border-radius: 8px;
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid #7c3aed;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid #7c3aed;
+  }
 }
 
 @layer utilities {
