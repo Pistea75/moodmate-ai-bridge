@@ -2,13 +2,10 @@ import { PublicNav } from '@/components/PublicNav';
 import { Footer } from '@/components/landing/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Brain, MessageCircle, TrendingUp, Shield, Users, Zap, Heart, Star, Play } from 'lucide-react';
+import { Brain, MessageCircle, TrendingUp, Shield, Users, Zap, Heart, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 
 export default function LandingPage() {
-  const [showChatDemo, setShowChatDemo] = useState(false);
-  const [showMoodDemo, setShowMoodDemo] = useState(false);
 
   const chatMessages = [
     { sender: 'ai', message: "Hello! I'm your AI companion. How are you feeling today?" },
@@ -144,42 +141,24 @@ export default function LandingPage() {
                 <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-white">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold">AI Chat Support</h3>
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      className="border-white text-white hover:bg-white hover:text-purple-700"
-                      onClick={() => setShowChatDemo(!showChatDemo)}
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      {showChatDemo ? 'Hide' : 'Demo'}
-                    </Button>
                   </div>
                   <p className="text-purple-100 mt-2">24/7 intelligent conversations</p>
                 </div>
                 
                 <div className="p-6 h-80 overflow-y-auto bg-gray-50">
-                  {showChatDemo ? (
-                    <div className="space-y-4">
-                      {chatMessages.map((msg, i) => (
-                        <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[80%] p-3 rounded-2xl ${
-                            msg.sender === 'user' 
-                              ? 'bg-purple-600 text-white' 
-                              : 'bg-white text-gray-800 shadow-sm'
-                          }`}>
-                            <p className="text-sm">{msg.message}</p>
-                          </div>
+                  <div className="space-y-4">
+                    {chatMessages.map((msg, i) => (
+                      <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] p-3 rounded-2xl ${
+                          msg.sender === 'user' 
+                            ? 'bg-purple-600 text-white' 
+                            : 'bg-white text-gray-800 shadow-sm'
+                        }`}>
+                          <p className="text-sm">{msg.message}</p>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center">
-                        <Brain className="h-12 w-12 text-purple-400 mx-auto mb-4" />
-                        <p className="text-gray-500">Click Demo to see AI chat in action</p>
                       </div>
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -190,26 +169,16 @@ export default function LandingPage() {
                 <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold">Mood Tracking</h3>
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      className="border-white text-white hover:bg-white hover:text-blue-700"
-                      onClick={() => setShowMoodDemo(!showMoodDemo)}
-                    >
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      {showMoodDemo ? 'Hide' : 'Demo'}
-                    </Button>
                   </div>
                   <p className="text-blue-100 mt-2">Smart pattern recognition</p>
                 </div>
                 
                 <div className="p-6 h-80 bg-gray-50">
-                  {showMoodDemo ? (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>This Week</span>
-                        <span className="text-green-600 font-medium">↗ Improving</span>
-                      </div>
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <span>This Week</span>
+                      <span className="text-green-600 font-medium">↗ Improving</span>
+                    </div>
                       
                       <div className="h-32 flex items-end justify-between gap-2">
                         {moodData.map((data, i) => (
@@ -222,22 +191,14 @@ export default function LandingPage() {
                           </div>
                         ))}
                       </div>
-                      
-                      <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                        <p className="text-sm text-blue-700">
-                          <strong>AI Insight:</strong> Your mood has improved 25% this week! 
-                          Keep up the great work with your daily routines.
-                        </p>
-                      </div>
+                    
+                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                      <p className="text-sm text-blue-700">
+                        <strong>AI Insight:</strong> Your mood has improved 25% this week! 
+                        Keep up the great work with your daily routines.
+                      </p>
                     </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center">
-                        <TrendingUp className="h-12 w-12 text-blue-400 mx-auto mb-4" />
-                        <p className="text-gray-500">Click Demo to see mood tracking</p>
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
