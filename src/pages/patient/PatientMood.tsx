@@ -48,10 +48,10 @@ export default function PatientMood() {
         {/* Header */}
         <div className="flex justify-between items-start">
           <div className="space-y-2">
-            <h1 className="text-4xl font-bold text-gray-900">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Mood Tracking
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-muted-foreground">
               Track your mood patterns and emotional well-being over time
             </p>
           </div>

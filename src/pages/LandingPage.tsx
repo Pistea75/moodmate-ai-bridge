@@ -66,7 +66,7 @@ export default function LandingPage() {
                   size="lg" 
                   className="border-2 border-white text-white hover:bg-white hover:text-purple-700 font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105"
                 >
-                  Join as Clinician
+                  For Clinicians
                 </Button>
               </Link>
             </div>
@@ -200,6 +200,48 @@ export default function LandingPage() {
                     </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Innovation Section */}
+      <section className="py-20 bg-gradient-to-b from-white to-purple-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+              Innovation in <span className="text-purple-600">Mental Health</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Experience the future of mental health care with our cutting-edge technology and compassionate approach
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <Card className="shadow-xl border-0 overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 text-white">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
+                  <Brain className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Advanced AI Technology</h3>
+                <p className="text-blue-100 leading-relaxed">
+                  Our AI doesn't just chat - it learns, adapts, and grows with you. Using advanced machine learning, 
+                  it understands your unique patterns and provides increasingly personalized support.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-xl border-0 overflow-hidden bg-gradient-to-br from-green-600 to-green-700 text-white">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
+                  <Users className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Human-Centered Care</h3>
+                <p className="text-green-100 leading-relaxed">
+                  Technology amplifies human compassion. Our platform connects you with licensed professionals 
+                  who work alongside AI to provide comprehensive, personalized mental health support.
+                </p>
               </CardContent>
             </Card>
           </div>

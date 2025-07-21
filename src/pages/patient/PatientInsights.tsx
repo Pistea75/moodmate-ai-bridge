@@ -77,10 +77,10 @@ export default function PatientInsights() {
       <div className="p-8 space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold text-gray-900">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             AI Insights
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-muted-foreground">
             Personalized insights based on your mental health journey
           </p>
         </div>

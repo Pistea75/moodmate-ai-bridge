@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       ai_chat_logs: {
         Row: {
           created_at: string | null
@@ -419,6 +446,7 @@ export type Database = {
           first_name: string | null
           id: string
           initial_assessment: string | null
+          is_super_admin: boolean | null
           language: string | null
           last_active_at: string | null
           last_name: string | null
@@ -440,6 +468,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           initial_assessment?: string | null
+          is_super_admin?: boolean | null
           language?: string | null
           last_active_at?: string | null
           last_name?: string | null
@@ -461,6 +490,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           initial_assessment?: string | null
+          is_super_admin?: boolean | null
           language?: string | null
           last_active_at?: string | null
           last_name?: string | null
@@ -763,6 +793,36 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           clinician_id: string | null
@@ -892,7 +952,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "patient" | "clinician" | "admin" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1019,6 +1079,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["patient", "clinician", "admin", "super_admin"],
+    },
   },
 } as const

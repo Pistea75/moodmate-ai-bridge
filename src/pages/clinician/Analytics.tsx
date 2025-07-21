@@ -10,8 +10,8 @@ export default function Analytics() {
     <ClinicianLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Analytics & System Tests</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Analytics & System Tests</h1>
+          <p className="text-muted-foreground mt-1">
             View detailed analytics and run system diagnostics
           </p>
         </div>

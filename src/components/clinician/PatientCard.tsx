@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ProfileButton } from '@/components/ProfileButton';
 import { 
   User, 
   Mail, 
@@ -261,15 +262,10 @@ export function PatientCard({
 
         {/* Action Buttons */}
         <div className="space-y-2 mt-auto">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <ProfileButton
             onClick={() => onViewProfile(patient.id)}
-            className="w-full"
-          >
-            <User className="h-4 w-4 mr-2" />
-            View Profile
-          </Button>
+            patientName={`${patient.first_name} ${patient.last_name}`}
+          />
         </div>
       </CardContent>
     </Card>

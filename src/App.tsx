@@ -42,6 +42,7 @@ import HelpCenter from './pages/HelpCenter';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 import Security from './pages/Security';
+import SuperAdminDashboard from './pages/admin/SuperAdminDashboard';
 
 function App() {
   return (
@@ -160,6 +161,9 @@ function App() {
               <Route path="/features" element={<Features />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/security" element={<Security />} />
+              
+              {/* Super Admin Routes */}
+              <Route path="/admin" element={<SuperAdminDashboard />} />
             </Routes>
           </div>
           </ErrorBoundary>
