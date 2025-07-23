@@ -204,6 +204,153 @@ export type Database = {
           },
         ]
       }
+      brodi_interactions: {
+        Row: {
+          context_data: Json | null
+          created_at: string
+          effectiveness_score: number | null
+          id: string
+          interaction_type: string
+          message: string
+          responded_at: string | null
+          user_id: string
+          user_response: string | null
+        }
+        Insert: {
+          context_data?: Json | null
+          created_at?: string
+          effectiveness_score?: number | null
+          id?: string
+          interaction_type: string
+          message: string
+          responded_at?: string | null
+          user_id: string
+          user_response?: string | null
+        }
+        Update: {
+          context_data?: Json | null
+          created_at?: string
+          effectiveness_score?: number | null
+          id?: string
+          interaction_type?: string
+          message?: string
+          responded_at?: string | null
+          user_id?: string
+          user_response?: string | null
+        }
+        Relationships: []
+      }
+      brodi_nudge_history: {
+        Row: {
+          actual_time: string | null
+          context_score: number | null
+          created_at: string
+          id: string
+          nudge_type: string
+          scheduled_time: string
+          success: boolean | null
+          user_action: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_time?: string | null
+          context_score?: number | null
+          created_at?: string
+          id?: string
+          nudge_type: string
+          scheduled_time: string
+          success?: boolean | null
+          user_action?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_time?: string | null
+          context_score?: number | null
+          created_at?: string
+          id?: string
+          nudge_type?: string
+          scheduled_time?: string
+          success?: boolean | null
+          user_action?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      brodi_pattern_analysis: {
+        Row: {
+          analysis_data: Json
+          confidence_score: number
+          created_at: string
+          id: string
+          last_updated: string
+          pattern_type: string
+          user_id: string
+        }
+        Insert: {
+          analysis_data: Json
+          confidence_score: number
+          created_at?: string
+          id?: string
+          last_updated?: string
+          pattern_type: string
+          user_id: string
+        }
+        Update: {
+          analysis_data?: Json
+          confidence_score?: number
+          created_at?: string
+          id?: string
+          last_updated?: string
+          pattern_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      brodi_user_preferences: {
+        Row: {
+          celebration_enabled: boolean
+          created_at: string
+          frequency_preference: string
+          id: string
+          interaction_style: string
+          mood_reminders_enabled: boolean
+          nudge_enabled: boolean
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          task_reminders_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          celebration_enabled?: boolean
+          created_at?: string
+          frequency_preference?: string
+          id?: string
+          interaction_style?: string
+          mood_reminders_enabled?: boolean
+          nudge_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          task_reminders_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          celebration_enabled?: boolean
+          created_at?: string
+          frequency_preference?: string
+          id?: string
+          interaction_style?: string
+          mood_reminders_enabled?: boolean
+          nudge_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          task_reminders_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       chat_reports: {
         Row: {
           advice: string | null

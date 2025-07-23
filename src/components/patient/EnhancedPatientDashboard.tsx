@@ -10,6 +10,7 @@ import { WellnessJourneyCard } from "./WellnessJourneyCard";
 import { QuickActionsCard } from "./QuickActionsCard";
 import { DailyCheckinCard } from "./DailyCheckinCard";
 import { AIInsightsCard } from "./AIInsightsCard";
+import { BrodiEngine } from "@/components/brodi/BrodiEngine";
 
 export function EnhancedPatientDashboard() {
   const { t } = useLanguage();
@@ -64,6 +65,9 @@ export function EnhancedPatientDashboard() {
           <WellnessStreakCard />
         </div>
       </div>
+      
+      {/* Brodi AI Companion */}
+      <BrodiEngine context="dashboard" />
     </div>
   );
 }
