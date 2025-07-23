@@ -163,38 +163,13 @@ export default function Landing() {
                 <div className="w-80 h-96 relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-100/50 to-pink-100/50 rounded-3xl blur-2xl transform rotate-6"></div>
                   <div className="relative z-10 w-full h-full flex items-center justify-center">
-                    {/* Static representation of Brodi for landing page */}
-                    <div className="relative">
-                      {/* Main teardrop body */}
-                      <div className="w-32 h-40 bg-gradient-to-b from-purple-400 to-purple-500 rounded-full rounded-t-[50%] shadow-2xl transform -rotate-2"></div>
-                      
-                      {/* Sitting position body */}
-                      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-28 h-20 bg-gradient-to-b from-purple-400 to-purple-500 rounded-t-full shadow-lg"></div>
-                      
-                      {/* Face */}
-                      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
-                        {/* Eyes */}
-                        <div className="flex gap-4 mb-2">
-                          <div className="w-3 h-4 bg-gray-800 rounded-full"></div>
-                          <div className="w-3 h-4 bg-gray-800 rounded-full"></div>
-                        </div>
-                        {/* Eyebrows */}
-                        <div className="flex gap-3 mb-3 -mt-4">
-                          <div className="w-4 h-1 bg-purple-700 rounded-full transform -rotate-12"></div>
-                          <div className="w-4 h-1 bg-purple-700 rounded-full transform rotate-12"></div>
-                        </div>
-                        {/* Smile */}
-                        <div className="w-6 h-3 border-b-2 border-purple-700 rounded-b-full mx-auto"></div>
-                        {/* Blush */}
-                        <div className="flex gap-8 mt-1 -ml-2">
-                          <div className="w-3 h-2 bg-pink-300 rounded-full opacity-60"></div>
-                          <div className="w-3 h-2 bg-pink-300 rounded-full opacity-60"></div>
-                        </div>
-                      </div>
-                      
-                      {/* Arms */}
-                      <div className="absolute top-16 -left-2 w-4 h-6 bg-purple-400 rounded-full transform -rotate-45"></div>
-                      <div className="absolute top-16 -right-2 w-4 h-6 bg-purple-400 rounded-full transform rotate-45"></div>
+                    {/* Actual Brodi Image */}
+                    <div className="relative animate-float">
+                      <img 
+                        src="/lovable-uploads/619f204f-5934-420a-8d58-dcc54b8b176c.png" 
+                        alt="Brodi - Your AI wellness companion"
+                        className="w-64 h-64 object-contain drop-shadow-2xl"
+                      />
                       
                       {/* Floating hearts */}
                       <div className="absolute -top-4 -right-6 animate-float">
