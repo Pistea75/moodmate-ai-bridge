@@ -146,6 +146,138 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Meet Brodi Section */}
+      <section className="py-20 bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-purple-200/30 to-pink-200/30 rounded-full blur-xl"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-pink-200/20 to-purple-200/20 rounded-full blur-xl"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left side - Brodi Character */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                {/* 3D Brodi Character Container */}
+                <div className="w-80 h-96 relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-100/50 to-pink-100/50 rounded-3xl blur-2xl transform rotate-6"></div>
+                  <div className="relative z-10 w-full h-full flex items-center justify-center">
+                    {/* Static representation of Brodi for landing page */}
+                    <div className="relative">
+                      {/* Main teardrop body */}
+                      <div className="w-32 h-40 bg-gradient-to-b from-purple-400 to-purple-500 rounded-full rounded-t-[50%] shadow-2xl transform -rotate-2"></div>
+                      
+                      {/* Sitting position body */}
+                      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-28 h-20 bg-gradient-to-b from-purple-400 to-purple-500 rounded-t-full shadow-lg"></div>
+                      
+                      {/* Face */}
+                      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
+                        {/* Eyes */}
+                        <div className="flex gap-4 mb-2">
+                          <div className="w-3 h-4 bg-gray-800 rounded-full"></div>
+                          <div className="w-3 h-4 bg-gray-800 rounded-full"></div>
+                        </div>
+                        {/* Eyebrows */}
+                        <div className="flex gap-3 mb-3 -mt-4">
+                          <div className="w-4 h-1 bg-purple-700 rounded-full transform -rotate-12"></div>
+                          <div className="w-4 h-1 bg-purple-700 rounded-full transform rotate-12"></div>
+                        </div>
+                        {/* Smile */}
+                        <div className="w-6 h-3 border-b-2 border-purple-700 rounded-b-full mx-auto"></div>
+                        {/* Blush */}
+                        <div className="flex gap-8 mt-1 -ml-2">
+                          <div className="w-3 h-2 bg-pink-300 rounded-full opacity-60"></div>
+                          <div className="w-3 h-2 bg-pink-300 rounded-full opacity-60"></div>
+                        </div>
+                      </div>
+                      
+                      {/* Arms */}
+                      <div className="absolute top-16 -left-2 w-4 h-6 bg-purple-400 rounded-full transform -rotate-45"></div>
+                      <div className="absolute top-16 -right-2 w-4 h-6 bg-purple-400 rounded-full transform rotate-45"></div>
+                      
+                      {/* Floating hearts */}
+                      <div className="absolute -top-4 -right-6 animate-float">
+                        <Heart className="h-4 w-4 text-pink-400 fill-pink-400" />
+                      </div>
+                      <div className="absolute top-2 -left-8 animate-float" style={{ animationDelay: '1s' }}>
+                        <Zap className="h-3 w-3 text-yellow-400" />
+                      </div>
+                      <div className="absolute -bottom-2 right-8 animate-pulse">
+                        <Star className="h-3 w-3 text-purple-400 fill-purple-400" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Speech bubble */}
+                <div className="absolute -top-4 -right-12 bg-white rounded-2xl p-4 shadow-xl border border-purple-100 max-w-xs">
+                  <div className="absolute bottom-0 left-8 w-4 h-4 bg-white transform rotate-45 translate-y-2 border-r border-b border-purple-100"></div>
+                  <p className="text-sm text-gray-700 font-medium">
+                    "Hi! I'm Brodi, your AI wellness companion. I'm here to support your mental health journey!"
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side - Brodi's Story */}
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-4xl lg:text-5xl font-bold text-gray-900">
+                  Meet <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Brodi</span>
+                </h2>
+                <p className="text-xl text-gray-600 leading-relaxed">
+                  Your AI wellness companion, designed with care and compassion
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-purple-100 shadow-lg">
+                  <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-pink-500" />
+                    Born from Compassion
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    Brodi was created by a team of mental health professionals and AI researchers who understood that healing requires both intelligence and empathy. Named after the gentle, nurturing qualities we all need during difficult times.
+                  </p>
+                </div>
+
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-purple-100 shadow-lg">
+                  <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-purple-500" />
+                    Designed to Understand
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    With advanced emotional intelligence and thousands of hours of training with real mental health conversations, Brodi learns to recognize patterns, offer support, and provide gentle nudges toward wellness.
+                  </p>
+                </div>
+
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-purple-100 shadow-lg">
+                  <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center gap-2">
+                    <Star className="h-5 w-5 text-yellow-500" />
+                    Always Growing
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    Just like you, Brodi is on a journey of continuous growth. Every interaction helps him become more helpful, more understanding, and more attuned to what you need for your unique wellness path.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <Link to="/signup/patient">
+                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                    Start Chatting with Brodi
+                  </Button>
+                </Link>
+                <Button variant="outline" className="border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white font-semibold px-6 py-3 rounded-full transition-all duration-300">
+                  Learn More
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Demo Section */}
       <DemoSection />
 
