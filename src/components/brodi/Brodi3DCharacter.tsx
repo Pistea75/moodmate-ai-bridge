@@ -18,9 +18,7 @@ interface Brodi3DCharacterProps {
 
 function BrodiRobot({ expression }: { expression: 'happy' | 'excited' | 'caring' | 'thoughtful' }) {
   const robotRef = useRef<THREE.Group>(null);
-  const antennaRef = useRef<THREE.Group>(null);
-  const leftArmRef = useRef<THREE.Mesh>(null);
-  const rightArmRef = useRef<THREE.Mesh>(null);
+  const heartRef = useRef<THREE.Group>(null);
   const [time, setTime] = useState(0);
 
   useFrame((state, delta) => {
@@ -28,137 +26,168 @@ function BrodiRobot({ expression }: { expression: 'happy' | 'excited' | 'caring'
     
     if (robotRef.current) {
       // Gentle floating animation
-      robotRef.current.position.y = Math.sin(time * 2) * 0.1;
+      robotRef.current.position.y = Math.sin(time * 2) * 0.05;
       
-      // Expression-based rotations
+      // Expression-based subtle movements
       switch (expression) {
         case 'excited':
-          robotRef.current.rotation.y = Math.sin(time * 4) * 0.2;
+          robotRef.current.rotation.y = Math.sin(time * 4) * 0.1;
           break;
         case 'caring':
-          robotRef.current.rotation.x = Math.sin(time * 1.5) * 0.05;
-          break;
-        case 'thoughtful':
-          robotRef.current.rotation.y = Math.sin(time * 0.8) * 0.1;
+          robotRef.current.rotation.x = Math.sin(time * 1.5) * 0.02;
           break;
         default:
-          robotRef.current.rotation.y = Math.sin(time * 1.2) * 0.1;
+          robotRef.current.rotation.y = Math.sin(time * 1.2) * 0.05;
       }
     }
 
-    // Antenna animation
-    if (antennaRef.current) {
-      antennaRef.current.rotation.z = Math.sin(time * 3) * 0.3;
-    }
-
-    // Arm animations
-    if (leftArmRef.current && rightArmRef.current) {
-      if (expression === 'excited') {
-        leftArmRef.current.rotation.z = Math.sin(time * 6) * 0.5 - 0.3;
-        rightArmRef.current.rotation.z = Math.sin(time * 6 + Math.PI) * 0.5 + 0.3;
-      } else {
-        leftArmRef.current.rotation.z = Math.sin(time * 2) * 0.1 - 0.2;
-        rightArmRef.current.rotation.z = Math.sin(time * 2 + Math.PI) * 0.1 + 0.2;
-      }
+    // Heart pulse animation for excited/caring states
+    if (heartRef.current && (expression === 'excited' || expression === 'caring')) {
+      const scale = 1 + Math.sin(time * 4) * 0.1;
+      heartRef.current.scale.set(scale, scale, scale);
     }
   });
 
-  const getBodyColor = () => {
+  const getHelmetColor = () => {
+    return '#4c5a7a'; // Dark blue-purple from the image
+  };
+
+  const getFaceExpression = () => {
+    const faceGeometry = new THREE.PlaneGeometry(0.4, 0.3);
+    const faceMaterial = new THREE.MeshBasicMaterial({ 
+      color: '#4c5a7a',
+      transparent: true
+    });
+
     switch (expression) {
-      case 'excited': return '#22c55e'; // green
-      case 'caring': return '#3b82f6';   // blue
-      case 'thoughtful': return '#8b5cf6'; // purple
-      default: return 'hsl(var(--primary))'; // primary
+      case 'excited':
+        return { eyes: '♥ ♥', mouth: '◡', color: '#ff6b8a' };
+      case 'caring':
+        return { eyes: '◕ ◕', mouth: '◡', color: '#4c5a7a' };
+      case 'thoughtful':
+        return { eyes: '~ ~', mouth: '◡', color: '#4c5a7a' };
+      default:
+        return { eyes: '◡ ◡', mouth: '◡', color: '#4c5a7a' };
     }
   };
 
-  const getEyeText = () => {
-    switch (expression) {
-      case 'excited': return '★ ★';
-      case 'caring': return '◕ ◕';
-      case 'thoughtful': return '◐ ◑';
-      default: return '• •';
-    }
-  };
+  const face = getFaceExpression();
 
   return (
     <group ref={robotRef} position={[0, 0, 0]}>
-      {/* Body - Main cylinder */}
-      <mesh position={[0, -0.5, 0]}>
-        <cylinderGeometry args={[0.4, 0.5, 1.2, 16]} />
-        <meshStandardMaterial color={getBodyColor()} metalness={0.3} roughness={0.4} />
+      {/* Main body - rounded and soft */}
+      <mesh position={[0, -0.3, 0]}>
+        <capsuleGeometry args={[0.4, 0.6, 4, 8]} />
+        <meshStandardMaterial color="#f5f0e8" roughness={0.8} metalness={0.1} />
       </mesh>
 
-      {/* Head - Sphere */}
-      <mesh position={[0, 0.3, 0]}>
-        <sphereGeometry args={[0.35, 32, 32]} />
-        <meshStandardMaterial color="#f8f9fa" metalness={0.1} roughness={0.3} />
+      {/* Helmet/Head - larger rounded helmet */}
+      <mesh position={[0, 0.2, 0]}>
+        <sphereGeometry args={[0.45, 32, 32]} />
+        <meshStandardMaterial color="#f5f0e8" roughness={0.8} metalness={0.1} />
       </mesh>
 
-      {/* Screen/Face */}
-      <mesh position={[0, 0.3, 0.36]}>
-        <planeGeometry args={[0.5, 0.4]} />
-        <meshStandardMaterial color="#1e293b" />
+      {/* Helmet visor - dark blue oval */}
+      <mesh position={[0, 0.15, 0.35]} rotation={[0.1, 0, 0]}>
+        <sphereGeometry args={[0.35, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.8]} />
+        <meshStandardMaterial color={getHelmetColor()} roughness={0.2} metalness={0.3} />
       </mesh>
 
-      {/* Eyes - Text on screen */}
-      <Text
-        position={[0, 0.3, 0.37]}
-        fontSize={0.15}
-        color="#22c55e"
-        anchorX="center"
-        anchorY="middle"
-        font="/fonts/mono.woff"
-      >
-        {getEyeText()}
-      </Text>
+      {/* Face - cute expression inside visor */}
+      <group position={[0, 0.15, 0.45]}>
+        {/* Eyes */}
+        <Text
+          position={[-0.08, 0.05, 0]}
+          fontSize={0.06}
+          color={face.color}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {face.eyes.split(' ')[0]}
+        </Text>
+        <Text
+          position={[0.08, 0.05, 0]}
+          fontSize={0.06}
+          color={face.color}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {face.eyes.split(' ')[1]}
+        </Text>
+        
+        {/* Mouth */}
+        <Text
+          position={[0, -0.05, 0]}
+          fontSize={0.08}
+          color={face.color}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {face.mouth}
+        </Text>
+      </group>
 
-      {/* Antenna */}
-      <group ref={antennaRef} position={[0, 0.65, 0]}>
+      {/* Medical heart with cross on chest */}
+      <group ref={heartRef} position={[0, -0.1, 0.41]}>
+        {/* Heart shape */}
         <mesh>
-          <cylinderGeometry args={[0.02, 0.02, 0.3, 8]} />
-          <meshStandardMaterial color="#6b7280" />
+          <sphereGeometry args={[0.12, 16, 16]} />
+          <meshStandardMaterial color="#ff6b8a" roughness={0.6} />
         </mesh>
-        {/* Antenna tip */}
-        <mesh position={[0, 0.2, 0]}>
-          <sphereGeometry args={[0.04, 16, 16]} />
-          <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.3} />
+        <mesh position={[-0.08, 0.06, 0]}>
+          <sphereGeometry args={[0.08, 16, 16]} />
+          <meshStandardMaterial color="#ff6b8a" roughness={0.6} />
+        </mesh>
+        <mesh position={[0.08, 0.06, 0]}>
+          <sphereGeometry args={[0.08, 16, 16]} />
+          <meshStandardMaterial color="#ff6b8a" roughness={0.6} />
+        </mesh>
+        
+        {/* Medical cross on heart */}
+        <mesh position={[0, 0, 0.01]}>
+          <boxGeometry args={[0.08, 0.03, 0.01]} />
+          <meshStandardMaterial color="#ffffff" />
+        </mesh>
+        <mesh position={[0, 0, 0.01]}>
+          <boxGeometry args={[0.03, 0.08, 0.01]} />
+          <meshStandardMaterial color="#ffffff" />
         </mesh>
       </group>
 
-      {/* Left Arm */}
-      <mesh ref={leftArmRef} position={[-0.5, 0, 0]} rotation={[0, 0, -0.2]}>
-        <cylinderGeometry args={[0.08, 0.1, 0.6, 8]} />
-        <meshStandardMaterial color="#9ca3af" metalness={0.5} roughness={0.3} />
+      {/* Cute rounded arms */}
+      <mesh position={[-0.35, -0.1, 0]} rotation={[0, 0, -0.3]}>
+        <capsuleGeometry args={[0.08, 0.3, 4, 8]} />
+        <meshStandardMaterial color="#f5f0e8" roughness={0.8} metalness={0.1} />
+      </mesh>
+      <mesh position={[0.35, -0.1, 0]} rotation={[0, 0, 0.3]}>
+        <capsuleGeometry args={[0.08, 0.3, 4, 8]} />
+        <meshStandardMaterial color="#f5f0e8" roughness={0.8} metalness={0.1} />
       </mesh>
 
-      {/* Right Arm */}
-      <mesh ref={rightArmRef} position={[0.5, 0, 0]} rotation={[0, 0, 0.2]}>
-        <cylinderGeometry args={[0.08, 0.1, 0.6, 8]} />
-        <meshStandardMaterial color="#9ca3af" metalness={0.5} roughness={0.3} />
+      {/* Cute rounded feet */}
+      <mesh position={[-0.15, -0.7, 0.1]}>
+        <sphereGeometry args={[0.1, 16, 16]} />
+        <meshStandardMaterial color="#f5f0e8" roughness={0.8} metalness={0.1} />
+      </mesh>
+      <mesh position={[0.15, -0.7, 0.1]}>
+        <sphereGeometry args={[0.1, 16, 16]} />
+        <meshStandardMaterial color="#f5f0e8" roughness={0.8} metalness={0.1} />
       </mesh>
 
-      {/* Medical Cross on chest */}
-      <group position={[0, -0.3, 0.51]}>
-        <mesh>
-          <boxGeometry args={[0.15, 0.05, 0.02]} />
-          <meshStandardMaterial color="#ef4444" />
-        </mesh>
-        <mesh>
-          <boxGeometry args={[0.05, 0.15, 0.02]} />
-          <meshStandardMaterial color="#ef4444" />
-        </mesh>
-      </group>
-
-      {/* Body details - horizontal lines */}
-      <mesh position={[0, -0.7, 0.51]}>
-        <boxGeometry args={[0.3, 0.03, 0.01]} />
-        <meshStandardMaterial color="#ffffff" opacity={0.7} transparent />
-      </mesh>
-      <mesh position={[0, -0.85, 0.51]}>
-        <boxGeometry args={[0.2, 0.02, 0.01]} />
-        <meshStandardMaterial color="#ffffff" opacity={0.5} transparent />
-      </mesh>
+      {/* Optional scarf for caring/cold weather expression */}
+      {expression === 'caring' && (
+        <group position={[0, 0, 0]}>
+          <mesh position={[0, 0.05, 0]} rotation={[0, 0.2, 0]}>
+            <torusGeometry args={[0.4, 0.04, 8, 16]} />
+            <meshStandardMaterial color="#ff6b8a" roughness={0.7} />
+          </mesh>
+          {/* Scarf ends */}
+          <mesh position={[-0.3, -0.1, 0.2]} rotation={[0.3, -0.5, 0]}>
+            <cylinderGeometry args={[0.04, 0.06, 0.2, 8]} />
+            <meshStandardMaterial color="#ff6b8a" roughness={0.7} />
+          </mesh>
+        </group>
+      )}
     </group>
   );
 }
