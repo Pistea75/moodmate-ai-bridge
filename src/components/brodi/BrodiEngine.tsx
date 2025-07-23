@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrodiCharacter } from './BrodiCharacter';
+import { Brodi3DCharacter } from './Brodi3DCharacter';
 import { useBrodiInteractions } from '@/hooks/useBrodiInteractions';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -210,7 +210,7 @@ export function BrodiEngine({ context = 'dashboard' }: BrodiEngineProps) {
   return {
     callBrodi,
     brodiComponent: currentInteraction ? (
-      <BrodiCharacter
+      <Brodi3DCharacter
         message={currentInteraction.message}
         type={currentInteraction.type}
         onDismiss={handleDismiss}
