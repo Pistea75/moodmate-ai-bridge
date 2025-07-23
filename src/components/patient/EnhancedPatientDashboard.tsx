@@ -48,6 +48,9 @@ export function EnhancedPatientDashboard() {
 
         {/* Right Column */}
         <div className="space-y-6">
+          {/* Motivational Quote */}
+          <MotivationalQuoteCard />
+          
           {/* Daily Check-in */}
           <DailyCheckinCard />
           
@@ -59,9 +62,6 @@ export function EnhancedPatientDashboard() {
           
           {/* Wellness Streak */}
           <WellnessStreakCard />
-          
-          {/* Motivational Quote */}
-          <MotivationalQuoteCard />
         </div>
       </div>
     </div>

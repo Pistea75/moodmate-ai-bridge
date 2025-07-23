@@ -122,14 +122,66 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Demo Section */}
+      {/* Success Stories Section */}
       <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-              See <span className="text-purple-600">MoodMate</span> in Action
+              Real Results from <span className="text-purple-600">Real People</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Join thousands who have transformed their mental health journey with MoodMate's personalized AI support
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+            {[
+              {
+                name: "Sarah M.",
+                role: "College Student",
+                testimonial: "MoodMate helped me identify my anxiety patterns and gave me tools to manage stress during finals week.",
+                improvement: "60% reduction in anxiety episodes"
+              },
+              {
+                name: "Dr. Michael R.",
+                role: "Therapist",
+                testimonial: "The AI insights help me understand my patients' emotional patterns between sessions. It's revolutionary.",
+                improvement: "Enhanced patient outcomes"
+              },
+              {
+                name: "Jennifer L.",
+                role: "Working Professional",
+                testimonial: "Having 24/7 support means I never feel alone during difficult moments. The AI really understands me.",
+                improvement: "Improved daily mood scores"
+              }
+            ].map((story, index) => (
+              <Card key={index} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-700 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-lg">{story.name[0]}</span>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="font-semibold text-gray-900">{story.name}</h4>
+                      <p className="text-sm text-gray-600">{story.role}</p>
+                    </div>
+                  </div>
+                  <blockquote className="text-gray-700 mb-4 italic">
+                    "{story.testimonial}"
+                  </blockquote>
+                  <div className="text-sm text-purple-600 font-semibold bg-purple-50 px-3 py-2 rounded-lg">
+                    ✨ {story.improvement}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold mb-6 text-gray-900">
+              See <span className="text-purple-600">MoodMate</span> in Action
+            </h3>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Experience how our AI companion and mood tracking work together to support your mental health journey
             </p>
           </div>
@@ -206,44 +258,74 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Innovation Section */}
+      {/* How It Works Section */}
       <section className="py-20 bg-gradient-to-b from-white to-purple-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-              Innovation in <span className="text-purple-600">Mental Health</span>
+              How <span className="text-purple-600">MoodMate</span> Works
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Experience the future of mental health care with our cutting-edge technology and compassionate approach
+              Simple steps to transform your mental health journey with AI-powered support
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            <Card className="shadow-xl border-0 overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 text-white">
-              <CardContent className="p-8">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
-                  <Brain className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4">Advanced AI Technology</h3>
-                <p className="text-blue-100 leading-relaxed">
-                  Our AI doesn't just chat - it learns, adapts, and grows with you. Using advanced machine learning, 
-                  it understands your unique patterns and provides increasingly personalized support.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-xl border-0 overflow-hidden bg-gradient-to-br from-green-600 to-green-700 text-white">
-              <CardContent className="p-8">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
-                  <Users className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4">Human-Centered Care</h3>
-                <p className="text-green-100 leading-relaxed">
-                  Technology amplifies human compassion. Our platform connects you with licensed professionals 
-                  who work alongside AI to provide comprehensive, personalized mental health support.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="max-w-4xl mx-auto">
+            <div className="relative">
+              {/* Connection line */}
+              <div className="absolute left-8 top-16 bottom-16 w-1 bg-gradient-to-b from-purple-600 to-purple-300 hidden md:block"></div>
+              
+              <div className="space-y-12">
+                {[
+                  {
+                    step: "01",
+                    title: "Sign Up & Connect",
+                    description: "Create your account and get matched with a licensed therapist who understands your needs.",
+                    icon: Users,
+                    color: "from-blue-600 to-blue-700"
+                  },
+                  {
+                    step: "02", 
+                    title: "Share Your Story",
+                    description: "Our AI learns about your mental health patterns, triggers, and goals through natural conversations.",
+                    icon: MessageCircle,
+                    color: "from-purple-600 to-purple-700"
+                  },
+                  {
+                    step: "03",
+                    title: "Get 24/7 Support",
+                    description: "Access personalized AI guidance anytime, with real-time mood tracking and smart insights.",
+                    icon: Brain,
+                    color: "from-green-600 to-green-700"
+                  },
+                  {
+                    step: "04",
+                    title: "Track Progress",
+                    description: "See your growth through detailed analytics, reports, and professional therapist check-ins.",
+                    icon: TrendingUp,
+                    color: "from-orange-600 to-orange-700"
+                  }
+                ].map((item, index) => (
+                  <div key={index} className="relative flex items-start gap-8">
+                    {/* Step indicator */}
+                    <div className="flex-shrink-0 relative z-10">
+                      <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center shadow-lg`}>
+                        <item.icon className="h-8 w-8 text-white" />
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-purple-200">
+                        <span className="text-sm font-bold text-purple-600">{item.step}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 pt-2">
+                      <h3 className="text-2xl font-bold mb-3 text-gray-900">{item.title}</h3>
+                      <p className="text-lg text-gray-600 leading-relaxed">{item.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

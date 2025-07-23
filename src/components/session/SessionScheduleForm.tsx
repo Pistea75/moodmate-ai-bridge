@@ -4,6 +4,7 @@ import { DateTimePicker } from "./DateTimePicker";
 import { TimezoneSelector } from "./TimezoneSelector";
 import { PatientSelector } from "./PatientSelector";
 import { SessionTypeSelector } from "./SessionTypeSelector";
+import { AvailableTimeSlots } from "./AvailableTimeSlots";
 import { getCurrentTimezone } from "@/utils/sessionUtils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -107,6 +108,13 @@ export function SessionScheduleForm({
         onDateChange={(d) => setFormData(prev => ({ ...prev, date: d }))}
         onTimeChange={(t) => setFormData(prev => ({ ...prev, time: t }))}
         bookedSlots={bookedSlots}
+      />
+
+      <AvailableTimeSlots
+        selectedDate={formData.date}
+        bookedSlots={bookedSlots}
+        onTimeSelect={(time) => setFormData(prev => ({ ...prev, time }))}
+        selectedTime={formData.time}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

@@ -2,13 +2,13 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Target, Plus, CheckCircle, TrendingUp, Brain } from 'lucide-react';
+import { Target, Plus, TrendingUp, Brain, Edit, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { GoalForm } from './GoalForm';
 
 interface Goal {
   id: string;
@@ -26,8 +26,8 @@ export function AIGoalSetting() {
   const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showNewGoal, setShowNewGoal] = useState(false);
-  const [newGoalTitle, setNewGoalTitle] = useState('');
+  const [showGoalForm, setShowGoalForm] = useState(false);
+  const [goalFormData, setGoalFormData] = useState<string>('');
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [generatingSuggestions, setGeneratingSuggestions] = useState(false);
 
@@ -123,29 +123,25 @@ export function AIGoalSetting() {
   };
 
   const createGoalFromSuggestion = (suggestion: string) => {
-    setNewGoalTitle(suggestion);
-    setShowNewGoal(true);
+    setGoalFormData(suggestion);
+    setShowGoalForm(true);
   };
 
-  const addNewGoal = () => {
-    if (!newGoalTitle.trim()) return;
-    
+  const addNewGoal = (goalData: Omit<Goal, 'id' | 'created_at' | 'current_value'>) => {
     const newGoal: Goal = {
       id: Date.now().toString(),
-      title: newGoalTitle,
-      description: 'Custom goal',
-      target_value: 7,
+      ...goalData,
       current_value: 0,
-      category: 'mood',
       created_at: new Date().toISOString(),
-      target_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      ai_suggestions: ['Stay consistent', 'Track your progress', 'Celebrate small wins']
     };
 
     setGoals(prev => [...prev, newGoal]);
-    setNewGoalTitle('');
-    setShowNewGoal(false);
     toast.success('Goal created successfully!');
+  };
+
+  const deleteGoal = (goalId: string) => {
+    setGoals(prev => prev.filter(goal => goal.id !== goalId));
+    toast.success('Goal deleted successfully!');
   };
 
   const getProgressPercentage = (goal: Goal) => {
@@ -201,9 +197,19 @@ export function AIGoalSetting() {
                       <span className="text-lg">{getCategoryIcon(goal.category)}</span>
                       <h3 className="font-semibold">{goal.title}</h3>
                     </div>
-                    <Badge className={getCategoryColor(goal.category)}>
-                      {goal.category}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getCategoryColor(goal.category)}>
+                        {goal.category}
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteGoal(goal.id)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                   
                   <p className="text-sm text-gray-600">{goal.description}</p>
@@ -242,28 +248,11 @@ export function AIGoalSetting() {
             </div>
           )}
 
-          {showNewGoal && (
-            <div className="mt-4 p-4 border rounded-lg bg-gray-50">
-              <Input
-                placeholder="Enter your goal..."
-                value={newGoalTitle}
-                onChange={(e) => setNewGoalTitle(e.target.value)}
-                className="mb-3"
-              />
-              <div className="flex gap-2">
-                <Button onClick={addNewGoal} size="sm">
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Create Goal
-                </Button>
-                <Button onClick={() => setShowNewGoal(false)} variant="outline" size="sm">
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )}
-
           <Button 
-            onClick={() => setShowNewGoal(true)} 
+            onClick={() => {
+              setGoalFormData('');
+              setShowGoalForm(true);
+            }} 
             variant="outline" 
             className="w-full mt-4"
           >
@@ -317,6 +306,14 @@ export function AIGoalSetting() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Goal Form Modal */}
+      <GoalForm
+        open={showGoalForm}
+        onClose={() => setShowGoalForm(false)}
+        onSubmit={addNewGoal}
+        initialData={goalFormData}
+      />
     </div>
   );
 }
