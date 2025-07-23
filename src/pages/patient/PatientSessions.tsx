@@ -6,6 +6,7 @@ import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal'
 import { usePatientSessions } from '@/hooks/usePatientSessionsList';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export default function PatientSessions() {
   const {
@@ -59,6 +60,17 @@ export default function PatientSessions() {
         onClose={() => setModalOpen(false)}
         onScheduled={handleScheduleComplete}
         isPatientView={true}
+      />
+      
+      <BrodiNudgeSystem 
+        context="session_prep"
+        trigger={{ 
+          type: 'page_visit', 
+          data: { 
+            upcomingSessions: sessions?.length || 0,
+            currentDate: date 
+          } 
+        }}
       />
     </PatientLayout>
   );

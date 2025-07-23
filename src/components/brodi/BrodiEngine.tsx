@@ -177,8 +177,8 @@ export function BrodiEngine({ context = 'dashboard' }: BrodiEngineProps) {
     // Check for interactions immediately, then set up interval
     checkForBrodiInteraction();
     
-    // Set up periodic checks with randomization
-    const interval = setInterval(checkForBrodiInteraction, Math.random() * 30000 + 60000); // 1-1.5 minutes
+    // Set up periodic checks with shorter intervals for testing
+    const interval = setInterval(checkForBrodiInteraction, Math.random() * 10000 + 20000); // 20-30 seconds
 
     return () => clearInterval(interval);
   }, [user, preferences, userStats, currentInteraction, context, shouldShowBrodi]);

@@ -67,16 +67,39 @@ export function BrodiCharacter({
     }
   };
 
-  const getBrodiEmoji = () => {
+  const getBrodiAvatar = () => {
+    const baseStyle = "w-12 h-12 rounded-full flex items-center justify-center relative overflow-hidden";
+    const faceStyle = "w-8 h-6 rounded-full flex items-center justify-center text-xs";
+    
     switch (expression) {
       case 'excited':
-        return '🎉';
+        return (
+          <div className={`${baseStyle} bg-gradient-to-b from-slate-100 to-white border-2 border-slate-300`}>
+            <div className={`${faceStyle} bg-slate-700 text-white`}>❤️ ❤️</div>
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-red-400 rounded-full flex items-center justify-center text-white text-xs">+</div>
+          </div>
+        );
       case 'caring':
-        return '💙';
+        return (
+          <div className={`${baseStyle} bg-gradient-to-b from-slate-100 to-white border-2 border-slate-300`}>
+            <div className={`${faceStyle} bg-slate-700 text-white`}>^ ^</div>
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-red-400 rounded-full flex items-center justify-center text-white text-xs">+</div>
+          </div>
+        );
       case 'thoughtful':
-        return '🤔';
+        return (
+          <div className={`${baseStyle} bg-gradient-to-b from-slate-100 to-white border-2 border-slate-300`}>
+            <div className={`${faceStyle} bg-slate-700 text-white`}>~ ~</div>
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-red-400 rounded-full flex items-center justify-center text-white text-xs">+</div>
+          </div>
+        );
       default:
-        return '😊';
+        return (
+          <div className={`${baseStyle} bg-gradient-to-b from-slate-100 to-white border-2 border-slate-300`}>
+            <div className={`${faceStyle} bg-slate-700 text-white`}>^ ^</div>
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-red-400 rounded-full flex items-center justify-center text-white text-xs">+</div>
+          </div>
+        );
     }
   };
 
@@ -89,8 +112,8 @@ export function BrodiCharacter({
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-2xl animate-bounce">{getBrodiEmoji()}</span>
+              <div className="animate-bounce">
+                {getBrodiAvatar()}
               </div>
             </div>
             

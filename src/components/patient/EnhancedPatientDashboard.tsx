@@ -11,6 +11,11 @@ import { QuickActionsCard } from "./QuickActionsCard";
 import { DailyCheckinCard } from "./DailyCheckinCard";
 import { AIInsightsCard } from "./AIInsightsCard";
 import { BrodiEngine } from "@/components/brodi/BrodiEngine";
+import { BrodiPredictiveWellness } from "@/components/brodi/BrodiPredictiveWellness";
+import { BrodiCrisisSupport } from "@/components/brodi/BrodiCrisisSupport";
+import { ExerciseTrackingCard } from "./ExerciseTrackingCard";
+import { MoodAnalyticsCard } from "./MoodAnalyticsCard";
+import { ChatNowCard } from "./ChatNowCard";
 
 export function EnhancedPatientDashboard() {
   const { t } = useLanguage();
@@ -65,9 +70,22 @@ export function EnhancedPatientDashboard() {
           <WellnessStreakCard />
         </div>
       </div>
+
+      {/* Advanced Features Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChatNowCard />
+        <MoodAnalyticsCard />
+      </div>
+
+      {/* Brodi Advanced Features */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <BrodiPredictiveWellness />
+        <ExerciseTrackingCard />
+      </div>
       
-      {/* Brodi AI Companion */}
+      {/* Brodi AI Companion & Crisis Support */}
       <BrodiEngine context="dashboard" />
+      <BrodiCrisisSupport />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, CheckCircle, Clock, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePatientTasks } from '@/hooks/usePatientTasks';
+import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export default function PatientTasks() {
   const { t } = useLanguage();
@@ -150,6 +151,18 @@ export default function PatientTasks() {
           )}
         </div>
       </div>
+      
+      <BrodiNudgeSystem 
+        context="task_completion"
+        trigger={{ 
+          type: 'page_visit', 
+          data: { 
+            totalTasks: tasks?.length || 0, 
+            pendingTasks: pendingTasks.length, 
+            completedTasks: completedTasks.length 
+          } 
+        }}
+      />
     </PatientLayout>
   );
 }
