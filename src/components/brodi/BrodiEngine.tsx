@@ -102,7 +102,20 @@ export function BrodiEngine({ context = 'dashboard' }: BrodiEngineProps) {
     loadUserStats();
   }, [user]);
 
-  // AI-powered decision engine for when Brodi should appear
+  // Manual call function
+  const callBrodi = () => {
+    if (currentInteraction) return; // Don't call if already showing
+    
+    const welcomeMessages = [
+      "Hi there! I'm here to help. What's on your mind today? 😊",
+      "Hello! How can I support your wellness journey today?",
+      "Hey! I'm glad you called me. What would you like to talk about?",
+    ];
+    
+    showBrodiInteraction('random', welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)]);
+  };
+
+  // AI-powered decision engine for when Brodi should appear (reduced frequency)
   useEffect(() => {
     if (!user || !preferences || currentInteraction) return;
 
@@ -112,73 +125,44 @@ export function BrodiEngine({ context = 'dashboard' }: BrodiEngineProps) {
         ? (now.getTime() - userStats.lastMoodEntry.getTime()) / (1000 * 60 * 60)
         : 168; // Default to 7 days if no mood entries
 
-      // Mood reminder logic
-      if (shouldShowBrodi('mood_reminder') && hoursSinceLastMood > 24) {
+      // Only show automatic interactions occasionally and with more restrictive conditions
+      
+      // Mood reminder logic (only after 48 hours, not 24)
+      if (shouldShowBrodi('mood_reminder') && hoursSinceLastMood > 48 && Math.random() < 0.3) {
         const messages = [
           "Hey! It's been a while since your last mood check-in. How are you feeling today?",
           "I noticed you haven't logged your mood recently. A quick check-in can be really helpful! 💙",
-          "Your mental health journey matters. How has your mood been lately?",
         ];
         
         showBrodiInteraction('mood_reminder', messages[Math.floor(Math.random() * messages.length)]);
         return;
       }
 
-      // Celebration logic
-      if (shouldShowBrodi('celebration') && userStats.recentAchievements > 0) {
+      // Celebration logic (only for significant achievements)
+      if (shouldShowBrodi('celebration') && userStats.recentAchievements > 2 && Math.random() < 0.5) {
         const messages = [
-          `Amazing! You've completed ${userStats.recentAchievements} task${userStats.recentAchievements > 1 ? 's' : ''} this week! 🎉`,
+          `Amazing! You've completed ${userStats.recentAchievements} tasks this week! 🎉`,
           "You're doing great! Keep up the excellent progress! ✨",
-          `${userStats.moodStreak} days of mood tracking - you're building a fantastic habit! 💪`,
         ];
         
         showBrodiInteraction('celebration', messages[Math.floor(Math.random() * messages.length)]);
         return;
       }
 
-      // Task reminder logic
-      if (shouldShowBrodi('task_reminder') && userStats.incompleteTasks > 2) {
+      // Task reminder logic (only for many incomplete tasks)
+      if (shouldShowBrodi('task_reminder') && userStats.incompleteTasks > 5 && Math.random() < 0.2) {
         const messages = [
           `You have ${userStats.incompleteTasks} pending tasks. Small steps lead to big changes! 📝`,
           "Ready to tackle some tasks? You've got this! 💪",
-          "Sometimes the hardest part is just getting started. Which task feels manageable today?",
         ];
         
         showBrodiInteraction('task_reminder', messages[Math.floor(Math.random() * messages.length)]);
         return;
       }
-
-      // Random encouraging messages (context-specific)
-      if (shouldShowBrodi('random') && Math.random() < 0.1) { // 10% chance
-        const contextMessages = {
-          dashboard: [
-            "Remember, progress isn't always linear. Every small step counts! 🌟",
-            "You're here, you're trying, and that's what matters most.",
-            "Mental health is a journey, not a destination. You're doing great! 💙",
-          ],
-          mood: [
-            "It's okay to have ups and downs. Your feelings are valid.",
-            "Thank you for being honest about your emotions. That takes courage! 💙",
-          ],
-          tasks: [
-            "Breaking tasks into smaller pieces can make them feel less overwhelming.",
-            "Celebrating small wins is just as important as completing big goals! 🎉",
-          ],
-          sessions: [
-            "Therapy is brave work. You're investing in your future self! 💪",
-          ],
-        };
-
-        const messages = contextMessages[context] || contextMessages.dashboard;
-        showBrodiInteraction('random', messages[Math.floor(Math.random() * messages.length)]);
-      }
     };
 
-    // Check for interactions immediately, then set up interval
-    checkForBrodiInteraction();
-    
-    // Set up periodic checks with shorter intervals for testing
-    const interval = setInterval(checkForBrodiInteraction, Math.random() * 10000 + 20000); // 20-30 seconds
+    // Much less frequent automatic checks - every 5-10 minutes
+    const interval = setInterval(checkForBrodiInteraction, Math.random() * 300000 + 300000); // 5-10 minutes
 
     return () => clearInterval(interval);
   }, [user, preferences, userStats, currentInteraction, context, shouldShowBrodi]);
@@ -223,15 +207,16 @@ export function BrodiEngine({ context = 'dashboard' }: BrodiEngineProps) {
     }
   };
 
-  if (!currentInteraction) return null;
-
-  return (
-    <BrodiCharacter
-      message={currentInteraction.message}
-      type={currentInteraction.type}
-      onDismiss={handleDismiss}
-      onEngaged={handleEngaged}
-      onActionCompleted={handleActionCompleted}
-    />
-  );
+  return {
+    callBrodi,
+    brodiComponent: currentInteraction ? (
+      <BrodiCharacter
+        message={currentInteraction.message}
+        type={currentInteraction.type}
+        onDismiss={handleDismiss}
+        onEngaged={handleEngaged}
+        onActionCompleted={handleActionCompleted}
+      />
+    ) : null
+  };
 }

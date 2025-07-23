@@ -13,23 +13,39 @@ import { AIInsightsCard } from "./AIInsightsCard";
 import { BrodiEngine } from "@/components/brodi/BrodiEngine";
 import { BrodiPredictiveWellness } from "@/components/brodi/BrodiPredictiveWellness";
 import { BrodiCrisisSupport } from "@/components/brodi/BrodiCrisisSupport";
+import { Button } from "@/components/ui/button";
+import { Bot } from "lucide-react";
 import { ExerciseTrackingCard } from "./ExerciseTrackingCard";
 import { MoodAnalyticsCard } from "./MoodAnalyticsCard";
 import { ChatNowCard } from "./ChatNowCard";
 
 export function EnhancedPatientDashboard() {
   const { t } = useLanguage();
+  const { callBrodi, brodiComponent } = BrodiEngine({ context: 'dashboard' });
 
   return (
     <div className="p-8 space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-gray-900">
-          {t('welcomeBackMessage')}
-        </h1>
-        <p className="text-xl text-gray-600">
-          {t('yourMentalHealthOverview')}
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">
+              {t('welcomeBackMessage')}
+            </h1>
+            <p className="text-xl text-gray-600">
+              {t('yourMentalHealthOverview')}
+            </p>
+          </div>
+          
+          {/* Call Brodi Button */}
+          <Button 
+            onClick={callBrodi}
+            className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary-variant hover:shadow-lg transition-all duration-300"
+          >
+            <Bot className="h-5 w-5" />
+            Call Brodi
+          </Button>
+        </div>
       </div>
 
       {/* Main Dashboard Grid */}
@@ -84,7 +100,7 @@ export function EnhancedPatientDashboard() {
       </div>
       
       {/* Brodi AI Companion & Crisis Support */}
-      <BrodiEngine context="dashboard" />
+      {brodiComponent}
       <BrodiCrisisSupport />
     </div>
   );
