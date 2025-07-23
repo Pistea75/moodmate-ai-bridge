@@ -174,10 +174,13 @@ export function BrodiEngine({ context = 'dashboard' }: BrodiEngineProps) {
       }
     };
 
-    // Check for interactions with some randomness in timing
-    const timeout = setTimeout(checkForBrodiInteraction, Math.random() * 10000 + 5000); // 5-15 seconds
+    // Check for interactions immediately, then set up interval
+    checkForBrodiInteraction();
+    
+    // Set up periodic checks with randomization
+    const interval = setInterval(checkForBrodiInteraction, Math.random() * 30000 + 60000); // 1-1.5 minutes
 
-    return () => clearTimeout(timeout);
+    return () => clearInterval(interval);
   }, [user, preferences, userStats, currentInteraction, context, shouldShowBrodi]);
 
   const showBrodiInteraction = async (

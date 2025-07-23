@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePatientDashboard } from '@/hooks/usePatientDashboard';
 import { useMoodEntries } from '@/hooks/useMoodEntries';
+import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export default function PatientMood() {
   const { t } = useLanguage();
@@ -160,6 +161,19 @@ export default function PatientMood() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Brodi Nudge System for mood logging context */}
+      <BrodiNudgeSystem 
+        context="mood_logging"
+        trigger={{
+          type: 'page_visit',
+          data: { 
+            averageMood: parseFloat(averageMood),
+            totalEntries: moods.length,
+            streak: currentStreak
+          }
+        }}
+      />
     </PatientLayout>
   );
 }
