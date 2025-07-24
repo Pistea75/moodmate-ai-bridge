@@ -34,27 +34,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Convert secure role to legacy format for backward compatibility
   const userRole = secureUserRole as UserRole;
 
-  const fetchUserRole = async (userId: string): Promise<string> => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      if (data?.role) return data.role;
-
-      // Create default profile if none exists
-      await supabase.from('profiles').insert([{ id: userId, role: 'patient' }]);
-      return 'patient';
-    } catch (err: any) {
-      console.error("Error fetching/creating profile:", err.message);
-      return 'patient'; // fallback
-    }
-  };
-
   const redirectToDashboard = (role: string) => {
     const dashboardPath = role === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
     console.log('🔄 Redirecting to dashboard:', dashboardPath);
@@ -83,9 +62,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initializeAuth = async () => {
       try {
         console.log('🔄 Initializing auth...');
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
         
         if (!mounted) return;
+        
+        if (error) {
+          console.error('🔴 Session error:', error);
+          setAuthError('Failed to retrieve session. Please try logging in again.');
+          setLoading(false);
+          return;
+        }
         
         if (session?.user) {
           console.log('✅ Session found, setting user:', session.user.id);
@@ -96,14 +82,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           logSecurityEvent('session_init', 'authentication', { 
             user_id: session.user.id 
           }, true);
-          
-          // Only redirect if on public pages and role is loaded
-          const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
-          
-          // Wait for role to be loaded before redirecting
-          if (isOnPublicPage && secureUserRole && !roleLoading) {
-            redirectToDashboard(secureUserRole);
-          }
         } else {
           console.log('ℹ️ No session found');
           setUser(null);
@@ -127,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
       
       console.log('🔄 Auth state changed:', event, !!session?.user);
@@ -168,7 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname, secureUserRole, roleLoading, refreshRole]);
+  }, [navigate]);
 
   // Handle role errors
   useEffect(() => {
@@ -182,6 +160,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }, false);
     }
   }, [roleError, user?.id]);
+
+  // Handle redirects after role is loaded
+  useEffect(() => {
+    if (user && secureUserRole && !roleLoading && !loading) {
+      const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
+      
+      if (isOnPublicPage) {
+        redirectToDashboard(secureUserRole);
+      }
+    }
+  }, [user, secureUserRole, roleLoading, loading, location.pathname]);
 
   const signOut = async () => {
     setAuthError(null);
