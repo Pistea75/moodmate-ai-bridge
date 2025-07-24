@@ -6,7 +6,6 @@ import { MotivationalQuoteCard } from "./MotivationalQuoteCard";
 import { MoodStatsCard } from "./MoodStatsCard";
 import { TasksCompletedCard } from "./TasksCompletedCard";
 import { UpcomingSessionsCard } from "./UpcomingSessionsCard";
-import { WellnessJourneyCard } from "./WellnessJourneyCard";
 import { QuickActionsCard } from "./QuickActionsCard";
 import { DailyCheckinCard } from "./DailyCheckinCard";
 import { AIInsightsCard } from "./AIInsightsCard";
@@ -49,15 +48,19 @@ export function EnhancedPatientDashboard() {
       </div>
 
       {/* Top Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <MoodStatsCard />
         <TasksCompletedCard />
         <UpcomingSessionsCard />
-        <WellnessStreakCard />
       </div>
 
-      {/* Mood Chart */}
-      <MoodAnalyticsCard />
+      {/* Mood Chart and Wellness Streak */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <MoodAnalyticsCard />
+        </div>
+        <WellnessStreakCard />
+      </div>
 
       {/* Quick Actions */}
       <QuickActionsCard />
@@ -71,7 +74,6 @@ export function EnhancedPatientDashboard() {
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <MotivationalQuoteCard />
-        <WellnessJourneyCard />
         <AIInsightsCard />
         <ExerciseTrackingCard />
       </div>

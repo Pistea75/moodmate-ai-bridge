@@ -104,7 +104,7 @@ export function MoodAnalyticsCard() {
 
   if (loading) {
     return (
-      <Card>
+      <Card className="h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart className="h-5 w-5" />
@@ -112,18 +112,18 @@ export function MoodAnalyticsCard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-40 bg-gray-100 rounded animate-pulse"></div>
+          <div className="h-64 bg-gray-100 rounded animate-pulse"></div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="h-full">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <BarChart className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <BarChart className="h-5 w-5 text-primary" />
             Mood Analytics
           </CardTitle>
           <div className="flex gap-1">
@@ -144,7 +144,7 @@ export function MoodAnalyticsCard() {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         {moodData.length > 0 ? (
           <div className="space-y-4">
             <div className="flex justify-between items-center text-sm">
@@ -153,33 +153,50 @@ export function MoodAnalyticsCard() {
                 <span className="font-medium">{getTrendText()}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-purple-600" />
-                <span>{streak} day good mood streak</span>
+                <Calendar className="h-4 w-4 text-primary" />
+                <span className="text-muted-foreground">{streak} day good mood streak</span>
               </div>
             </div>
             
-            <div className="h-32">
+            <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={moodData}>
-                  <XAxis dataKey="day" fontSize={12} />
-                  <YAxis domain={[0, 10]} fontSize={12} />
+                <BarChart data={moodData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                  <XAxis 
+                    dataKey="day" 
+                    fontSize={12} 
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    domain={[0, 10]} 
+                    fontSize={12}
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <Tooltip 
                     formatter={(value) => [`${value}/10`, 'Mood']}
-                    labelFormatter={(label) => `Day: ${label}`}
+                    labelFormatter={(label) => `${timePeriod === 'daily' ? 'Time' : 'Day'}: ${label}`}
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
                   />
                   <Bar 
                     dataKey="mood" 
-                    fill="#8b5cf6"
-                    radius={[2, 2, 0, 0]}
+                    fill="hsl(var(--primary))"
+                    radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
-            <BarChart className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>Start tracking your mood to see analytics</p>
+          <div className="text-center py-12 text-muted-foreground">
+            <BarChart className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p className="text-sm">Start tracking your mood to see analytics</p>
           </div>
         )}
       </CardContent>
