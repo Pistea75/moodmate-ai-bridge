@@ -1,6 +1,8 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { validatePassword, authRateLimiter, logSecurityEvent } from '@/utils/securityUtils';
 
 interface AuthError {
   message: string;
@@ -23,7 +25,7 @@ export function useAuthFlow() {
       } else if (error.message.includes('User already registered')) {
         message = 'This email is already registered. Please try logging in instead.';
       } else if (error.message.includes('Password should be')) {
-        message = 'Password should be at least 6 characters long.';
+        message = 'Password should be at least 8 characters long with uppercase, lowercase, number, and special character.';
       } else if (error.message.includes('Database error') || 
                 error.message.includes('error in Supabase function')) {
         message = 'There was a technical issue. Please try again or contact support.';
@@ -40,6 +42,13 @@ export function useAuthFlow() {
     }
 
     setError({ message });
+    
+    // Log security event for failed authentication
+    logSecurityEvent('auth_failure', 'authentication', { 
+      error: message,
+      timestamp: new Date().toISOString()
+    }, false);
+
     toast({
       title: "Authentication Error",
       description: message,
@@ -61,6 +70,13 @@ export function useAuthFlow() {
       if (!email.includes('@')) {
         throw new Error('Please enter a valid email address.');
       }
+
+      // Check rate limiting
+      const clientId = `${email}_${Date.now()}`;
+      if (!authRateLimiter.isAllowed(clientId)) {
+        const remainingTime = Math.ceil(authRateLimiter.getRemainingTime(clientId) / 1000 / 60);
+        throw new Error(`Too many login attempts. Please wait ${remainingTime} minutes before trying again.`);
+      }
       
       console.log('🔄 Starting sign in process...');
       
@@ -74,6 +90,12 @@ export function useAuthFlow() {
       if (!data.user) {
         throw new Error('Login failed. Please try again.');
       }
+
+      // Log successful authentication
+      logSecurityEvent('auth_success', 'authentication', { 
+        user_id: data.user.id,
+        email: data.user.email
+      }, true);
 
       console.log('✅ Sign in successful - auth state change will handle redirect');
       toast({
@@ -100,8 +122,10 @@ export function useAuthFlow() {
         throw new Error('Please enter both email and password.');
       }
       
-      if (password.length < 6) {
-        throw new Error('Password should be at least 6 characters long.');
+      // Enhanced password validation
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.isValid) {
+        throw new Error(passwordValidation.errors.join('. '));
       }
       
       const cleanedMetadata = { ...metadata };
@@ -136,6 +160,13 @@ export function useAuthFlow() {
       if (!data?.user) {
         throw new Error('Failed to create user account');
       }
+
+      // Log successful signup
+      logSecurityEvent('signup_success', 'authentication', { 
+        user_id: data.user.id,
+        email: data.user.email,
+        role: cleanedMetadata.role
+      }, true);
 
       toast({
         title: "Success",

@@ -2,7 +2,7 @@
 import React, { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSecureAuth } from '@/hooks/useSecureAuth';
-import { hasValidRole } from '@/utils/securityUtils';
+import { useSecureRoleValidation } from '@/hooks/useSecureRoleValidation';
 import { AlertTriangle, Shield } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,8 +20,11 @@ export function AuthGuard({
   fallbackPath = '/login',
   showFallback = false 
 }: AuthGuardProps) {
-  const { user, loading, isAuthenticated, secureSignOut } = useSecureAuth();
+  const { user, loading: authLoading, isAuthenticated, secureSignOut } = useSecureAuth();
+  const { userRole, hasRole, loading: roleLoading, error: roleError } = useSecureRoleValidation(user);
   const location = useLocation();
+
+  const loading = authLoading || roleLoading;
 
   // Show loading state
   if (loading) {
@@ -35,6 +38,37 @@ export function AuthGuard({
     );
   }
 
+  // Handle role verification errors
+  if (roleError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <AlertTriangle className="h-16 w-16 text-red-500 mx-auto" />
+              <div>
+                <h2 className="text-xl font-semibold mb-2">Security Verification Failed</h2>
+                <p className="text-muted-foreground mb-4">
+                  Unable to verify your account permissions.
+                </p>
+                <p className="text-sm text-red-600">
+                  Error: {roleError}
+                </p>
+              </div>
+              <Button 
+                onClick={secureSignOut}
+                variant="destructive"
+                className="w-full"
+              >
+                Sign Out
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {
     return <Navigate to={fallbackPath} state={{ from: location }} replace />;
@@ -42,10 +76,9 @@ export function AuthGuard({
 
   // Check role permissions if required
   if (requiredRole) {
-    const userRole = user.user_metadata?.role;
     const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
     
-    if (!hasValidRole(userRole, allowedRoles)) {
+    if (!hasRole(allowedRoles)) {
       if (showFallback) {
         return (
           <div className="min-h-screen flex items-center justify-center p-4">
@@ -87,7 +120,7 @@ export function AuthGuard({
         );
       }
       
-      // Redirect based on user role
+      // Redirect based on verified user role
       const redirectPath = userRole === 'clinician' ? '/clinician/dashboard' : '/patient/dashboard';
       return <Navigate to={redirectPath} replace />;
     }

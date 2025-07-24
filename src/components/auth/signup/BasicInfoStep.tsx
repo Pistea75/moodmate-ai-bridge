@@ -1,8 +1,9 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { validatePassword } from "@/utils/securityUtils";
 
 interface BasicInfoStepProps {
   formData: {
@@ -17,18 +18,10 @@ interface BasicInfoStepProps {
 }
 
 export function BasicInfoStep({ formData, handleChange, error }: BasicInfoStepProps) {
-  const validatePassword = () => {
-    if (formData.password !== formData.confirmPassword) {
-      return 'Passwords do not match';
-    }
-    if (formData.password && formData.password.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-    return '';
-  };
-  
-  const passwordError = validatePassword();
-  const showPasswordError = formData.password && formData.confirmPassword && passwordError;
+  const passwordValidation = validatePassword(formData.password);
+  const passwordsMatch = formData.password === formData.confirmPassword;
+  const showPasswordError = formData.password && formData.confirmPassword && !passwordsMatch;
+  const showPasswordValidation = formData.password.length > 0;
 
   return (
     <div className="space-y-4">
@@ -76,11 +69,26 @@ export function BasicInfoStep({ formData, handleChange, error }: BasicInfoStepPr
           value={formData.password}
           onChange={handleChange}
           required
-          className={`mt-1 ${showPasswordError ? 'border-red-500' : ''}`}
-          placeholder="Create a password"
+          className={`mt-1 ${!passwordValidation.isValid && showPasswordValidation ? 'border-red-500' : ''}`}
+          placeholder="Create a secure password"
         />
-        {formData.password && formData.password.length < 6 && (
-          <p className="text-red-500 text-xs mt-1">Password must be at least 6 characters</p>
+        
+        {showPasswordValidation && (
+          <div className="mt-2 space-y-1">
+            <div className="text-sm font-medium">Password Requirements:</div>
+            {passwordValidation.errors.map((error, index) => (
+              <div key={index} className="flex items-center gap-2 text-xs">
+                <XCircle className="h-3 w-3 text-red-500" />
+                <span className="text-red-600">{error}</span>
+              </div>
+            ))}
+            {passwordValidation.isValid && (
+              <div className="flex items-center gap-2 text-xs">
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                <span className="text-green-600">Password meets all requirements</span>
+              </div>
+            )}
+          </div>
         )}
       </div>
       
@@ -96,8 +104,17 @@ export function BasicInfoStep({ formData, handleChange, error }: BasicInfoStepPr
           className={`mt-1 ${showPasswordError ? 'border-red-500' : ''}`}
           placeholder="Confirm password"
         />
-        {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-          <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
+        {showPasswordError && (
+          <div className="flex items-center gap-2 text-xs mt-1">
+            <XCircle className="h-3 w-3 text-red-500" />
+            <span className="text-red-600">Passwords do not match</span>
+          </div>
+        )}
+        {formData.password && formData.confirmPassword && passwordsMatch && (
+          <div className="flex items-center gap-2 text-xs mt-1">
+            <CheckCircle className="h-3 w-3 text-green-500" />
+            <span className="text-green-600">Passwords match</span>
+          </div>
         )}
       </div>
       

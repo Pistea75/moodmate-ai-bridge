@@ -3,6 +3,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSecureRoleValidation } from '@/hooks/useSecureRoleValidation';
+import { logSecurityEvent } from '@/utils/securityUtils';
 
 type UserRole = 'patient' | 'clinician' | null;
 
@@ -21,11 +23,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [userRole, setUserRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Use secure role validation hook
+  const { userRole: secureUserRole, loading: roleLoading, error: roleError, refreshRole } = useSecureRoleValidation(user);
+  
+  // Convert secure role to legacy format for backward compatibility
+  const userRole = secureUserRole as UserRole;
 
   const fetchUserRole = async (userId: string): Promise<string> => {
     try {
@@ -60,9 +67,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthError(null);
     
     try {
-      const role = await fetchUserRole(user.id);
-      setUserRole(role as UserRole);
-      redirectToDashboard(role);
+      await refreshRole();
+      if (secureUserRole) {
+        redirectToDashboard(secureUserRole);
+      }
     } catch (error) {
       console.error('🔴 Retry auth failed:', error);
       setAuthError('Authentication retry failed. Please refresh the page.');
@@ -82,30 +90,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user) {
           console.log('✅ Session found, setting user:', session.user.id);
           setUser(session.user);
+          setAuthError(null);
           
-          const role = await fetchUserRole(session.user.id);
+          // Log successful session initialization
+          logSecurityEvent('session_init', 'authentication', { 
+            user_id: session.user.id 
+          }, true);
           
-          if (mounted) {
-            setUserRole(role as UserRole);
-            setAuthError(null);
-            
-            // Only redirect if on public pages
-            const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
-            if (isOnPublicPage) {
-              redirectToDashboard(role);
-            }
+          // Only redirect if on public pages and role is loaded
+          const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
+          
+          // Wait for role to be loaded before redirecting
+          if (isOnPublicPage && secureUserRole && !roleLoading) {
+            redirectToDashboard(secureUserRole);
           }
         } else {
           console.log('ℹ️ No session found');
           setUser(null);
-          setUserRole(null);
         }
       } catch (error) {
         console.error('🔴 Error initializing auth:', error);
         if (mounted) {
           setUser(null);
-          setUserRole(null);
           setAuthError('Failed to initialize authentication. Please refresh the page.');
+          
+          // Log failed session initialization
+          logSecurityEvent('session_init_failed', 'authentication', { 
+            error: String(error) 
+          }, false);
         }
       } finally {
         if (mounted) {
@@ -114,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    // Set up auth state listener - NO ASYNC OPERATIONS HERE
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       
@@ -125,32 +137,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
         setAuthError(null);
         
-        // Fetch role separately to avoid blocking
-        setTimeout(() => {
-          if (mounted) {
-            fetchUserRole(session.user.id).then(role => {
-              if (mounted) {
-                setUserRole(role as UserRole);
-                redirectToDashboard(role);
-              }
-            }).catch(err => {
-              console.warn("Role fetch failed:", err);
-              if (mounted) {
-                setUserRole('patient');
-                redirectToDashboard('patient');
-              }
-            });
-          }
-        }, 0);
+        // Log successful sign in
+        logSecurityEvent('sign_in', 'authentication', { 
+          user_id: session.user.id 
+        }, true);
+        
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
-        setUserRole(null);
         setLoading(false);
         setAuthError(null);
+        
+        // Log sign out
+        logSecurityEvent('sign_out', 'authentication', {}, true);
+        
         navigate('/login', { replace: true });
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         setUser(session.user);
         setAuthError(null);
+        
+        // Log token refresh
+        logSecurityEvent('token_refresh', 'authentication', { 
+          user_id: session.user.id 
+        }, true);
       }
     });
 
@@ -160,15 +168,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, secureUserRole, roleLoading, refreshRole]);
+
+  // Handle role errors
+  useEffect(() => {
+    if (roleError) {
+      setAuthError(`Role verification failed: ${roleError}`);
+      
+      // Log role verification failure
+      logSecurityEvent('role_verification_failed', 'authorization', { 
+        error: roleError,
+        user_id: user?.id 
+      }, false);
+    }
+  }, [roleError, user?.id]);
 
   const signOut = async () => {
     setAuthError(null);
+    
+    // Log sign out attempt
+    logSecurityEvent('sign_out_attempt', 'authentication', { 
+      user_id: user?.id 
+    }, true);
+    
     await supabase.auth.signOut();
   };
 
   const deleteAccount = async () => {
     if (!user) throw new Error('No user logged in');
+    
+    // Log account deletion attempt
+    logSecurityEvent('account_deletion_attempt', 'user_management', { 
+      user_id: user.id 
+    }, true);
     
     const { error } = await supabase.functions.invoke('delete-user', {
       body: { userId: user.id }
@@ -183,8 +215,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={{ 
       user, 
       userRole, 
-      loading, 
-      isLoading: loading,
+      loading: loading || roleLoading, 
+      isLoading: loading || roleLoading,
       signOut,
       deleteAccount,
       authError,
