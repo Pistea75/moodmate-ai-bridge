@@ -4,23 +4,45 @@ import * as THREE from 'three';
 
 export function LandingBrodiRobot() {
   const robotRef = useRef<THREE.Group>(null);
+  const eyesRef = useRef<THREE.Group>(null);
   const blushRef = useRef<THREE.Group>(null);
   const [time, setTime] = useState(0);
+  const [blinkTimer, setBlinkTimer] = useState(0);
 
   useFrame((state, delta) => {
     setTime(time + delta);
+    setBlinkTimer(blinkTimer + delta);
     
     if (robotRef.current) {
-      // Gentle floating animation
-      robotRef.current.position.y = Math.sin(time * 2) * 0.1;
+      // Gentle floating animation (idle)
+      robotRef.current.position.y = Math.sin(time * 1.5) * 0.15;
       
       // Gentle side-to-side sway
-      robotRef.current.rotation.z = Math.sin(time * 1.5) * 0.05;
+      robotRef.current.rotation.z = Math.sin(time * 0.8) * 0.08;
+      
+      // Celebration jump every 8 seconds
+      const jumpCycle = Math.sin(time * 0.785); // ~8 second cycle
+      if (jumpCycle > 0.95) {
+        robotRef.current.position.y += Math.sin(time * 15) * 0.3;
+      }
+    }
+
+    // Blinking animation
+    if (eyesRef.current && blinkTimer > 3) {
+      const blinkPhase = (blinkTimer - 3) * 8;
+      const eyeScale = blinkPhase < 0.5 ? 1 - blinkPhase * 2 : (blinkPhase - 0.5) * 2;
+      eyesRef.current.children.forEach((eye: any) => {
+        eye.scale.y = Math.max(0.1, Math.min(1, eyeScale));
+      });
+      
+      if (blinkTimer > 3.5) {
+        setBlinkTimer(0);
+      }
     }
 
     // Subtle blush animation
     if (blushRef.current) {
-      const intensity = 0.8 + Math.sin(time * 3) * 0.2;
+      const intensity = 0.6 + Math.sin(time * 2) * 0.3;
       blushRef.current.children.forEach((child: any) => {
         if (child.material) {
           child.material.opacity = intensity;
@@ -103,14 +125,16 @@ export function LandingBrodiRobot() {
         </mesh>
 
         {/* Eyes */}
-        <mesh position={[-0.1, 0.02, 0]}>
-          <sphereGeometry args={[0.06, 16, 16]} />
-          <meshStandardMaterial color="#2a2a2a" />
-        </mesh>
-        <mesh position={[0.1, 0.02, 0]}>
-          <sphereGeometry args={[0.06, 16, 16]} />
-          <meshStandardMaterial color="#2a2a2a" />
-        </mesh>
+        <group ref={eyesRef}>
+          <mesh position={[-0.1, 0.02, 0]}>
+            <sphereGeometry args={[0.06, 16, 16]} />
+            <meshStandardMaterial color="#2a2a2a" />
+          </mesh>
+          <mesh position={[0.1, 0.02, 0]}>
+            <sphereGeometry args={[0.06, 16, 16]} />
+            <meshStandardMaterial color="#2a2a2a" />
+          </mesh>
+        </group>
 
         {/* Eye highlights */}
         <mesh position={[-0.08, 0.04, 0.01]}>
