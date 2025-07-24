@@ -66,7 +66,7 @@ RESPONSE STRUCTURE:
 - Explore thoughts and patterns gently
 - Provide evidence-based coping strategies
 - Offer hope and encouragement
-- Suggest practical next steps when appropriate"`
+- Suggest practical next steps when appropriate`
 
     // Enhanced data fetching for clinicians
     if (isClinicianView) {
@@ -328,7 +328,13 @@ You are speaking with a clinician who has professional access to this patient in
     }
 
     const data = await response.json()
-    const aiMessage = data.choices[0]?.message?.content || 'I apologize, but I could not generate a response. Please try again.'
+    
+    // Check if choices array exists and has content
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response format from OpenAI')
+    }
+    
+    const aiMessage = data.choices[0].message.content || 'I apologize, but I could not generate a response. Please try again.'
 
     // Store the conversation in chat logs
     if (!isClinicianView) {

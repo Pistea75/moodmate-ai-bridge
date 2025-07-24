@@ -9,7 +9,7 @@ import { OnboardingTooltips } from '@/components/clinician/OnboardingTooltips';
 import { UpcomingSessions } from '@/components/clinician/UpcomingSessions';
 import { PatientSpotlight } from '@/components/clinician/PatientSpotlight';
 import { ClinicianTasks } from '@/components/clinician/ClinicianTasks';
-import { TaskForm } from '@/components/clinician/TaskForm';
+import { TaskForm } from '@/components/clinician/TaskForm/index';
 import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
 import { RecentReports } from '@/components/clinician/RecentReports';
 import { RiskAlertBanner } from '@/components/clinician/RiskAlertBanner';
@@ -49,6 +49,7 @@ export default function ClinicianDashboard() {
 
   const handleTaskCreated = () => {
     setShowTaskForm(false);
+    // Refresh tasks or trigger a re-fetch here if needed
   };
 
   const handleScheduleSession = () => {

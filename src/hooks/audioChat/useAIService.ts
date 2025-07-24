@@ -36,18 +36,24 @@ export function useAIService() {
           messages: updatedHistory,
           systemPrompt: personalizedSystemPrompt,
           userId: user.id,
-          isClinicianView: isClinicianView
+          isClinicianView: isClinicianView,
+          patientId: isClinicianView ? null : user.id
         }
       });
 
       if (error) throw new Error(error.message);
       
+      // Check if data exists and has the expected structure
+      if (!data || !data.message) {
+        throw new Error('Invalid response from AI service');
+      }
+      
       setConversationHistory([...updatedHistory, { 
         role: 'assistant', 
-        content: data.reply.content 
+        content: data.message 
       }]);
       
-      return data.reply.content;
+      return data.message;
     } catch (error) {
       console.error("Error calling AI:", error);
       toast({
