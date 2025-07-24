@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -189,7 +188,7 @@ export default function Login() {
                   <select 
                     className="bg-white border px-2 py-1 rounded-md text-sm"
                     value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
+                    onChange={(e) => setLanguage(e.target.value as 'en' | 'es' | 'fr' | 'de')}
                   >
                     <option value="en">English</option>
                     <option value="es">Español</option>

@@ -33,7 +33,7 @@ export function LanguageSelect({ form }: LanguageSelectProps) {
           <Select 
             onValueChange={(value) => {
               field.onChange(value);
-              setLanguage(value);
+              setLanguage(value as 'en' | 'es' | 'fr' | 'de');
             }} 
             defaultValue={field.value}
           >
