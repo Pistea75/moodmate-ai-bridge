@@ -1,65 +1,58 @@
 
 import { useState, useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { logSecurityEvent } from '@/utils/securityUtils';
 
 interface SecureRoleValidationResult {
-  role: string | null;
-  isSuperAdmin: boolean;
-  isLoading: boolean;
+  userRole: string | null;
+  hasRole: (roles: string[]) => boolean;
+  loading: boolean;
   error: string | null;
   refreshRole: () => Promise<void>;
   validateRole: (expectedRole: string) => boolean;
   validateSuperAdmin: () => boolean;
 }
 
-export function useSecureRoleValidation(): SecureRoleValidationResult {
+export function useSecureRoleValidation(user: User | null): SecureRoleValidationResult {
   const [role, setRole] = useState<string | null>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchRoleFromDatabase = async () => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       setError(null);
 
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setRole(null);
         setIsSuperAdmin(false);
         return;
       }
 
-      // Query role directly from database to prevent tampering
-      const { data: roleData, error: roleError } = await supabase
-        .rpc('get_user_role', { user_id: user.id });
+      // Query role directly from profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
 
-      if (roleError) {
-        console.error('Error fetching user role:', roleError);
-        await logSecurityEvent('role_fetch_failed', 'database', { error: roleError.message }, false);
+      if (profileError) {
+        console.error('Error fetching user role:', profileError);
+        await logSecurityEvent('role_fetch_failed', 'database', { error: profileError.message }, false);
         setError('Failed to validate user role');
         return;
       }
 
-      // Query super admin status directly from database
-      const { data: superAdminData, error: superAdminError } = await supabase
-        .rpc('is_super_admin', { user_id: user.id });
-
-      if (superAdminError) {
-        console.error('Error fetching super admin status:', superAdminError);
-        await logSecurityEvent('super_admin_check_failed', 'database', { error: superAdminError.message }, false);
-        setError('Failed to validate admin status');
-        return;
-      }
-
-      setRole(roleData);
-      setIsSuperAdmin(Boolean(superAdminData));
+      // For now, assume no super admin functionality
+      setRole(profileData?.role || null);
+      setIsSuperAdmin(false);
 
       // Log successful role validation
       await logSecurityEvent('role_validated', 'database', { 
-        role: roleData, 
-        isSuperAdmin: Boolean(superAdminData) 
+        role: profileData?.role, 
+        isSuperAdmin: false 
       });
 
     } catch (err) {
@@ -67,8 +60,12 @@ export function useSecureRoleValidation(): SecureRoleValidationResult {
       await logSecurityEvent('role_validation_error', 'system', { error: String(err) }, false);
       setError('Unexpected error during role validation');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
+  };
+
+  const hasRole = (roles: string[]): boolean => {
+    return role ? roles.includes(role) : false;
   };
 
   const validateRole = (expectedRole: string): boolean => {
@@ -102,17 +99,17 @@ export function useSecureRoleValidation(): SecureRoleValidationResult {
       } else if (event === 'SIGNED_OUT') {
         setRole(null);
         setIsSuperAdmin(false);
-        setIsLoading(false);
+        setLoading(false);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [user]);
 
   return {
-    role,
-    isSuperAdmin,
-    isLoading,
+    userRole: role,
+    hasRole,
+    loading,
     error,
     refreshRole: fetchRoleFromDatabase,
     validateRole,
