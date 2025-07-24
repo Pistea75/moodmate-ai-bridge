@@ -75,7 +75,9 @@ export function useSecureApi<T = any>() {
         return null;
       }
 
-      setState(prev => ({ ...prev, loading: false, data: data as T }));
+      // Fix the type conversion issue by using 'unknown' as intermediate type
+      const typedData = data as unknown as T;
+      setState(prev => ({ ...prev, loading: false, data: typedData }));
       onSuccess?.(data as R);
       return data as R;
 
