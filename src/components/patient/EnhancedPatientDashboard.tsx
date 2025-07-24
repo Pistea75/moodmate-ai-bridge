@@ -48,6 +48,13 @@ export function EnhancedPatientDashboard() {
         </div>
       </div>
 
+      {/* Top Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <MoodStatsCard />
+        <TasksCompletedCard />
+        <UpcomingSessionsCard />
+      </div>
+
       {/* Main Dashboard Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
@@ -57,15 +64,6 @@ export function EnhancedPatientDashboard() {
           
           {/* Progress Overview */}
           <ProgressOverviewCard />
-          
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <MoodStatsCard />
-            <TasksCompletedCard />
-          </div>
-          
-          {/* Upcoming Sessions */}
-          <UpcomingSessionsCard />
         </div>
 
         {/* Right Column */}
