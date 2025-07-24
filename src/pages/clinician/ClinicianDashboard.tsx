@@ -57,28 +57,39 @@ export default function ClinicianDashboard() {
   return (
     <ClinicianLayout>
       <div className="space-y-6 p-6">
+        {/* Welcome Banner */}
         <WelcomeBanner />
         
+        {/* Risk Alert Banner */}
         <RiskAlertBanner />
         
+        {/* Quick Stats */}
         <QuickStats />
         
+        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Takes 2/3 of the space */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Upcoming Sessions */}
             <UpcomingSessions 
               sessions={upcomingSessions} 
               loading={loadingSessions} 
             />
+            
+            {/* Recent Reports */}
             <RecentReports patients={patients} />
           </div>
           
+          {/* Right Column - Takes 1/3 of the space */}
           <div className="space-y-6">
+            {/* Patient Spotlight */}
             <PatientSpotlight 
               selectedPatient={selectedPatient}
               patients={patients}
               onPatientSelect={setSelectedPatient}
             />
             
+            {/* My Tasks Card */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -107,9 +118,11 @@ export default function ClinicianDashboard() {
           </div>
         </div>
 
+        {/* Advanced Analytics - Full Width */}
         <AdvancedAnalytics />
       </div>
 
+      {/* Modals */}
       {showTaskForm && (
         <TaskForm
           open={showTaskForm}
