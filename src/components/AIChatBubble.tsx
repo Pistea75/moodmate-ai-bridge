@@ -1,88 +1,94 @@
 
-import { useState } from 'react';
-import { User, Bot, Volume2, Pause, Play } from 'lucide-react';
-
-type MessageType = 'user' | 'assistant';
+import React from 'react';
+import { Card } from "@/components/ui/card";
+import { format } from 'date-fns';
 
 interface AIChatBubbleProps {
-  type: MessageType;
+  type: 'user' | 'assistant';
   content: string;
   timestamp: Date;
 }
 
 export function AIChatBubble({ type, content, timestamp }: AIChatBubbleProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  
-  const togglePlayback = () => {
-    // In a real implementation, this would control the text-to-speech
-    setIsPlaying(!isPlaying);
-  };
-  
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+  const formatMessage = (text: string) => {
+    // Split by double newlines to create paragraphs
+    const paragraphs = text.split('\n\n').filter(p => p.trim());
+    
+    return paragraphs.map((paragraph, index) => {
+      // Check if it's a list item (starts with - or *)
+      if (paragraph.includes('\n-') || paragraph.includes('\n*')) {
+        const lines = paragraph.split('\n');
+        const intro = lines[0];
+        const listItems = lines.slice(1).filter(line => line.trim().startsWith('-') || line.trim().startsWith('*'));
+        
+        return (
+          <div key={index} className="mb-3">
+            {intro && <p className="mb-2">{intro}</p>}
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              {listItems.map((item, itemIndex) => (
+                <li key={itemIndex} className="text-sm">
+                  {item.replace(/^[\s-*]+/, '')}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+      
+      // Check if it's a numbered list
+      if (paragraph.match(/\d+\./)) {
+        const lines = paragraph.split('\n');
+        const intro = lines.find(line => !line.match(/^\d+\./));
+        const listItems = lines.filter(line => line.match(/^\d+\./));
+        
+        return (
+          <div key={index} className="mb-3">
+            {intro && <p className="mb-2">{intro}</p>}
+            <ol className="list-decimal list-inside space-y-1 ml-4">
+              {listItems.map((item, itemIndex) => (
+                <li key={itemIndex} className="text-sm">
+                  {item.replace(/^\d+\.\s*/, '')}
+                </li>
+              ))}
+            </ol>
+          </div>
+        );
+      }
+      
+      // Regular paragraph
+      return (
+        <p key={index} className="mb-3 leading-relaxed">
+          {paragraph}
+        </p>
+      );
     });
   };
-  
+
   return (
-    <div className={`flex ${type === 'user' ? 'justify-end' : 'justify-start'}`}>
-      <div className={`
-        max-w-[85%] md:max-w-[70%] flex gap-2 items-start
-        ${type === 'user' ? 'flex-row-reverse' : ''}
-      `}>
-        {/* Avatar */}
-        <div className={`
-          size-8 rounded-full flex items-center justify-center flex-shrink-0
-          ${type === 'user' 
-            ? 'bg-mood-purple text-white' 
-            : 'bg-mood-purple-light text-mood-purple'
-          }
-        `}>
-          {type === 'user' ? <User size={16} /> : <Bot size={16} />}
-        </div>
-        
-        {/* Message bubble */}
-        <div>
-          <div className={`
-            px-4 py-2 rounded-2xl text-sm
-            ${type === 'user' 
-              ? 'bg-mood-purple text-white rounded-tr-none' 
-              : 'bg-muted rounded-tl-none'
-            }
-          `}>
-            {content}
-            
-            {/* Voice control for assistant messages */}
-            {type === 'assistant' && (
-              <button 
-                onClick={togglePlayback}
-                className="mt-2 flex items-center gap-1.5 text-xs text-foreground/70 hover:text-foreground"
-              >
-                {isPlaying ? (
-                  <>
-                    <Pause size={12} />
-                    <span>Pause voice</span>
-                  </>
-                ) : (
-                  <>
-                    <Volume2 size={12} />
-                    <span>Listen</span>
-                  </>
-                )}
-              </button>
-            )}
+    <div className={`flex ${type === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
+      <Card className={`max-w-[80%] p-4 ${
+        type === 'user' 
+          ? 'bg-mood-purple text-white' 
+          : 'bg-gray-50 border-gray-200'
+      }`}>
+        <div className="space-y-2">
+          <div className={`text-sm font-medium ${
+            type === 'user' ? 'text-white/90' : 'text-gray-600'
+          }`}>
+            {type === 'user' ? 'You' : 'AI Assistant'}
           </div>
-          
-          {/* Timestamp */}
-          <div className={`
-            text-xs mt-1 text-muted-foreground
-            ${type === 'user' ? 'text-right' : ''}
-          `}>
-            {formatTime(timestamp)}
+          <div className={`${
+            type === 'user' ? 'text-white' : 'text-gray-800'
+          }`}>
+            {formatMessage(content)}
+          </div>
+          <div className={`text-xs ${
+            type === 'user' ? 'text-white/70' : 'text-gray-500'
+          }`}>
+            {format(timestamp, 'HH:mm')}
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

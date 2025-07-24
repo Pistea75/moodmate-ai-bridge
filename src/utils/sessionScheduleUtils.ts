@@ -23,6 +23,7 @@ export interface ScheduleSessionParams {
   sessionType?: 'online' | 'in_person';
   recordingEnabled?: boolean;
   isPatientView: boolean;
+  duration?: number;
 }
 
 /**
@@ -53,7 +54,8 @@ export const scheduleSession = async ({
   timezone,
   sessionType,
   recordingEnabled,
-  isPatientView 
+  isPatientView,
+  duration = 60
 }: ScheduleSessionParams) => {
   // Validate input parameters
   const { inputDate, hours, minutes } = validateScheduleParams(date, time, timezone);
@@ -103,7 +105,7 @@ export const scheduleSession = async ({
   // Create the payload with validated UUIDs
   const payload: SessionInsertPayload = {
     scheduled_time: utcDateTime.toISOString(),
-    duration_minutes: 50,
+    duration_minutes: duration,
     timezone,
     status: 'scheduled',
     session_type: sessionType || 'in_person',

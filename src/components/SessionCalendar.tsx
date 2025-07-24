@@ -5,14 +5,32 @@ import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { useEffect } from "react";
 
 interface SessionCalendarProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
   getSessionsForDate: (date: Date) => any[];
+  onCalendarDateChange?: (date: Date) => void;
 }
 
-export function SessionCalendar({ selectedDate, onDateChange, getSessionsForDate }: SessionCalendarProps) {
+export function SessionCalendar({ 
+  selectedDate, 
+  onDateChange, 
+  getSessionsForDate,
+  onCalendarDateChange 
+}: SessionCalendarProps) {
+  
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      onDateChange(date);
+      // Trigger additional refresh if callback provided
+      if (onCalendarDateChange) {
+        onCalendarDateChange(date);
+      }
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -28,18 +46,16 @@ export function SessionCalendar({ selectedDate, onDateChange, getSessionsForDate
         <Calendar
           mode="single"
           selected={selectedDate}
-          onSelect={(date) => onDateChange(date || new Date())}
+          onSelect={handleDateSelect}
           initialFocus
           className="pointer-events-auto"
           components={{
             DayContent: (props) => {
-              // Extract the date from props
               const { date } = props;
               const sessionsOnDate = getSessionsForDate(date);
               
               return (
                 <div className="relative flex h-8 w-8 items-center justify-center p-0">
-                  {/* Use a standard div without passing the active modifiers */}
                   <div className="h-8 w-8 flex items-center justify-center">{date.getDate()}</div>
                   {sessionsOnDate.length > 0 && (
                     <div className="text-[10px] text-center mt-1 absolute bottom-0 text-mood-purple font-semibold">

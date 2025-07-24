@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "./DateTimePicker";
@@ -7,6 +8,8 @@ import { SessionTypeSelector } from "./SessionTypeSelector";
 import { AvailableTimeSlots } from "./AvailableTimeSlots";
 import { getCurrentTimezone } from "@/utils/sessionUtils";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export interface SessionFormData {
   date: Date;
@@ -15,6 +18,7 @@ export interface SessionFormData {
   timezone: string;
   sessionType: 'online' | 'in_person';
   recordingEnabled: boolean;
+  duration: number;
 }
 
 interface SessionScheduleFormProps {
@@ -25,6 +29,12 @@ interface SessionScheduleFormProps {
   bookedSlots?: { [key: string]: boolean };
   onDateChange?: (date: Date, clinicianId?: string) => void;
 }
+
+const durationOptions = [
+  { value: 45, label: "45 minutes" },
+  { value: 60, label: "60 minutes (Standard)" },
+  { value: 90, label: "90 minutes" }
+];
 
 export function SessionScheduleForm({
   onSubmit,
@@ -41,14 +51,15 @@ export function SessionScheduleForm({
     patientId: "",
     timezone: getCurrentTimezone(),
     sessionType: 'online',
-    recordingEnabled: true
+    recordingEnabled: true,
+    duration: 60 // Default to 60 minutes
   });
 
   useEffect(() => {
     if (onDateChange && formData.date && !isPatientView) {
       onDateChange(formData.date, formData.patientId);
     }
-  }, [formData.date, formData.patientId]);
+  }, [formData.date, formData.patientId, onDateChange, isPatientView]);
 
   const handleSubmit = async () => {
     console.log("🕐 Submitting session with timezone:", formData.timezone);
@@ -117,7 +128,26 @@ export function SessionScheduleForm({
         selectedTime={formData.time}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <Label htmlFor="duration">Session Duration</Label>
+          <Select
+            value={formData.duration.toString()}
+            onValueChange={(value) => setFormData(prev => ({ ...prev, duration: parseInt(value) }))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select duration" />
+            </SelectTrigger>
+            <SelectContent>
+              {durationOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value.toString()}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <TimezoneSelector
           value={formData.timezone}
           onChange={(tz) => {

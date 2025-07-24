@@ -118,6 +118,7 @@ export function useSessionScheduling({
         sessionType: formData.sessionType,
         recordingEnabled: formData.recordingEnabled,
         isPatientView,
+        duration: formData.duration,
       });
 
       toast({
