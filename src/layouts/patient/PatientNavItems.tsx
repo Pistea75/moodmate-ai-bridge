@@ -23,7 +23,7 @@ export const patientNavItems = [
   },
   {
     title: 'mood',
-    href: '/patient/mood',
+    href: '/patient/mood-insights',
     icon: Heart,
   },
   {
@@ -35,11 +35,6 @@ export const patientNavItems = [
     title: 'goals',
     href: '/patient/goals',
     icon: Target,
-  },
-  {
-    title: 'insights',
-    href: '/patient/insights',
-    icon: TrendingUp,
   },
   {
     title: 'sessions',

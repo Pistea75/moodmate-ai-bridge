@@ -15,6 +15,9 @@ import TrainAI from "./pages/clinician/TrainAI";
 import Tasks from "./pages/clinician/Tasks";
 import Sessions from "./pages/clinician/Sessions";
 import Reports from "./pages/clinician/Reports";
+import Analytics from "./pages/clinician/Analytics";
+import RiskManagement from "./pages/clinician/RiskManagement";
+import PatientDetail from "./pages/clinician/PatientDetail";
 import ClinicianProfile from "./pages/clinician/ClinicianProfile";
 import ClinicianSettings from "./pages/clinician/ClinicianSettings";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -26,8 +29,7 @@ import PatientSessions from "./pages/patient/PatientSessions";
 import PatientProfile from "./pages/patient/PatientProfile";
 import PatientSettings from "./pages/patient/PatientSettings";
 import PatientGoals from './pages/patient/Goals';
-import PatientMood from './pages/patient/PatientMood';
-import PatientInsights from './pages/patient/PatientInsights';
+import PatientMoodInsights from './pages/patient/PatientMoodInsights';
 import SignupClinician from './pages/SignupClinician';
 import SignupPatient from './pages/SignupPatient';
 import ForgotPassword from './pages/ForgotPassword';
@@ -70,6 +72,21 @@ function App() {
               <Route path="/clinician/patients" element={
                 <ProtectedRoute>
                   <Patients />
+                </ProtectedRoute>
+              } />
+              <Route path="/clinician/patients/:patientId" element={
+                <ProtectedRoute>
+                  <PatientDetail />
+                </ProtectedRoute>
+              } />
+              <Route path="/clinician/analytics" element={
+                <ProtectedRoute>
+                  <Analytics />
+                </ProtectedRoute>
+              } />
+              <Route path="/clinician/risk-management" element={
+                <ProtectedRoute>
+                  <RiskManagement />
                 </ProtectedRoute>
               } />
               <Route path="/clinician/train-ai" element={
@@ -139,14 +156,9 @@ function App() {
                   <PatientSettings />
                 </ProtectedRoute>
               } />
-              <Route path="/patient/mood" element={
+              <Route path="/patient/mood-insights" element={
                 <ProtectedRoute>
-                  <PatientMood />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/insights" element={
-                <ProtectedRoute>
-                  <PatientInsights />
+                  <PatientMoodInsights />
                 </ProtectedRoute>
               } />
 

@@ -210,10 +210,6 @@ export default function Patients() {
             </h1>
             <p className="text-muted-foreground">Manage and monitor your patients</p>
           </div>
-          <Button onClick={() => navigate('/clinician/patients/new')}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Patient
-          </Button>
         </div>
 
         {/* Stats Cards */}
@@ -279,10 +275,6 @@ export default function Patients() {
                   ? 'Try adjusting your search criteria or filters.'
                   : 'Start by adding your first patient to begin monitoring their progress.'}
               </p>
-              <Button onClick={() => navigate('/clinician/patients/new')}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add First Patient
-              </Button>
             </CardContent>
           </Card>
         ) : (

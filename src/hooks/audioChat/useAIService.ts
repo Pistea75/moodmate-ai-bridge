@@ -32,6 +32,7 @@ export function useAIService() {
       
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: {
+          message: messageContent,
           messages: updatedHistory,
           systemPrompt: personalizedSystemPrompt,
           userId: user.id,
