@@ -1,14 +1,14 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Canvas } from '@react-three/fiber';
+
 import { PublicNav } from '@/components/PublicNav';
 import { DemoSection } from '@/components/landing/DemoSection';
 import { Footer } from '@/components/landing/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Brain, MessageCircle, TrendingUp, Shield, Users, Zap, Heart, Star } from 'lucide-react';
-import { LandingBrodiRobot } from '@/components/brodi/LandingBrodiRobot';
+
 
 export default function Landing() {
   return (
@@ -164,26 +164,11 @@ export default function Landing() {
                 {/* 3D Brodi Character Container */}
                 <div className="w-80 h-96 relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-100/50 to-pink-100/50 rounded-3xl blur-2xl transform rotate-6"></div>
-                  <div className="relative z-10 w-full h-full">
-                    {/* 3D Canvas with Brodi */}
-                    <Canvas
-                      camera={{ position: [2, 2, 4], fov: 50 }}
-                      style={{ background: 'transparent' }}
-                    >
-                      {/* Lighting */}
-                      <ambientLight intensity={0.8} />
-                      <directionalLight 
-                        position={[5, 5, 5]} 
-                        intensity={1.2} 
-                        castShadow 
-                        shadow-mapSize-width={1024}
-                        shadow-mapSize-height={1024}
-                      />
-                      <pointLight position={[2, 2, 2]} intensity={0.6} color="#fbbf24" />
-                      
-                      {/* 3D Brodi Robot */}
-                      <LandingBrodiRobot />
-                    </Canvas>
+                  <div className="relative z-10 w-full h-full flex items-center justify-center">
+                    {/* Simple Brodi representation */}
+                    <div className="w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center shadow-2xl">
+                      <Brain className="h-16 w-16 text-white" />
+                    </div>
                     
                     {/* Floating hearts and effects */}
                     <div className="absolute -top-4 -right-6 animate-float pointer-events-none">
