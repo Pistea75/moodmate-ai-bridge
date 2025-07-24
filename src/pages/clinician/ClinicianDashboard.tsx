@@ -9,7 +9,7 @@ import { OnboardingTooltips } from '@/components/clinician/OnboardingTooltips';
 import { UpcomingSessions } from '@/components/clinician/UpcomingSessions';
 import { PatientSpotlight } from '@/components/clinician/PatientSpotlight';
 import { ClinicianTasks } from '@/components/clinician/ClinicianTasks';
-import { AddTaskDialog } from '@/components/clinician/AddTaskDialog';
+import { TaskForm } from '@/components/clinician/TaskForm';
 import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
 import { RecentReports } from '@/components/clinician/RecentReports';
 import { RiskAlertBanner } from '@/components/clinician/RiskAlertBanner';
@@ -18,9 +18,8 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 export default function ClinicianDashboard() {
   console.log('🔄 ClinicianDashboard rendering');
   
-  const [showAddTaskDialog, setShowAddTaskDialog] = useState(false);
+  const [showTaskForm, setShowTaskForm] = useState(false);
   const [showScheduleSessionModal, setShowScheduleSessionModal] = useState(false);
-  const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '' });
   
   const {
     patients,
@@ -48,17 +47,8 @@ export default function ClinicianDashboard() {
     loadingTasks
   });
 
-  const handleAddTask = async () => {
-    if (!newTask.title) return;
-    
-    await addTask(
-      newTask.title, 
-      newTask.description, 
-      newTask.dueDate || new Date().toISOString().split('T')[0]
-    );
-    
-    setNewTask({ title: '', description: '', dueDate: '' });
-    setShowAddTaskDialog(false);
+  const handleTaskCreated = () => {
+    setShowTaskForm(false);
   };
 
   const handleScheduleSession = () => {
@@ -118,7 +108,7 @@ export default function ClinicianDashboard() {
           <div id="quick-actions">
             <EnhancedQuickActions 
               onScheduleSession={handleScheduleSession}
-              onAddTask={() => setShowAddTaskDialog(true)}
+              onAddTask={() => setShowTaskForm(true)}
             />
           </div>
 
@@ -159,7 +149,7 @@ export default function ClinicianDashboard() {
                 <ClinicianTasks
                   tasks={formatTasksForComponent(tasks)}
                   loadingTasks={loadingTasks}
-                  onAddTaskClick={() => setShowAddTaskDialog(true)}
+                  onAddTaskClick={() => setShowTaskForm(true)}
                   onTaskUpdate={updateTaskCompletion}
                 />
               </div>
@@ -176,12 +166,10 @@ export default function ClinicianDashboard() {
         <OnboardingTooltips />
 
         {/* Modals */}
-        <AddTaskDialog
-          open={showAddTaskDialog}
-          onOpenChange={setShowAddTaskDialog}
-          newTask={newTask}
-          onTaskChange={setNewTask}
-          onAddTask={handleAddTask}
+        <TaskForm
+          open={showTaskForm}
+          onClose={() => setShowTaskForm(false)}
+          onTaskCreated={handleTaskCreated}
         />
 
         <ScheduleSessionModal
