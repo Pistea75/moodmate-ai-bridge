@@ -63,7 +63,7 @@ export function useSecureRoleValidation(user: User | null) {
     return allowedRoles.includes(userRole.role);
   }, [userRole]);
 
-  const isSuperAdmin = useCallback((): boolean => {
+  const isSuperAdminCheck = useCallback((): boolean => {
     return userRole?.is_super_admin === true;
   }, [userRole]);
 
@@ -75,7 +75,7 @@ export function useSecureRoleValidation(user: User | null) {
     userRole: userRole?.role || null,
     isSuperAdmin: userRole?.is_super_admin || false,
     hasRole,
-    isSuperAdmin: isSuperAdmin,
+    isSuperAdminCheck,
     loading,
     error,
     refreshRole
