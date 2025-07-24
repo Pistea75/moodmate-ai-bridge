@@ -1,83 +1,121 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { User } from '@supabase/supabase-js';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logSecurityEvent } from '@/utils/securityUtils';
 
-interface UserRole {
-  role: string;
-  is_super_admin: boolean;
+interface SecureRoleValidationResult {
+  role: string | null;
+  isSuperAdmin: boolean;
+  isLoading: boolean;
+  error: string | null;
+  refreshRole: () => Promise<void>;
+  validateRole: (expectedRole: string) => boolean;
+  validateSuperAdmin: () => boolean;
 }
 
-export function useSecureRoleValidation(user: User | null) {
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [loading, setLoading] = useState(true);
+export function useSecureRoleValidation(): SecureRoleValidationResult {
+  const [role, setRole] = useState<string | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUserRole = useCallback(async () => {
-    if (!user) {
-      setUserRole(null);
-      setLoading(false);
-      return;
-    }
-
+  const fetchRoleFromDatabase = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
-      // Fetch role directly from profiles table (secure)
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, is_super_admin')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        throw profileError;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setRole(null);
+        setIsSuperAdmin(false);
+        return;
       }
 
-      if (!profile) {
-        throw new Error('User profile not found');
+      // Query role directly from database to prevent tampering
+      const { data: roleData, error: roleError } = await supabase
+        .rpc('get_user_role', { user_id: user.id });
+
+      if (roleError) {
+        console.error('Error fetching user role:', roleError);
+        await logSecurityEvent('role_fetch_failed', 'database', { error: roleError.message }, false);
+        setError('Failed to validate user role');
+        return;
       }
 
-      setUserRole({
-        role: profile.role,
-        is_super_admin: profile.is_super_admin || false
+      // Query super admin status directly from database
+      const { data: superAdminData, error: superAdminError } = await supabase
+        .rpc('is_super_admin', { user_id: user.id });
+
+      if (superAdminError) {
+        console.error('Error fetching super admin status:', superAdminError);
+        await logSecurityEvent('super_admin_check_failed', 'database', { error: superAdminError.message }, false);
+        setError('Failed to validate admin status');
+        return;
+      }
+
+      setRole(roleData);
+      setIsSuperAdmin(Boolean(superAdminData));
+
+      // Log successful role validation
+      await logSecurityEvent('role_validated', 'database', { 
+        role: roleData, 
+        isSuperAdmin: Boolean(superAdminData) 
       });
-    } catch (err: any) {
-      console.error('Error fetching user role:', err);
-      setError(err.message || 'Failed to verify user role');
-      setUserRole(null);
+
+    } catch (err) {
+      console.error('Unexpected error during role validation:', err);
+      await logSecurityEvent('role_validation_error', 'system', { error: String(err) }, false);
+      setError('Unexpected error during role validation');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [user?.id]);
+  };
+
+  const validateRole = (expectedRole: string): boolean => {
+    const isValid = role === expectedRole;
+    if (!isValid) {
+      logSecurityEvent('unauthorized_role_access', 'authorization', { 
+        expectedRole, 
+        actualRole: role 
+      }, false);
+    }
+    return isValid;
+  };
+
+  const validateSuperAdmin = (): boolean => {
+    if (!isSuperAdmin) {
+      logSecurityEvent('unauthorized_admin_access', 'authorization', { 
+        role, 
+        isSuperAdmin 
+      }, false);
+    }
+    return isSuperAdmin;
+  };
 
   useEffect(() => {
-    fetchUserRole();
-  }, [fetchUserRole]);
+    fetchRoleFromDatabase();
 
-  const hasRole = useCallback((requiredRole: string | string[]): boolean => {
-    if (!userRole) return false;
-    
-    const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-    return allowedRoles.includes(userRole.role);
-  }, [userRole]);
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        fetchRoleFromDatabase();
+      } else if (event === 'SIGNED_OUT') {
+        setRole(null);
+        setIsSuperAdmin(false);
+        setIsLoading(false);
+      }
+    });
 
-  const isSuperAdminCheck = useCallback((): boolean => {
-    return userRole?.is_super_admin === true;
-  }, [userRole]);
-
-  const refreshRole = useCallback(() => {
-    fetchUserRole();
-  }, [fetchUserRole]);
+    return () => subscription.unsubscribe();
+  }, []);
 
   return {
-    userRole: userRole?.role || null,
-    isSuperAdmin: userRole?.is_super_admin || false,
-    hasRole,
-    isSuperAdminCheck,
-    loading,
+    role,
+    isSuperAdmin,
+    isLoading,
     error,
-    refreshRole
+    refreshRole: fetchRoleFromDatabase,
+    validateRole,
+    validateSuperAdmin
   };
 }
