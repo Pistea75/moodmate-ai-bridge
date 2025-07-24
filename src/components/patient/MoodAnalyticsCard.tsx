@@ -1,5 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { TrendingUp, Calendar, Target } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -18,35 +19,42 @@ export function MoodAnalyticsCard() {
   const [loading, setLoading] = useState(true);
   const [streak, setStreak] = useState(0);
   const [trend, setTrend] = useState<'up' | 'down' | 'stable'>('stable');
+  const [timePeriod, setTimePeriod] = useState<'daily' | 'weekly'>('weekly');
 
   useEffect(() => {
     if (user?.id) {
       fetchMoodData();
     }
-  }, [user?.id]);
+  }, [user?.id, timePeriod]);
 
   const fetchMoodData = async () => {
     if (!user?.id) return;
     
     try {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const daysAgo = timePeriod === 'daily' ? 1 : 7;
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - daysAgo);
       
       const { data, error } = await supabase
         .from('mood_entries')
         .select('mood_score, created_at')
         .eq('patient_id', user.id)
-        .gte('created_at', sevenDaysAgo.toISOString())
+        .gte('created_at', startDate.toISOString())
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
       if (data && data.length > 0) {
-        const formattedData = data.map(entry => ({
-          date: new Date(entry.created_at).toLocaleDateString(),
-          mood: entry.mood_score,
-          day: new Date(entry.created_at).toLocaleDateString('en-US', { weekday: 'short' })
-        }));
+        const formattedData = data.map(entry => {
+          const date = new Date(entry.created_at);
+          return {
+            date: date.toLocaleDateString(),
+            mood: entry.mood_score,
+            day: timePeriod === 'daily' 
+              ? date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })
+              : date.toLocaleDateString('en-US', { weekday: 'short' })
+          };
+        });
 
         setMoodData(formattedData);
         
@@ -113,10 +121,28 @@ export function MoodAnalyticsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BarChart className="h-5 w-5" />
-          Mood Analytics
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <BarChart className="h-5 w-5" />
+            Mood Analytics
+          </CardTitle>
+          <div className="flex gap-1">
+            <Button
+              variant={timePeriod === 'daily' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTimePeriod('daily')}
+            >
+              Daily
+            </Button>
+            <Button
+              variant={timePeriod === 'weekly' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTimePeriod('weekly')}
+            >
+              7 Days
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         {moodData.length > 0 ? (

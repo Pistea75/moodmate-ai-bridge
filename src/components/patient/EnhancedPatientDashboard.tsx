@@ -49,10 +49,11 @@ export function EnhancedPatientDashboard() {
       </div>
 
       {/* Top Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MoodStatsCard />
         <TasksCompletedCard />
         <UpcomingSessionsCard />
+        <WellnessStreakCard />
       </div>
 
       {/* Mood Chart */}
@@ -64,23 +65,22 @@ export function EnhancedPatientDashboard() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProgressOverviewCard />
-        <ChatNowCard />
+        <DailyCheckinCard />
       </div>
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <MotivationalQuoteCard />
-        <DailyCheckinCard />
         <WellnessJourneyCard />
         <AIInsightsCard />
-        <WellnessStreakCard />
         <ExerciseTrackingCard />
       </div>
 
       {/* Brodi Advanced Features */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <BrodiPredictiveWellness />
-      </div>
+      <BrodiPredictiveWellness />
+
+      {/* Support Section - Bottom */}
+      <ChatNowCard />
       
       {/* Brodi AI Companion & Crisis Support */}
       {brodiComponent}
