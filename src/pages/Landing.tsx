@@ -1,19 +1,37 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { PublicNav } from '@/components/PublicNav';
 import { DemoSection } from '@/components/landing/DemoSection';
 import { Footer } from '@/components/landing/Footer';
+import { DownloadableLogo } from '@/components/DownloadableLogo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Brain, MessageCircle, TrendingUp, Shield, Users, Zap, Heart, Star } from 'lucide-react';
 
-
 export default function Landing() {
+  const [showLogoDownload, setShowLogoDownload] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <PublicNav />
+      
+      {/* Logo Download Section - Show/Hide */}
+      {showLogoDownload && (
+        <section className="py-12 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <DownloadableLogo />
+            <div className="text-center mt-6">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowLogoDownload(false)}
+              >
+                Hide Logo Download
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
       
       {/* Hero Section */}
       <section className="relative min-h-screen bg-gradient-to-br from-hero-primary via-hero-secondary to-hero-accent overflow-hidden">
@@ -52,8 +70,9 @@ export default function Landing() {
                 variant="outline" 
                 size="lg" 
                 className="border-2 border-white text-white hover:bg-white hover:text-hero-primary font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105"
+                onClick={() => setShowLogoDownload(true)}
               >
-                Watch Demo
+                Download Logo
               </Button>
             </div>
 
@@ -150,7 +169,6 @@ export default function Landing() {
 
       {/* Meet Brodi Section */}
       <section className="py-20 bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
-        {/* Background decoration */}
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-purple-200/30 to-pink-200/30 rounded-full blur-xl"></div>
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-pink-200/20 to-purple-200/20 rounded-full blur-xl"></div>
@@ -158,19 +176,15 @@ export default function Landing() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left side - Brodi Character */}
             <div className="flex justify-center lg:justify-end">
               <div className="relative">
-                {/* 3D Brodi Character Container */}
                 <div className="w-80 h-96 relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-100/50 to-pink-100/50 rounded-3xl blur-2xl transform rotate-6"></div>
                   <div className="relative z-10 w-full h-full flex items-center justify-center">
-                    {/* Simple Brodi representation */}
                     <div className="w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center shadow-2xl">
                       <Brain className="h-16 w-16 text-white" />
                     </div>
                     
-                    {/* Floating hearts and effects */}
                     <div className="absolute -top-4 -right-6 animate-float pointer-events-none">
                       <Heart className="h-4 w-4 text-pink-400 fill-pink-400" />
                     </div>
@@ -183,7 +197,6 @@ export default function Landing() {
                   </div>
                 </div>
                 
-                {/* Speech bubble */}
                 <div className="absolute -top-4 -right-12 bg-white rounded-2xl p-4 shadow-xl border border-purple-100 max-w-xs">
                   <div className="absolute bottom-0 left-8 w-4 h-4 bg-white transform rotate-45 translate-y-2 border-r border-b border-purple-100"></div>
                   <p className="text-sm text-gray-700 font-medium">
@@ -193,7 +206,6 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right side - Brodi's Story */}
             <div className="space-y-8">
               <div className="space-y-4">
                 <h2 className="text-4xl lg:text-5xl font-bold text-gray-900">
@@ -251,10 +263,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Demo Section */}
       <DemoSection />
 
-      {/* Features Section */}
       <section className="py-20 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -313,7 +323,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-hero-primary to-hero-accent">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
