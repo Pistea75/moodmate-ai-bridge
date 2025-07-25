@@ -13,7 +13,7 @@ import { TaskForm } from '@/components/clinician/TaskForm/index';
 import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
 import { RecentReports } from '@/components/clinician/RecentReports';
 import { RiskAlertBanner } from '@/components/clinician/RiskAlertBanner';
-import { AdvancedAnalytics } from '@/components/clinician/AdvancedAnalytics';
+import { DashboardInsights } from '@/components/clinician/DashboardInsights';
 import { useDashboardData } from '@/hooks/useDashboardData';
 
 export default function ClinicianDashboard() {
@@ -66,30 +66,31 @@ export default function ClinicianDashboard() {
         {/* Quick Stats */}
         <QuickStats />
         
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Takes 2/3 of the space */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Upcoming Sessions */}
-            <UpcomingSessions 
-              sessions={upcomingSessions} 
-              loading={loadingSessions} 
-            />
-            
-            {/* Recent Reports */}
-            <RecentReports patients={patients} />
-          </div>
+        {/* Main Content */}
+        <div className="space-y-6">
+          {/* Upcoming Sessions - Full Width */}
+          <UpcomingSessions 
+            sessions={upcomingSessions} 
+            loading={loadingSessions} 
+          />
           
-          {/* Right Column - Takes 1/3 of the space */}
-          <div className="space-y-6">
-            {/* Patient Spotlight */}
-            <PatientSpotlight 
-              selectedPatient={selectedPatient}
-              patients={patients}
-              onPatientSelect={setSelectedPatient}
-            />
-            
-            {/* My Tasks Card */}
+          {/* Patient Spotlight - Full Width */}
+          <Card>
+            <CardContent className="p-6">
+              <PatientSpotlight 
+                selectedPatient={selectedPatient}
+                patients={patients}
+                onPatientSelect={setSelectedPatient}
+              />
+            </CardContent>
+          </Card>
+          
+          {/* Practice Insights - Full Width */}
+          <DashboardInsights />
+          
+          {/* Bottom Grid - Tasks and Recent Reports */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* My Tasks */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -115,11 +116,15 @@ export default function ClinicianDashboard() {
                 />
               </CardContent>
             </Card>
+            
+            {/* Recent Reports */}
+            <Card>
+              <CardContent className="p-6">
+                <RecentReports patients={patients} />
+              </CardContent>
+            </Card>
           </div>
         </div>
-
-        {/* Advanced Analytics - Full Width */}
-        <AdvancedAnalytics />
       </div>
 
       {/* Modals */}
