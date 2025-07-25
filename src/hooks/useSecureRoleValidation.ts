@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { logSecurityEvent } from '@/utils/securityUtils';
+import { logSecurityEvent, validateSession } from '@/utils/securityUtils';
 
 interface SecureRoleValidationResult {
   userRole: string | null;
@@ -31,33 +31,54 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
         return;
       }
 
-      // Query role directly from profiles table
+      // Validate current session before proceeding
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session || !validateSession(session)) {
+        setError('Invalid session');
+        await logSecurityEvent('invalid_session', 'role_validation', { user_id: user.id }, false);
+        return;
+      }
+
+      // Query role and super admin status directly from profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, is_super_admin')
         .eq('id', user.id)
         .single();
 
       if (profileError) {
         console.error('Error fetching user role:', profileError);
-        await logSecurityEvent('role_fetch_failed', 'database', { error: profileError.message }, false);
+        await logSecurityEvent('role_fetch_failed', 'database', { 
+          error: profileError.message,
+          user_id: user.id 
+        }, false);
         setError('Failed to validate user role');
         return;
       }
 
-      // For now, assume no super admin functionality
-      setRole(profileData?.role || null);
-      setIsSuperAdmin(false);
+      if (!profileData) {
+        setError('User profile not found');
+        await logSecurityEvent('profile_not_found', 'database', { user_id: user.id }, false);
+        return;
+      }
+
+      // Set role and super admin status
+      setRole(profileData.role || null);
+      setIsSuperAdmin(profileData.is_super_admin || false);
 
       // Log successful role validation
       await logSecurityEvent('role_validated', 'database', { 
-        role: profileData?.role, 
-        isSuperAdmin: false 
+        role: profileData.role,
+        isSuperAdmin: profileData.is_super_admin,
+        user_id: user.id
       });
 
     } catch (err) {
       console.error('Unexpected error during role validation:', err);
-      await logSecurityEvent('role_validation_error', 'system', { error: String(err) }, false);
+      await logSecurityEvent('role_validation_error', 'system', { 
+        error: String(err),
+        user_id: user?.id
+      }, false);
       setError('Unexpected error during role validation');
     } finally {
       setLoading(false);
@@ -65,7 +86,10 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
   };
 
   const hasRole = (roles: string[]): boolean => {
-    return role ? roles.includes(role) : false;
+    if (!role || !Array.isArray(roles) || roles.length === 0) {
+      return false;
+    }
+    return roles.includes(role);
   };
 
   const validateRole = (expectedRole: string): boolean => {
@@ -73,7 +97,8 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
     if (!isValid) {
       logSecurityEvent('unauthorized_role_access', 'authorization', { 
         expectedRole, 
-        actualRole: role 
+        actualRole: role,
+        user_id: user?.id
       }, false);
     }
     return isValid;
@@ -83,7 +108,8 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
     if (!isSuperAdmin) {
       logSecurityEvent('unauthorized_admin_access', 'authorization', { 
         role, 
-        isSuperAdmin 
+        isSuperAdmin,
+        user_id: user?.id
       }, false);
     }
     return isSuperAdmin;
@@ -93,13 +119,20 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
     fetchRoleFromDatabase();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        fetchRoleFromDatabase();
+        if (session && validateSession(session)) {
+          fetchRoleFromDatabase();
+        } else {
+          setRole(null);
+          setIsSuperAdmin(false);
+          setError('Invalid session');
+        }
       } else if (event === 'SIGNED_OUT') {
         setRole(null);
         setIsSuperAdmin(false);
         setLoading(false);
+        setError(null);
       }
     });
 

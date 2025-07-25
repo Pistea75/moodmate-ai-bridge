@@ -1,304 +1,308 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  Shield, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
-  Eye,
-  Lock,
-  Key,
-  Server
-} from 'lucide-react';
-import { useSecureAuth } from '@/hooks/useSecureAuth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertTriangle, Shield, Search, Filter, Download } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
-interface SecurityCheck {
+interface AuditLog {
   id: string;
-  name: string;
-  description: string;
-  status: 'pass' | 'fail' | 'warning' | 'pending';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  details?: string;
+  user_id: string;
+  action: string;
+  resource: string;
+  details: any;
+  success: boolean;
+  ip_address: string;
+  user_agent: string;
+  created_at: string;
 }
 
 export function SecurityAuditPanel() {
-  const { session, isAuthenticated } = useSecureAuth();
-  const [checks, setChecks] = useState<SecurityCheck[]>([]);
-  const [isRunning, setIsRunning] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const { user } = useAuth();
+  const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [actionFilter, setActionFilter] = useState('all');
+  const [successFilter, setSuccessFilter] = useState('all');
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
-  const securityChecks: Omit<SecurityCheck, 'status' | 'details'>[] = [
-    {
-      id: 'session-validation',
-      name: 'Session Validation',
-      description: 'Verify current session is valid and secure',
-      severity: 'critical',
-    },
-    {
-      id: 'csrf-protection',
-      name: 'CSRF Protection',
-      description: 'Check for Cross-Site Request Forgery protection',
-      severity: 'high',
-    },
-    {
-      id: 'xss-prevention',
-      name: 'XSS Prevention',
-      description: 'Verify input sanitization and output encoding',
-      severity: 'high',
-    },
-    {
-      id: 'secure-headers',
-      name: 'Security Headers',
-      description: 'Check for security-related HTTP headers',
-      severity: 'medium',
-    },
-    {
-      id: 'password-policy',
-      name: 'Password Policy',
-      description: 'Verify password strength requirements',
-      severity: 'medium',
-    },
-    {
-      id: 'rate-limiting',
-      name: 'Rate Limiting',
-      description: 'Check for rate limiting on sensitive endpoints',
-      severity: 'medium',
-    },
-    {
-      id: 'data-encryption',
-      name: 'Data Encryption',
-      description: 'Verify data is encrypted in transit and at rest',
-      severity: 'critical',
-    },
-    {
-      id: 'auth-token-security',
-      name: 'Authentication Token Security',
-      description: 'Check token storage and handling security',
-      severity: 'high',
-    },
-  ];
+  const fetchLogs = async (reset = false) => {
+    try {
+      setLoading(true);
+      
+      let query = supabase
+        .from('security_audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(reset ? 0 : page * 50, (reset ? 0 : page * 50) + 49);
 
-  const runSecurityAudit = async () => {
-    setIsRunning(true);
-    setProgress(0);
-    
-    const results: SecurityCheck[] = [];
-    const totalChecks = securityChecks.length;
-
-    for (let i = 0; i < securityChecks.length; i++) {
-      const check = securityChecks[i];
-      setProgress(((i + 1) / totalChecks) * 100);
-
-      // Simulate security check execution
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      let status: SecurityCheck['status'] = 'pass';
-      let details = '';
-
-      switch (check.id) {
-        case 'session-validation':
-          if (!isAuthenticated || !session) {
-            status = 'fail';
-            details = 'No valid session found';
-          } else if (session.expires_at && Date.now() / 1000 > session.expires_at) {
-            status = 'fail';
-            details = 'Session has expired';
-          } else {
-            details = 'Session is valid and secure';
-          }
-          break;
-
-        case 'csrf-protection':
-          // Check if CSRF protection is implemented
-          status = 'pass';
-          details = 'CSRF protection is implemented via Supabase';
-          break;
-
-        case 'xss-prevention':
-          // Check if input sanitization is in place
-          status = 'pass';
-          details = 'Input sanitization functions are implemented';
-          break;
-
-        case 'secure-headers':
-          // Check for security headers
-          status = 'warning';
-          details = 'Some security headers may be missing - check server configuration';
-          break;
-
-        case 'password-policy':
-          status = 'pass';
-          details = 'Strong password policy is enforced';
-          break;
-
-        case 'rate-limiting':
-          status = 'pass';
-          details = 'Rate limiting is implemented for authentication';
-          break;
-
-        case 'data-encryption':
-          status = 'pass';
-          details = 'Data is encrypted via HTTPS and Supabase encryption';
-          break;
-
-        case 'auth-token-security':
-          if (typeof window !== 'undefined' && localStorage.getItem('supabase.auth.token')) {
-            status = 'pass';
-            details = 'Tokens are securely stored in localStorage';
-          } else {
-            status = 'warning';
-            details = 'Token storage method could not be verified';
-          }
-          break;
-
-        default:
-          status = 'warning';
-          details = 'Check not implemented';
+      if (actionFilter !== 'all') {
+        query = query.eq('action', actionFilter);
       }
 
-      results.push({
-        ...check,
-        status,
-        details,
+      if (successFilter !== 'all') {
+        query = query.eq('success', successFilter === 'true');
+      }
+
+      if (searchTerm) {
+        query = query.or(`action.ilike.%${searchTerm}%,resource.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching audit logs:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch security audit logs",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (reset) {
+        setLogs(data || []);
+        setPage(0);
+      } else {
+        setLogs(prev => [...prev, ...(data || [])]);
+      }
+
+      setHasMore((data || []).length === 50);
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogs(true);
+  }, [searchTerm, actionFilter, successFilter]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchLogs(true);
+  };
+
+  const exportLogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('security_audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1000);
+
+      if (error) throw error;
+
+      const csvContent = [
+        ['Timestamp', 'Action', 'Resource', 'User ID', 'Success', 'IP Address', 'Details'],
+        ...data.map(log => [
+          log.created_at,
+          log.action,
+          log.resource,
+          log.user_id || 'N/A',
+          log.success ? 'Success' : 'Failed',
+          log.ip_address || 'N/A',
+          JSON.stringify(log.details || {})
+        ])
+      ].map(row => row.join(',')).join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `security-audit-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "Audit logs exported successfully",
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to export audit logs",
+        variant: "destructive",
       });
     }
-
-    setChecks(results);
-    setIsRunning(false);
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pass':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'fail':
-        return <XCircle className="h-4 w-4 text-red-600" />;
-      case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+  const getActionBadgeColor = (action: string, success: boolean) => {
+    if (!success) return 'bg-red-100 text-red-800';
+    
+    switch (action) {
+      case 'signin_success':
+      case 'signup_success':
+        return 'bg-green-100 text-green-800';
+      case 'auth_failure':
+      case 'unauthorized_access':
+        return 'bg-red-100 text-red-800';
+      case 'role_validated':
+        return 'bg-blue-100 text-blue-800';
       default:
-        return <Eye className="h-4 w-4 text-gray-400" />;
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      pass: 'bg-green-100 text-green-800',
-      fail: 'bg-red-100 text-red-800',
-      warning: 'bg-yellow-100 text-yellow-800',
-      pending: 'bg-gray-100 text-gray-800'
-    };
-
-    return (
-      <Badge className={variants[status as keyof typeof variants] || variants.pending}>
-        {status.toUpperCase()}
-      </Badge>
-    );
+  const formatTimestamp = (timestamp: string) => {
+    return new Date(timestamp).toLocaleString();
   };
 
-  const getSeverityBadge = (severity: string) => {
-    const variants = {
-      low: 'bg-blue-100 text-blue-800',
-      medium: 'bg-yellow-100 text-yellow-800',
-      high: 'bg-orange-100 text-orange-800',
-      critical: 'bg-red-100 text-red-800'
-    };
-
-    return (
-      <Badge className={variants[severity as keyof typeof variants]}>
-        {severity.toUpperCase()}
-      </Badge>
-    );
-  };
-
-  const getSummary = () => {
-    const passed = checks.filter(c => c.status === 'pass').length;
-    const failed = checks.filter(c => c.status === 'fail').length;
-    const warnings = checks.filter(c => c.status === 'warning').length;
-
-    return { passed, failed, warnings, total: checks.length };
+  const formatDetails = (details: any) => {
+    if (!details || typeof details !== 'object') return '';
+    
+    const relevantKeys = ['error', 'user_id', 'email', 'role', 'ip_address'];
+    const formatted = relevantKeys
+      .filter(key => details[key])
+      .map(key => `${key}: ${details[key]}`)
+      .join(', ');
+    
+    return formatted.length > 100 ? formatted.substring(0, 100) + '...' : formatted;
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-6xl mx-auto">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-primary" />
-          Security Audit Panel
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Button 
-            onClick={runSecurityAudit}
-            disabled={isRunning}
-            className="flex items-center gap-2"
-          >
-            <Shield className="h-4 w-4" />
-            {isRunning ? 'Running Security Audit...' : 'Run Security Audit'}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-blue-600" />
+            <CardTitle>Security Audit Logs</CardTitle>
+          </div>
+          <Button onClick={exportLogs} variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
           </Button>
         </div>
-
-        {isRunning && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Scanning security measures...</span>
-              <span>{Math.round(progress)}%</span>
+      </CardHeader>
+      
+      <CardContent>
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search actions or resources..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-64"
+              />
             </div>
-            <Progress value={progress} className="w-full" />
+            <Button type="submit" variant="outline" size="sm">
+              Search
+            </Button>
+          </form>
+          
+          <Select value={actionFilter} onValueChange={setActionFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filter by action" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Actions</SelectItem>
+              <SelectItem value="signin_success">Sign In Success</SelectItem>
+              <SelectItem value="signin_failed">Sign In Failed</SelectItem>
+              <SelectItem value="signup_success">Sign Up Success</SelectItem>
+              <SelectItem value="auth_failure">Auth Failure</SelectItem>
+              <SelectItem value="unauthorized_access">Unauthorized Access</SelectItem>
+              <SelectItem value="role_validated">Role Validated</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={successFilter} onValueChange={setSuccessFilter}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Success" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="true">Success</SelectItem>
+              <SelectItem value="false">Failed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Logs Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-gray-200">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-200 px-4 py-2 text-left">Timestamp</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Action</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Resource</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Status</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map((log) => (
+                <tr key={log.id} className="hover:bg-gray-50">
+                  <td className="border border-gray-200 px-4 py-2 text-sm">
+                    {formatTimestamp(log.created_at)}
+                  </td>
+                  <td className="border border-gray-200 px-4 py-2">
+                    <Badge className={getActionBadgeColor(log.action, log.success)}>
+                      {log.action}
+                    </Badge>
+                  </td>
+                  <td className="border border-gray-200 px-4 py-2 text-sm">
+                    {log.resource}
+                  </td>
+                  <td className="border border-gray-200 px-4 py-2">
+                    <div className="flex items-center gap-2">
+                      {log.success ? (
+                        <div className="flex items-center gap-1 text-green-600">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          Success
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 text-red-600">
+                          <AlertTriangle className="h-3 w-3" />
+                          Failed
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="border border-gray-200 px-4 py-2 text-sm text-gray-600">
+                    {formatDetails(log.details)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Load More */}
+        {hasMore && (
+          <div className="mt-4 text-center">
+            <Button
+              onClick={() => {
+                setPage(prev => prev + 1);
+                fetchLogs(false);
+              }}
+              variant="outline"
+              disabled={loading}
+            >
+              {loading ? 'Loading...' : 'Load More'}
+            </Button>
           </div>
         )}
 
-        {checks.length > 0 && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{getSummary().passed}</div>
-                <div className="text-sm text-gray-600">Passed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">{getSummary().failed}</div>
-                <div className="text-sm text-gray-600">Failed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-600">{getSummary().warnings}</div>
-                <div className="text-sm text-gray-600">Warnings</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{getSummary().total}</div>
-                <div className="text-sm text-gray-600">Total</div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Security Check Results</h3>
-              <div className="space-y-2">
-                {checks.map((check) => (
-                  <div 
-                    key={check.id}
-                    className="flex items-start justify-between p-3 border rounded-lg"
-                  >
-                    <div className="flex items-start gap-3">
-                      {getStatusIcon(check.status)}
-                      <div className="flex-1">
-                        <div className="font-medium">{check.name}</div>
-                        <div className="text-sm text-gray-600">{check.description}</div>
-                        {check.details && (
-                          <div className="text-xs text-gray-500 mt-1">{check.details}</div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      {getSeverityBadge(check.severity)}
-                      {getStatusBadge(check.status)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {logs.length === 0 && !loading && (
+          <div className="text-center py-8 text-gray-500">
+            No audit logs found matching your criteria.
           </div>
         )}
       </CardContent>

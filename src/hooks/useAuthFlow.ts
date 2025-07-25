@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { validatePassword, authRateLimiter, logSecurityEvent } from '@/utils/securityUtils';
+import { validatePassword, authRateLimiter, logSecurityEvent, sanitizeInput, isValidEmail } from '@/utils/securityUtils';
 
 interface AuthError {
   message: string;
@@ -13,7 +13,7 @@ export function useAuthFlow() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<AuthError | null>(null);
 
-  const handleAuthError = (error: any) => {
+  const handleAuthError = async (error: any, context: string) => {
     console.error('🔴 Auth error:', error);
     let message = 'An unexpected error occurred';
     
@@ -25,7 +25,7 @@ export function useAuthFlow() {
       } else if (error.message.includes('User already registered')) {
         message = 'This email is already registered. Please try logging in instead.';
       } else if (error.message.includes('Password should be')) {
-        message = 'Password should be at least 8 characters long with uppercase, lowercase, number, and special character.';
+        message = 'Password must be at least 12 characters with uppercase, lowercase, number, and special character.';
       } else if (error.message.includes('Database error') || 
                 error.message.includes('error in Supabase function')) {
         message = 'There was a technical issue. Please try again or contact support.';
@@ -44,7 +44,7 @@ export function useAuthFlow() {
     setError({ message });
     
     // Log security event for failed authentication
-    logSecurityEvent('auth_failure', 'authentication', { 
+    await logSecurityEvent('auth_failure', context, { 
       error: message,
       timestamp: new Date().toISOString()
     }, false);
@@ -63,16 +63,19 @@ export function useAuthFlow() {
       setIsLoading(true);
       clearError();
       
-      if (!email || !password) {
+      // Input validation and sanitization
+      const sanitizedEmail = sanitizeInput(email).toLowerCase();
+      
+      if (!sanitizedEmail || !password) {
         throw new Error('Please enter both email and password.');
       }
       
-      if (!email.includes('@')) {
+      if (!isValidEmail(sanitizedEmail)) {
         throw new Error('Please enter a valid email address.');
       }
 
-      // Check rate limiting
-      const clientId = `${email}_${Date.now()}`;
+      // Enhanced rate limiting
+      const clientId = `${sanitizedEmail}_${Date.now()}`;
       if (!authRateLimiter.isAllowed(clientId)) {
         const remainingTime = Math.ceil(authRateLimiter.getRemainingTime(clientId) / 1000 / 60);
         throw new Error(`Too many login attempts. Please wait ${remainingTime} minutes before trying again.`);
@@ -81,7 +84,7 @@ export function useAuthFlow() {
       console.log('🔄 Starting sign in process...');
       
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
+        email: sanitizedEmail,
         password,
       });
 
@@ -92,10 +95,10 @@ export function useAuthFlow() {
       }
 
       // Log successful authentication
-      logSecurityEvent('auth_success', 'authentication', { 
+      await logSecurityEvent('auth_success', 'authentication', { 
         user_id: data.user.id,
         email: data.user.email
-      }, true);
+      });
 
       console.log('✅ Sign in successful - auth state change will handle redirect');
       toast({
@@ -106,7 +109,7 @@ export function useAuthFlow() {
       return true;
     } catch (error: any) {
       console.error('🔴 Sign in error:', error);
-      handleAuthError(error);
+      await handleAuthError(error, 'signin');
       return false;
     } finally {
       setIsLoading(false);
@@ -118,8 +121,15 @@ export function useAuthFlow() {
       setIsLoading(true);
       clearError();
       
-      if (!email || !password) {
+      // Input validation and sanitization
+      const sanitizedEmail = sanitizeInput(email).toLowerCase();
+      
+      if (!sanitizedEmail || !password) {
         throw new Error('Please enter both email and password.');
+      }
+      
+      if (!isValidEmail(sanitizedEmail)) {
+        throw new Error('Please enter a valid email address.');
       }
       
       // Enhanced password validation
@@ -128,7 +138,16 @@ export function useAuthFlow() {
         throw new Error(passwordValidation.errors.join('. '));
       }
       
-      const cleanedMetadata = { ...metadata };
+      // Sanitize metadata
+      const cleanedMetadata = metadata ? Object.keys(metadata).reduce((acc, key) => {
+        const value = metadata[key];
+        if (typeof value === 'string') {
+          acc[key] = sanitizeInput(value);
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as any) : {};
       
       if (!cleanedMetadata.role) {
         cleanedMetadata.role = 'patient';
@@ -145,7 +164,7 @@ export function useAuthFlow() {
       console.log('Signing up with metadata:', cleanedMetadata);
       
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
+        email: sanitizedEmail,
         password,
         options: {
           data: cleanedMetadata,
@@ -162,11 +181,11 @@ export function useAuthFlow() {
       }
 
       // Log successful signup
-      logSecurityEvent('signup_success', 'authentication', { 
+      await logSecurityEvent('signup_success', 'authentication', { 
         user_id: data.user.id,
         email: data.user.email,
         role: cleanedMetadata.role
-      }, true);
+      });
 
       toast({
         title: "Success",
@@ -176,7 +195,7 @@ export function useAuthFlow() {
       return true;
     } catch (error: any) {
       console.error('Full signup error:', error);
-      handleAuthError(error);
+      await handleAuthError(error, 'signup');
       return false;
     } finally {
       setIsLoading(false);
