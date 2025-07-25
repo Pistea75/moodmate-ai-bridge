@@ -17,7 +17,7 @@ export const patientNavItems = [
     icon: Home,
   },
   {
-    title: 'aiChat',
+    title: 'AI Chat',
     href: '/patient/chat',
     icon: MessageSquare,
   },

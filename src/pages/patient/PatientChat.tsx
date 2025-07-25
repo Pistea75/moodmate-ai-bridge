@@ -1,10 +1,10 @@
 
 import PatientLayout from '../../layouts/PatientLayout';
 import { AudioChatInterface } from '@/components/AudioChatInterface';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useClinicianDetails } from '@/hooks/useClinicianDetails';
 
 export default function PatientChat() {
-  const { t } = useLanguage();
+  const { clinicianName } = useClinicianDetails();
 
   return (
     <PatientLayout>
@@ -12,10 +12,10 @@ export default function PatientChat() {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-4xl font-bold text-gray-900">
-            {t('aiChat')}
+            Dr. {clinicianName} AI
           </h1>
           <p className="text-xl text-gray-600">
-            {t('aiPersonalizedByClinician')}
+            AI personalized by your clinician
           </p>
         </div>
 

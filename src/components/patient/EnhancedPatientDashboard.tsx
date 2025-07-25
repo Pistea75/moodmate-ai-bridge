@@ -1,5 +1,6 @@
 
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePatientProfile } from "@/layouts/patient/usePatientProfile";
 import { ProgressOverviewCard } from "./ProgressOverviewCard";
 import { WellnessStreakCard } from "./WellnessStreakCard";
 import { MotivationalQuoteCard } from "./MotivationalQuoteCard";
@@ -20,6 +21,7 @@ import { ChatNowCard } from "./ChatNowCard";
 
 export function EnhancedPatientDashboard() {
   const { t } = useLanguage();
+  const { patientName } = usePatientProfile();
   const { callBrodi, brodiComponent } = BrodiEngine({ context: 'dashboard' });
 
   return (
@@ -29,7 +31,7 @@ export function EnhancedPatientDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-gray-900">
-              {t('welcomeBackMessage')}
+              Welcome back, {patientName}!
             </h1>
             <p className="text-xl text-gray-600">
               {t('yourMentalHealthOverview')}
