@@ -143,16 +143,10 @@ export function EnhancedPatientDashboard() {
 
       {/* Dashboard Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <TasksCompletedCard 
-          completedTasks={stats.tasksCompleted}
-          totalTasks={stats.totalTasks}
-        />
-        <UpcomingSessionsCard upcomingSessions={stats.upcomingSessions} />
+        <TasksCompletedCard />
+        <UpcomingSessionsCard />
         <QuickActionsCard />
-        <WellnessStreakCard 
-          currentStreak={stats.currentStreak}
-          longestStreak={stats.longestStreak}
-        />
+        <WellnessStreakCard />
       </div>
 
       {/* Insights Card */}
@@ -200,7 +194,7 @@ export function EnhancedPatientDashboard() {
       
       {/* Brodi Nudge System */}
       <BrodiNudgeSystem 
-        context="dashboard_visit"
+        context="mood_logging"
         trigger={{
           type: 'page_visit',
           data: { 
