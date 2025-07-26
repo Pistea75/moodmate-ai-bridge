@@ -117,9 +117,9 @@ export function useSecureAuth() {
   const secureSignIn = useCallback(async (email: string, password: string) => {
     const clientId = `${email}_${Date.now()}`;
     
-    // Enhanced rate limiting check
-    if (!authRateLimiter.isAllowed(clientId)) {
-      const remainingTime = Math.ceil(authRateLimiter.getRemainingTime(clientId) / 1000 / 60);
+    // Enhanced rate limiting check with correct method signature
+    if (!(await authRateLimiter.isAllowed(clientId, 'signin'))) {
+      const remainingTime = Math.ceil((await authRateLimiter.getRemainingTime(clientId, 'signin')) / 1000 / 60);
       
       await logSecurityEvent('rate_limit_exceeded', 'authentication', { 
         email,
@@ -185,7 +185,7 @@ export function useSecureAuth() {
       }
 
       // Reset rate limiter on successful login
-      authRateLimiter.reset(clientId);
+      await authRateLimiter.reset(clientId, 'signin');
 
       // Log successful authentication
       await logSecurityEvent('signin_success', 'authentication', { 

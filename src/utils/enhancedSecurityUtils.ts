@@ -149,7 +149,7 @@ export class EnhancedRateLimiter {
     private blockMinutes: number = 30
   ) {}
 
-  async isAllowed(identifier: string, actionType: string): Promise<boolean> {
+  async isAllowed(identifier: string, actionType: string = 'default'): Promise<boolean> {
     try {
       const windowStart = new Date();
       windowStart.setMinutes(windowStart.getMinutes() - this.windowMinutes);
@@ -224,6 +224,41 @@ export class EnhancedRateLimiter {
     } catch (error) {
       console.error('Rate limiter error:', error);
       return true; // Fail open
+    }
+  }
+
+  async getRemainingTime(identifier: string, actionType: string = 'default'): Promise<number> {
+    try {
+      const { data: attempts, error } = await supabase
+        .from('rate_limit_attempts')
+        .select('blocked_until')
+        .eq('identifier', identifier)
+        .eq('action_type', actionType)
+        .single();
+
+      if (error || !attempts?.blocked_until) {
+        return 0;
+      }
+
+      const blockedUntil = new Date(attempts.blocked_until);
+      const now = new Date();
+      
+      return Math.max(0, blockedUntil.getTime() - now.getTime());
+    } catch (error) {
+      console.error('Error getting remaining time:', error);
+      return 0;
+    }
+  }
+
+  async reset(identifier: string, actionType: string = 'default'): Promise<void> {
+    try {
+      await supabase
+        .from('rate_limit_attempts')
+        .delete()
+        .eq('identifier', identifier)
+        .eq('action_type', actionType);
+    } catch (error) {
+      console.error('Error resetting rate limiter:', error);
     }
   }
 

@@ -74,10 +74,10 @@ export function useAuthFlow() {
         throw new Error('Please enter a valid email address.');
       }
 
-      // Enhanced rate limiting
+      // Enhanced rate limiting with correct method signature
       const clientId = `${sanitizedEmail}_${Date.now()}`;
-      if (!authRateLimiter.isAllowed(clientId)) {
-        const remainingTime = Math.ceil(authRateLimiter.getRemainingTime(clientId) / 1000 / 60);
+      if (!(await authRateLimiter.isAllowed(clientId, 'signin'))) {
+        const remainingTime = Math.ceil((await authRateLimiter.getRemainingTime(clientId, 'signin')) / 1000 / 60);
         throw new Error(`Too many login attempts. Please wait ${remainingTime} minutes before trying again.`);
       }
       
@@ -93,6 +93,9 @@ export function useAuthFlow() {
       if (!data.user) {
         throw new Error('Login failed. Please try again.');
       }
+
+      // Reset rate limiter on successful login
+      await authRateLimiter.reset(clientId, 'signin');
 
       // Log successful authentication
       await logSecurityEvent('auth_success', 'authentication', { 
