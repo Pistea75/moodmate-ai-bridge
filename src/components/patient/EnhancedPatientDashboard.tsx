@@ -12,7 +12,6 @@ import {
   Activity
 } from 'lucide-react';
 import { MoodChart } from '@/components/mood/MoodChart';
-import { MoodAnalyticsCard } from '@/components/patient/MoodAnalyticsCard';
 import { MoodLogModal } from '@/components/patient/MoodLogModal';
 import { TasksCompletedCard } from './TasksCompletedCard';
 import { UpcomingSessionsCard } from './UpcomingSessionsCard';
@@ -122,22 +121,15 @@ export function EnhancedPatientDashboard() {
         </Card>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Main Content Grid - Single Column for Mood Chart */}
+      <div className="grid grid-cols-1 gap-6">
         {/* Mood Chart */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-sm border p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
-              <h2 className="text-xl font-semibold">Mood Trends</h2>
-            </div>
-            <MoodChart showLogButton={false} />
+        <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <TrendingUp className="h-5 w-5 text-purple-600" />
+            <h2 className="text-xl font-semibold">Mood Trends</h2>
           </div>
-        </div>
-
-        {/* Mood Analytics */}
-        <div className="lg:col-span-1">
-          <MoodAnalyticsCard />
+          <MoodChart showLogButton={false} />
         </div>
       </div>
 
