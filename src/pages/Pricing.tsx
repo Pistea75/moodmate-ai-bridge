@@ -67,7 +67,7 @@ const plans = [
 
 export default function Pricing() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-900">
       <PublicNav />
       
       {/* Hero Section */}
@@ -92,11 +92,11 @@ export default function Pricing() {
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-slate-800">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
-              <Card key={index} className={`relative border-0 shadow-lg hover:shadow-2xl transition-all duration-500 ${
+              <Card key={index} className={`relative border-0 bg-slate-700/50 backdrop-blur-md border border-slate-600/50 shadow-lg hover:shadow-2xl transition-all duration-500 ${
                 plan.popular ? 'ring-2 ring-purple-500 transform scale-105' : ''
               }`}>
                 {plan.popular && (
@@ -112,18 +112,18 @@ export default function Pricing() {
                     <span className="text-2xl font-bold text-white">{plan.name.charAt(0)}</span>
                   </div>
                   
-                  <h3 className="text-2xl font-bold mb-2 text-slate-900">{plan.name}</h3>
+                  <h3 className="text-2xl font-bold mb-2 text-white">{plan.name}</h3>
                   <div className="mb-4">
-                    <span className="text-4xl font-bold text-slate-900">{plan.price}</span>
-                    {plan.period && <span className="text-slate-600">{plan.period}</span>}
+                    <span className="text-4xl font-bold text-white">{plan.price}</span>
+                    {plan.period && <span className="text-slate-300">{plan.period}</span>}
                   </div>
-                  <p className="text-slate-600 mb-6">{plan.description}</p>
+                  <p className="text-slate-300 mb-6">{plan.description}</p>
                   
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                        <span className="text-slate-600">{feature}</span>
+                        <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+                        <span className="text-slate-300">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -132,7 +132,7 @@ export default function Pricing() {
                     <Button className={`w-full py-3 font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 ${
                       plan.popular 
                         ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl'
-                        : 'bg-slate-900 text-white hover:bg-slate-800'
+                        : 'bg-white text-slate-900 hover:bg-slate-100'
                     }`}>
                       {plan.buttonText}
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -146,11 +146,11 @@ export default function Pricing() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 bg-slate-50">
+      <section className="py-24 bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-slate-900">Frequently Asked Questions</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold mb-6 text-white">Frequently Asked Questions</h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
               Got questions about our pricing? We've got answers.
             </p>
           </div>
@@ -158,35 +158,35 @@ export default function Pricing() {
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900">Can I change plans anytime?</h3>
-                <p className="text-slate-600">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+                <h3 className="text-lg font-bold mb-2 text-white">Can I change plans anytime?</h3>
+                <p className="text-slate-300">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
               </div>
               
               <div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900">Is there a free trial?</h3>
-                <p className="text-slate-600">Yes! The Starter plan is completely free forever. Paid plans come with a 14-day free trial.</p>
+                <h3 className="text-lg font-bold mb-2 text-white">Is there a free trial?</h3>
+                <p className="text-slate-300">Yes! The Starter plan is completely free forever. Paid plans come with a 14-day free trial.</p>
               </div>
 
               <div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900">What payment methods do you accept?</h3>
-                <p className="text-slate-600">We accept all major credit cards, PayPal, and bank transfers for annual plans.</p>
+                <h3 className="text-lg font-bold mb-2 text-white">What payment methods do you accept?</h3>
+                <p className="text-slate-300">We accept all major credit cards, PayPal, and bank transfers for annual plans.</p>
               </div>
             </div>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900">Is my data secure?</h3>
-                <p className="text-slate-600">Absolutely. We use bank-level encryption and are fully HIPAA compliant to protect your privacy.</p>
+                <h3 className="text-lg font-bold mb-2 text-white">Is my data secure?</h3>
+                <p className="text-slate-300">Absolutely. We use bank-level encryption and are fully HIPAA compliant to protect your privacy.</p>
               </div>
 
               <div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900">Can I cancel anytime?</h3>
-                <p className="text-slate-600">Yes, you can cancel your subscription at any time with no cancellation fees or penalties.</p>
+                <h3 className="text-lg font-bold mb-2 text-white">Can I cancel anytime?</h3>
+                <p className="text-slate-300">Yes, you can cancel your subscription at any time with no cancellation fees or penalties.</p>
               </div>
 
               <div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900">Do you offer discounts?</h3>
-                <p className="text-slate-600">We offer student discounts, annual plan savings, and special rates for non-profit organizations.</p>
+                <h3 className="text-lg font-bold mb-2 text-white">Do you offer discounts?</h3>
+                <p className="text-slate-300">We offer student discounts, annual plan savings, and special rates for non-profit organizations.</p>
               </div>
             </div>
           </div>

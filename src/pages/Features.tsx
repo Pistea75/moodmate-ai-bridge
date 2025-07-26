@@ -10,12 +10,12 @@ import {
   Users, 
   Shield, 
   MessageCircle, 
-  Clock, 
-  Heart, 
+  Clock,
   Sparkles,
   ArrowRight,
-  CheckCircle,
-  Star
+  Star,
+  Heart,
+  Zap
 } from 'lucide-react';
 
 const features = [
@@ -23,49 +23,79 @@ const features = [
     icon: Brain,
     title: "AI Companion",
     description: "Advanced AI that understands your emotions and provides personalized support 24/7",
-    color: "from-purple-500 to-pink-500",
-    details: ["Natural conversation flow", "Emotional intelligence", "Personalized responses", "Crisis detection"]
+    benefits: [
+      "Natural conversation flow",
+      "Emotional intelligence",
+      "Personalized responses",
+      "Available anytime"
+    ],
+    color: "from-purple-500 to-pink-500"
   },
   {
     icon: TrendingUp,
     title: "Smart Analytics",
     description: "Track patterns, triggers, and progress with intelligent insights and recommendations",
-    color: "from-blue-500 to-cyan-500",
-    details: ["Mood trend analysis", "Trigger identification", "Progress tracking", "Predictive insights"]
+    benefits: [
+      "Mood pattern recognition",
+      "Trigger identification",
+      "Progress tracking",
+      "Predictive insights"
+    ],
+    color: "from-blue-500 to-cyan-500"
   },
   {
     icon: Users,
     title: "Expert Therapists",
     description: "Connect with licensed mental health professionals for personalized care",
-    color: "from-green-500 to-emerald-500",
-    details: ["Licensed professionals", "Video sessions", "Treatment plans", "Progress monitoring"]
+    benefits: [
+      "Licensed professionals",
+      "Video sessions",
+      "Treatment plans",
+      "Secure messaging"
+    ],
+    color: "from-green-500 to-emerald-500"
   },
   {
     icon: Shield,
     title: "Privacy First",
     description: "Bank-level encryption and HIPAA compliance ensure your data stays secure",
-    color: "from-orange-500 to-red-500",
-    details: ["End-to-end encryption", "HIPAA compliance", "Secure data storage", "Privacy controls"]
+    benefits: [
+      "End-to-end encryption",
+      "HIPAA compliant",
+      "Secure servers",
+      "Privacy controls"
+    ],
+    color: "from-orange-500 to-red-500"
   },
   {
     icon: MessageCircle,
     title: "Crisis Support",
     description: "Immediate intervention and emergency resources when you need them most",
-    color: "from-pink-500 to-rose-500",
-    details: ["24/7 crisis hotline", "Emergency protocols", "Immediate intervention", "Safety planning"]
+    benefits: [
+      "24/7 emergency line",
+      "Immediate response",
+      "Professional support",
+      "Safety protocols"
+    ],
+    color: "from-pink-500 to-rose-500"
   },
   {
     icon: Clock,
     title: "Real-time Care",
     description: "Instant mood tracking and immediate feedback to support your wellbeing",
-    color: "from-indigo-500 to-purple-500",
-    details: ["Real-time monitoring", "Instant feedback", "Mood tracking", "Continuous support"]
+    benefits: [
+      "Instant feedback",
+      "Real-time monitoring",
+      "Immediate alerts",
+      "Continuous support"
+    ],
+    color: "from-indigo-500 to-purple-500"
   }
 ];
 
 export default function Features() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-900">
       <PublicNav />
       
       {/* Hero Section */}
@@ -73,7 +103,7 @@ export default function Features() {
         <div className="container mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-2 text-white font-semibold mb-8">
             <Sparkles className="h-4 w-4" />
-            Complete Feature Overview
+            Platform Features
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
             Everything you need for
@@ -83,12 +113,13 @@ export default function Features() {
             </span>
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-8">
-            Discover how MoodMate's comprehensive platform combines cutting-edge AI technology 
-            with human expertise to provide unparalleled mental health support.
+            Discover all the powerful features that make MoodMate the most comprehensive 
+            mental health platform available.
           </p>
+          
           <Link to="/signup/patient">
-            <Button size="lg" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 font-bold px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
-              Start Free Trial
+            <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-100 font-bold px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+              Try Features Free
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -96,29 +127,22 @@ export default function Features() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-slate-800">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-slate-900">Powerful Features</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Every feature is designed to support your mental health journey with precision and care.
-            </p>
-          </div>
-
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {features.map((feature, index) => (
-              <Card key={index} className="group bg-white border-0 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+              <Card key={index} className="group bg-slate-700/50 backdrop-blur-md border border-slate-600/50 hover:bg-slate-700 transition-all duration-500 hover:-translate-y-2">
                 <CardContent className="p-8">
-                  <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                     <feature.icon className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-4 text-slate-900">{feature.title}</h3>
-                  <p className="text-slate-600 leading-relaxed mb-6">{feature.description}</p>
+                  <h3 className="text-xl font-bold mb-4 text-white">{feature.title}</h3>
+                  <p className="text-slate-300 leading-relaxed mb-6">{feature.description}</p>
                   <ul className="space-y-2">
-                    {feature.details.map((detail, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-sm text-slate-600">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span>{detail}</span>
+                    {feature.benefits.map((benefit, idx) => (
+                      <li key={idx} className="flex items-center gap-3 text-slate-300">
+                        <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                        <span className="text-sm">{benefit}</span>
                       </li>
                     ))}
                   </ul>
@@ -129,80 +153,49 @@ export default function Features() {
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-24 bg-slate-50">
+      {/* Why Choose Section */}
+      <section className="py-24 bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-slate-900">Why Choose MoodMate?</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              See how our features translate into real benefits for your mental health journey.
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              Why Choose MoodMate?
+            </h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+              We've built the most comprehensive mental health platform with features 
+              that actually make a difference in your daily life.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Star className="h-6 w-6 text-white" />
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <Card className="text-center border-0 bg-slate-800/50 backdrop-blur-md border border-slate-600/50">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Heart className="h-8 w-8 text-white" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-slate-900">Personalized Experience</h3>
-                  <p className="text-slate-600">Every interaction is tailored to your unique mental health needs and preferences.</p>
+                <h3 className="text-xl font-bold mb-4 text-white">Evidence-Based</h3>
+                <p className="text-slate-300">All our features are grounded in clinical research and proven therapeutic methods.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center border-0 bg-slate-800/50 backdrop-blur-md border border-slate-600/50">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Zap className="h-8 w-8 text-white" />
                 </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Clock className="h-6 w-6 text-white" />
+                <h3 className="text-xl font-bold mb-4 text-white">Instant Impact</h3>
+                <p className="text-slate-300">Start feeling the benefits immediately with our intuitive interface and smart features.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center border-0 bg-slate-800/50 backdrop-blur-md border border-slate-600/50">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Star className="h-8 w-8 text-white" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-slate-900">Always Available</h3>
-                  <p className="text-slate-600">24/7 support means help is always there when you need it most.</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Heart className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-slate-900">Clinically Proven</h3>
-                  <p className="text-slate-600">All our methods are based on evidence-based therapeutic practices.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Shield className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-slate-900">Privacy Protected</h3>
-                  <p className="text-slate-600">Your mental health data is secured with the highest standards of privacy and encryption.</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-slate-900">Expert Support</h3>
-                  <p className="text-slate-600">Access to licensed therapists when you need professional human guidance.</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <TrendingUp className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 text-slate-900">Track Progress</h3>
-                  <p className="text-slate-600">Visualize your mental health journey with detailed analytics and insights.</p>
-                </div>
-              </div>
-            </div>
+                <h3 className="text-xl font-bold mb-4 text-white">Trusted Quality</h3>
+                <p className="text-slate-300">Rated 5 stars by thousands of users and trusted by healthcare professionals worldwide.</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -211,24 +204,17 @@ export default function Features() {
       <section className="py-24 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-            Ready to experience the future of mental healthcare?
+            Ready to experience these features?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of users who have transformed their mental health journey with MoodMate.
+            Join thousands who have transformed their mental health with MoodMate's powerful features.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/signup/patient">
-              <Button size="lg" className="bg-white text-purple-600 hover:bg-slate-100 font-bold px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
-                Start Free Trial
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/contact">
-              <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-bold px-8 py-4 rounded-full text-lg transition-all duration-300 transform hover:scale-105">
-                Contact Sales
-              </Button>
-            </Link>
-          </div>
+          <Link to="/signup/patient">
+            <Button size="lg" className="bg-white text-purple-600 hover:bg-slate-100 font-bold px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+              Start Free Trial
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 

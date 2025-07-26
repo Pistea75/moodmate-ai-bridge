@@ -109,7 +109,7 @@ const popularArticles = [
 
 export default function HelpCenter() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-900">
       <PublicNav />
       
       {/* Hero Section */}
@@ -148,20 +148,20 @@ export default function HelpCenter() {
       </section>
 
       {/* Popular Articles */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-slate-800">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-slate-900">Popular Articles</h2>
-            <p className="text-slate-600">Quick answers to the most common questions</p>
+            <h2 className="text-3xl font-bold mb-4 text-white">Popular Articles</h2>
+            <p className="text-slate-300">Quick answers to the most common questions</p>
           </div>
           
           <div className="max-w-4xl mx-auto">
             <div className="space-y-3">
               {popularArticles.map((article, index) => (
-                <Card key={index} className="border-0 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer">
+                <Card key={index} className="border-0 bg-slate-700/50 backdrop-blur-md border border-slate-600/50 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-700 font-medium">{article}</span>
+                      <span className="text-slate-200 font-medium">{article}</span>
                       <ArrowRight className="h-5 w-5 text-slate-400" />
                     </div>
                   </CardContent>
@@ -173,33 +173,33 @@ export default function HelpCenter() {
       </section>
 
       {/* Help Categories */}
-      <section className="py-24 bg-slate-50">
+      <section className="py-24 bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-slate-900">Browse Help Topics</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold mb-6 text-white">Browse Help Topics</h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
               Find detailed guides and tutorials organized by topic to help you make the most of MoodMate.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {categories.map((category, index) => (
-              <Card key={index} className="group border-0 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-2 cursor-pointer">
+              <Card key={index} className="group border-0 bg-slate-800/50 backdrop-blur-md border border-slate-600/50 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-2 cursor-pointer">
                 <CardContent className="p-8">
                   <div className={`w-16 h-16 bg-gradient-to-r ${category.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                     <category.icon className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-slate-900">{category.title}</h3>
-                  <p className="text-slate-600 mb-6 leading-relaxed">{category.description}</p>
+                  <h3 className="text-xl font-bold mb-3 text-white">{category.title}</h3>
+                  <p className="text-slate-300 mb-6 leading-relaxed">{category.description}</p>
                   <ul className="space-y-3">
                     {category.articles.map((article, idx) => (
-                      <li key={idx} className="flex items-center gap-3 text-sm text-slate-600 hover:text-purple-600 transition-colors cursor-pointer">
-                        <div className="w-1.5 h-1.5 bg-slate-300 rounded-full"></div>
+                      <li key={idx} className="flex items-center gap-3 text-sm text-slate-300 hover:text-purple-400 transition-colors cursor-pointer">
+                        <div className="w-1.5 h-1.5 bg-slate-400 rounded-full"></div>
                         <span>{article}</span>
                       </li>
                     ))}
                   </ul>
-                  <Button variant="ghost" className="w-full mt-6 text-purple-600 hover:bg-purple-50">
+                  <Button variant="ghost" className="w-full mt-6 text-purple-400 hover:bg-purple-500/10">
                     View All Articles
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -211,23 +211,23 @@ export default function HelpCenter() {
       </section>
 
       {/* Contact Support */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-slate-800">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-slate-900">Still Need Help?</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold mb-6 text-white">Still Need Help?</h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
               Can't find what you're looking for? Our support team is here to help you every step of the way.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-0 bg-slate-700/50 backdrop-blur-md border border-slate-600/50 shadow-lg">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Mail className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-4 text-slate-900">Email Support</h3>
-                <p className="text-slate-600 mb-6">
+                <h3 className="text-xl font-bold mb-4 text-white">Email Support</h3>
+                <p className="text-slate-300 mb-6">
                   Send us a detailed message and we'll get back to you within 24 hours with a comprehensive answer.
                 </p>
                 <Button className="bg-blue-600 text-white hover:bg-blue-700 w-full">
@@ -236,13 +236,13 @@ export default function HelpCenter() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg">
+            <Card className="border-0 bg-slate-700/50 backdrop-blur-md border border-slate-600/50 shadow-lg">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Phone className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-4 text-slate-900">Live Support</h3>
-                <p className="text-slate-600 mb-6">
+                <h3 className="text-xl font-bold mb-4 text-white">Live Support</h3>
+                <p className="text-slate-300 mb-6">
                   Talk directly to our support team for immediate assistance with urgent questions or issues.
                 </p>
                 <Button className="bg-green-600 text-white hover:bg-green-700 w-full">
