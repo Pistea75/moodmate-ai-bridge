@@ -6,7 +6,7 @@ import { ModernTestimonials } from '@/components/landing/ModernTestimonials';
 import { ModernCTA } from '@/components/landing/ModernCTA';
 import { ModernFooter } from '@/components/landing/ModernFooter';
 
-export default function Landing() {
+export default function NewLanding() {
   return (
     <div className="min-h-screen bg-background">
       <PublicNav />

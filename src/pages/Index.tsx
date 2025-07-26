@@ -1,7 +1,6 @@
+
 import Landing from './Landing';
 
-const Index = () => {
+export default function Index() {
   return <Landing />;
-};
-
-export default Index;
+}
