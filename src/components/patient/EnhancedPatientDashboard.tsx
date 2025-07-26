@@ -79,7 +79,7 @@ export function EnhancedPatientDashboard() {
         />
       </div>
 
-      {/* Quick Stats */}
+      {/* Top Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -94,34 +94,23 @@ export function EnhancedPatientDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Entries</CardTitle>
-            <Brain className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{moods.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Total logged
-            </p>
-          </CardContent>
-        </Card>
+        <TasksCompletedCard />
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Streak</CardTitle>
-            <Heart className="h-4 w-4 text-pink-600" />
+            <CardTitle className="text-sm font-medium">Sessions Today</CardTitle>
+            <Calendar className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-pink-600">{currentStreak}</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.upcomingSessions}</div>
             <p className="text-xs text-muted-foreground">
-              Recent entries
+              Scheduled sessions
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Content Grid */}
+      {/* Mood Trends Chart and Wellness Streak */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Mood Chart */}
         <div className="lg:col-span-1">
@@ -140,11 +129,14 @@ export function EnhancedPatientDashboard() {
         </div>
       </div>
 
-      {/* Dashboard Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <TasksCompletedCard />
-        <UpcomingSessionsCard />
+      {/* Quick Actions Card */}
+      <div className="grid grid-cols-1 gap-6">
         <QuickActionsCard />
+      </div>
+
+      {/* Upcoming Sessions Card */}
+      <div className="grid grid-cols-1 gap-6">
+        <UpcomingSessionsCard />
       </div>
 
       {/* Insights Card */}
