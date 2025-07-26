@@ -134,48 +134,22 @@ export default function About() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-slate-900">Our Team</h2>
+            <h2 className="text-4xl font-bold mb-6 text-slate-900">Our Leadership</h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              We're a diverse team of mental health professionals, AI researchers, and engineers 
-              united by our passion for improving mental healthcare.
+              Meet the visionary leading MoodMate's mission to revolutionize mental healthcare.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            <div className="text-center">
-              <div className="w-32 h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl font-bold text-white">DR</span>
+          <div className="flex justify-center">
+            <div className="text-center max-w-sm">
+              <div className="w-40 h-40 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl">
+                <span className="text-4xl font-bold text-white">MB</span>
               </div>
-              <h3 className="font-bold text-lg mb-2">Dr. Rachel Martinez</h3>
-              <p className="text-purple-600 font-medium mb-2">Chief Medical Officer</p>
-              <p className="text-slate-600 text-sm">Licensed Clinical Psychologist with 15+ years of experience</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-32 h-32 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl font-bold text-white">AK</span>
-              </div>
-              <h3 className="font-bold text-lg mb-2">Alex Kim</h3>
-              <p className="text-blue-600 font-medium mb-2">AI Research Lead</p>
-              <p className="text-slate-600 text-sm">Former Google AI researcher specializing in emotional intelligence</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-32 h-32 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl font-bold text-white">SP</span>
-              </div>
-              <h3 className="font-bold text-lg mb-2">Sarah Patel</h3>
-              <p className="text-green-600 font-medium mb-2">Head of Product</p>
-              <p className="text-slate-600 text-sm">Product leader focused on user-centered healthcare design</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-32 h-32 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl font-bold text-white">MJ</span>
-              </div>
-              <h3 className="font-bold text-lg mb-2">Dr. Michael Johnson</h3>
-              <p className="text-orange-600 font-medium mb-2">Clinical Director</p>
-              <p className="text-slate-600 text-sm">Board-certified psychiatrist and digital health pioneer</p>
+              <h3 className="font-bold text-2xl mb-2 text-slate-900">Matías Beathyate</h3>
+              <p className="text-purple-600 font-semibold text-lg mb-4">Chief Executive Officer</p>
+              <p className="text-slate-600 leading-relaxed">
+                Visionary leader passionate about democratizing mental healthcare through innovative technology and compassionate design.
+              </p>
             </div>
           </div>
         </div>

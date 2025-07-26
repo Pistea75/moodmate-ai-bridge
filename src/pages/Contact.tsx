@@ -1,186 +1,196 @@
-import { PublicNav } from '../components/PublicNav';
+
+import { PublicNav } from '@/components/PublicNav';
+import { ModernFooter } from '@/components/landing/ModernFooter';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Mail, Phone, MapPin, Clock, MessageCircle, Heart, Users, Award, Send, Building } from 'lucide-react';
+import { 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Clock, 
+  MessageCircle, 
+  Headphones,
+  Send,
+  Sparkles
+} from 'lucide-react';
 
 export default function Contact() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-primary/5">
+    <div className="min-h-screen bg-background">
       <PublicNav />
       
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-16 md:py-24">
+      {/* Hero Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <div className="container mx-auto px-4 text-center">
-          <Badge variant="outline" className="mb-4 px-4 py-2">
-            <MessageCircle className="w-4 h-4 mr-2" />
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-2 text-white font-semibold mb-8">
+            <MessageCircle className="h-4 w-4" />
             Get in Touch
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            We're Here to Help
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            We're here to
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              support you
+            </span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Have questions about MoodMate? Want to learn more about our platform? 
-            We'd love to hear from you and help you get started.
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            Have questions about MoodMate? Need help getting started? Our team is ready to assist you 
+            on your mental health journey.
           </p>
         </div>
-      </div>
+      </section>
 
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid lg:grid-cols-2 gap-16">
-          <div>
-            <h2 className="text-3xl font-bold mb-6">Send us a Message</h2>
-            <form className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="John" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Doe" />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="john@example.com" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="role">I am a...</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="patient">Patient</SelectItem>
-                    <SelectItem value="clinician">Mental Health Clinician</SelectItem>
-                    <SelectItem value="organization">Healthcare Organization</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="What can we help you with?" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="demo">Schedule a Demo</SelectItem>
-                    <SelectItem value="pricing">Pricing Information</SelectItem>
-                    <SelectItem value="support">Technical Support</SelectItem>
-                    <SelectItem value="partnership">Partnership Opportunities</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea 
-                  id="message" 
-                  placeholder="Tell us more about your inquiry..."
-                  className="min-h-[120px]"
-                />
-              </div>
-              
-              <Button type="submit" className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90">
-                <Send className="w-4 h-4 mr-2" />
-                Send Message
-              </Button>
-            </form>
+      {/* Contact Methods */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-6 text-slate-900">Get In Touch</h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              Choose the best way to reach us. We're committed to responding quickly and thoroughly.
+            </p>
           </div>
-          
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <Mail className="w-6 h-6 text-primary mt-1" />
-                  <div>
-                    <p className="font-semibold">Email</p>
-                    <p className="text-muted-foreground">support@moodmate.com</p>
-                    <p className="text-sm text-muted-foreground">We typically respond within 24 hours</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <Phone className="w-6 h-6 text-primary mt-1" />
-                  <div>
-                    <p className="font-semibold">Phone</p>
-                    <p className="text-muted-foreground">+1 (555) 123-4567</p>
-                    <p className="text-sm text-muted-foreground">Mon-Fri, 9AM-6PM EST</p>
-                  </div>
-                </div>
 
-                <div className="flex items-start space-x-4">
-                  <Building className="w-6 h-6 text-primary mt-1" />
-                  <div>
-                    <p className="font-semibold">Office</p>
-                    <p className="text-muted-foreground">123 Innovation Drive<br />Suite 100<br />San Francisco, CA 94105</p>
-                  </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+            <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Mail className="h-8 w-8 text-white" />
                 </div>
-
-                <div className="flex items-start space-x-4">
-                  <Clock className="w-6 h-6 text-primary mt-1" />
-                  <div>
-                    <p className="font-semibold">Business Hours</p>
-                    <p className="text-muted-foreground">Monday - Friday: 9:00 AM - 6:00 PM EST</p>
-                    <p className="text-muted-foreground">Emergency Support: 24/7</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-primary" />
-                  Need Immediate Support?
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  If you're experiencing a mental health emergency, please contact:
-                </p>
-                <div className="space-y-2 text-sm">
-                  <p><strong>National Suicide Prevention Lifeline:</strong> 988</p>
-                  <p><strong>Crisis Text Line:</strong> Text HOME to 741741</p>
-                  <p><strong>Emergency Services:</strong> 911</p>
-                </div>
+                <h3 className="text-xl font-bold mb-4 text-slate-900">Email Support</h3>
+                <p className="text-slate-600 mb-4">Send us a detailed message and we'll get back to you within 24 hours.</p>
+                <a href="mailto:support@moodmate.com" className="text-purple-600 font-semibold hover:underline">
+                  support@moodmate.com
+                </a>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>For Healthcare Organizations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Interested in implementing MoodMate at your organization? 
-                  Our team can provide customized demos and integration support.
-                </p>
-                <Button variant="outline" className="w-full">
-                  <Users className="w-4 h-4 mr-2" />
-                  Request Enterprise Demo
+            <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Phone className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-slate-900">Phone Support</h3>
+                <p className="text-slate-600 mb-4">Call us for immediate assistance with urgent questions or technical issues.</p>
+                <a href="tel:+1-800-MOODMATE" className="text-purple-600 font-semibold hover:underline">
+                  1-800-MOODMATE
+                </a>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Headphones className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-slate-900">Live Chat</h3>
+                <p className="text-slate-600 mb-4">Start a real-time conversation with our support team during business hours.</p>
+                <Button className="bg-purple-600 text-white hover:bg-purple-700">
+                  Start Chat
                 </Button>
               </CardContent>
             </Card>
           </div>
-        </div>
-      </div>
 
-      <footer className="border-t py-8 bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 text-sm text-center text-muted-foreground">
-          &copy; {new Date().getFullYear()} MoodMate. All rights reserved.
+          {/* Contact Form */}
+          <div className="max-w-2xl mx-auto">
+            <Card className="border-0 shadow-xl">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold mb-6 text-slate-900 text-center">Send Us a Message</h3>
+                <form className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">First Name</label>
+                      <Input placeholder="Enter your first name" className="w-full" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
+                      <Input placeholder="Enter your last name" className="w-full" />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                    <Input type="email" placeholder="Enter your email address" className="w-full" />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Subject</label>
+                    <Input placeholder="What can we help you with?" className="w-full" />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Message</label>
+                    <Textarea 
+                      placeholder="Tell us more about your question or how we can help..."
+                      className="w-full h-32"
+                    />
+                  </div>
+                  
+                  <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 py-3 font-semibold rounded-lg">
+                    Send Message
+                    <Send className="ml-2 h-5 w-5" />
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Info Section */}
+      <section className="py-24 bg-slate-50">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            <Card className="text-center border-0 shadow-lg">
+              <CardContent className="p-6">
+                <MapPin className="h-8 w-8 text-purple-600 mx-auto mb-4" />
+                <h4 className="font-bold text-slate-900 mb-2">Address</h4>
+                <p className="text-slate-600 text-sm">
+                  123 Mental Health Blvd<br />
+                  San Francisco, CA 94102
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-0 shadow-lg">
+              <CardContent className="p-6">
+                <Clock className="h-8 w-8 text-purple-600 mx-auto mb-4" />
+                <h4 className="font-bold text-slate-900 mb-2">Business Hours</h4>
+                <p className="text-slate-600 text-sm">
+                  Monday - Friday<br />
+                  9:00 AM - 6:00 PM PST
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-0 shadow-lg">
+              <CardContent className="p-6">
+                <Phone className="h-8 w-8 text-purple-600 mx-auto mb-4" />
+                <h4 className="font-bold text-slate-900 mb-2">Crisis Support</h4>
+                <p className="text-slate-600 text-sm">
+                  24/7 Emergency Line<br />
+                  1-800-CRISIS-1
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-0 shadow-lg">
+              <CardContent className="p-6">
+                <Mail className="h-8 w-8 text-purple-600 mx-auto mb-4" />
+                <h4 className="font-bold text-slate-900 mb-2">General Info</h4>
+                <p className="text-slate-600 text-sm">
+                  info@moodmate.com<br />
+                  Response within 24hrs
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <ModernFooter />
     </div>
   );
 }
