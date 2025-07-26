@@ -1,187 +1,142 @@
 
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-} from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { LanguageProvider } from "./contexts/LanguageContext";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { CSRFProvider } from "@/components/security/CSRFProtection";
+import { SecurityHeaders } from "@/components/security/SecurityHeaders";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+
+// Import pages
+import Index from "./pages/Index";
 import Login from "./pages/Login";
+import SignupPatient from "./pages/SignupPatient";
+import SignupClinician from "./pages/SignupClinician";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import PatientDashboard from "./pages/patient/PatientDashboard";
+import PatientProfile from "./pages/patient/PatientProfile";
+import PatientSessions from "./pages/patient/PatientSessions";
+import PatientTasks from "./pages/patient/PatientTasks";
+import PatientMood from "./pages/patient/PatientMood";
+import PatientMoodInsights from "./pages/patient/PatientMoodInsights";
+import PatientInsights from "./pages/patient/PatientInsights";
+import PatientChat from "./pages/patient/PatientChat";
+import PatientSettings from "./pages/patient/PatientSettings";
+import Goals from "./pages/patient/Goals";
 import ClinicianDashboard from "./pages/clinician/ClinicianDashboard";
-import Patients from "./pages/clinician/Patients";
-import TrainAI from "./pages/clinician/TrainAI";
-import Tasks from "./pages/clinician/Tasks";
-import Sessions from "./pages/clinician/Sessions";
-import Reports from "./pages/clinician/Reports";
-import Analytics from "./pages/clinician/Analytics";
-import RiskManagement from "./pages/clinician/RiskManagement";
-import PatientDetail from "./pages/clinician/PatientDetail";
 import ClinicianProfile from "./pages/clinician/ClinicianProfile";
 import ClinicianSettings from "./pages/clinician/ClinicianSettings";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { Toaster } from "@/components/ui/toaster"
-import PatientDashboard from "./pages/patient/PatientDashboard";
-import PatientChat from "./pages/patient/PatientChat";
-import PatientTasks from "./pages/patient/PatientTasks";
-import PatientSessions from "./pages/patient/PatientSessions";
-import PatientProfile from "./pages/patient/PatientProfile";
-import PatientSettings from "./pages/patient/PatientSettings";
-import PatientGoals from './pages/patient/Goals';
-import PatientMoodInsights from './pages/patient/PatientMoodInsights';
-import SignupClinician from './pages/SignupClinician';
-import SignupPatient from './pages/SignupPatient';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Index from './pages/Index';
-import Privacy from './pages/Privacy';
-import Terms from './pages/Terms';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import FAQ from './pages/FAQ';
-import HelpCenter from './pages/HelpCenter';
-import Features from './pages/Features';
-import Pricing from './pages/Pricing';
-import Security from './pages/Security';
-import SuperAdminDashboard from './pages/admin/SuperAdminDashboard';
+import Patients from "./pages/clinician/Patients";
+import PatientDetail from "./pages/clinician/PatientDetail";
+import Sessions from "./pages/clinician/Sessions";
+import Tasks from "./pages/clinician/Tasks";
+import Reports from "./pages/clinician/Reports";
+import Analytics from "./pages/clinician/Analytics";
+import Communications from "./pages/clinician/Communications";
+import Reminders from "./pages/clinician/Reminders";
+import TreatmentPlans from "./pages/clinician/TreatmentPlans";
+import ResourceLibrary from "./pages/clinician/ResourceLibrary";
+import TrainAI from "./pages/clinician/TrainAI";
+import RiskManagement from "./pages/clinician/RiskManagement";
+import SuperAdminDashboard from "./pages/admin/SuperAdminDashboard";
+import About from "./pages/About";
+import Features from "./pages/Features";
+import Pricing from "./pages/Pricing";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import HelpCenter from "./pages/HelpCenter";
+import FAQ from "./pages/FAQ";
+import Security from "./pages/Security";
+import NotFound from "./pages/NotFound";
+import TestPage from "./pages/TestPage";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <LanguageProvider>
-          <ErrorBoundary>
-          <div className="min-h-screen bg-background">
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <TooltipProvider>
+            <LanguageProvider>
+              <BrowserRouter>
+                <CSRFProvider>
+                  <SecurityHeaders />
+                  <AuthProvider>
+                    <Routes>
+                      {/* Public routes */}
+                      <Route path="/" element={<Index />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/features" element={<Features />} />
+                      <Route path="/pricing" element={<Pricing />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/privacy" element={<Privacy />} />
+                      <Route path="/terms" element={<Terms />} />
+                      <Route path="/help" element={<HelpCenter />} />
+                      <Route path="/faq" element={<FAQ />} />
+                      <Route path="/security" element={<Security />} />
+                      
+                      {/* Auth routes */}
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup/patient" element={<SignupPatient />} />
+                      <Route path="/signup/clinician" element={<SignupClinician />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      
+                      {/* Patient routes */}
+                      <Route path="/patient/dashboard" element={<PatientDashboard />} />
+                      <Route path="/patient/profile" element={<PatientProfile />} />
+                      <Route path="/patient/sessions" element={<PatientSessions />} />
+                      <Route path="/patient/tasks" element={<PatientTasks />} />
+                      <Route path="/patient/mood" element={<PatientMood />} />
+                      <Route path="/patient/mood-insights" element={<PatientMoodInsights />} />
+                      <Route path="/patient/insights" element={<PatientInsights />} />
+                      <Route path="/patient/chat" element={<PatientChat />} />
+                      <Route path="/patient/settings" element={<PatientSettings />} />
+                      <Route path="/patient/goals" element={<Goals />} />
+                      
+                      {/* Clinician routes */}
+                      <Route path="/clinician/dashboard" element={<ClinicianDashboard />} />
+                      <Route path="/clinician/profile" element={<ClinicianProfile />} />
+                      <Route path="/clinician/settings" element={<ClinicianSettings />} />
+                      <Route path="/clinician/patients" element={<Patients />} />
+                      <Route path="/clinician/patients/:patientId" element={<PatientDetail />} />
+                      <Route path="/clinician/sessions" element={<Sessions />} />
+                      <Route path="/clinician/tasks" element={<Tasks />} />
+                      <Route path="/clinician/reports" element={<Reports />} />
+                      <Route path="/clinician/analytics" element={<Analytics />} />
+                      <Route path="/clinician/communications" element={<Communications />} />
+                      <Route path="/clinician/reminders" element={<Reminders />} />
+                      <Route path="/clinician/treatment-plans" element={<TreatmentPlans />} />
+                      <Route path="/clinician/resources" element={<ResourceLibrary />} />
+                      <Route path="/clinician/train-ai" element={<TrainAI />} />
+                      <Route path="/clinician/risk-management" element={<RiskManagement />} />
+                      
+                      {/* Admin routes */}
+                      <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
+                      
+                      {/* Test route */}
+                      <Route path="/test" element={<TestPage />} />
+                      
+                      {/* Catch all */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </AuthProvider>
+                </CSRFProvider>
+              </BrowserRouter>
+            </LanguageProvider>
             <Toaster />
-            <Routes>
-              {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup/clinician" element={<SignupClinician />} />
-              <Route path="/signup/patient" element={<SignupPatient />} />
-              <Route path="/signup" element={<SignupPatient />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-
-              {/* Clinician Routes */}
-              <Route path="/clinician/dashboard" element={
-                <ProtectedRoute>
-                  <ClinicianDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/patients" element={
-                <ProtectedRoute>
-                  <Patients />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/patients/:patientId" element={
-                <ProtectedRoute>
-                  <PatientDetail />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/analytics" element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/risk-management" element={
-                <ProtectedRoute>
-                  <RiskManagement />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/train-ai" element={
-                <ProtectedRoute>
-                  <TrainAI />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/tasks" element={
-                <ProtectedRoute>
-                  <Tasks />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/sessions" element={
-                <ProtectedRoute>
-                  <Sessions />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/reports" element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/profile" element={
-                <ProtectedRoute>
-                  <ClinicianProfile />
-                </ProtectedRoute>
-              } />
-              <Route path="/clinician/settings" element={
-                <ProtectedRoute>
-                  <ClinicianSettings />
-                </ProtectedRoute>
-              } />
-              
-              {/* Patient Routes */}
-              <Route path="/patient/dashboard" element={
-                <ProtectedRoute>
-                  <PatientDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/chat" element={
-                <ProtectedRoute>
-                  <PatientChat />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/tasks" element={
-                <ProtectedRoute>
-                  <PatientTasks />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/goals" element={
-                <ProtectedRoute>
-                  <PatientGoals />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/sessions" element={
-                <ProtectedRoute>
-                  <PatientSessions />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/profile" element={
-                <ProtectedRoute>
-                  <PatientProfile />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/settings" element={
-                <ProtectedRoute>
-                  <PatientSettings />
-                </ProtectedRoute>
-              } />
-              <Route path="/patient/mood-insights" element={
-                <ProtectedRoute>
-                  <PatientMoodInsights />
-                </ProtectedRoute>
-              } />
-
-              {/* Public Routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/help" element={<HelpCenter />} />
-              <Route path="/features" element={<Features />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/security" element={<Security />} />
-              
-              {/* Super Admin Routes */}
-              <Route path="/admin" element={<SuperAdminDashboard />} />
-            </Routes>
-          </div>
-          </ErrorBoundary>
-        </LanguageProvider>
-      </AuthProvider>
-    </Router>
+            <Sonner />
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

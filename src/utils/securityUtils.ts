@@ -1,4 +1,13 @@
 
+import { supabase } from '@/integrations/supabase/client';
+import { 
+  logEnhancedSecurityEvent, 
+  authRateLimiter, 
+  apiRateLimiter,
+  sanitizeForContext,
+  validateSecureForm
+} from './enhancedSecurityUtils';
+
 /**
  * Enhanced security utilities for the application
  */
@@ -8,16 +17,7 @@
  */
 export const sanitizeInput = (input: string): string => {
   if (!input || typeof input !== 'string') return '';
-  
-  return input
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;')
-    .replace(/`/g, '&#x60;')
-    .replace(/=/g, '&#x3D;')
-    .trim();
+  return sanitizeForContext.html(input).trim();
 };
 
 /**
@@ -72,73 +72,6 @@ export const validatePassword = (password: string): { isValid: boolean; errors: 
 };
 
 /**
- * Enhanced rate limiting utility for API calls
- */
-class RateLimiter {
-  private attempts: Map<string, { count: number; lastAttempt: number; blocked: boolean }> = new Map();
-  private maxAttempts: number;
-  private windowMs: number;
-  private blockDurationMs: number;
-
-  constructor(maxAttempts: number = 5, windowMs: number = 15 * 60 * 1000, blockDurationMs: number = 30 * 60 * 1000) {
-    this.maxAttempts = maxAttempts;
-    this.windowMs = windowMs;
-    this.blockDurationMs = blockDurationMs;
-  }
-
-  isAllowed(identifier: string): boolean {
-    const now = Date.now();
-    const userAttempts = this.attempts.get(identifier);
-
-    if (!userAttempts) {
-      this.attempts.set(identifier, { count: 1, lastAttempt: now, blocked: false });
-      return true;
-    }
-
-    // Check if user is blocked
-    if (userAttempts.blocked && now - userAttempts.lastAttempt < this.blockDurationMs) {
-      return false;
-    }
-
-    // Reset if window has passed
-    if (now - userAttempts.lastAttempt > this.windowMs) {
-      this.attempts.set(identifier, { count: 1, lastAttempt: now, blocked: false });
-      return true;
-    }
-
-    // Check if under limit
-    if (userAttempts.count < this.maxAttempts) {
-      userAttempts.count++;
-      userAttempts.lastAttempt = now;
-      return true;
-    }
-
-    // Block user after exceeding limit
-    userAttempts.blocked = true;
-    userAttempts.lastAttempt = now;
-    return false;
-  }
-
-  getRemainingTime(identifier: string): number {
-    const userAttempts = this.attempts.get(identifier);
-    if (!userAttempts) return 0;
-    
-    const elapsed = Date.now() - userAttempts.lastAttempt;
-    if (userAttempts.blocked) {
-      return Math.max(0, this.blockDurationMs - elapsed);
-    }
-    return Math.max(0, this.windowMs - elapsed);
-  }
-
-  reset(identifier: string): void {
-    this.attempts.delete(identifier);
-  }
-}
-
-export const authRateLimiter = new RateLimiter(5, 15 * 60 * 1000, 30 * 60 * 1000);
-export const apiRateLimiter = new RateLimiter(100, 60 * 1000, 5 * 60 * 1000);
-
-/**
  * Enhanced session validation with additional security checks
  */
 export const validateSession = (session: any): boolean => {
@@ -188,45 +121,12 @@ export const hasValidRole = (userRole: string, allowedRoles: string[]): boolean 
 /**
  * Enhanced form data validation with security checks
  */
-export const validateFormData = (data: Record<string, any>, rules: Record<string, any>): { isValid: boolean; errors: Record<string, string> } => {
-  const errors: Record<string, string> = {};
-  
-  for (const [field, rule] of Object.entries(rules)) {
-    const value = data[field];
-    
-    if (rule.required && (!value || (typeof value === 'string' && !value.trim()))) {
-      errors[field] = `${field} is required`;
-      continue;
-    }
-    
-    if (value && rule.maxLength && value.length > rule.maxLength) {
-      errors[field] = `${field} must be less than ${rule.maxLength} characters`;
-    }
-    
-    if (value && rule.minLength && value.length < rule.minLength) {
-      errors[field] = `${field} must be at least ${rule.minLength} characters`;
-    }
-    
-    if (value && rule.pattern && !rule.pattern.test(value)) {
-      errors[field] = rule.message || `${field} format is invalid`;
-    }
-    
-    // XSS protection
-    if (typeof value === 'string' && /<script|javascript:|data:/i.test(value)) {
-      errors[field] = `${field} contains invalid content`;
-    }
-    
-    // SQL injection protection
-    if (typeof value === 'string' && /(union|select|insert|update|delete|drop|exec|script)/i.test(value)) {
-      errors[field] = `${field} contains invalid characters`;
-    }
-  }
-  
-  return { isValid: Object.keys(errors).length === 0, errors };
+export const validateFormData = (data: Record<string, any>, rules: Record<string, any>) => {
+  return validateSecureForm(data, rules);
 };
 
 /**
- * Enhanced security audit logging with additional metadata
+ * Enhanced security audit logging with database integration
  */
 export const logSecurityEvent = async (
   action: string,
@@ -234,31 +134,14 @@ export const logSecurityEvent = async (
   details: Record<string, any> = {},
   success: boolean = true
 ) => {
-  try {
-    const auditData = {
-      action,
-      resource,
-      details: {
-        ...details,
-        userAgent: navigator.userAgent,
-        timestamp: new Date().toISOString(),
-        url: window.location.href
-      },
-      success
-    };
-    
-    // Log to console for development
-    console.log('Security Event:', auditData);
-    
-    // In production, this would send to audit logging service
-    // await fetch('/api/security/audit', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(auditData)
-    // });
-  } catch (error) {
-    console.error('Failed to log security event:', error);
-  }
+  // Use enhanced logging for database persistence
+  await logEnhancedSecurityEvent({
+    action,
+    resource,
+    details,
+    success,
+    riskScore: success ? 0 : 25
+  });
 };
 
 /**
@@ -293,15 +176,15 @@ export const secureCookieOptions = {
  * Input sanitization for different contexts
  */
 export const sanitizeForHTML = (input: string): string => {
-  return sanitizeInput(input);
+  return sanitizeForContext.html(input);
 };
 
 export const sanitizeForURL = (input: string): string => {
-  return encodeURIComponent(input);
+  return sanitizeForContext.url(input);
 };
 
 export const sanitizeForSQL = (input: string): string => {
-  return input.replace(/'/g, "''").replace(/;/g, '');
+  return sanitizeForContext.sql(input);
 };
 
 /**
@@ -368,3 +251,6 @@ export class SessionManager {
 }
 
 export const sessionManager = new SessionManager();
+
+// Re-export enhanced utilities
+export { authRateLimiter, apiRateLimiter };

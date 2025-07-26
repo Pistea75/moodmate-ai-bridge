@@ -383,6 +383,75 @@ export type Database = {
           },
         ]
       }
+      csrf_tokens: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          token: string
+          used: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          token: string
+          used?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      enhanced_security_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          resource: string
+          risk_score: number | null
+          session_id: string | null
+          success: boolean
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource: string
+          risk_score?: number | null
+          session_id?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource?: string
+          risk_score?: number | null
+          session_id?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       exercise_logs: {
         Row: {
           completed: boolean | null
@@ -650,6 +719,39 @@ export type Database = {
           treatment_goals?: string | null
           updated_at?: string | null
           welcome_message?: string | null
+        }
+        Relationships: []
+      }
+      rate_limit_attempts: {
+        Row: {
+          action_type: string
+          attempt_count: number
+          blocked_until: string | null
+          created_at: string | null
+          id: string
+          identifier: string
+          updated_at: string | null
+          window_start: string
+        }
+        Insert: {
+          action_type: string
+          attempt_count?: number
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          identifier: string
+          updated_at?: string | null
+          window_start?: string
+        }
+        Update: {
+          action_type?: string
+          attempt_count?: number
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          identifier?: string
+          updated_at?: string | null
+          window_start?: string
         }
         Relationships: []
       }
