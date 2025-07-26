@@ -121,24 +121,30 @@ export function EnhancedPatientDashboard() {
         </Card>
       </div>
 
-      {/* Main Content Grid - Single Column for Mood Chart */}
-      <div className="grid grid-cols-1 gap-6">
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Mood Chart */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="h-5 w-5 text-purple-600" />
-            <h2 className="text-xl font-semibold">Mood Trends</h2>
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm border p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <TrendingUp className="h-5 w-5 text-purple-600" />
+              <h2 className="text-xl font-semibold">Mood Trends</h2>
+            </div>
+            <MoodChart showLogButton={false} />
           </div>
-          <MoodChart showLogButton={false} />
+        </div>
+
+        {/* Wellness Streak Card */}
+        <div className="lg:col-span-1">
+          <WellnessStreakCard />
         </div>
       </div>
 
       {/* Dashboard Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <TasksCompletedCard />
         <UpcomingSessionsCard />
         <QuickActionsCard />
-        <WellnessStreakCard />
       </div>
 
       {/* Insights Card */}
