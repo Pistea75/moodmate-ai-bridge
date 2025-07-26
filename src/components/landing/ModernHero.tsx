@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Play, Star, Users, Shield, Zap } from 'lucide-react';
+import { ArrowRight, Star, Users, Shield, Zap } from 'lucide-react';
 
 export function ModernHero() {
   return (
@@ -39,22 +39,23 @@ export function ModernHero() {
             </p>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+          {/* Enhanced CTA Button */}
+          <div className="pt-8">
             <Link to="/signup/patient">
-              <Button size="lg" className="group bg-white text-slate-900 hover:bg-slate-100 font-bold px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
-                Start Free Trial
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <Button 
+                size="lg" 
+                className="group relative bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold px-12 py-6 rounded-full text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-2 border-white/20 backdrop-blur-sm"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  Start Your Free Trial
+                  <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
             </Link>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="group border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-md font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 transform hover:scale-105"
-            >
-              <Play className="mr-2 h-5 w-5" />
-              Watch Demo
-            </Button>
+            <p className="text-sm text-slate-400 mt-4 font-medium">
+              No credit card required • 14-day free trial • Cancel anytime
+            </p>
           </div>
 
           {/* Social Proof */}
