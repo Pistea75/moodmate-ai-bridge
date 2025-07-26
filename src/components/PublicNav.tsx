@@ -31,7 +31,7 @@ export function PublicNav() {
       </Link>
 
       <NavigationMenu>
-        <NavigationMenuList className="flex items-center gap-1">
+        <NavigationMenuList className="flex items-center justify-center gap-1">
           {navItems.map((item) => (
             <NavigationMenuItem key={item.path}>
               <Link 
@@ -46,25 +46,24 @@ export function PublicNav() {
               </Link>
             </NavigationMenuItem>
           ))}
-          <NavigationMenuItem className="ml-4">
-            <Link to="/login">
-              <Button 
-                variant="ghost" 
-                className="text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300 hover:scale-105"
-              >
-                Log In
-              </Button>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem className="ml-2">
-            <Link to="/signup/patient">
-              <Button className="text-sm font-semibold rounded-full px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
-                Start Your Journey
-              </Button>
-            </Link>
-          </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
+
+      <div className="flex items-center gap-2">
+        <Link to="/login">
+          <Button 
+            variant="ghost" 
+            className="text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300 hover:scale-105"
+          >
+            Log In
+          </Button>
+        </Link>
+        <Link to="/signup/patient">
+          <Button className="text-sm font-semibold rounded-full px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+            Start Your Journey
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
