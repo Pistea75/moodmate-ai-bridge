@@ -1,94 +1,215 @@
 
-import { useLanguage } from "@/contexts/LanguageContext";
-import { usePatientProfile } from "@/layouts/patient/usePatientProfile";
-import { ProgressOverviewCard } from "./ProgressOverviewCard";
-import { WellnessStreakCard } from "./WellnessStreakCard";
-import { MotivationalQuoteCard } from "./MotivationalQuoteCard";
-import { MoodStatsCard } from "./MoodStatsCard";
-import { TasksCompletedCard } from "./TasksCompletedCard";
-import { UpcomingSessionsCard } from "./UpcomingSessionsCard";
-import { QuickActionsCard } from "./QuickActionsCard";
-import { DailyCheckinCard } from "./DailyCheckinCard";
-import { AIInsightsCard } from "./AIInsightsCard";
-import { BrodiEngine } from "@/components/brodi/BrodiEngine";
-import { BrodiPredictiveWellness } from "@/components/brodi/BrodiPredictiveWellness";
-import { BrodiCrisisSupport } from "@/components/brodi/BrodiCrisisSupport";
-import { Button } from "@/components/ui/button";
-import { Bot } from "lucide-react";
-import { ExerciseTrackingCard } from "./ExerciseTrackingCard";
-import { MoodAnalyticsCard } from "./MoodAnalyticsCard";
-import { ChatNowCard } from "./ChatNowCard";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { 
+  Calendar, 
+  CheckCircle, 
+  MessageSquare, 
+  TrendingUp, 
+  Brain,
+  Plus,
+  Heart,
+  Activity
+} from 'lucide-react';
+import { MoodChart } from '@/components/mood/MoodChart';
+import { MoodAnalyticsCard } from '@/components/patient/MoodAnalyticsCard';
+import { MoodLogModal } from '@/components/patient/MoodLogModal';
+import { TasksCompletedCard } from './TasksCompletedCard';
+import { UpcomingSessionsCard } from './UpcomingSessionsCard';
+import { QuickActionsCard } from './QuickActionsCard';
+import { WellnessStreakCard } from './WellnessStreakCard';
+import { usePatientDashboard } from '@/hooks/usePatientDashboard';
+import { useMoodEntries } from '@/hooks/useMoodEntries';
+import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export function EnhancedPatientDashboard() {
-  const { t } = useLanguage();
-  const { patientName } = usePatientProfile();
-  const { callBrodi, brodiComponent } = BrodiEngine({ context: 'dashboard' });
+  const { stats, loading } = usePatientDashboard();
+  const { moods, refetch } = useMoodEntries();
+
+  // Calculate recent stats from mood entries
+  const recentMoods = moods.slice(-7); // Last 7 entries
+  const averageMood = recentMoods.length > 0 
+    ? (recentMoods.reduce((sum, mood) => sum + mood.mood_score, 0) / recentMoods.length).toFixed(1)
+    : '0.0';
+  
+  const currentStreak = moods.length > 0 ? Math.min(moods.length, 7) : 0;
+
+  const handleMoodLogComplete = () => {
+    console.log('Mood logged successfully, refreshing data...');
+    refetch();
+  };
+
+  if (loading) {
+    return (
+      <div className="p-8 space-y-8">
+        <div className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[1, 2].map(i => (
+            <div key={i} className="h-64 bg-gray-200 rounded-xl animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">
-              Welcome back, {patientName}!
-            </h1>
-            <p className="text-xl text-gray-600">
-              {t('yourMentalHealthOverview')}
+      {/* Welcome Header */}
+      <div className="flex justify-between items-start">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Welcome Back!
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Here's how you're doing today
+          </p>
+        </div>
+        <MoodLogModal 
+          onLogComplete={handleMoodLogComplete}
+          trigger={
+            <Button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700">
+              <Plus className="h-4 w-4" />
+              Log Mood
+            </Button>
+          }
+        />
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">This Week</CardTitle>
+            <TrendingUp className="h-4 w-4 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">{averageMood}</div>
+            <p className="text-xs text-muted-foreground">
+              Average mood score
             </p>
-          </div>
-          
-          {/* Call Brodi Button */}
-          <Button 
-            onClick={callBrodi}
-            className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary-variant hover:shadow-lg transition-all duration-300"
-          >
-            <Bot className="h-5 w-5" />
-            Call Brodi
-          </Button>
-        </div>
-      </div>
+          </CardContent>
+        </Card>
 
-      {/* Top Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <MoodStatsCard />
-        <TasksCompletedCard />
-        <UpcomingSessionsCard />
-      </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Entries</CardTitle>
+            <Brain className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{moods.length}</div>
+            <p className="text-xs text-muted-foreground">
+              Total logged
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* Mood Chart and Wellness Streak */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <MoodAnalyticsCard />
-        </div>
-        <WellnessStreakCard />
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Streak</CardTitle>
+            <Heart className="h-4 w-4 text-pink-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-pink-600">{currentStreak}</div>
+            <p className="text-xs text-muted-foreground">
+              Recent entries
+            </p>
+          </CardContent>
+        </Card>
       </div>
-
-      {/* Quick Actions */}
-      <QuickActionsCard />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ProgressOverviewCard />
-        <DailyCheckinCard />
+        {/* Mood Chart */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm border p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <TrendingUp className="h-5 w-5 text-purple-600" />
+              <h2 className="text-xl font-semibold">Mood Trends</h2>
+            </div>
+            <MoodChart showLogButton={false} />
+          </div>
+        </div>
+
+        {/* Mood Analytics */}
+        <div className="lg:col-span-1">
+          <MoodAnalyticsCard />
+        </div>
       </div>
 
-      {/* Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <MotivationalQuoteCard />
-        <AIInsightsCard />
-        <ExerciseTrackingCard />
+      {/* Dashboard Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <TasksCompletedCard 
+          completedTasks={stats.tasksCompleted}
+          totalTasks={stats.totalTasks}
+        />
+        <UpcomingSessionsCard upcomingSessions={stats.upcomingSessions} />
+        <QuickActionsCard />
+        <WellnessStreakCard 
+          currentStreak={stats.currentStreak}
+          longestStreak={stats.longestStreak}
+        />
       </div>
 
-      {/* Brodi Advanced Features */}
-      <BrodiPredictiveWellness />
-
-      {/* Support Section - Bottom */}
-      <ChatNowCard />
+      {/* Insights Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-purple-600" />
+            AI Insights
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {recentMoods.length > 0 ? (
+              <>
+                <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                  <h4 className="font-semibold text-purple-900 mb-2">Pattern Detected</h4>
+                  <p className="text-purple-700 text-sm">
+                    Your average mood this week is {averageMood}/10. 
+                    {parseFloat(averageMood) >= 7 ? " You're doing great! Keep up the positive momentum." 
+                     : parseFloat(averageMood) >= 5 ? " You're maintaining a stable mood. Consider what activities make you feel better."
+                     : " Consider reaching out for support. Remember that ups and downs are normal."}
+                  </p>
+                </div>
+                
+                <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                  <h4 className="font-semibold text-blue-900 mb-2">Recommendation</h4>
+                  <p className="text-blue-700 text-sm">
+                    You've logged {moods.length} mood entries! 
+                    {moods.length >= 7 ? " Consistent tracking helps us provide better insights and support."
+                     : " Try to log your mood daily for more personalized insights."}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="p-4 bg-gray-50 rounded-lg border-l-4 border-gray-500">
+                <h4 className="font-semibold text-gray-900 mb-2">Getting Started</h4>
+                <p className="text-gray-700 text-sm">
+                  Start tracking your mood to see patterns and get personalized insights. Click "Log Mood" above to begin!
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
       
-      {/* Brodi AI Companion & Crisis Support */}
-      {brodiComponent}
-      <BrodiCrisisSupport />
+      {/* Brodi Nudge System */}
+      <BrodiNudgeSystem 
+        context="dashboard_visit"
+        trigger={{
+          type: 'page_visit',
+          data: { 
+            averageMood: parseFloat(averageMood),
+            totalEntries: moods.length,
+            streak: currentStreak
+          }
+        }}
+      />
     </div>
   );
 }
