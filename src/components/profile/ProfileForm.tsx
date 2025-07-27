@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,10 +34,24 @@ interface ProfileFormProps {
 export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(
+    user?.user_metadata?.avatar_url || null
+  );
 
   const form = useForm<ProfileFormData>({
     defaultValues: initialData,
   });
+
+  // Update avatar URL when user metadata changes
+  useEffect(() => {
+    if (user?.user_metadata?.avatar_url) {
+      setCurrentAvatarUrl(user.user_metadata.avatar_url);
+    }
+  }, [user?.user_metadata?.avatar_url]);
+
+  const handleAvatarUpdate = (url: string) => {
+    setCurrentAvatarUrl(url);
+  };
 
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) return;
@@ -58,6 +72,21 @@ export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
 
       if (error) throw error;
 
+      // Also update the profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: data.first_name,
+          last_name: data.last_name,
+          language: data.language,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+      }
+
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -77,8 +106,9 @@ export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <ProfileAvatar 
-          avatarUrl={user?.user_metadata?.avatar_url} 
+          avatarUrl={currentAvatarUrl} 
           userId={user?.id}
+          onAvatarUpdate={handleAvatarUpdate}
         />
 
         <FormField
