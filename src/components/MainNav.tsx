@@ -12,7 +12,6 @@ export function MainNav() {
   const { themeColor } = useTheme();
   
   const isLoggedIn = !!user;
-  
   const navItems = userRole === 'clinician' ? clinicianNavItems : patientNavItems;
   const username = user?.user_metadata?.full_name || 'User';
 
@@ -21,12 +20,27 @@ export function MainNav() {
     return null;
   }
 
-  // Desktop navigation for patient and public pages only
-  return (
-    <DesktopNavigation 
-      isLoggedIn={isLoggedIn} 
-      navItems={isLoggedIn ? navItems : undefined}
-      username={isLoggedIn ? username : undefined}
-    />
-  );
+  // Mobile navigation for patient pages
+  if (isMobile && isLoggedIn && userRole === 'patient') {
+    return (
+      <MobileNavigation 
+        navItems={navItems}
+        username={username}
+      />
+    );
+  }
+
+  // Desktop navigation for patient and public pages
+  if (!isMobile) {
+    return (
+      <DesktopNavigation 
+        isLoggedIn={isLoggedIn} 
+        navItems={isLoggedIn ? navItems : undefined}
+        username={isLoggedIn ? username : undefined}
+      />
+    );
+  }
+
+  // For mobile public pages, no navigation (handled by PublicNav)
+  return null;
 }
