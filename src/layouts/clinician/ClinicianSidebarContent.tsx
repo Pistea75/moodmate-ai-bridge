@@ -80,9 +80,9 @@ export function ClinicianSidebarContent() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-white">
       {/* Logo and Title */}
-      <div className="p-6 border-b border-border flex-shrink-0 bg-background">
+      <div className="p-6 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-sm">
             <span className="font-bold text-primary-foreground text-xl">M</span>
@@ -95,8 +95,8 @@ export function ClinicianSidebarContent() {
       </div>
 
       {/* User Info */}
-      <div className="p-6 border-b border-border flex-shrink-0 bg-background">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+      <div className="p-6 border-b border-gray-200 flex-shrink-0 bg-white">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
           <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
             <span className="text-sm font-semibold text-primary">
               {clinicianFullName?.split(' ').map(n => n[0]).join('') || 'Dr'}
@@ -112,7 +112,7 @@ export function ClinicianSidebarContent() {
       </div>
 
       {/* Scrollable Navigation Area */}
-      <ScrollArea className="flex-1 bg-background">
+      <ScrollArea className="flex-1 bg-white">
         <nav className="p-4 space-y-1">
           {navItems.map((item) => (
             <NavLink
@@ -123,7 +123,7 @@ export function ClinicianSidebarContent() {
                   "flex items-center gap-4 px-4 py-4 text-base font-medium rounded-xl transition-all duration-200 active:scale-95",
                   isActive
                     ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 active:bg-muted/80'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-gray-50 active:bg-gray-100'
                 )
               }
             >
@@ -135,7 +135,7 @@ export function ClinicianSidebarContent() {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border space-y-1 flex-shrink-0 bg-background">
+      <div className="p-4 border-t border-gray-200 space-y-1 flex-shrink-0 bg-white">
         <NavLink
           to="/clinician/profile"
           className={({ isActive }) =>
@@ -143,7 +143,7 @@ export function ClinicianSidebarContent() {
               "flex items-center gap-4 px-4 py-4 text-base font-medium rounded-xl transition-all duration-200 w-full active:scale-95",
               isActive
                 ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 active:bg-muted/80'
+                : 'text-muted-foreground hover:text-foreground hover:bg-gray-50 active:bg-gray-100'
             )
           }
         >
@@ -158,7 +158,7 @@ export function ClinicianSidebarContent() {
               "flex items-center gap-4 px-4 py-4 text-base font-medium rounded-xl transition-all duration-200 w-full active:scale-95",
               isActive
                 ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 active:bg-muted/80'
+                : 'text-muted-foreground hover:text-foreground hover:bg-gray-50 active:bg-gray-100'
             )
           }
         >
@@ -169,7 +169,7 @@ export function ClinicianSidebarContent() {
         <Button
           variant="ghost"
           onClick={handleSignOut}
-          className="flex items-center gap-4 px-4 py-4 text-base font-medium rounded-xl transition-all duration-200 w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50 active:bg-muted/80 active:scale-95"
+          className="flex items-center gap-4 px-4 py-4 text-base font-medium rounded-xl transition-all duration-200 w-full justify-start text-muted-foreground hover:text-foreground hover:bg-gray-50 active:bg-gray-100 active:scale-95"
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />
           <span className="flex-1">{t('logout')}</span>

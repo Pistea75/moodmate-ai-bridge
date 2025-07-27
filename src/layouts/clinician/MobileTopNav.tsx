@@ -29,7 +29,7 @@ export function MobileTopNav({ isOpen, setIsOpen }: MobileTopNavProps) {
             </SheetTrigger>
             <SheetContent 
               side="left" 
-              className="p-0 w-80 bg-background border-r border-border"
+              className="p-0 w-80 bg-white border-r border-gray-200"
             >
               <ClinicianSidebarContent />
             </SheetContent>
