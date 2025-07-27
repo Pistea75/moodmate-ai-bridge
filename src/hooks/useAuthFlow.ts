@@ -2,12 +2,22 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { validatePassword, authRateLimiter, logSecurityEvent, sanitizeInput, isValidEmail } from '@/utils/securityUtils';
+import { validatePasswordStrength, authRateLimiter, logEnhancedSecurityEvent, sanitizeForContext } from '@/utils/enhancedSecurityUtils';
 
 interface AuthError {
   message: string;
   status?: number;
 }
+
+// Enhanced input validation
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 254;
+};
+
+const sanitizeInput = (input: string): string => {
+  return sanitizeForContext.html(input);
+};
 
 export function useAuthFlow() {
   const [isLoading, setIsLoading] = useState(false);
@@ -44,10 +54,16 @@ export function useAuthFlow() {
     setError({ message });
     
     // Log security event for failed authentication
-    await logSecurityEvent('auth_failure', context, { 
-      error: message,
-      timestamp: new Date().toISOString()
-    }, false);
+    await logEnhancedSecurityEvent({
+      action: 'auth_failure',
+      resource: context,
+      details: { 
+        error: message,
+        timestamp: new Date().toISOString()
+      },
+      success: false,
+      riskScore: 25
+    });
 
     toast({
       title: "Authentication Error",
@@ -74,7 +90,7 @@ export function useAuthFlow() {
         throw new Error('Please enter a valid email address.');
       }
 
-      // Enhanced rate limiting with correct method signature
+      // Enhanced rate limiting
       const clientId = `${sanitizedEmail}_${Date.now()}`;
       if (!(await authRateLimiter.isAllowed(clientId, 'signin'))) {
         const remainingTime = Math.ceil((await authRateLimiter.getRemainingTime(clientId, 'signin')) / 1000 / 60);
@@ -98,9 +114,14 @@ export function useAuthFlow() {
       await authRateLimiter.reset(clientId, 'signin');
 
       // Log successful authentication
-      await logSecurityEvent('auth_success', 'authentication', { 
-        user_id: data.user.id,
-        email: data.user.email
+      await logEnhancedSecurityEvent({
+        action: 'auth_success',
+        resource: 'authentication',
+        details: { 
+          user_id: data.user.id,
+          email: data.user.email
+        },
+        success: true
       });
 
       console.log('✅ Sign in successful - auth state change will handle redirect');
@@ -136,21 +157,13 @@ export function useAuthFlow() {
       }
       
       // Enhanced password validation
-      const passwordValidation = validatePassword(password);
+      const passwordValidation = validatePasswordStrength(password);
       if (!passwordValidation.isValid) {
         throw new Error(passwordValidation.errors.join('. '));
       }
       
       // Sanitize metadata
-      const cleanedMetadata = metadata ? Object.keys(metadata).reduce((acc, key) => {
-        const value = metadata[key];
-        if (typeof value === 'string') {
-          acc[key] = sanitizeInput(value);
-        } else {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as any) : {};
+      const cleanedMetadata = metadata ? sanitizeForContext.json(metadata) : {};
       
       if (!cleanedMetadata.role) {
         cleanedMetadata.role = 'patient';
@@ -184,10 +197,15 @@ export function useAuthFlow() {
       }
 
       // Log successful signup
-      await logSecurityEvent('signup_success', 'authentication', { 
-        user_id: data.user.id,
-        email: data.user.email,
-        role: cleanedMetadata.role
+      await logEnhancedSecurityEvent({
+        action: 'signup_success',
+        resource: 'authentication',
+        details: { 
+          user_id: data.user.id,
+          email: data.user.email,
+          role: cleanedMetadata.role
+        },
+        success: true
       });
 
       toast({

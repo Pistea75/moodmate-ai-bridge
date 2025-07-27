@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
@@ -7,6 +8,7 @@ import { PatientSignupStep2 } from '../components/auth/patient/PatientSignupStep
 import { useAuthFlow } from '../hooks/useAuthFlow';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { validatePasswordStrength } from '@/utils/enhancedSecurityUtils';
 
 export default function SignupPatient() {
   const [step, setStep] = useState(1);
@@ -48,10 +50,12 @@ export default function SignupPatient() {
         return;
       }
 
-      if (formData.password.length < 6) {
+      // Use enhanced password validation
+      const passwordValidation = validatePasswordStrength(formData.password);
+      if (!passwordValidation.isValid) {
         toast({
-          title: "Error",
-          description: "Password must be at least 6 characters",
+          title: "Password Requirements Not Met",
+          description: passwordValidation.errors.join('. '),
           variant: "destructive"
         });
         return;
@@ -82,7 +86,7 @@ export default function SignupPatient() {
 
         const { data: clinician, error } = await supabase
           .from('profiles')
-          .select('user_id')
+          .select('id')
           .ilike('referral_code', referralCodeInput)
           .eq('role', 'clinician')
           .maybeSingle();
@@ -107,7 +111,8 @@ export default function SignupPatient() {
             role: 'patient',
             referral_code: referralCodeInput,
             language: formData.language
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/login`
         }
       });
 
@@ -127,16 +132,17 @@ export default function SignupPatient() {
         throw new Error('User not returned after signup');
       }
 
-      // Create profile manually (if you don't have an auth.trigger to handle it)
+      // Create profile manually
       const { data: patientProfile, error: profileError } = await supabase
         .from('profiles')
         .insert({
-          user_id: newUser.id,
+          id: newUser.id,
           first_name: firstName,
           last_name: lastName || '',
           role: 'patient',
           referral_code: referralCodeInput,
-          language: formData.language
+          language: formData.language,
+          email: formData.email
         })
         .select()
         .single();
@@ -223,4 +229,3 @@ export default function SignupPatient() {
     </AuthFormLayout>
   );
 }
-

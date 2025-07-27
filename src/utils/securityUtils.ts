@@ -5,19 +5,19 @@ import {
   authRateLimiter, 
   apiRateLimiter,
   sanitizeForContext,
-  validateSecureForm
+  validateSecureForm,
+  validatePasswordStrength
 } from './enhancedSecurityUtils';
 
 /**
- * Enhanced security utilities for the application
+ * Security utilities for the application - now using enhanced security
  */
 
 /**
  * Sanitizes user input to prevent XSS attacks
  */
 export const sanitizeInput = (input: string): string => {
-  if (!input || typeof input !== 'string') return '';
-  return sanitizeForContext.html(input).trim();
+  return sanitizeForContext.html(input);
 };
 
 /**
@@ -31,45 +31,7 @@ export const isValidEmail = (email: string): boolean => {
 /**
  * Enhanced password validation with stronger requirements
  */
-export const validatePassword = (password: string): { isValid: boolean; errors: string[] } => {
-  const errors: string[] = [];
-  
-  if (!password) {
-    errors.push('Password is required');
-    return { isValid: false, errors };
-  }
-  
-  if (password.length < 12) {
-    errors.push('Password must be at least 12 characters long');
-  }
-  
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
-  }
-  
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
-  }
-  
-  if (!/\d/.test(password)) {
-    errors.push('Password must contain at least one number');
-  }
-  
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character');
-  }
-  
-  // Check for common weak patterns
-  if (/(.)\1{2,}/.test(password)) {
-    errors.push('Password cannot contain repeated characters');
-  }
-  
-  if (/123456|password|qwerty|admin|welcome/i.test(password)) {
-    errors.push('Password cannot contain common words or patterns');
-  }
-  
-  return { isValid: errors.length === 0, errors };
-};
+export const validatePassword = validatePasswordStrength;
 
 /**
  * Enhanced session validation with additional security checks
@@ -121,9 +83,7 @@ export const hasValidRole = (userRole: string, allowedRoles: string[]): boolean 
 /**
  * Enhanced form data validation with security checks
  */
-export const validateFormData = (data: Record<string, any>, rules: Record<string, any>) => {
-  return validateSecureForm(data, rules);
-};
+export const validateFormData = validateSecureForm;
 
 /**
  * Enhanced security audit logging with database integration
@@ -134,7 +94,6 @@ export const logSecurityEvent = async (
   details: Record<string, any> = {},
   success: boolean = true
 ) => {
-  // Use enhanced logging for database persistence
   await logEnhancedSecurityEvent({
     action,
     resource,
