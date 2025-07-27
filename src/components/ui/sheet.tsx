@@ -59,7 +59,7 @@ const SheetContent = React.forwardRef<
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
-      className={cn(sheetVariants({ side }), "p-0 bg-background/95 backdrop-blur-sm", className)}
+      className={cn(sheetVariants({ side }), "p-0 bg-white", className)}
       {...props}
     >
       {children}
