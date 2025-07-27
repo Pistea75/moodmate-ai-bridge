@@ -3,7 +3,6 @@ import React from 'react';
 import { MenuIcon, Bell, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
 import { ClinicianSidebarContent } from './ClinicianSidebarContent';
 import { Link } from 'react-router-dom';
 

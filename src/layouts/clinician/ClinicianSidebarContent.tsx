@@ -82,7 +82,7 @@ export function ClinicianSidebarContent() {
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Logo and Title */}
-      <div className="p-6 border-b border-border flex-shrink-0 bg-muted/30">
+      <div className="p-6 border-b border-border flex-shrink-0 bg-background">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-sm">
             <span className="font-bold text-primary-foreground text-xl">M</span>
@@ -95,8 +95,8 @@ export function ClinicianSidebarContent() {
       </div>
 
       {/* User Info */}
-      <div className="p-6 border-b border-border flex-shrink-0 bg-muted/30">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
+      <div className="p-6 border-b border-border flex-shrink-0 bg-background">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
           <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
             <span className="text-sm font-semibold text-primary">
               {clinicianFullName?.split(' ').map(n => n[0]).join('') || 'Dr'}
@@ -112,7 +112,7 @@ export function ClinicianSidebarContent() {
       </div>
 
       {/* Scrollable Navigation Area */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 bg-background">
         <nav className="p-4 space-y-1">
           {navItems.map((item) => (
             <NavLink
@@ -135,7 +135,7 @@ export function ClinicianSidebarContent() {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border space-y-1 flex-shrink-0 bg-muted/30">
+      <div className="p-4 border-t border-border space-y-1 flex-shrink-0 bg-background">
         <NavLink
           to="/clinician/profile"
           className={({ isActive }) =>

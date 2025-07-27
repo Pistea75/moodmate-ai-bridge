@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { MenuIcon, X } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -36,26 +36,18 @@ export function MobileNavigation({ navItems, username }: MobileNavigationProps) 
               side="left" 
               className="p-0 w-80 bg-background border-r border-border"
             >
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col h-full bg-background">
                 {/* Header */}
-                <div className="p-6 border-b border-border bg-muted/30">
-                  <div className="flex items-center justify-between mb-4">
+                <div className="p-6 border-b border-border bg-background">
+                  <div className="flex items-center gap-3 mb-4">
                     <Link to="/patient/dashboard" className="flex items-center gap-2">
                       <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-sm">
                         <span className="font-bold text-primary-foreground text-lg">M</span>
                       </div>
                       <span className="text-xl font-bold text-primary">MoodMate</span>
                     </Link>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsOpen(false)}
-                      className="h-8 w-8 hover:bg-muted/80"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-sm font-semibold text-primary">
                         {username.split(' ').map(n => n[0]).join('') || 'U'}
@@ -71,7 +63,7 @@ export function MobileNavigation({ navItems, username }: MobileNavigationProps) 
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 p-4 space-y-1">
+                <nav className="flex-1 p-4 space-y-1 bg-background">
                   {navItems.map((item) => (
                     <Link
                       key={item.path}
@@ -91,7 +83,7 @@ export function MobileNavigation({ navItems, username }: MobileNavigationProps) 
                 </nav>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-border bg-muted/30">
+                <div className="p-4 border-t border-border bg-background">
                   <LogoutButton 
                     variant="ghost" 
                     className="w-full justify-start text-base font-medium py-4 hover:bg-muted/50 active:bg-muted/80 transition-colors" 
