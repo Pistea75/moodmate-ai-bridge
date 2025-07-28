@@ -62,23 +62,16 @@ export default function RiskManagement() {
       
       const { data, error } = await supabase
         .from('patient_risk_assessments')
-        .select(`
-          *,
-          patient:patient_id (first_name, last_name),
-          clinician:clinician_id (first_name, last_name)
-        `)
+        .select('*')
         .order('assessed_at', { ascending: false });
 
       if (error) throw error;
 
-      const formattedData = (data || []).map(assessment => ({
+      // Format the data with mock names since we can't join with profiles
+      const formattedData: RiskAssessment[] = (data || []).map(assessment => ({
         ...assessment,
-        patient_name: assessment.patient 
-          ? `${assessment.patient.first_name} ${assessment.patient.last_name}`
-          : 'Unknown Patient',
-        clinician_name: assessment.clinician 
-          ? `${assessment.clinician.first_name} ${assessment.clinician.last_name}`
-          : 'Unknown Clinician'
+        patient_name: `Patient ${assessment.patient_id.substring(0, 8)}`,
+        clinician_name: `Clinician ${assessment.clinician_id.substring(0, 8)}`
       }));
 
       setAssessments(formattedData);

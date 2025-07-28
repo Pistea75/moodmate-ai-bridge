@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +21,6 @@ import {
 import { useSecureRoleValidation } from '@/hooks/useSecureRoleValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function SystemOverview() {
