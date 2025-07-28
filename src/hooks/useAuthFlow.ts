@@ -2,22 +2,14 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { validatePasswordStrength, authRateLimiter, logEnhancedSecurityEvent, sanitizeForContext } from '@/utils/enhancedSecurityUtils';
+import { validatePasswordStrength } from '@/utils/passwordValidation';
+import { validateAndSanitizeForm, commonValidationRules } from '@/utils/secureInputValidation';
+import { authRateLimiter, logEnhancedSecurityEvent } from '@/utils/enhancedSecurityUtils';
 
 interface AuthError {
   message: string;
   status?: number;
 }
-
-// Enhanced input validation
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email) && email.length <= 254;
-};
-
-const sanitizeInput = (input: string): string => {
-  return sanitizeForContext.html(input);
-};
 
 export function useAuthFlow() {
   const [isLoading, setIsLoading] = useState(false);
@@ -53,13 +45,15 @@ export function useAuthFlow() {
 
     setError({ message });
     
-    // Log security event for failed authentication
+    // Log security event for failed authentication with enhanced details
     await logEnhancedSecurityEvent({
       action: 'auth_failure',
       resource: context,
       details: { 
         error: message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        url: window.location.href
       },
       success: false,
       riskScore: 25
@@ -79,19 +73,24 @@ export function useAuthFlow() {
       setIsLoading(true);
       clearError();
       
-      // Input validation and sanitization
-      const sanitizedEmail = sanitizeInput(email).toLowerCase();
+      // Enhanced input validation using new validation system
+      const validation = validateAndSanitizeForm(
+        { email, password },
+        { 
+          email: commonValidationRules.email,
+          password: { required: true, minLength: 1 } // Less strict for login
+        }
+      );
       
-      if (!sanitizedEmail || !password) {
-        throw new Error('Please enter both email and password.');
-      }
-      
-      if (!isValidEmail(sanitizedEmail)) {
-        throw new Error('Please enter a valid email address.');
+      if (!validation.isValid) {
+        const errorMessage = Object.values(validation.errors).flat().join(', ');
+        throw new Error(errorMessage);
       }
 
-      // Enhanced rate limiting
-      const clientId = `${sanitizedEmail}_${Date.now()}`;
+      const { email: sanitizedEmail, password: sanitizedPassword } = validation.sanitizedData;
+
+      // Enhanced rate limiting with user identification
+      const clientId = `${sanitizedEmail}_signin`;
       if (!(await authRateLimiter.isAllowed(clientId, 'signin'))) {
         const remainingTime = Math.ceil((await authRateLimiter.getRemainingTime(clientId, 'signin')) / 1000 / 60);
         throw new Error(`Too many login attempts. Please wait ${remainingTime} minutes before trying again.`);
@@ -101,7 +100,7 @@ export function useAuthFlow() {
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: sanitizedEmail,
-        password,
+        password: sanitizedPassword,
       });
 
       if (error) throw error;
@@ -113,13 +112,15 @@ export function useAuthFlow() {
       // Reset rate limiter on successful login
       await authRateLimiter.reset(clientId, 'signin');
 
-      // Log successful authentication
+      // Log successful authentication with enhanced context
       await logEnhancedSecurityEvent({
         action: 'auth_success',
         resource: 'authentication',
         details: { 
           user_id: data.user.id,
-          email: data.user.email
+          email: data.user.email,
+          loginMethod: 'password',
+          timestamp: new Date().toISOString()
         },
         success: true
       });
@@ -145,43 +146,42 @@ export function useAuthFlow() {
       setIsLoading(true);
       clearError();
       
-      // Input validation and sanitization
-      const sanitizedEmail = sanitizeInput(email).toLowerCase();
-      
-      if (!sanitizedEmail || !password) {
-        throw new Error('Please enter both email and password.');
-      }
-      
-      if (!isValidEmail(sanitizedEmail)) {
-        throw new Error('Please enter a valid email address.');
-      }
-      
-      // Enhanced password validation
-      const passwordValidation = validatePasswordStrength(password);
-      if (!passwordValidation.isValid) {
-        throw new Error(passwordValidation.errors.join('. '));
-      }
-      
-      // Sanitize metadata
-      const cleanedMetadata = metadata ? sanitizeForContext.json(metadata) : {};
-      
-      if (!cleanedMetadata.role) {
-        cleanedMetadata.role = 'patient';
-      }
-      
-      if (cleanedMetadata.referral_code) {
-        if (typeof cleanedMetadata.referral_code === 'string' && cleanedMetadata.referral_code.trim() !== '') {
-          cleanedMetadata.referral_code = cleanedMetadata.referral_code.trim().toUpperCase();
-        } else {
-          delete cleanedMetadata.referral_code;
+      // Enhanced input validation using new validation system
+      const validation = validateAndSanitizeForm(
+        { email, password },
+        { 
+          email: commonValidationRules.email,
+          password: commonValidationRules.password // Strict password requirements
         }
+      );
+      
+      if (!validation.isValid) {
+        const errorMessage = Object.values(validation.errors).flat().join('. ');
+        throw new Error(errorMessage);
+      }
+
+      const { email: sanitizedEmail, password: sanitizedPassword } = validation.sanitizedData;
+      
+      // Enhanced metadata sanitization
+      const cleanedMetadata = metadata ? {
+        ...metadata,
+        role: metadata.role || 'patient',
+        first_name: metadata.first_name ? String(metadata.first_name).trim() : '',
+        last_name: metadata.last_name ? String(metadata.last_name).trim() : '',
+        referral_code: metadata.referral_code ? 
+          String(metadata.referral_code).trim().toUpperCase() : undefined
+      } : { role: 'patient' };
+      
+      // Remove empty referral code
+      if (cleanedMetadata.referral_code && cleanedMetadata.referral_code.trim() === '') {
+        delete cleanedMetadata.referral_code;
       }
       
       console.log('Signing up with metadata:', cleanedMetadata);
       
       const { data, error } = await supabase.auth.signUp({
         email: sanitizedEmail,
-        password,
+        password: sanitizedPassword,
         options: {
           data: cleanedMetadata,
           emailRedirectTo: `${window.location.origin}/login`
@@ -196,14 +196,16 @@ export function useAuthFlow() {
         throw new Error('Failed to create user account');
       }
 
-      // Log successful signup
+      // Log successful signup with enhanced context
       await logEnhancedSecurityEvent({
         action: 'signup_success',
         resource: 'authentication',
         details: { 
           user_id: data.user.id,
           email: data.user.email,
-          role: cleanedMetadata.role
+          role: cleanedMetadata.role,
+          hasReferralCode: !!cleanedMetadata.referral_code,
+          timestamp: new Date().toISOString()
         },
         success: true
       });
