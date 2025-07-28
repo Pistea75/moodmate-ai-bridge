@@ -84,8 +84,8 @@ export function ClinicianSidebarContent() {
       {/* Logo and Title */}
       <div className="p-6 border-b border-gray-200 flex-shrink-0 bg-white">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-sm">
-            <span className="font-bold text-primary-foreground text-xl">M</span>
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
+            <Brain className="h-7 w-7 text-white" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">MoodMate</h1>
