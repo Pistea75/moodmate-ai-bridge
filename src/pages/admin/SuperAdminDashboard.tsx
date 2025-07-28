@@ -81,22 +81,28 @@ export default function SuperAdminDashboard() {
 
       if (usersError) throw usersError;
 
-      setUsers(usersData || []);
+      // Map the data to include user_role fallback
+      const mappedUsers = usersData?.map(user => ({
+        ...user,
+        user_role: user.user_role || user.role
+      })) || [];
+
+      setUsers(mappedUsers);
 
       // Calculate stats
-      const totalUsers = usersData?.length || 0;
-      const totalPatients = usersData?.filter(u => u.role === 'patient' || u.user_role === 'patient').length || 0;
-      const totalClinicians = usersData?.filter(u => u.role === 'clinician' || u.user_role === 'clinician').length || 0;
+      const totalUsers = mappedUsers.length;
+      const totalPatients = mappedUsers.filter(u => u.role === 'patient' || u.user_role === 'patient').length;
+      const totalClinicians = mappedUsers.filter(u => u.role === 'clinician' || u.user_role === 'clinician').length;
       const today = new Date().toISOString().split('T')[0];
-      const newUsersToday = usersData?.filter(u => 
+      const newUsersToday = mappedUsers.filter(u => 
         u.created_at?.startsWith(today)
-      ).length || 0;
+      ).length;
 
       setStats({
         totalUsers,
         totalPatients,
         totalClinicians,
-        activeUsers: usersData?.filter(u => u.status === 'active').length || 0,
+        activeUsers: mappedUsers.filter(u => u.status === 'active').length,
         newUsersToday
       });
 
