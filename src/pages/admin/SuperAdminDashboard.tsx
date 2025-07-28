@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +18,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 
 interface UserData {
   id: string;
@@ -24,6 +26,7 @@ interface UserData {
   first_name: string;
   last_name: string;
   role: string;
+  user_role: string;
   status: string;
   created_at: string;
   last_active_at: string;
@@ -41,6 +44,7 @@ interface SystemSetting {
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isSuperAdmin, loading: superAdminLoading } = useSuperAdmin();
   const [users, setUsers] = useState<UserData[]>([]);
   const [settings, setSettings] = useState<SystemSetting[]>([]);
   const [stats, setStats] = useState({
@@ -54,30 +58,16 @@ export default function SuperAdminDashboard() {
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
 
   useEffect(() => {
-    checkAdminAccess();
-  }, [user]);
-
-  const checkAdminAccess = async () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    // Check if user is super admin
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('is_super_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (error || !data?.is_super_admin) {
+    if (!superAdminLoading && !isSuperAdmin) {
       toast.error('Access denied. Super admin privileges required.');
       navigate('/');
       return;
     }
-
-    fetchData();
-  };
+    
+    if (isSuperAdmin) {
+      fetchData();
+    }
+  }, [user, isSuperAdmin, superAdminLoading, navigate]);
 
   const fetchData = async () => {
     try {
@@ -95,8 +85,8 @@ export default function SuperAdminDashboard() {
 
       // Calculate stats
       const totalUsers = usersData?.length || 0;
-      const totalPatients = usersData?.filter(u => u.role === 'patient').length || 0;
-      const totalClinicians = usersData?.filter(u => u.role === 'clinician').length || 0;
+      const totalPatients = usersData?.filter(u => u.role === 'patient' || u.user_role === 'patient').length || 0;
+      const totalClinicians = usersData?.filter(u => u.role === 'clinician' || u.user_role === 'clinician').length || 0;
       const today = new Date().toISOString().split('T')[0];
       const newUsersToday = usersData?.filter(u => 
         u.created_at?.startsWith(today)
@@ -193,12 +183,16 @@ export default function SuperAdminDashboard() {
     }
   };
 
-  if (loading) {
+  if (superAdminLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  if (!isSuperAdmin) {
+    return null;
   }
 
   return (
@@ -211,11 +205,19 @@ export default function SuperAdminDashboard() {
               <Shield className="h-8 w-8 text-red-600" />
               Super Admin Dashboard
             </h1>
-            <p className="text-gray-600 mt-1">System management and user control</p>
+            <p className="text-gray-600 mt-1">System management with PHI protection</p>
           </div>
-          <Badge variant="destructive" className="px-3 py-1">
-            ADMIN ACCESS
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="destructive" className="px-3 py-1">
+              SUPER ADMIN ACCESS
+            </Badge>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/admin/super-admin-panel')}
+            >
+              PHI Access Panel
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}

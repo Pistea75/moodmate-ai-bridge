@@ -12,6 +12,7 @@ interface SecureRoleValidationResult {
   refreshRole: () => Promise<void>;
   validateRole: (expectedRole: string) => boolean;
   validateSuperAdmin: () => boolean;
+  isSuperAdmin: boolean;
 }
 
 export function useSecureRoleValidation(user: User | null): SecureRoleValidationResult {
@@ -42,7 +43,7 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
       // Query role and super admin status directly from profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('role, is_super_admin')
+        .select('role, is_super_admin, user_role')
         .eq('id', user.id)
         .single();
 
@@ -62,14 +63,18 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
         return;
       }
 
+      // Use the new user_role column if available, otherwise fall back to role
+      const userRole = profileData.user_role || profileData.role;
+      const superAdmin = profileData.is_super_admin || userRole === 'super_admin';
+
       // Set role and super admin status
-      setRole(profileData.role || null);
-      setIsSuperAdmin(profileData.is_super_admin || false);
+      setRole(userRole || null);
+      setIsSuperAdmin(superAdmin || false);
 
       // Log successful role validation
       await logSecurityEvent('role_validated', 'database', { 
-        role: profileData.role,
-        isSuperAdmin: profileData.is_super_admin,
+        role: userRole,
+        isSuperAdmin: superAdmin,
         user_id: user.id
       });
 
@@ -146,6 +151,7 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
     error,
     refreshRole: fetchRoleFromDatabase,
     validateRole,
-    validateSuperAdmin
+    validateSuperAdmin,
+    isSuperAdmin
   };
 }
