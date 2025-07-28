@@ -1,4 +1,4 @@
-
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,23 +14,78 @@ import {
   TrendingUp,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  BarChart3
 } from 'lucide-react';
 import { useSecureRoleValidation } from '@/hooks/useSecureRoleValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function SystemOverview() {
   const { user } = useAuth();
   const { isSuperAdmin, loading } = useSecureRoleValidation(user);
   const navigate = useNavigate();
+  const [systemStats, setSystemStats] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    clinicians: 0,
+    patients: 0,
+    sessions: 0,
+    moodEntries: 0,
+    systemHealth: 'healthy'
+  });
 
   useEffect(() => {
     if (!loading && !isSuperAdmin) {
       navigate('/clinician/dashboard');
     }
   }, [loading, isSuperAdmin, navigate]);
+
+  useEffect(() => {
+    if (isSuperAdmin) {
+      fetchSystemStats();
+    }
+  }, [isSuperAdmin]);
+
+  const fetchSystemStats = async () => {
+    try {
+      // Fetch real data from the database
+      const { data: users, error: usersError } = await supabase
+        .from('profiles')
+        .select('role, status');
+
+      const { data: sessions, error: sessionsError } = await supabase
+        .from('sessions')
+        .select('id');
+
+      const { data: moodEntries, error: moodError } = await supabase
+        .from('mood_entries')
+        .select('id');
+
+      if (usersError || sessionsError || moodError) {
+        console.error('Error fetching stats:', { usersError, sessionsError, moodError });
+      }
+
+      const totalUsers = users?.length || 0;
+      const activeUsers = users?.filter(u => u.status === 'active').length || 0;
+      const clinicians = users?.filter(u => u.role === 'clinician').length || 0;
+      const patients = users?.filter(u => u.role === 'patient').length || 0;
+
+      setSystemStats({
+        totalUsers,
+        activeUsers,
+        clinicians,
+        patients,
+        sessions: sessions?.length || 0,
+        moodEntries: moodEntries?.length || 0,
+        systemHealth: 'healthy'
+      });
+    } catch (error) {
+      console.error('Error fetching system stats:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -51,7 +106,7 @@ export default function SystemOverview() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <Shield className="h-8 w-8 text-blue-600" />
+              <BarChart3 className="h-8 w-8 text-blue-600" />
               System Overview
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">Comprehensive system administration dashboard</p>
@@ -65,45 +120,45 @@ export default function SystemOverview() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card className="border-gray-200 dark:border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">System Status</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{systemStats.totalUsers}</div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Registered users</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-gray-200 dark:border-gray-700">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Active Users</CardTitle>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">Healthy</div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">All systems operational</p>
+              <div className="text-2xl font-bold text-green-600">{systemStats.activeUsers}</div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Currently active</p>
             </CardContent>
           </Card>
           
           <Card className="border-gray-200 dark:border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Database</CardTitle>
-              <Database className="h-4 w-4 text-blue-600" />
+              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Sessions</CardTitle>
+              <Activity className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">Active</div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Response time: 23ms</p>
+              <div className="text-2xl font-bold text-blue-600">{systemStats.sessions}</div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Total sessions</p>
             </CardContent>
           </Card>
           
           <Card className="border-gray-200 dark:border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Security</CardTitle>
-              <Lock className="h-4 w-4 text-amber-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-amber-600">Secure</div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">No threats detected</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="border-gray-200 dark:border-gray-700">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Performance</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Mood Entries</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">Optimal</div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">99.9% uptime</p>
+              <div className="text-2xl font-bold text-green-600">{systemStats.moodEntries}</div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Total entries</p>
             </CardContent>
           </Card>
         </div>
@@ -111,7 +166,7 @@ export default function SystemOverview() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate('/admin/super-admin-dashboard')}>
+                onClick={() => navigate('/admin/user-management')}>
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-600" />
@@ -146,7 +201,8 @@ export default function SystemOverview() {
             </CardContent>
           </Card>
           
-          <Card className="border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate('/admin/system-health')}>
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
                 <Activity className="h-5 w-5 text-green-600" />
