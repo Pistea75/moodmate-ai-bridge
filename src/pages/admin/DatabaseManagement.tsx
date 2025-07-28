@@ -64,7 +64,7 @@ export default function DatabaseManagement() {
         .select('id', { count: 'exact' });
 
       const { data: chatData, error: chatError } = await supabase
-        .from('chat_messages')
+        .from('ai_chat_logs')
         .select('id', { count: 'exact' });
 
       // Mock some additional stats since we can't get real database metrics
@@ -143,7 +143,7 @@ export default function DatabaseManagement() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <Database className="h-8 w-8 text-purple-600" />
+              <Database className="h-8 w-8 text-blue-600" />
               Database Management
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">Monitor and manage database operations</p>
@@ -164,10 +164,10 @@ export default function DatabaseManagement() {
           <Card className="border-gray-200 dark:border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Records</CardTitle>
-              <Database className="h-4 w-4 text-purple-600" />
+              <Database className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{stats.totalRecords.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.totalRecords.toLocaleString()}</div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Across all tables</p>
             </CardContent>
           </Card>
@@ -175,10 +175,10 @@ export default function DatabaseManagement() {
           <Card className="border-gray-200 dark:border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Storage Used</CardTitle>
-              <HardDrive className="h-4 w-4 text-blue-600" />
+              <HardDrive className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.storageUsed}</div>
+              <div className="text-2xl font-bold text-gray-600">{stats.storageUsed}</div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Database size</p>
             </CardContent>
           </Card>
@@ -197,10 +197,10 @@ export default function DatabaseManagement() {
           <Card className="border-gray-200 dark:border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Performance</CardTitle>
-              <TrendingUp className="h-4 w-4 text-amber-600" />
+              <TrendingUp className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-amber-600">{stats.queryPerformance}%</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.queryPerformance}%</div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Query performance</p>
             </CardContent>
           </Card>
@@ -237,7 +237,7 @@ export default function DatabaseManagement() {
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <HardDrive className="h-5 w-5 text-blue-600" />
+                      <HardDrive className="h-5 w-5 text-gray-600" />
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">Backup Size</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{stats.backupSize}</p>
@@ -266,14 +266,14 @@ export default function DatabaseManagement() {
             <Card className="border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-green-600" />
+                  <Activity className="h-5 w-5 text-blue-600" />
                   Database Maintenance
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <Button onClick={optimizeDatabase} className="w-full bg-green-600 hover:bg-green-700">
+                    <Button onClick={optimizeDatabase} className="w-full bg-blue-600 hover:bg-blue-700">
                       <TrendingUp className="h-4 w-4 mr-2" />
                       Optimize Database
                     </Button>
@@ -305,7 +305,7 @@ export default function DatabaseManagement() {
             <Card className="border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-amber-600" />
+                  <Activity className="h-5 w-5 text-blue-600" />
                   Database Monitoring
                 </CardTitle>
               </CardHeader>
