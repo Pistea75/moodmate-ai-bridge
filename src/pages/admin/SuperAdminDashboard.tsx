@@ -26,7 +26,6 @@ interface UserData {
   first_name: string;
   last_name: string;
   role: string;
-  user_role: string;
   status: string;
   created_at: string;
   last_active_at: string;
@@ -81,18 +80,18 @@ export default function SuperAdminDashboard() {
 
       if (usersError) throw usersError;
 
-      // Map the data to include user_role fallback
+      // Map the data to work with current schema
       const mappedUsers = usersData?.map(user => ({
         ...user,
-        user_role: user.user_role || user.role
+        role: user.role || 'patient' // fallback to patient if no role
       })) || [];
 
       setUsers(mappedUsers);
 
       // Calculate stats
       const totalUsers = mappedUsers.length;
-      const totalPatients = mappedUsers.filter(u => u.role === 'patient' || u.user_role === 'patient').length;
-      const totalClinicians = mappedUsers.filter(u => u.role === 'clinician' || u.user_role === 'clinician').length;
+      const totalPatients = mappedUsers.filter(u => u.role === 'patient').length;
+      const totalClinicians = mappedUsers.filter(u => u.role === 'clinician').length;
       const today = new Date().toISOString().split('T')[0];
       const newUsersToday = mappedUsers.filter(u => 
         u.created_at?.startsWith(today)
@@ -106,14 +105,20 @@ export default function SuperAdminDashboard() {
         newUsersToday
       });
 
-      // Fetch system settings
-      const { data: settingsData, error: settingsError } = await supabase
-        .from('system_settings')
-        .select('*')
-        .order('setting_key');
+      // Fetch system settings if table exists
+      try {
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('system_settings')
+          .select('*')
+          .order('setting_key');
 
-      if (settingsError) throw settingsError;
-      setSettings(settingsData || []);
+        if (!settingsError) {
+          setSettings(settingsData || []);
+        }
+      } catch (settingsError) {
+        // System settings table might not exist yet
+        console.log('System settings table not available yet');
+      }
 
     } catch (error) {
       console.error('Error fetching admin data:', error);
@@ -378,45 +383,52 @@ export default function SuperAdminDashboard() {
                 <CardTitle>System Settings</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {settings.map((setting) => (
-                  <div key={setting.setting_key} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label className="text-sm font-medium">{setting.setting_key}</Label>
-                      <Badge variant="outline">{typeof setting.setting_value}</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">{setting.description}</p>
-                    
-                    {typeof setting.setting_value === 'boolean' ? (
-                      <Switch
-                        checked={setting.setting_value}
-                        onCheckedChange={(checked) => 
-                          updateSystemSetting(setting.setting_key, checked)
-                        }
-                      />
-                    ) : typeof setting.setting_value === 'object' ? (
-                      <Textarea
-                        value={JSON.stringify(setting.setting_value, null, 2)}
-                        onChange={(e) => {
-                          try {
-                            const parsed = JSON.parse(e.target.value);
-                            updateSystemSetting(setting.setting_key, parsed);
-                          } catch (error) {
-                            // Invalid JSON, don't update
-                          }
-                        }}
-                        className="font-mono text-sm"
-                        rows={4}
-                      />
-                    ) : (
-                      <Input
-                        value={setting.setting_value}
-                        onChange={(e) => 
-                          updateSystemSetting(setting.setting_key, e.target.value)
-                        }
-                      />
-                    )}
+                {settings.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Settings className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>System settings will be available after database migration</p>
                   </div>
-                ))}
+                ) : (
+                  settings.map((setting) => (
+                    <div key={setting.setting_key} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label className="text-sm font-medium">{setting.setting_key}</Label>
+                        <Badge variant="outline">{typeof setting.setting_value}</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3">{setting.description}</p>
+                      
+                      {typeof setting.setting_value === 'boolean' ? (
+                        <Switch
+                          checked={setting.setting_value}
+                          onCheckedChange={(checked) => 
+                            updateSystemSetting(setting.setting_key, checked)
+                          }
+                        />
+                      ) : typeof setting.setting_value === 'object' ? (
+                        <Textarea
+                          value={JSON.stringify(setting.setting_value, null, 2)}
+                          onChange={(e) => {
+                            try {
+                              const parsed = JSON.parse(e.target.value);
+                              updateSystemSetting(setting.setting_key, parsed);
+                            } catch (error) {
+                              // Invalid JSON, don't update
+                            }
+                          }}
+                          className="font-mono text-sm"
+                          rows={4}
+                        />
+                      ) : (
+                        <Input
+                          value={setting.setting_value}
+                          onChange={(e) => 
+                            updateSystemSetting(setting.setting_key, e.target.value)
+                          }
+                        />
+                      )}
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
           </TabsContent>

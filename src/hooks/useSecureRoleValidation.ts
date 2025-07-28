@@ -43,7 +43,7 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
       // Query role and super admin status directly from profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('role, is_super_admin, user_role')
+        .select('role, is_super_admin')
         .eq('id', user.id)
         .single();
 
@@ -63,8 +63,8 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
         return;
       }
 
-      // Use the new user_role column if available, otherwise fall back to role
-      const userRole = profileData.user_role || profileData.role;
+      // Use the role column for now, will be updated when schema is migrated
+      const userRole = profileData.role;
       const superAdmin = profileData.is_super_admin || userRole === 'super_admin';
 
       // Set role and super admin status
