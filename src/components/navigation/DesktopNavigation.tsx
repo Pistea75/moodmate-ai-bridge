@@ -5,6 +5,7 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/compon
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogoutButton } from "@/components/LogoutButton";
+import { Brain } from "lucide-react";
 
 interface DesktopNavigationProps {
   isLoggedIn: boolean;
@@ -16,8 +17,8 @@ export function DesktopNavigation({ isLoggedIn, navItems, username }: DesktopNav
   return (
     <div className="flex items-center justify-between py-4 px-6 bg-background border-b sticky top-0 z-50 w-full">
       <Link to="/" className="flex items-center gap-2">
-        <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
-          <span className="font-bold text-primary-foreground">M</span>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
+          <Brain className="h-6 w-6 text-white" />
         </div>
         <span className="text-xl font-semibold text-primary">MoodMate</span>
       </Link>

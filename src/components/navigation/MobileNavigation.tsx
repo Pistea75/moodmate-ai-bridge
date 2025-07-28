@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -41,8 +41,8 @@ export function MobileNavigation({ navItems, username }: MobileNavigationProps) 
                 <div className="p-6 border-b border-border bg-background">
                   <div className="flex items-center gap-3 mb-4">
                     <Link to="/patient/dashboard" className="flex items-center gap-2">
-                      <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-sm">
-                        <span className="font-bold text-primary-foreground text-lg">M</span>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
+                        <Brain className="h-6 w-6 text-white" />
                       </div>
                       <span className="text-xl font-bold text-primary">MoodMate</span>
                     </Link>
@@ -95,8 +95,8 @@ export function MobileNavigation({ navItems, username }: MobileNavigationProps) 
           
           {/* Logo */}
           <Link to="/patient/dashboard" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="font-bold text-primary-foreground text-sm">M</span>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
+              <Brain className="h-5 w-5 text-white" />
             </div>
             <span className="text-lg font-semibold text-primary">MoodMate</span>
           </Link>

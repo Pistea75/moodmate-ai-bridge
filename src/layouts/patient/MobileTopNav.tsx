@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MenuIcon, MessageCircle, Plus } from 'lucide-react';
+import { MenuIcon, MessageCircle, Plus, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { PatientSidebarContent } from './PatientSidebarContent';
@@ -37,8 +37,8 @@ export function MobileTopNav({ patientFullName, isOpen, setIsOpen }: MobileTopNa
           </Sheet>
           
           <Link to="/patient/dashboard" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="font-bold text-primary-foreground text-sm">M</span>
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
+              <Brain className="h-5 w-5 text-white" />
             </div>
             <span className="text-lg font-semibold text-primary">MoodMate</span>
           </Link>
