@@ -5,6 +5,7 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/compon
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogoutButton } from "@/components/LogoutButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Brain } from "lucide-react";
 
 interface DesktopNavigationProps {
@@ -43,6 +44,9 @@ export function DesktopNavigation({ isLoggedIn, navItems, username }: DesktopNav
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
+                <ThemeToggle />
+              </NavigationMenuItem>
+              <NavigationMenuItem>
                 <Link to="/login">
                   <Button variant="ghost" className="text-sm">Log in</Button>
                 </Link>
@@ -55,35 +59,40 @@ export function DesktopNavigation({ isLoggedIn, navItems, username }: DesktopNav
             </>
           ) : (
             navItems && username && (
-              <NavigationMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="flex gap-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src="/placeholder-avatar.jpg" />
-                        <AvatarFallback>{username.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <span className="hidden md:inline">{username}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {navItems.map((item) => (
-                      <DropdownMenuItem key={item.path} asChild>
-                        <Link to={item.path} className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.name}</span>
-                        </Link>
+              <>
+                <NavigationMenuItem>
+                  <ThemeToggle />
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="flex gap-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src="/placeholder-avatar.jpg" />
+                          <AvatarFallback>{username.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className="hidden md:inline">{username}</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {navItems.map((item) => (
+                        <DropdownMenuItem key={item.path} asChild>
+                          <Link to={item.path} className="flex items-center gap-2">
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.name}</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <LogoutButton variant="ghost" className="w-full justify-start" />
                       </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <LogoutButton variant="ghost" className="w-full justify-start" />
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </NavigationMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </NavigationMenuItem>
+              </>
             )
           )}
         </NavigationMenuList>

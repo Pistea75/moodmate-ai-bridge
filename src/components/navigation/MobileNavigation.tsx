@@ -4,6 +4,7 @@ import { MenuIcon, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LogoutButton } from "@/components/LogoutButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -39,13 +40,14 @@ export function MobileNavigation({ navItems, username }: MobileNavigationProps) 
               <div className="flex flex-col h-full bg-background">
                 {/* Header */}
                 <div className="p-6 border-b border-border bg-background">
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center justify-between mb-4">
                     <Link to="/patient/dashboard" className="flex items-center gap-2">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
                         <Brain className="h-6 w-6 text-white" />
                       </div>
                       <span className="text-xl font-bold text-primary">MoodMate</span>
                     </Link>
+                    <ThemeToggle />
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -102,16 +104,19 @@ export function MobileNavigation({ navItems, username }: MobileNavigationProps) 
           </Link>
         </div>
 
-        {/* Optional: Quick action button */}
-        <Link to="/patient/chat">
-          <Button 
-            size="sm" 
-            variant="outline"
-            className="h-9 px-3 text-sm font-medium border-primary/20 text-primary hover:bg-primary/10 active:bg-primary/20 transition-colors"
-          >
-            Chat
-          </Button>
-        </Link>
+        {/* Right side actions */}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link to="/patient/chat">
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="h-9 px-3 text-sm font-medium border-primary/20 text-primary hover:bg-primary/10 active:bg-primary/20 transition-colors"
+            >
+              Chat
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Spacer for fixed header */}

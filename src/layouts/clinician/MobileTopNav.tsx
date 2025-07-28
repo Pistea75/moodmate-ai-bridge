@@ -4,6 +4,7 @@ import { MenuIcon, Bell, Search, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ClinicianSidebarContent } from './ClinicianSidebarContent';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
 
 type MobileTopNavProps = {
@@ -44,6 +45,7 @@ export function MobileTopNav({ isOpen, setIsOpen }: MobileTopNavProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Button 
             variant="ghost" 
             size="icon"

@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PatientNavItems } from './PatientNavItems';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { LogOut, User, Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -41,14 +42,17 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
     <div className="flex flex-col h-full bg-background">
       {/* Logo and Title */}
       <div className="p-6 border-b border-border flex-shrink-0 bg-background">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
-            <Brain className="h-7 w-7 text-white" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
+              <Brain className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">MoodMate</h1>
+              <p className="text-sm text-muted-foreground">{t('patientPortal')}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">MoodMate</h1>
-            <p className="text-sm text-muted-foreground">{t('patientPortal')}</p>
-          </div>
+          <ThemeToggle />
         </div>
       </div>
 

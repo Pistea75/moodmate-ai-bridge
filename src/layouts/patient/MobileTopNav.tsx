@@ -4,6 +4,7 @@ import { MenuIcon, MessageCircle, Plus, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { PatientSidebarContent } from './PatientSidebarContent';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
 
 type MobileTopNavProps = {
@@ -45,6 +46,7 @@ export function MobileTopNav({ patientFullName, isOpen, setIsOpen }: MobileTopNa
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link to="/patient/chat">
             <Button 
               size="sm" 
