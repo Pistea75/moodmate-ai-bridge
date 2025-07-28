@@ -48,16 +48,16 @@
   }
 
   .dark {
-    /* Base */
-    --page-background: 240 22% 13%;
-    --background: 240 22% 13%;
-    --foreground: 0 0% 95%;
+    /* Base - Enhanced dark mode */
+    --page-background: 240 10% 3.9%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
 
-    --card: 240 22% 16%;
-    --card-foreground: 0 0% 95%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 240 22% 16%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
 
     /* Primary purple color for dark mode */
     --primary: 263 83% 75%;
@@ -67,19 +67,24 @@
     --secondary: 261 28% 63%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Neutrals */
-    --muted: 240 20% 22%;
-    --muted-foreground: 240 10% 70%;
+    /* Neutrals - Enhanced for better contrast */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
 
     --accent: 45 100% 70%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 40.6%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 20% 25%;
-    --input: 240 20% 25%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
     --ring: var(--primary);
+
+    /* Super admin specific colors */
+    --admin-bg: 240 10% 3.9%;
+    --admin-card: 240 9% 9%;
+    --admin-border: 240 6% 20%;
   }
 }
 
@@ -92,12 +97,17 @@
     @apply bg-background text-foreground transition-colors duration-300;
   }
 
+  /* Enhanced dark mode support */
+  html.dark {
+    color-scheme: dark;
+  }
+
   /* Theme color styles for backgrounds */
   body {
     background-color: hsl(var(--page-background));
   }
 
-  /* Add a subtle gradient for various theme colors in the background */
+  /* Enhanced dark mode gradients */
   body::before {
     content: '';
     position: fixed;
@@ -106,14 +116,22 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    opacity: 0.05;
+    opacity: 0.03;
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, transparent 100%);
     z-index: -1;
   }
 
-  /* Ensure cards and buttons are styled properly with theme colors */
+  .dark body::before {
+    opacity: 0.02;
+  }
+
+  /* Enhanced card styling for dark mode */
   .card, .card-highlighted {
-    @apply bg-card border-border;
+    @apply bg-card border-border shadow-sm;
+  }
+
+  .dark .card, .dark .card-highlighted {
+    @apply shadow-lg;
   }
 
   /* Apply theme colors to sidebar navigation */
@@ -125,12 +143,16 @@
     @apply bg-primary text-primary-foreground;
   }
   
-  /* Enhanced switch visibility */
+  /* Enhanced switch visibility for dark mode */
   .switch-thumb {
     @apply bg-white shadow-md;
   }
 
-  /* Custom slider styling */
+  .dark .switch-thumb {
+    @apply bg-gray-200;
+  }
+
+  /* Enhanced custom slider styling for dark mode */
   .slider {
     -webkit-appearance: none;
     appearance: none;
@@ -151,6 +173,11 @@
     border: 2px solid #7c3aed;
   }
 
+  .dark .slider::-webkit-slider-thumb {
+    background: #f3f4f6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
   .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
@@ -159,6 +186,16 @@
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     border: 2px solid #7c3aed;
+  }
+
+  .dark .slider::-moz-range-thumb {
+    background: #f3f4f6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Enhanced button styling for dark mode */
+  .dark .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
   }
 }
 
@@ -197,7 +234,7 @@
     animation: countUp 2s ease-out forwards;
   }
 
-  /* Gentle glow animation */
+  /* Enhanced glow animation for dark mode */
   .animate-glow {
     animation: glow 3s ease-in-out infinite alternate;
   }
@@ -295,7 +332,7 @@
     }
   }
 
-  /* Improved hover effects */
+  /* Enhanced hover effects for dark mode */
   .hover-glow {
     transition: all 0.3s ease;
   }
@@ -312,7 +349,13 @@
     background-size: 20px 20px;
   }
 
-  /* Gradient text effect */
+  .dark .bg-grid-pattern {
+    background-image: 
+      linear-gradient(rgba(155, 135, 245, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(155, 135, 245, 0.05) 1px, transparent 1px);
+  }
+
+  /* Enhanced gradient text effect for dark mode */
   .gradient-text {
     background: linear-gradient(135deg, #60A5FA, #A78BFA, #F472B6);
     -webkit-background-clip: text;
@@ -320,10 +363,15 @@
     background-clip: text;
   }
 
-  /* Glassmorphism effect */
+  /* Enhanced glassmorphism effect for dark mode */
   .glass-effect {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .dark .glass-effect {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }

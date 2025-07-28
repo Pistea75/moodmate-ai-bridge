@@ -1,138 +1,109 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  Users, Search, Filter, UserCheck, UserX, Edit, Trash2, Plus, Shield
+  Users, 
+  Search, 
+  Filter, 
+  Edit, 
+  Trash2, 
+  Plus, 
+  Shield, 
+  UserCheck,
+  AlertCircle,
+  Clock,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useSecureRoleValidation } from '@/hooks/useSecureRoleValidation';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSuperAdmin } from '@/hooks/useSuperAdmin';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
-interface UserData {
+interface User {
   id: string;
-  email: string;
   first_name: string;
   last_name: string;
-  role: string;
-  status: string;
+  email: string;
+  role: 'patient' | 'clinician' | 'admin';
+  status: 'active' | 'inactive' | 'suspended';
   created_at: string;
-  is_super_admin: boolean;
+  last_login: string;
 }
 
 export default function UserManagement() {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const { isSuperAdmin, loading: superAdminLoading } = useSuperAdmin();
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { isSuperAdmin, loading } = useSecureRoleValidation(user);
+  const navigate = useNavigate();
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'suspended'>('all');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'patient' | 'clinician' | 'admin'>('all');
 
   useEffect(() => {
-    if (!superAdminLoading && !isSuperAdmin) {
-      toast.error('Access denied. Super admin privileges required.');
-      navigate('/');
-      return;
+    if (!loading && !isSuperAdmin) {
+      navigate('/clinician/dashboard');
     }
-    
+  }, [loading, isSuperAdmin, navigate]);
+
+  useEffect(() => {
     if (isSuperAdmin) {
       fetchUsers();
     }
-  }, [user, isSuperAdmin, superAdminLoading, navigate]);
-
-  useEffect(() => {
-    filterUsers();
-  }, [users, searchTerm, roleFilter, statusFilter]);
+  }, [isSuperAdmin]);
 
   const fetchUsers = async () => {
     try {
-      setLoading(true);
-      const { data: usersData, error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, first_name, last_name, email, role, status, created_at, last_login')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setUsers(usersData || []);
+      if (error) {
+        console.error('Error fetching users:', error);
+        return;
+      }
+
+      setUsers(data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('Failed to load users');
-    } finally {
-      setLoading(false);
     }
   };
 
-  const filterUsers = () => {
-    let filtered = users;
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = 
+      user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
 
-    if (searchTerm) {
-      filtered = filtered.filter(user => 
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+    return matchesSearch && matchesStatus && matchesRole;
+  });
 
-    if (roleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === roleFilter);
-    }
-
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(user => user.status === statusFilter);
-    }
-
-    setFilteredUsers(filtered);
-  };
-
-  const updateUserStatus = async (userId: string, newStatus: string) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ status: newStatus })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      setUsers(prev => prev.map(user => 
-        user.id === userId ? { ...user, status: newStatus } : user
-      ));
-
-      toast.success(`User status updated to ${newStatus}`);
-    } catch (error) {
-      console.error('Error updating user status:', error);
-      toast.error('Failed to update user status');
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'inactive': return <Clock className="h-4 w-4 text-gray-500" />;
+      case 'suspended': return <XCircle className="h-4 w-4 text-red-500" />;
+      default: return <AlertCircle className="h-4 w-4 text-yellow-500" />;
     }
   };
 
-  const deleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      const { error } = await supabase.functions.invoke('delete-user', {
-        body: { userId }
-      });
-
-      if (error) throw error;
-
-      setUsers(prev => prev.filter(user => user.id !== userId));
-      toast.success('User deleted successfully');
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      toast.error('Failed to delete user');
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'admin': return <Shield className="h-4 w-4 text-blue-500" />;
+      case 'clinician': return <UserCheck className="h-4 w-4 text-green-500" />;
+      case 'patient': return <Users className="h-4 w-4 text-gray-500" />;
+      default: return <Users className="h-4 w-4 text-gray-500" />;
     }
   };
 
-  if (superAdminLoading || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -145,7 +116,7 @@ export default function UserManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -156,188 +127,176 @@ export default function UserManagement() {
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">Manage user accounts, roles, and permissions</p>
           </div>
-          <Button onClick={() => navigate('/admin/create-user')} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Create User
-          </Button>
+          <Badge variant="outline" className="px-4 py-2 text-sm border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20">
+            SUPER ADMIN
+          </Badge>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="border-gray-200 dark:border-gray-700">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{users.length}</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="border-gray-200 dark:border-gray-700">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Active Users</CardTitle>
-              <UserCheck className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {users.filter(u => u.status === 'active').length}
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Users</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{users.length}</p>
+                </div>
+                <Users className="h-8 w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
           
-          <Card className="border-gray-200 dark:border-gray-700">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Clinicians</CardTitle>
-              <Shield className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
-                {users.filter(u => u.role === 'clinician').length}
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Active Users</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {users.filter(u => u.status === 'active').length}
+                  </p>
+                </div>
+                <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
           
-          <Card className="border-gray-200 dark:border-gray-700">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Patients</CardTitle>
-              <UserCheck className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-600">
-                {users.filter(u => u.role === 'patient').length}
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Clinicians</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {users.filter(u => u.role === 'clinician').length}
+                  </p>
+                </div>
+                <UserCheck className="h-8 w-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Patients</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {users.filter(u => u.role === 'patient').length}
+                  </p>
+                </div>
+                <Users className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Filters */}
-        <Card className="border-gray-200 dark:border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Filters</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+        {/* Filters and Search */}
+        <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search users..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+                  />
+                </div>
               </div>
-              
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Roles</SelectItem>
-                  <SelectItem value="patient">Patient</SelectItem>
-                  <SelectItem value="clinician">Clinician</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as any)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="suspended">Suspended</option>
+              </select>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value as any)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="all">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="clinician">Clinician</option>
+                <option value="patient">Patient</option>
+              </select>
             </div>
           </CardContent>
         </Card>
 
         {/* Users Table */}
-        <Card className="border-gray-200 dark:border-gray-700">
+        <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">Users ({filteredUsers.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-gray-700 dark:text-gray-300">User</TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">Email</TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">Role</TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">Status</TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">Created</TableHead>
-                    <TableHead className="text-gray-700 dark:text-gray-300">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.map((userData) => (
-                    <TableRow key={userData.id}>
-                      <TableCell>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-4 text-gray-900 dark:text-white">User</th>
+                    <th className="text-left py-3 px-4 text-gray-900 dark:text-white">Role</th>
+                    <th className="text-left py-3 px-4 text-gray-900 dark:text-white">Status</th>
+                    <th className="text-left py-3 px-4 text-gray-900 dark:text-white">Created</th>
+                    <th className="text-left py-3 px-4 text-gray-900 dark:text-white">Last Login</th>
+                    <th className="text-left py-3 px-4 text-gray-900 dark:text-white">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user) => (
+                    <tr key={user.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="py-3 px-4">
                         <div>
                           <div className="font-medium text-gray-900 dark:text-white">
-                            {userData.first_name} {userData.last_name}
-                            {userData.is_super_admin && (
-                              <Badge variant="outline" className="ml-2 text-xs border-blue-200 text-blue-800 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-700">
-                                SUPER ADMIN
-                              </Badge>
-                            )}
+                            {user.first_name} {user.last_name}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">{userData.id}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-gray-900 dark:text-white">{userData.email}</TableCell>
-                      <TableCell>
-                        <Badge variant={userData.role === 'clinician' ? 'default' : 'secondary'}>
-                          {userData.role}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={userData.status === 'active' ? 'default' : 'destructive'}>
-                          {userData.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-gray-900 dark:text-white">
-                        {new Date(userData.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <Button
+                          {getRoleIcon(user.role)}
+                          <span className="capitalize text-gray-900 dark:text-white">{user.role}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(user.status)}
+                          <span className="capitalize text-gray-900 dark:text-white">{user.status}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-gray-900 dark:text-white">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="py-3 px-4 text-gray-900 dark:text-white">
+                        {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
                             size="sm"
-                            variant="outline"
-                            onClick={() => navigate(`/admin/user/${userData.id}`)}
+                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                           >
-                            <Edit className="h-3 w-3" />
+                            <Edit className="h-4 w-4" />
                           </Button>
-                          <Select
-                            value={userData.status}
-                            onValueChange={(value) => updateUserStatus(userData.id, value)}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="active">Active</SelectItem>
-                              <SelectItem value="inactive">Inactive</SelectItem>
-                              <SelectItem value="suspended">Suspended</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Button
+                          <Button 
+                            variant="ghost" 
                             size="sm"
-                            variant="destructive"
-                            onClick={() => deleteUser(userData.id)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                           >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>

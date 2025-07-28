@@ -100,7 +100,7 @@ export default function SystemOverview() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -111,14 +111,14 @@ export default function SystemOverview() {
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">Comprehensive system administration dashboard</p>
           </div>
-          <Badge variant="outline" className="px-4 py-2 text-sm border-blue-200 text-blue-800 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
+          <Badge variant="outline" className="px-4 py-2 text-sm border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20">
             SUPER ADMIN
           </Badge>
         </div>
 
         {/* System Health Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Users</CardTitle>
               <Users className="h-4 w-4 text-blue-600" />
@@ -129,7 +129,7 @@ export default function SystemOverview() {
             </CardContent>
           </Card>
           
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Active Users</CardTitle>
               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -140,7 +140,7 @@ export default function SystemOverview() {
             </CardContent>
           </Card>
           
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Sessions</CardTitle>
               <Activity className="h-4 w-4 text-blue-600" />
@@ -151,7 +151,7 @@ export default function SystemOverview() {
             </CardContent>
           </Card>
           
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">Mood Entries</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-600" />
@@ -165,7 +165,7 @@ export default function SystemOverview() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={() => navigate('/admin/user-management')}>
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
@@ -177,13 +177,13 @@ export default function SystemOverview() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Manage user accounts, roles, and permissions across the platform.
               </p>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                 Manage Users
               </Button>
             </CardContent>
           </Card>
           
-          <Card className="border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={() => navigate('/admin/super-admin-panel')}>
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
@@ -195,13 +195,13 @@ export default function SystemOverview() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Request and manage access to protected health information with audit trails.
               </p>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                 Access PHI Panel
               </Button>
             </CardContent>
           </Card>
           
-          <Card className="border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={() => navigate('/admin/system-health')}>
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
@@ -213,7 +213,7 @@ export default function SystemOverview() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Monitor system performance, logs, and health metrics in real-time.
               </p>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                 View Metrics
               </Button>
             </CardContent>
@@ -222,7 +222,7 @@ export default function SystemOverview() {
 
         {/* System Statistics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
                 <Server className="h-5 w-5 text-blue-600" />
@@ -233,25 +233,25 @@ export default function SystemOverview() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-700 dark:text-gray-300">CPU Usage</span>
-                  <Badge variant="outline" className="text-green-600 border-green-600">23%</Badge>
+                  <Badge variant="outline" className="text-green-600 border-green-600 dark:border-green-500">23%</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-700 dark:text-gray-300">Memory Usage</span>
-                  <Badge variant="outline" className="text-blue-600 border-blue-600">67%</Badge>
+                  <Badge variant="outline" className="text-blue-600 border-blue-600 dark:border-blue-500">67%</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-700 dark:text-gray-300">Storage</span>
-                  <Badge variant="outline" className="text-amber-600 border-amber-600">45%</Badge>
+                  <Badge variant="outline" className="text-amber-600 border-amber-600 dark:border-amber-500">45%</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-700 dark:text-gray-300">Network</span>
-                  <Badge variant="outline" className="text-green-600 border-green-600">Normal</Badge>
+                  <Badge variant="outline" className="text-green-600 border-green-600 dark:border-green-500">Normal</Badge>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
                 <Eye className="h-5 w-5 text-amber-600" />

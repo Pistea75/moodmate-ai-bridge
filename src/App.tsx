@@ -25,7 +25,6 @@ import DatabaseManagement from './pages/admin/DatabaseManagement';
 import SecurityLogs from './pages/admin/SecurityLogs';
 import SystemHealth from './pages/admin/SystemHealth';
 import AuditTrail from './pages/admin/AuditTrail';
-import RiskManagement from './pages/admin/RiskManagement';
 import SystemMaintenance from './pages/admin/SystemMaintenance';
 
 const queryClient = new QueryClient();
@@ -36,7 +35,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <LanguageProvider>
-            <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+            <ThemeProvider>
               <div className="flex flex-col min-h-screen">
                 <ErrorBoundary>
                   <Routes>
@@ -116,13 +115,6 @@ function App() {
                       <ProtectedRoute>
                         <ClinicianLayout>
                           <AuditTrail />
-                        </ClinicianLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/admin/risk-management" element={
-                      <ProtectedRoute>
-                        <ClinicianLayout>
-                          <RiskManagement />
                         </ClinicianLayout>
                       </ProtectedRoute>
                     } />
