@@ -2,6 +2,7 @@
 import { ReactNode, useState } from 'react';
 import { MobileTopNav } from './clinician/MobileTopNav';
 import { DesktopSidebar } from './clinician/DesktopSidebar';
+import { SuperAdminDesktopSidebar } from './clinician/SuperAdminDesktopSidebar';
 import { useClinicianProfile } from './clinician/useClinicianProfile';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -12,7 +13,7 @@ type ClinicianLayoutProps = {
 export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
   console.log('🏗️ ClinicianLayout component rendering');
   const [isOpen, setIsOpen] = useState(false);
-  const { clinicianFullName } = useClinicianProfile();
+  const { clinicianFullName, isSuperAdmin } = useClinicianProfile();
   const isMobile = useIsMobile();
   
   return (
@@ -25,13 +26,17 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
         />
       )}
       
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - Show different sidebar based on super admin status */}
       {!isMobile && (
-        <DesktopSidebar />
+        isSuperAdmin ? (
+          <SuperAdminDesktopSidebar />
+        ) : (
+          <DesktopSidebar />
+        )
       )}
       
       {/* Main Content */}
-      <main className={`flex-1 ${isMobile ? 'pt-16' : 'md:ml-64'} bg-gray-50 min-h-screen`}>
+      <main className={`flex-1 ${isMobile ? 'pt-16' : 'md:ml-64'} ${isSuperAdmin ? 'bg-red-50' : 'bg-gray-50'} min-h-screen`}>
         <div className={`w-full min-h-screen ${isMobile ? 'px-4 py-6' : 'p-6'}`}>
           {children}
         </div>
