@@ -97,11 +97,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const selectedColors = colorSchemes[themeColor];
       
       if (selectedColors) {
-        root.style.setProperty("--primary", selectedColors.primary);
-        root.style.setProperty("--secondary", selectedColors.secondary);
-        root.style.setProperty("--accent", selectedColors.accent);
-        root.style.setProperty("--muted", selectedColors.muted);
-        root.style.setProperty("--ring", selectedColors.ring);
+        // Apply the colors to CSS custom properties
+        Object.entries(selectedColors).forEach(([key, value]) => {
+          root.style.setProperty(`--${key}`, value);
+        });
         
         // Update sidebar colors based on theme and selected color
         const sidebarBg = theme === "dark" ? "240 10% 8%" : "240 10% 15%";
@@ -110,6 +109,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.style.setProperty("--sidebar-primary", selectedColors.primary);
         root.style.setProperty("--sidebar-background", sidebarBg);
         root.style.setProperty("--sidebar-accent", sidebarAccent);
+        
+        // Force a re-render by triggering a custom event
+        window.dispatchEvent(new CustomEvent('themeChanged', { 
+          detail: { theme, themeColor } 
+        }));
       }
     }
   }, [themeColor, theme]);
