@@ -1,212 +1,147 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Bell, 
-  Clock, 
-  AlertTriangle, 
-  CheckCircle, 
-  User, 
-  Calendar,
-  MessageSquare,
-  X,
-  RefreshCw
-} from "lucide-react";
-import { useNotifications } from "@/hooks/useNotifications";
-import { formatDistanceToNow } from "date-fns";
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Bell, MessageSquare, Calendar, AlertTriangle, CheckCircle, X, Check } from 'lucide-react';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationService } from '@/hooks/useNotificationService';
+import { formatDistanceToNow } from 'date-fns';
+
+const getNotificationIcon = (type: string) => {
+  switch (type) {
+    case 'alert':
+      return <AlertTriangle className="h-4 w-4 text-red-500" />;
+    case 'session':
+      return <Calendar className="h-4 w-4 text-blue-500" />;
+    case 'message':
+      return <MessageSquare className="h-4 w-4 text-green-500" />;
+    case 'task':
+      return <CheckCircle className="h-4 w-4 text-orange-500" />;
+    default:
+      return <Bell className="h-4 w-4 text-gray-500" />;
+  }
+};
+
+const getPriorityColor = (priority: string) => {
+  switch (priority) {
+    case 'high':
+      return 'destructive';
+    case 'medium':
+      return 'default';
+    case 'low':
+      return 'secondary';
+    default:
+      return 'default';
+  }
+};
 
 export function NotificationsPanel() {
-  const {
-    notifications,
-    loading,
-    error,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-    dismissNotification,
-    refetch
-  } = useNotifications();
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'session': return Calendar;
-      case 'task': return CheckCircle;
-      case 'alert': return AlertTriangle;
-      case 'message': return MessageSquare;
-      case 'system': return Bell;
-      default: return Bell;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const formatTimeAgo = (dateString: string) => {
-    try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
-    } catch {
-      return 'Unknown time';
-    }
-  };
+  const { notifications, loading, unreadCount, markAsRead, markAllAsRead, dismissNotification } = useNotifications();
+  const { createTestNotifications } = useNotificationService();
 
   if (loading) {
-    return (
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Notifications
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="p-3 rounded-lg border">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1">
-                    <Skeleton className="h-4 w-4 rounded-full" />
-                    <div className="flex-1">
-                      <Skeleton className="h-4 w-3/4 mb-2" />
-                      <Skeleton className="h-3 w-full mb-1" />
-                      <Skeleton className="h-3 w-1/2" />
-                    </div>
-                  </div>
-                  <Skeleton className="h-6 w-6" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Notifications
-          </CardTitle>
-          <Button variant="ghost" size="sm" onClick={refetch}>
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p className="mb-2">Failed to load notifications</p>
-            <Button variant="outline" size="sm" onClick={refetch}>
-              Try again
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <div className="text-center py-8">Loading notifications...</div>;
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          Notifications
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Notifications</h2>
+          <p className="text-muted-foreground">
+            {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All caught up!'}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={createTestNotifications}
+            size="sm"
+          >
+            Create Test Notifications
+          </Button>
           {unreadCount > 0 && (
-            <Badge variant="destructive" className="ml-2">
-              {unreadCount}
-            </Badge>
-          )}
-        </CardTitle>
-        <div className="flex items-center gap-2">
-          {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead}>
-              Mark all read
+            <Button
+              variant="outline"
+              onClick={markAllAsRead}
+              size="sm"
+            >
+              Mark All Read
             </Button>
           )}
-          <Button variant="ghost" size="sm" onClick={refetch}>
-            <RefreshCw className="h-4 w-4" />
-          </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3 max-h-96 overflow-y-auto">
-          {notifications.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No notifications</p>
-              <p className="text-sm mt-1">You're all caught up!</p>
-            </div>
-          ) : (
-            notifications.map((notification) => {
-              const Icon = getIcon(notification.type);
-              return (
-                <div
-                  key={notification.id}
-                  className={`p-3 rounded-lg border transition-all hover:shadow-sm cursor-pointer group ${
-                    !notification.is_read ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
-                  }`}
-                  onClick={() => !notification.is_read && markAsRead(notification.id)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
+      </div>
+
+      <Card>
+        <ScrollArea className="h-[500px]">
+          <div className="p-4">
+            {notifications.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No notifications yet</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`flex items-start gap-3 p-4 rounded-lg border transition-colors ${
+                      notification.is_read 
+                        ? 'bg-background' 
+                        : 'bg-muted/50 border-primary/20'
+                    }`}
+                  >
+                    {getNotificationIcon(notification.type)}
+                    
+                    <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2">
-                        <Icon className={`h-4 w-4 ${
-                          notification.type === 'alert' ? 'text-red-500' :
-                          notification.type === 'session' ? 'text-blue-500' :
-                          notification.type === 'task' ? 'text-green-500' :
-                          'text-muted-foreground'
-                        }`} />
-                        <div 
-                          className={`w-2 h-2 rounded-full ${getPriorityColor(notification.priority)}`} 
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`font-medium text-sm ${
-                          !notification.is_read ? 'text-foreground' : 'text-muted-foreground'
-                        }`}>
+                        <h3 className={`font-medium ${!notification.is_read ? 'font-semibold' : ''}`}>
                           {notification.title}
-                        </p>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {notification.description}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatTimeAgo(notification.created_at)}
-                        </p>
+                        </h3>
+                        <Badge variant={getPriorityColor(notification.priority)} size="sm">
+                          {notification.priority}
+                        </Badge>
                         {!notification.is_read && (
-                          <div className="flex items-center gap-1 mt-1">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                            <span className="text-xs text-blue-600 font-medium">New</span>
-                          </div>
+                          <div className="w-2 h-2 bg-primary rounded-full" />
                         )}
                       </div>
+                      
+                      <p className="text-sm text-muted-foreground">
+                        {notification.description}
+                      </p>
+                      
+                      <p className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                      </p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        dismissNotification(notification.id);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+
+                    <div className="flex gap-1">
+                      {!notification.is_read && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => markAsRead(notification.id)}
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => dismissNotification(notification.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </CardContent>
-    </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </Card>
+    </div>
   );
 }

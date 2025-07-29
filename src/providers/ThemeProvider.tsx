@@ -56,6 +56,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           accent: "238 50% 97%",
           muted: "238 25% 96%",
           background: "238 20% 99%",
+          sidebarPrimary: "238 75% 65%",
+          sidebarBackground: "238 20% 15%",
+          sidebarAccent: "238 50% 25%",
         },
         green: {
           primary: "142 52% 65%",
@@ -63,6 +66,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           accent: "142 40% 97%",
           muted: "142 25% 96%",
           background: "142 25% 99%",
+          sidebarPrimary: "142 52% 65%",
+          sidebarBackground: "142 20% 15%",
+          sidebarAccent: "142 50% 25%",
         },
         orange: {
           primary: "22 80% 72%",
@@ -70,6 +76,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           accent: "22 30% 97%",
           muted: "22 20% 97%",
           background: "22 15% 99%",
+          sidebarPrimary: "22 80% 72%",
+          sidebarBackground: "22 20% 15%",
+          sidebarAccent: "22 50% 25%",
         },
         blue: {
           primary: "212 70% 70%",
@@ -77,6 +86,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           accent: "212 30% 97%",
           muted: "212 20% 97%",
           background: "212 15% 99%",
+          sidebarPrimary: "212 70% 70%",
+          sidebarBackground: "212 20% 15%",
+          sidebarAccent: "212 50% 25%",
         },
         purple: {
           primary: "270 70% 70%",
@@ -84,6 +96,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           accent: "270 30% 97%",
           muted: "270 20% 97%",
           background: "270 15% 99%",
+          sidebarPrimary: "270 70% 70%",
+          sidebarBackground: "270 20% 15%",
+          sidebarAccent: "270 50% 25%",
         },
         emerald: {
           primary: "158 70% 70%",
@@ -91,6 +106,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           accent: "158 30% 97%",
           muted: "158 20% 97%",
           background: "158 15% 99%",
+          sidebarPrimary: "158 70% 70%",
+          sidebarBackground: "158 20% 15%",
+          sidebarAccent: "158 50% 25%",
         },
       };
 
@@ -102,6 +120,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.style.setProperty("--accent", selectedColors.accent);
         root.style.setProperty("--muted", selectedColors.muted);
         root.style.setProperty("--page-background", selectedColors.background);
+        root.style.setProperty("--sidebar-primary", selectedColors.sidebarPrimary);
+        root.style.setProperty("--sidebar-background", selectedColors.sidebarBackground);
+        root.style.setProperty("--sidebar-accent", selectedColors.sidebarAccent);
       }
     }
   }, [themeColor]);

@@ -28,16 +28,16 @@ export function ClinicianSidebarContent() {
   const { signOut } = useAuth();
 
   const navItems = [
-    { title: t('dashboard'), href: '/clinician/dashboard', icon: LayoutDashboard },
-    { title: t('patients'), href: '/clinician/patients', icon: Users },
-    { title: t('sessions'), href: '/clinician/sessions', icon: Calendar },
-    { title: t('communications'), href: '/clinician/communications', icon: MessageSquare },
-    { title: t('analytics'), href: '/clinician/analytics', icon: BarChart3 },
-    { title: t('tasks'), href: '/clinician/tasks', icon: CheckSquare },
-    { title: t('reports'), href: '/clinician/reports', icon: FileText },
-    { title: t('resourceLibrary'), href: '/clinician/resource-library', icon: BookOpen },
-    { title: t('reminders'), href: '/clinician/reminders', icon: Bell },
-    { title: t('trainAI'), href: '/clinician/train-ai', icon: Brain },
+    { title: 'Dashboard', href: '/clinician/dashboard', icon: LayoutDashboard },
+    { title: 'Patients', href: '/clinician/patients', icon: Users },
+    { title: 'Sessions', href: '/clinician/sessions', icon: Calendar },
+    { title: 'Communications', href: '/clinician/communications', icon: MessageSquare },
+    { title: 'Analytics', href: '/clinician/analytics', icon: BarChart3 },
+    { title: 'Tasks', href: '/clinician/tasks', icon: CheckSquare },
+    { title: 'Reports', href: '/clinician/reports', icon: FileText },
+    { title: 'Resource Library', href: '/clinician/resource-library', icon: BookOpen },
+    { title: 'Reminders', href: '/clinician/reminders', icon: Bell },
+    { title: 'Train AI', href: '/clinician/train-ai', icon: Brain },
   ];
 
   const handleSignOut = async () => {
@@ -49,17 +49,21 @@ export function ClinicianSidebarContent() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 dark:bg-gray-950 border-r border-gray-800 dark:border-gray-700">
+    <div className="flex flex-col h-full border-r border-gray-800 dark:border-gray-700" style={{
+      backgroundColor: `hsl(var(--sidebar-background))`,
+    }}>
       {/* Logo and Title */}
       <div className="p-6 border-b border-gray-800 dark:border-gray-700 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style={{
+              background: `linear-gradient(135deg, hsl(var(--sidebar-primary)), hsl(var(--sidebar-accent)))`,
+            }}>
               <Brain className="h-7 w-7 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">MoodMate</h1>
-              <p className="text-sm text-blue-400 font-medium">{t('clinicianPortal')}</p>
+              <p className="text-sm font-medium" style={{ color: `hsl(var(--sidebar-primary))` }}>Clinician Portal</p>
             </div>
           </div>
           <ThemeToggle />
@@ -67,8 +71,10 @@ export function ClinicianSidebarContent() {
       </div>
 
       {/* Professional Status Badge */}
-      <div className="p-4 bg-blue-950/50 dark:bg-blue-900/20 border-b border-gray-800 dark:border-gray-700">
-        <div className="flex items-center gap-2 text-blue-400">
+      <div className="p-4 border-b border-gray-800 dark:border-gray-700" style={{
+        backgroundColor: `hsl(var(--sidebar-accent))`,
+      }}>
+        <div className="flex items-center gap-2" style={{ color: `hsl(var(--sidebar-primary))` }}>
           <Users className="h-4 w-4" />
           <span className="text-xs font-medium uppercase tracking-wide">CLINICAL PORTAL</span>
         </div>
@@ -85,10 +91,15 @@ export function ClinicianSidebarContent() {
                 cn(
                   "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95",
                   isActive
-                    ? 'bg-blue-900/50 text-blue-300 border border-blue-800'
+                    ? 'text-white border'
                     : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
                 )
               }
+              style={({ isActive }) => ({
+                backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
+                borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+                color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+              })}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
               <span className="flex-1">{item.title}</span>
@@ -105,13 +116,18 @@ export function ClinicianSidebarContent() {
             cn(
               "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
               isActive
-                ? 'bg-blue-900/50 text-blue-300 border border-blue-800'
+                ? 'text-white border'
                 : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
             )
           }
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
+            borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+            color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+          })}
         >
           <User className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">{t('profile')}</span>
+          <span className="flex-1">Profile</span>
         </NavLink>
         
         <NavLink
@@ -120,13 +136,18 @@ export function ClinicianSidebarContent() {
             cn(
               "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
               isActive
-                ? 'bg-blue-900/50 text-blue-300 border border-blue-800'
+                ? 'text-white border'
                 : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
             )
           }
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
+            borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+            color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+          })}
         >
           <Settings className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">{t('settings')}</span>
+          <span className="flex-1">Settings</span>
         </NavLink>
 
         <Button
@@ -135,7 +156,7 @@ export function ClinicianSidebarContent() {
           className="flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700 active:scale-95"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">{t('logout')}</span>
+          <span className="flex-1">Logout</span>
         </Button>
       </div>
     </div>

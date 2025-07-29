@@ -7,7 +7,8 @@ import {
   Calendar, 
   User, 
   Target,
-  TrendingUp
+  TrendingUp,
+  Settings
 } from 'lucide-react';
 
 export const patientNavItems = [

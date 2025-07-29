@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PatientNavItems } from './PatientNavItems';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LogOut, User, Brain, Heart } from 'lucide-react';
+import { LogOut, User, Brain, Heart, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PatientSidebarContentProps {
@@ -38,18 +38,27 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
     }
   };
 
+  // Capitalize first letter of each word
+  const capitalize = (str: string) => {
+    return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
   return (
-    <div className="flex flex-col h-full bg-gray-900 dark:bg-gray-950 border-r border-gray-800 dark:border-gray-700">
+    <div className="flex flex-col h-full border-r border-gray-800 dark:border-gray-700" style={{
+      backgroundColor: `hsl(var(--sidebar-background))`,
+    }}>
       {/* Logo and Title */}
       <div className="p-6 border-b border-gray-800 dark:border-gray-700 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-600 to-violet-600">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style={{
+              background: `linear-gradient(135deg, hsl(var(--sidebar-primary)), hsl(var(--sidebar-accent)))`,
+            }}>
               <Brain className="h-7 w-7 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">MoodMate</h1>
-              <p className="text-sm text-indigo-400 font-medium">{t('patientPortal')}</p>
+              <p className="text-sm font-medium" style={{ color: `hsl(var(--sidebar-primary))` }}>Patient Portal</p>
             </div>
           </div>
           <ThemeToggle />
@@ -58,9 +67,13 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
 
       {/* User Info */}
       <div className="p-6 border-b border-gray-800 dark:border-gray-700 flex-shrink-0">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-indigo-950/50 dark:bg-indigo-900/20">
-          <div className="h-12 w-12 rounded-full bg-indigo-700/50 dark:bg-indigo-600/40 flex items-center justify-center">
-            <span className="text-sm font-semibold text-indigo-300">
+        <div className="flex items-center gap-3 p-3 rounded-lg" style={{
+          backgroundColor: `hsl(var(--sidebar-accent))`,
+        }}>
+          <div className="h-12 w-12 rounded-full flex items-center justify-center" style={{
+            backgroundColor: `hsl(var(--sidebar-primary) / 0.5)`,
+          }}>
+            <span className="text-sm font-semibold" style={{ color: `hsl(var(--sidebar-primary))` }}>
               {getDisplayName().split(' ').map(n => n[0]).join('') || 'P'}
             </span>
           </div>
@@ -68,14 +81,16 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
             <p className="text-base font-semibold text-white truncate">
               {getDisplayName()}
             </p>
-            <p className="text-sm text-indigo-400">Patient</p>
+            <p className="text-sm" style={{ color: `hsl(var(--sidebar-primary))` }}>Patient</p>
           </div>
         </div>
       </div>
 
       {/* Wellness Status Badge */}
-      <div className="p-4 bg-indigo-950/50 dark:bg-indigo-900/20 border-b border-gray-800 dark:border-gray-700">
-        <div className="flex items-center gap-2 text-indigo-400">
+      <div className="p-4 border-b border-gray-800 dark:border-gray-700" style={{
+        backgroundColor: `hsl(var(--sidebar-accent))`,
+      }}>
+        <div className="flex items-center gap-2" style={{ color: `hsl(var(--sidebar-primary))` }}>
           <Heart className="h-4 w-4" />
           <span className="text-xs font-medium uppercase tracking-wide">WELLNESS PORTAL</span>
         </div>
@@ -92,13 +107,18 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
                 cn(
                   "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95",
                   isActive
-                    ? 'bg-indigo-900/50 text-indigo-300 border border-indigo-800'
+                    ? 'text-white border'
                     : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
                 )
               }
+              style={({ isActive }) => ({
+                backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
+                borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+                color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+              })}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
-              <span className="flex-1">{t(item.title as keyof typeof t)}</span>
+              <span className="flex-1">{capitalize(t(item.title as keyof typeof t) || item.title)}</span>
             </NavLink>
           ))}
         </nav>
@@ -112,22 +132,47 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
             cn(
               "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
               isActive
-                ? 'bg-indigo-900/50 text-indigo-300 border border-indigo-800'
+                ? 'text-white border'
                 : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
             )
           }
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
+            borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+            color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+          })}
         >
           <User className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">{t('profile')}</span>
+          <span className="flex-1">Profile</span>
         </NavLink>
         
+        <NavLink
+          to="/patient/settings"
+          className={({ isActive }) =>
+            cn(
+              "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
+              isActive
+                ? 'text-white border'
+                : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
+            )
+          }
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
+            borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+            color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+          })}
+        >
+          <Settings className="h-4 w-4 flex-shrink-0" />
+          <span className="flex-1">Settings</span>
+        </NavLink>
+
         <Button
           variant="ghost"
           onClick={handleSignOut}
           className="flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700 active:scale-95"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">{t('logout')}</span>
+          <span className="flex-1">Logout</span>
         </Button>
       </div>
     </div>
