@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,6 +57,37 @@ export function DirectMessaging() {
       fetchMessages(selectedPatient.id);
     }
   }, [selectedPatient]);
+
+  // Add real-time subscription
+  useEffect(() => {
+    if (!selectedPatient || !currentUserId) return;
+
+    const channel = supabase
+      .channel('direct-messages-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'direct_messages',
+        },
+        (payload) => {
+          const newMessage = payload.new;
+          // Only update if this message involves the current conversation
+          if (
+            (newMessage.sender_id === currentUserId && newMessage.recipient_id === selectedPatient.id) ||
+            (newMessage.sender_id === selectedPatient.id && newMessage.recipient_id === currentUserId)
+          ) {
+            fetchMessages(selectedPatient.id);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedPatient, currentUserId]);
 
   const fetchPatients = async () => {
     try {

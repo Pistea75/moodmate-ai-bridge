@@ -4,6 +4,7 @@ import { Home, Calendar, MessageSquare, BarChart, ListCheck, Users, Bot, User, H
 export const patientNavItems = [
   { name: 'Dashboard', path: '/patient/dashboard', icon: Home },
   { name: 'AI Chat', path: '/patient/chat', icon: MessageSquare },
+  { name: 'Direct Messages', path: '/patient/messages', icon: MessageSquare },
   { name: 'Mood Log', path: '/patient/mood-insights', icon: Heart },
   { name: 'Tasks', path: '/patient/tasks', icon: ListCheck },
   { name: 'Goals', path: '/patient/goals', icon: Target },
@@ -19,6 +20,7 @@ export const clinicianNavItems = [
   { name: 'Tasks', path: '/clinician/tasks', icon: ListCheck },
   { name: 'AI Reports', path: '/clinician/reports', icon: MessageSquare },
   { name: 'Train AI', path: '/clinician/train-ai', icon: Bot },
+  { name: 'Direct Messages', path: '/clinician/communications', icon: MessageSquare },
   { name: 'Analytics', path: '/clinician/analytics', icon: BarChart },
   { name: 'Settings', path: '/clinician/settings', icon: User },
 ];

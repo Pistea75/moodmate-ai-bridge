@@ -8,7 +8,8 @@ import {
   User, 
   Target,
   TrendingUp,
-  Settings
+  Settings,
+  Mail
 } from 'lucide-react';
 
 export const patientNavItems = [
@@ -21,6 +22,11 @@ export const patientNavItems = [
     title: 'AI Chat',
     href: '/patient/chat',
     icon: MessageSquare,
+  },
+  {
+    title: 'Direct Messages',
+    href: '/patient/messages',
+    icon: Mail,
   },
   {
     title: 'mood',

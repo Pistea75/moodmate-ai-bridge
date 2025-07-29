@@ -7,7 +7,7 @@ export function CommunicationHub() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Communications</h1>
+        <h1 className="text-3xl font-bold">Direct Messages</h1>
         <p className="text-muted-foreground">
           Stay connected with your patients and manage notifications
         </p>
