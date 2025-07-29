@@ -48,67 +48,61 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.dataset.themeColor = themeColor;
       localStorage.setItem("themeColor", themeColor);
 
-      // Define color schemes with proper HSL values
+      // Define color schemes with proper HSL values that match index.css structure
       const colorSchemes = {
         indigo: {
-          primary: "238 75% 65%",
-          secondary: "243 40% 60%", 
-          accent: "238 50% 97%",
-          muted: "238 25% 96%",
-          background: "238 20% 99%",
-          sidebarPrimary: "238 75% 65%",
-          sidebarBackground: "238 20% 15%",
-          sidebarAccent: "238 50% 25%",
+          primary: "263 83% 75%",
+          secondary: "261 28% 63%",
+          accent: "245 12% 95%",
+          muted: "245 12% 95%",
+          sidebarPrimary: "263 83% 75%",
+          sidebarBackground: theme === "dark" ? "240 10% 8%" : "240 10% 15%",
+          sidebarAccent: theme === "dark" ? "240 6% 15%" : "240 6% 20%",
         },
         green: {
-          primary: "142 52% 65%",
-          secondary: "142 30% 60%",
-          accent: "142 40% 97%",
-          muted: "142 25% 96%",
-          background: "142 25% 99%",
-          sidebarPrimary: "142 52% 65%",
-          sidebarBackground: "142 20% 15%",
-          sidebarAccent: "142 50% 25%",
+          primary: "142 76% 36%",
+          secondary: "142 69% 58%",
+          accent: "142 76% 96%",
+          muted: "142 76% 96%",
+          sidebarPrimary: "142 76% 36%",
+          sidebarBackground: theme === "dark" ? "142 84% 2%" : "142 84% 7%",
+          sidebarAccent: theme === "dark" ? "142 84% 7%" : "142 84% 12%",
         },
         orange: {
-          primary: "22 80% 72%",
-          secondary: "22 70% 67%",
-          accent: "22 30% 97%",
-          muted: "22 20% 97%",
-          background: "22 15% 99%",
-          sidebarPrimary: "22 80% 72%",
-          sidebarBackground: "22 20% 15%",
-          sidebarAccent: "22 50% 25%",
+          primary: "25 95% 53%",
+          secondary: "25 95% 70%",
+          accent: "25 95% 96%",
+          muted: "25 95% 96%",
+          sidebarPrimary: "25 95% 53%",
+          sidebarBackground: theme === "dark" ? "25 95% 3%" : "25 95% 8%",
+          sidebarAccent: theme === "dark" ? "25 95% 8%" : "25 95% 13%",
         },
         blue: {
-          primary: "212 70% 70%",
-          secondary: "212 60% 65%",
-          accent: "212 30% 97%",
-          muted: "212 20% 97%",
-          background: "212 15% 99%",
-          sidebarPrimary: "212 70% 70%",
-          sidebarBackground: "212 20% 15%",
-          sidebarAccent: "212 50% 25%",
+          primary: "221 83% 53%",
+          secondary: "221 83% 70%",
+          accent: "221 83% 96%",
+          muted: "221 83% 96%",
+          sidebarPrimary: "221 83% 53%",
+          sidebarBackground: theme === "dark" ? "221 83% 3%" : "221 83% 8%",
+          sidebarAccent: theme === "dark" ? "221 83% 8%" : "221 83% 13%",
         },
         purple: {
-          primary: "270 70% 70%",
-          secondary: "270 60% 65%",
-          accent: "270 30% 97%",
-          muted: "270 20% 97%",
-          background: "270 15% 99%",
-          sidebarPrimary: "270 70% 70%",
-          sidebarBackground: "270 20% 15%",
-          sidebarAccent: "270 50% 25%",
+          primary: "262 83% 58%",
+          secondary: "262 83% 75%",
+          accent: "262 83% 96%",
+          muted: "262 83% 96%",
+          sidebarPrimary: "262 83% 58%",
+          sidebarBackground: theme === "dark" ? "262 83% 3%" : "262 83% 8%",
+          sidebarAccent: theme === "dark" ? "262 83% 8%" : "262 83% 13%",
         },
         emerald: {
-          primary: "158 70% 70%",
-          secondary: "158 60% 65%",
-          accent: "158 30% 97%",
-          muted: "158 20% 97%",
-          background: "158 15% 99%",
-          sidebarPrimary: "158 70% 70%",
-          sidebarBackground: "158 20% 15%",
-          sidebarAccent: "158 50% 25%",
+          primary: "160 84% 39%",
+          secondary: "160 84% 56%",
+          accent: "160 84% 96%",
+          muted: "160 84% 96%",
+          sidebarPrimary: "160 84% 39%",
+          sidebarBackground: theme === "dark" ? "160 84% 3%" : "160 84% 8%",
+          sidebarAccent: theme === "dark" ? "160 84% 8%" : "160 84% 13%",
         },
       };
 
@@ -119,13 +113,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.style.setProperty("--secondary", selectedColors.secondary);
         root.style.setProperty("--accent", selectedColors.accent);
         root.style.setProperty("--muted", selectedColors.muted);
-        root.style.setProperty("--page-background", selectedColors.background);
         root.style.setProperty("--sidebar-primary", selectedColors.sidebarPrimary);
         root.style.setProperty("--sidebar-background", selectedColors.sidebarBackground);
         root.style.setProperty("--sidebar-accent", selectedColors.sidebarAccent);
+        root.style.setProperty("--ring", selectedColors.primary);
       }
     }
-  }, [themeColor]);
+  }, [themeColor, theme]);
 
   return (
     <ThemeContext.Provider value={{ theme, themeColor, setTheme, setThemeColor }}>
