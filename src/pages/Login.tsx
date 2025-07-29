@@ -33,12 +33,22 @@ export default function Login() {
     };
   }, []);
   
-  // Show success when user is logged in
   useEffect(() => {
-    if (user) {
-      setShowSuccess(true);
+  const loadProfile = async () => {
+    try {
+      if (user) {
+        setShowSuccess(true);
+        const profile = await fetchUserProfile();
+        console.log('✅ Profile loaded:', profile);
+        // Optional: Store in context or redirect based on role
+      }
+    } catch (error) {
+      console.error('❌ Failed to fetch user profile:', error);
     }
-  }, [user]);
+  };
+
+  loadProfile();
+}, [user]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
