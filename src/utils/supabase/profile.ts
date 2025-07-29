@@ -1,5 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * Fetch the authenticated user's profile securely.
+ */
 export async function fetchUserProfile() {
   const {
     data: { user },
@@ -17,7 +20,8 @@ export async function fetchUserProfile() {
     .single();
 
   if (profileError) {
-    throw new Error('Could not load user profile');
+    console.error('Profile query failed:', profileError);
+    throw new Error('Could not load profile');
   }
 
   return profile;
