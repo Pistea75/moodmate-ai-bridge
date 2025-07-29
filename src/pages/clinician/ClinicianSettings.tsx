@@ -4,6 +4,7 @@ import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelect } from '@/components/profile/LanguageSelect';
+import { ColorPicker } from '@/components/theme/ColorPicker';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,8 @@ export default function ClinicianSettings() {
         </div>
         
         <div className="grid gap-6">
+          <ColorPicker />
+          
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">{t('languageSettings')}</h2>
             <Form {...form}>

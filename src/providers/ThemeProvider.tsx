@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
-type ThemeColor = "purple" | "green" | "peach" | "blue";
+type ThemeColor = "indigo" | "green" | "orange" | "blue";
 
 interface ThemeContextType {
   theme: Theme;
@@ -13,7 +13,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: "light",
-  themeColor: "purple",
+  themeColor: "indigo",
   setTheme: () => null,
   setThemeColor: () => null,
 });
@@ -28,9 +28,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   
   const [themeColor, setThemeColor] = useState<ThemeColor>(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
-      return (localStorage.getItem("themeColor") as ThemeColor) || "purple";
+      return (localStorage.getItem("themeColor") as ThemeColor) || "indigo";
     }
-    return "purple";
+    return "indigo";
   });
 
   useEffect(() => {
@@ -48,41 +48,40 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.dataset.themeColor = themeColor;
       localStorage.setItem("themeColor", themeColor);
 
-      // Create color schemes with lighter, more subtle tones
+      // Create color schemes with better variants
       const colors = {
-        purple: {
-          primary: "252, 76%, 65%", // Lighter purple
-          secondary: "260, 28%, 60%", 
-          accent: "252, 60%, 97%", // Very light accent for backgrounds
-          muted: "248, 30%, 96%",
-          background: "252, 30%, 99%", // Very light background
+        indigo: {
+          primary: "238, 75%, 65%", // Better indigo
+          secondary: "243, 40%, 60%", 
+          accent: "238, 50%, 97%",
+          muted: "238, 25%, 96%",
+          background: "238, 20%, 99%",
         },
         green: {
-          primary: "142, 52%, 65%", // Lighter green
+          primary: "142, 52%, 65%",
           secondary: "142, 30%, 60%",
-          accent: "142, 40%, 97%", // Very light accent
+          accent: "142, 40%, 97%",
           muted: "142, 25%, 96%",
-          background: "142, 25%, 99%", // Very light background
+          background: "142, 25%, 99%",
         },
-        peach: {
-          primary: "22, 80%, 72%", // Lighter peach
+        orange: {
+          primary: "22, 80%, 72%",
           secondary: "22, 70%, 67%",
-          accent: "22, 30%, 97%", // Very light accent
+          accent: "22, 30%, 97%",
           muted: "22, 20%, 97%",
-          background: "22, 15%, 99%", // Very light background
+          background: "22, 15%, 99%",
         },
         blue: {
-          primary: "212, 70%, 70%", // Lighter blue
+          primary: "212, 70%, 70%",
           secondary: "212, 60%, 65%",
-          accent: "212, 30%, 97%", // Very light accent
+          accent: "212, 30%, 97%",
           muted: "212, 20%, 97%",
-          background: "212, 15%, 99%", // Very light background
+          background: "212, 15%, 99%",
         },
       };
 
       const selectedColors = colors[themeColor];
       
-      // Set CSS custom properties with HSL values
       root.style.setProperty("--primary", selectedColors.primary);
       root.style.setProperty("--secondary", selectedColors.secondary);
       root.style.setProperty("--accent", selectedColors.accent);
