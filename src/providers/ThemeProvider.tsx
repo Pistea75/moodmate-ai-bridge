@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
-type ThemeColor = "indigo" | "green" | "orange" | "blue";
+type ThemeColor = "indigo" | "green" | "orange" | "blue" | "purple" | "emerald";
 
 interface ThemeContextType {
   theme: Theme;
@@ -48,45 +48,61 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.dataset.themeColor = themeColor;
       localStorage.setItem("themeColor", themeColor);
 
-      // Create color schemes with better variants
-      const colors = {
+      // Define color schemes with proper HSL values
+      const colorSchemes = {
         indigo: {
-          primary: "238, 75%, 65%", // Better indigo
-          secondary: "243, 40%, 60%", 
-          accent: "238, 50%, 97%",
-          muted: "238, 25%, 96%",
-          background: "238, 20%, 99%",
+          primary: "238 75% 65%",
+          secondary: "243 40% 60%", 
+          accent: "238 50% 97%",
+          muted: "238 25% 96%",
+          background: "238 20% 99%",
         },
         green: {
-          primary: "142, 52%, 65%",
-          secondary: "142, 30%, 60%",
-          accent: "142, 40%, 97%",
-          muted: "142, 25%, 96%",
-          background: "142, 25%, 99%",
+          primary: "142 52% 65%",
+          secondary: "142 30% 60%",
+          accent: "142 40% 97%",
+          muted: "142 25% 96%",
+          background: "142 25% 99%",
         },
         orange: {
-          primary: "22, 80%, 72%",
-          secondary: "22, 70%, 67%",
-          accent: "22, 30%, 97%",
-          muted: "22, 20%, 97%",
-          background: "22, 15%, 99%",
+          primary: "22 80% 72%",
+          secondary: "22 70% 67%",
+          accent: "22 30% 97%",
+          muted: "22 20% 97%",
+          background: "22 15% 99%",
         },
         blue: {
-          primary: "212, 70%, 70%",
-          secondary: "212, 60%, 65%",
-          accent: "212, 30%, 97%",
-          muted: "212, 20%, 97%",
-          background: "212, 15%, 99%",
+          primary: "212 70% 70%",
+          secondary: "212 60% 65%",
+          accent: "212 30% 97%",
+          muted: "212 20% 97%",
+          background: "212 15% 99%",
+        },
+        purple: {
+          primary: "270 70% 70%",
+          secondary: "270 60% 65%",
+          accent: "270 30% 97%",
+          muted: "270 20% 97%",
+          background: "270 15% 99%",
+        },
+        emerald: {
+          primary: "158 70% 70%",
+          secondary: "158 60% 65%",
+          accent: "158 30% 97%",
+          muted: "158 20% 97%",
+          background: "158 15% 99%",
         },
       };
 
-      const selectedColors = colors[themeColor];
+      const selectedColors = colorSchemes[themeColor];
       
-      root.style.setProperty("--primary", selectedColors.primary);
-      root.style.setProperty("--secondary", selectedColors.secondary);
-      root.style.setProperty("--accent", selectedColors.accent);
-      root.style.setProperty("--muted", selectedColors.muted);
-      root.style.setProperty("--page-background", selectedColors.background);
+      if (selectedColors) {
+        root.style.setProperty("--primary", selectedColors.primary);
+        root.style.setProperty("--secondary", selectedColors.secondary);
+        root.style.setProperty("--accent", selectedColors.accent);
+        root.style.setProperty("--muted", selectedColors.muted);
+        root.style.setProperty("--page-background", selectedColors.background);
+      }
     }
   }, [themeColor]);
 
