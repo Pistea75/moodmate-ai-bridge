@@ -8,6 +8,7 @@ import { AlertCircle, Loader2, Wifi, WifiOff, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { fetchUserProfile } from '@/utils/supabase/profile';
 
 export default function Login() {
   const [email, setEmail] = useState('');
