@@ -2,7 +2,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -90,8 +90,8 @@ function App() {
           <ThemeProvider>
             <TooltipProvider>
               <LanguageProvider>
-                <EnhancedSecurityProvider>
-                  <AuthProvider>
+                <AuthProvider>
+                  <EnhancedSecurityProvider>
                     <div className="min-h-screen bg-background">
                       <Toaster />
                       <Routes>
@@ -114,55 +114,67 @@ function App() {
                         <Route path="/help" element={<HelpCenter />} />
 
                         {/* Patient routes */}
-                        <Route path="/patient" element={<ProtectedRoute allowedRoles={['patient']} />}>
-                          <Route path="dashboard" element={<PatientDashboard />} />
-                          <Route path="profile" element={<PatientProfile />} />
-                          <Route path="settings" element={<PatientSettings />} />
-                          <Route path="mood" element={<PatientMood />} />
-                          <Route path="tasks" element={<PatientTasks />} />
-                          <Route path="sessions" element={<PatientSessions />} />
-                          <Route path="chat" element={<PatientChat />} />
-                          <Route path="messages" element={<PatientMessages />} />
-                          <Route path="insights" element={<PatientInsights />} />
-                          <Route path="mood-insights" element={<PatientMoodInsights />} />
-                          <Route path="goals" element={<Goals />} />
-                        </Route>
+                        <Route path="/patient/*" element={
+                          <ProtectedRoute requiredRole="patient">
+                            <Routes>
+                              <Route path="dashboard" element={<PatientDashboard />} />
+                              <Route path="profile" element={<PatientProfile />} />
+                              <Route path="settings" element={<PatientSettings />} />
+                              <Route path="mood" element={<PatientMood />} />
+                              <Route path="tasks" element={<PatientTasks />} />
+                              <Route path="sessions" element={<PatientSessions />} />
+                              <Route path="chat" element={<PatientChat />} />
+                              <Route path="messages" element={<PatientMessages />} />
+                              <Route path="insights" element={<PatientInsights />} />
+                              <Route path="mood-insights" element={<PatientMoodInsights />} />
+                              <Route path="goals" element={<Goals />} />
+                            </Routes>
+                          </ProtectedRoute>
+                        } />
 
                         {/* Clinician routes */}
-                        <Route path="/clinician" element={<ProtectedRoute allowedRoles={['clinician', 'super_admin']} />}>
-                          <Route path="dashboard" element={<ClinicianDashboard />} />
-                          <Route path="profile" element={<ClinicianProfile />} />
-                          <Route path="settings" element={<ClinicianSettings />} />
-                          <Route path="patients" element={<Patients />} />
-                          <Route path="patients/:patientId" element={<PatientDetail />} />
-                          <Route path="sessions" element={<Sessions />} />
-                          <Route path="tasks" element={<Tasks />} />
-                          <Route path="reports" element={<Reports />} />
-                          <Route path="analytics" element={<Analytics />} />
-                          <Route path="communications" element={<Communications />} />
-                          <Route path="treatment-plans" element={<TreatmentPlans />} />
-                          <Route path="train-ai" element={<TrainAI />} />
-                          <Route path="reminders" element={<Reminders />} />
-                          <Route path="resource-library" element={<ResourceLibraryPage />} />
-                          <Route path="risk-management" element={<RiskManagement />} />
-                        </Route>
+                        <Route path="/clinician/*" element={
+                          <ProtectedRoute requiredRole="clinician">
+                            <Routes>
+                              <Route path="dashboard" element={<ClinicianDashboard />} />
+                              <Route path="profile" element={<ClinicianProfile />} />
+                              <Route path="settings" element={<ClinicianSettings />} />
+                              <Route path="patients" element={<Patients />} />
+                              <Route path="patients/:patientId" element={<PatientDetail />} />
+                              <Route path="sessions" element={<Sessions />} />
+                              <Route path="tasks" element={<Tasks />} />
+                              <Route path="reports" element={<Reports />} />
+                              <Route path="analytics" element={<Analytics />} />
+                              <Route path="communications" element={<Communications />} />
+                              <Route path="treatment-plans" element={<TreatmentPlans />} />
+                              <Route path="train-ai" element={<TrainAI />} />
+                              <Route path="reminders" element={<Reminders />} />
+                              <Route path="resource-library" element={<ResourceLibraryPage />} />
+                              <Route path="risk-management" element={<RiskManagement />} />
+                            </Routes>
+                          </ProtectedRoute>
+                        } />
 
                         {/* Admin routes */}
-                        <Route path="/admin" element={<ProtectedRoute allowedRoles={['super_admin']} />}>
-                          <Route path="dashboard" element={<SuperAdminDashboard />} />
-                          <Route path="users" element={<UserManagement />} />
-                          <Route path="system-health" element={<SystemHealth />} />
-                          <Route path="audit-trail" element={<AuditTrail />} />
-                          <Route path="security-logs" element={<SecurityLogs />} />
-                          <Route path="settings" element={<SystemSettings />} />
-                        </Route>
+                        <Route path="/admin/*" element={
+                          <ProtectedRoute>
+                            <Routes>
+                              <Route path="dashboard" element={<SuperAdminDashboard />} />
+                              <Route path="users" element={<UserManagement />} />
+                              <Route path="system-health" element={<SystemHealth />} />
+                              <Route path="audit-trail" element={<AuditTrail />} />
+                              <Route path="security-logs" element={<SecurityLogs />} />
+                              <Route path="settings" element={<SystemSettings />} />
+                            </Routes>
+                          </ProtectedRoute>
+                        } />
 
                         {/* 404 route */}
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </div>
-                  </AuthProvider>
-                </EnhancedSecurityProvider>
+                  </EnhancedSecurityProvider>
+                </AuthProvider>
               </LanguageProvider>
             </TooltipProvider>
           </ThemeProvider>
