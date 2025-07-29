@@ -58,7 +58,6 @@ export function NotificationsPanel() {
           <Button
             variant="outline"
             onClick={createTestNotifications}
-            size="sm"
           >
             Create Test Notifications
           </Button>
@@ -66,7 +65,6 @@ export function NotificationsPanel() {
             <Button
               variant="outline"
               onClick={markAllAsRead}
-              size="sm"
             >
               Mark All Read
             </Button>
@@ -100,7 +98,7 @@ export function NotificationsPanel() {
                         <h3 className={`font-medium ${!notification.is_read ? 'font-semibold' : ''}`}>
                           {notification.title}
                         </h3>
-                        <Badge variant={getPriorityColor(notification.priority)} size="sm">
+                        <Badge variant={getPriorityColor(notification.priority)}>
                           {notification.priority}
                         </Badge>
                         {!notification.is_read && (

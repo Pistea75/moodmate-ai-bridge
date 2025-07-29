@@ -1,57 +1,71 @@
 
 import React from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
-import { Card } from "@/components/ui/card";
-import { useLanguage } from '@/contexts/LanguageContext';
-import { LanguageSelect } from '@/components/profile/LanguageSelect';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { ColorPicker } from '@/components/theme/ColorPicker';
-import { useForm } from 'react-hook-form';
-import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
 
 export default function PatientSettings() {
-  const { t } = useLanguage();
-  const { user } = useAuth();
-  
-  const form = useForm({
-    defaultValues: {
-      language: user?.user_metadata?.language || 'en',
-    }
-  });
-
-  const onSubmit = (data: any) => {
-    console.log('Settings updated:', data);
-  };
-
   return (
     <PatientLayout>
-      <div className="p-8 space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold text-gray-900">{t('settings')}</h1>
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground">
+            Customize your experience and preferences
+          </p>
         </div>
-        
-        <div className="grid gap-6">
-          <ColorPicker />
-          
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('languageSettings')}</h2>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <LanguageSelect form={form} />
-                <Button type="submit">{t('save')}</Button>
-              </form>
-            </Form>
+
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>
+                Customize the look and feel of your dashboard
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Theme Color</label>
+                <ColorPicker />
+              </div>
+            </CardContent>
           </Card>
 
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('accountSettings')}</h2>
-            <p className="text-muted-foreground">{t('noDataAvailable')}</p>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('notificationSettings')}</h2>
-            <p className="text-muted-foreground">{t('noDataAvailable')}</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Notifications</CardTitle>
+              <CardDescription>
+                Configure how you want to receive notifications
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">Session Reminders</div>
+                  <div className="text-sm text-muted-foreground">
+                    Get notified about upcoming sessions
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Coming soon
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">Task Notifications</div>
+                  <div className="text-sm text-muted-foreground">
+                    Get notified about new tasks and deadlines
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Coming soon
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </div>
       </div>

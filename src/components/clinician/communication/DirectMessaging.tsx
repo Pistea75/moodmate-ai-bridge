@@ -33,7 +33,19 @@ export function DirectMessaging() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Get current user
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
+    };
+    getCurrentUser();
+  }, []);
 
   // Fetch patients
   useEffect(() => {
@@ -95,29 +107,37 @@ export function DirectMessaging() {
           sender_id,
           recipient_id,
           content,
-          created_at,
-          sender:profiles!direct_messages_sender_id_fkey (
-            first_name,
-            last_name,
-            role
-          )
+          created_at
         `)
         .or(`and(sender_id.eq.${user.user.id},recipient_id.eq.${patientId}),and(sender_id.eq.${patientId},recipient_id.eq.${user.user.id})`)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
-      const formattedMessages = data?.map(msg => ({
-        id: msg.id,
-        sender_id: msg.sender_id,
-        recipient_id: msg.recipient_id,
-        content: msg.content,
-        created_at: msg.created_at,
-        sender_name: `${msg.sender?.first_name || ''} ${msg.sender?.last_name || ''}`.trim(),
-        sender_role: msg.sender?.role || 'unknown'
-      })) || [];
+      // Get sender names for each message
+      const messagesWithNames = await Promise.all(
+        (data || []).map(async (msg) => {
+          const { data: senderProfile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, role')
+            .eq('id', msg.sender_id)
+            .single();
 
-      setMessages(formattedMessages);
+          return {
+            id: msg.id,
+            sender_id: msg.sender_id,
+            recipient_id: msg.recipient_id,
+            content: msg.content,
+            created_at: msg.created_at,
+            sender_name: senderProfile 
+              ? `${senderProfile.first_name || ''} ${senderProfile.last_name || ''}`.trim()
+              : 'Unknown',
+            sender_role: senderProfile?.role || 'unknown'
+          };
+        })
+      );
+
+      setMessages(messagesWithNames);
     } catch (error: any) {
       console.error('Error fetching messages:', error);
       toast({
@@ -129,17 +149,15 @@ export function DirectMessaging() {
   };
 
   const sendMessage = async () => {
-    if (!selectedPatient || !newMessage.trim()) return;
+    if (!selectedPatient || !newMessage.trim() || !currentUserId) return;
 
     try {
       setLoading(true);
-      const { data: user } = await supabase.auth.getUser();
-      if (!user?.user) return;
 
       const { error } = await supabase
         .from('direct_messages')
         .insert({
-          sender_id: user.user.id,
+          sender_id: currentUserId,
           recipient_id: selectedPatient.id,
           content: newMessage.trim()
         });
@@ -223,8 +241,7 @@ export function DirectMessaging() {
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-4">
                 {messages.map(message => {
-                  const { data: user } = supabase.auth.getUser();
-                  const isOwn = message.sender_id === user?.user?.id;
+                  const isOwn = message.sender_id === currentUserId;
                   
                   return (
                     <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
