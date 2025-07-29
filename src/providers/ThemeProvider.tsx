@@ -48,61 +48,49 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.dataset.themeColor = themeColor;
       localStorage.setItem("themeColor", themeColor);
 
-      // Define color schemes with proper HSL values that match index.css structure
+      // Define color schemes with proper HSL values
       const colorSchemes = {
         indigo: {
-          primary: "263 83% 75%",
+          primary: "263 83% 58%",
           secondary: "261 28% 63%",
           accent: "245 12% 95%",
           muted: "245 12% 95%",
-          sidebarPrimary: "263 83% 75%",
-          sidebarBackground: theme === "dark" ? "240 10% 8%" : "240 10% 15%",
-          sidebarAccent: theme === "dark" ? "240 6% 15%" : "240 6% 20%",
+          ring: "263 83% 58%",
         },
         green: {
           primary: "142 76% 36%",
           secondary: "142 69% 58%",
           accent: "142 76% 96%",
           muted: "142 76% 96%",
-          sidebarPrimary: "142 76% 36%",
-          sidebarBackground: theme === "dark" ? "142 84% 2%" : "142 84% 7%",
-          sidebarAccent: theme === "dark" ? "142 84% 7%" : "142 84% 12%",
+          ring: "142 76% 36%",
         },
         orange: {
           primary: "25 95% 53%",
           secondary: "25 95% 70%",
           accent: "25 95% 96%",
           muted: "25 95% 96%",
-          sidebarPrimary: "25 95% 53%",
-          sidebarBackground: theme === "dark" ? "25 95% 3%" : "25 95% 8%",
-          sidebarAccent: theme === "dark" ? "25 95% 8%" : "25 95% 13%",
+          ring: "25 95% 53%",
         },
         blue: {
           primary: "221 83% 53%",
           secondary: "221 83% 70%",
           accent: "221 83% 96%",
           muted: "221 83% 96%",
-          sidebarPrimary: "221 83% 53%",
-          sidebarBackground: theme === "dark" ? "221 83% 3%" : "221 83% 8%",
-          sidebarAccent: theme === "dark" ? "221 83% 8%" : "221 83% 13%",
+          ring: "221 83% 53%",
         },
         purple: {
           primary: "262 83% 58%",
           secondary: "262 83% 75%",
           accent: "262 83% 96%",
           muted: "262 83% 96%",
-          sidebarPrimary: "262 83% 58%",
-          sidebarBackground: theme === "dark" ? "262 83% 3%" : "262 83% 8%",
-          sidebarAccent: theme === "dark" ? "262 83% 8%" : "262 83% 13%",
+          ring: "262 83% 58%",
         },
         emerald: {
           primary: "160 84% 39%",
           secondary: "160 84% 56%",
           accent: "160 84% 96%",
           muted: "160 84% 96%",
-          sidebarPrimary: "160 84% 39%",
-          sidebarBackground: theme === "dark" ? "160 84% 3%" : "160 84% 8%",
-          sidebarAccent: theme === "dark" ? "160 84% 8%" : "160 84% 13%",
+          ring: "160 84% 39%",
         },
       };
 
@@ -113,10 +101,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.style.setProperty("--secondary", selectedColors.secondary);
         root.style.setProperty("--accent", selectedColors.accent);
         root.style.setProperty("--muted", selectedColors.muted);
-        root.style.setProperty("--sidebar-primary", selectedColors.sidebarPrimary);
-        root.style.setProperty("--sidebar-background", selectedColors.sidebarBackground);
-        root.style.setProperty("--sidebar-accent", selectedColors.sidebarAccent);
-        root.style.setProperty("--ring", selectedColors.primary);
+        root.style.setProperty("--ring", selectedColors.ring);
+        
+        // Update sidebar colors based on theme and selected color
+        const sidebarBg = theme === "dark" ? "240 10% 8%" : "240 10% 15%";
+        const sidebarAccent = theme === "dark" ? "240 6% 15%" : "240 6% 20%";
+        
+        root.style.setProperty("--sidebar-primary", selectedColors.primary);
+        root.style.setProperty("--sidebar-background", sidebarBg);
+        root.style.setProperty("--sidebar-accent", sidebarAccent);
       }
     }
   }, [themeColor, theme]);

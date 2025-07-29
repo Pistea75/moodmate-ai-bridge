@@ -1,19 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bell, Clock, Calendar } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { ReminderSettingsComponent } from './reminders/ReminderSettings';
+import { Button } from '@/components/ui/button';
+import { Bell, Settings, Send } from 'lucide-react';
 import { UpcomingSessionsList } from './reminders/UpcomingSessionsList';
-
-interface ReminderSettings {
-  id: string;
-  enabled: boolean;
-  type: 'email' | 'sms' | 'push';
-  timing: '24h' | '2h' | '30m';
-  message: string;
-}
+import { ReminderSettingsComponent } from './reminders/ReminderSettings';
 
 interface UpcomingSession {
   id: string;
@@ -23,124 +14,77 @@ interface UpcomingSession {
   reminder_sent: boolean;
 }
 
-export function AppointmentReminders() {
-  const [reminderSettings, setReminderSettings] = useState<ReminderSettings[]>([
-    {
-      id: '1',
-      enabled: true,
-      type: 'email',
-      timing: '24h',
-      message: 'Reminder: You have an appointment tomorrow at {time} with Dr. {clinician}'
-    },
-    {
-      id: '2',
-      enabled: true,
-      type: 'sms',
-      timing: '2h',
-      message: 'Appointment reminder: Your session starts in 2 hours'
-    },
-    {
-      id: '3',
-      enabled: false,
-      type: 'push',
-      timing: '30m',
-      message: 'Your appointment is starting in 30 minutes'
-    }
-  ]);
+interface ReminderSettings {
+  id: string;
+  enabled: boolean;
+  type: 'email' | 'sms' | 'push';
+  timing: '24h' | '2h' | '30m';
+  message: string;
+}
 
-  const [upcomingSessions, setUpcomingSessions] = useState<UpcomingSession[]>([]);
+export function AppointmentReminders() {
+  const [sessions, setSessions] = useState<UpcomingSession[]>([]);
+  const [settings, setSettings] = useState<ReminderSettings[]>([]);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'sessions' | 'settings'>('sessions');
 
   useEffect(() => {
-    fetchUpcomingSessions();
+    // Load sample data
+    setSessions([
+      {
+        id: '1',
+        patient_name: 'John Doe',
+        scheduled_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        session_type: 'Therapy Session',
+        reminder_sent: false
+      }
+    ]);
+
+    setSettings([
+      {
+        id: '1',
+        enabled: true,
+        type: 'email',
+        timing: '24h',
+        message: 'Your appointment is scheduled for tomorrow at {time}'
+      }
+    ]);
   }, []);
 
-  const fetchUpcomingSessions = async () => {
-    try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user?.user) return;
-
-      const { data: sessions } = await supabase
-        .from('sessions')
-        .select(`
-          id,
-          scheduled_time,
-          session_type,
-          reminder_sent_at,
-          profiles!sessions_patient_id_fkey (
-            first_name,
-            last_name
-          )
-        `)
-        .eq('clinician_id', user.user.id)
-        .gte('scheduled_time', new Date().toISOString())
-        .lte('scheduled_time', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString())
-        .order('scheduled_time');
-
-      const sessionData = sessions?.map(session => ({
-        id: session.id,
-        patient_name: session.profiles ? 
-          `${session.profiles.first_name} ${session.profiles.last_name}` : 
-          'Unknown Patient',
-        scheduled_time: session.scheduled_time,
-        session_type: session.session_type || 'Therapy Session',
-        reminder_sent: !!session.reminder_sent_at
-      })) || [];
-
-      setUpcomingSessions(sessionData);
-    } catch (error) {
-      console.error('Error fetching upcoming sessions:', error);
-    }
-  };
-
-  const toggleReminder = (id: string) => {
-    setReminderSettings(prev => prev.map(setting => 
-      setting.id === id ? { ...setting, enabled: !setting.enabled } : setting
-    ));
-  };
-
-  const updateReminderType = (id: string, type: 'email' | 'sms' | 'push') => {
-    setReminderSettings(prev => prev.map(setting => 
-      setting.id === id ? { ...setting, type } : setting
-    ));
-  };
-
-  const updateReminderTiming = (id: string, timing: '24h' | '2h' | '30m') => {
-    setReminderSettings(prev => prev.map(setting => 
-      setting.id === id ? { ...setting, timing } : setting
-    ));
-  };
-
-  const sendTestReminder = async (sessionId: string) => {
+  const handleSendTestReminder = (sessionId: string) => {
     setLoading(true);
-    try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user?.user) return;
-
-      const session = upcomingSessions.find(s => s.id === sessionId);
-      if (!session) return;
-
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: user.user.id,
-          type: 'session_reminder',
-          title: 'Test Appointment Reminder',
-          description: `Test reminder for ${session.patient_name}'s appointment on ${new Date(session.scheduled_time).toLocaleDateString()}`,
-          priority: 'medium',
-          metadata: {
-            session_id: sessionId,
-            test_reminder: true
-          }
-        });
-
-      toast.success('Test reminder sent successfully');
-    } catch (error) {
-      console.error('Error sending test reminder:', error);
-      toast.error('Failed to send test reminder');
-    } finally {
+    setTimeout(() => {
+      setSessions(prev => prev.map(session => 
+        session.id === sessionId 
+          ? { ...session, reminder_sent: true }
+          : session
+      ));
       setLoading(false);
-    }
+    }, 1000);
+  };
+
+  const handleToggleSetting = (id: string) => {
+    setSettings(prev => prev.map(setting =>
+      setting.id === id 
+        ? { ...setting, enabled: !setting.enabled }
+        : setting
+    ));
+  };
+
+  const handleUpdateType = (id: string, type: 'email' | 'sms' | 'push') => {
+    setSettings(prev => prev.map(setting =>
+      setting.id === id 
+        ? { ...setting, type }
+        : setting
+    ));
+  };
+
+  const handleUpdateTiming = (id: string, timing: '24h' | '2h' | '30m') => {
+    setSettings(prev => prev.map(setting =>
+      setting.id === id 
+        ? { ...setting, timing }
+        : setting
+    ));
   };
 
   return (
@@ -148,47 +92,52 @@ export function AppointmentReminders() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Bell className="h-7 w-7 text-blue-600" />
+            <Bell className="h-7 w-7 text-primary" />
             Appointment Reminders
           </h2>
-          <p className="text-muted-foreground">Automated reminders for upcoming sessions</p>
+          <p className="text-muted-foreground">Manage patient appointment reminders</p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant={activeTab === 'sessions' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('sessions')}
+          >
+            <Send className="h-4 w-4 mr-2" />
+            Upcoming Sessions
+          </Button>
+          <Button
+            variant={activeTab === 'settings' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('settings')}
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Reminder Settings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ReminderSettingsComponent 
-              settings={reminderSettings}
-              onToggle={toggleReminder}
-              onUpdateType={updateReminderType}
-              onUpdateTiming={updateReminderTiming}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Upcoming Sessions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <UpcomingSessionsList 
-              sessions={upcomingSessions}
-              onSendTestReminder={sendTestReminder}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {activeTab === 'sessions' ? 'Upcoming Sessions' : 'Reminder Settings'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {activeTab === 'sessions' ? (
+            <UpcomingSessionsList
+              sessions={sessions}
+              onSendTestReminder={handleSendTestReminder}
               loading={loading}
             />
-          </CardContent>
-        </Card>
-      </div>
+          ) : (
+            <ReminderSettingsComponent
+              settings={settings}
+              onToggle={handleToggleSetting}
+              onUpdateType={handleUpdateType}
+              onUpdateTiming={handleUpdateTiming}
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
