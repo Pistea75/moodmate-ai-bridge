@@ -64,24 +64,32 @@ export function DirectMessaging() {
       const { data: user } = await supabase.auth.getUser();
       if (!user?.user) return;
 
-      const { data, error } = await supabase
+      // First get patient IDs from patient_clinician_links
+      const { data: links, error: linksError } = await supabase
         .from('patient_clinician_links')
-        .select(`
-          patient_id,
-          profiles!patient_clinician_links_patient_id_fkey (
-            id,
-            first_name,
-            last_name
-          )
-        `)
+        .select('patient_id')
         .eq('clinician_id', user.user.id);
 
-      if (error) throw error;
+      if (linksError) throw linksError;
 
-      const patientsData = data?.map(link => ({
-        id: link.patient_id,
-        first_name: link.profiles?.first_name || '',
-        last_name: link.profiles?.last_name || ''
+      if (!links || links.length === 0) {
+        setPatients([]);
+        return;
+      }
+
+      // Then get patient profiles
+      const patientIds = links.map(link => link.patient_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', patientIds);
+
+      if (profilesError) throw profilesError;
+
+      const patientsData = profiles?.map(profile => ({
+        id: profile.id,
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || ''
       })) || [];
 
       setPatients(patientsData);
