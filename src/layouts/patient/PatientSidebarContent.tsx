@@ -39,17 +39,17 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+    <div className="flex flex-col h-full bg-purple-900 border-r border-purple-800">
       {/* Logo and Title */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+      <div className="p-6 border-b border-purple-800 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-500">
               <Brain className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">MoodMate</h1>
-              <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">{t('patientPortal')}</p>
+              <h1 className="text-xl font-bold text-white">MoodMate</h1>
+              <p className="text-sm text-purple-400 font-medium">{t('patientPortal')}</p>
             </div>
           </div>
           <ThemeToggle />
@@ -57,25 +57,25 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
       </div>
 
       {/* User Info */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/30">
-          <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
-            <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+      <div className="p-6 border-b border-purple-800 flex-shrink-0">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-purple-800/50">
+          <div className="h-12 w-12 rounded-full bg-purple-700/50 flex items-center justify-center">
+            <span className="text-sm font-semibold text-purple-300">
               {getDisplayName().split(' ').map(n => n[0]).join('') || 'P'}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-base font-semibold text-gray-900 dark:text-white truncate">
+            <p className="text-base font-semibold text-white truncate">
               {getDisplayName()}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Patient</p>
+            <p className="text-sm text-purple-400">Patient</p>
           </div>
         </div>
       </div>
 
       {/* Wellness Status Badge */}
-      <div className="p-4 bg-purple-50 dark:bg-purple-950/30 border-b border-gray-200 dark:border-gray-800">
-        <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+      <div className="p-4 bg-purple-950/50 border-b border-purple-800">
+        <div className="flex items-center gap-2 text-purple-400">
           <Heart className="h-4 w-4" />
           <span className="text-xs font-medium uppercase tracking-wide">WELLNESS PORTAL</span>
         </div>
@@ -92,8 +92,8 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
                 cn(
                   "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95",
                   isActive
-                    ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700'
+                    ? 'bg-purple-800/50 text-purple-300 border border-purple-700'
+                    : 'text-purple-300 hover:text-white hover:bg-purple-800 active:bg-purple-700'
                 )
               }
             >
@@ -105,15 +105,15 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-1 flex-shrink-0">
+      <div className="p-4 border-t border-purple-800 space-y-1 flex-shrink-0">
         <NavLink
           to="/patient/profile"
           className={({ isActive }) =>
             cn(
               "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
               isActive
-                ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-                : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700'
+                ? 'bg-purple-800/50 text-purple-300 border border-purple-700'
+                : 'text-purple-300 hover:text-white hover:bg-purple-800 active:bg-purple-700'
             )
           }
         >
@@ -124,7 +124,7 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
         <Button
           variant="ghost"
           onClick={handleSignOut}
-          className="flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full justify-start text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700 active:scale-95"
+          className="flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full justify-start text-purple-300 hover:text-white hover:bg-purple-800 active:bg-purple-700 active:scale-95"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
           <span className="flex-1">{t('logout')}</span>
