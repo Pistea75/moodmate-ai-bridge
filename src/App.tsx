@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -9,34 +10,31 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { EnhancedSecurityProvider } from "./components/security/EnhancedSecurityProvider";
 import LandingPage from "./pages/LandingPage";
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
+import SignIn from "./pages/Login";
+import SignUp from "./pages/SignupPatient";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import ClinicianDashboard from "./pages/clinician/ClinicianDashboard";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 import PatientProfile from "./pages/patient/PatientProfile";
 import ClinicianProfile from "./pages/clinician/ClinicianProfile";
-import AdminProfile from "./pages/admin/AdminProfile";
 import PatientSettings from "./pages/patient/PatientSettings";
 import ClinicianSettings from "./pages/clinician/ClinicianSettings";
-import AdminSettings from "./pages/admin/AdminSettings";
 import SystemSettings from "./pages/admin/SystemSettings";
 import PatientChat from "./pages/patient/PatientChat";
 import PatientMoodInsights from "./pages/patient/PatientMoodInsights";
 import PatientTasks from "./pages/patient/PatientTasks";
-import PatientGoals from "./pages/patient/PatientGoals";
+import PatientGoals from "./pages/patient/Goals";
 import PatientSessions from "./pages/patient/PatientSessions";
-import ClinicianPatients from "./pages/clinician/ClinicianPatients";
-import ClinicianSessions from "./pages/clinician/ClinicianSessions";
+import ClinicianPatients from "./pages/clinician/Patients";
+import ClinicianSessions from "./pages/clinician/Sessions";
 import ClinicianCommunications from "./pages/clinician/ClinicianCommunications";
-import ClinicianAnalytics from "./pages/clinician/ClinicianAnalytics";
-import ClinicianTasks from "./pages/clinician/ClinicianTasks";
-import ClinicianReports from "./pages/clinician/ClinicianReports";
-import ClinicianTrainAI from "./pages/clinician/ClinicianTrainAI";
-import ClinicianResourceLibrary from "./pages/clinician/ClinicianResourceLibrary";
-import ClinicianReminders from "./pages/clinician/ClinicianReminders";
+import ClinicianAnalytics from "./pages/clinician/Analytics";
+import ClinicianTasks from "./pages/clinician/Tasks";
+import ClinicianReports from "./pages/clinician/Reports";
+import ClinicianTrainAI from "./pages/clinician/TrainAI";
+import ClinicianResourceLibrary from "./pages/clinician/ResourceLibrary";
+import ClinicianReminders from "./pages/clinician/Reminders";
 
 const queryClient = new QueryClient();
 
@@ -83,9 +81,6 @@ function App() {
                         <Route path="/clinician/settings" element={<ProtectedRoute><ClinicianSettings /></ProtectedRoute>} />
 
                         {/* Admin Routes */}
-                        <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-                        <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
-                        <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
                         <Route path="/admin/system-settings" element={<ProtectedRoute><SystemSettings /></ProtectedRoute>} />
                       </Routes>
                     </div>
