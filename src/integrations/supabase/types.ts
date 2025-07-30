@@ -1283,8 +1283,14 @@ export type Database = {
     }
     Functions: {
       check_session_conflict: {
-        Args: { _clinician_id: string; _start: string; _end: string }
-        Returns: boolean
+        Args:
+          | Record<PropertyKey, never>
+          | {
+              p_clinician_id: string
+              p_proposed_start: string
+              p_proposed_end: string
+            }
+        Returns: undefined
       }
       check_upcoming_sessions: {
         Args: Record<PropertyKey, never>
@@ -1303,6 +1309,10 @@ export type Database = {
           avg_mood: number
           last_entry: string
         }[]
+      }
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       sync_user_email: {
         Args: Record<PropertyKey, never>
