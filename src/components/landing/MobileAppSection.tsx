@@ -1,5 +1,4 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import mobileAppImage from '@/assets/mobile-app-preview.jpg';
 
 export function MobileAppSection() {
   const { t } = useLanguage();
@@ -39,11 +38,10 @@ export function MobileAppSection() {
           <div className="order-1 lg:order-2 flex justify-center">
             <div className="relative">
               <img 
-                src={mobileAppImage} 
+                src="/lovable-uploads/0fe37c4f-9ee0-4d82-840b-5f9dc31b4a47.png" 
                 alt={t('mobileApp.imageAlt') || 'Vista previa de la aplicación móvil de MoodMate'}
-                className="w-64 md:w-80 h-auto rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300"
+                className="w-full max-w-md h-auto rounded-2xl shadow-2xl hover:scale-105 transition-transform duration-300"
               />
-              <div className="absolute -z-10 top-8 left-8 w-full h-full bg-primary/10 rounded-2xl"></div>
             </div>
           </div>
         </div>
