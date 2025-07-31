@@ -79,10 +79,9 @@ export default function SignupPatient() {
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ');
 
-      let referralCodeInput: string | null = null;
-
+      // Validate referral code if provided
       if (formData.referralCode?.trim()) {
-        referralCodeInput = formData.referralCode.trim().toUpperCase();
+        const referralCodeInput = formData.referralCode.trim().toUpperCase();
 
         const { data: clinician, error } = await supabase
           .from('profiles')
@@ -101,100 +100,25 @@ export default function SignupPatient() {
         }
       }
 
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName || '',
-            role: 'patient',
-            referral_code: referralCodeInput,
-            language: formData.language
-          },
-          emailRedirectTo: `${window.location.origin}/login`
-        }
-      });
+      const metadata = {
+        first_name: firstName,
+        last_name: lastName || '',
+        role: 'patient',
+        referral_code: formData.referralCode?.trim()?.toUpperCase() || null,
+        language: formData.language
+      };
 
-      if (signUpError) {
-        console.error('Signup error:', signUpError);
+      console.log("Attempting patient signup with metadata:", metadata);
+
+      const success = await signUp(formData.email.trim(), formData.password, metadata);
+
+      if (success) {
         toast({
-          title: "Error",
-          description: signUpError.message,
-          variant: "destructive"
+          title: "Account Created",
+          description: "Please check your email to verify your account."
         });
-        return;
+        navigate('/login');
       }
-
-      const newUser = data.user;
-
-      if (!newUser) {
-        throw new Error('User not returned after signup');
-      }
-
-      // Create profile manually
-      const { data: patientProfile, error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: newUser.id,
-          first_name: firstName,
-          last_name: lastName || '',
-          role: 'patient',
-          referral_code: referralCodeInput,
-          language: formData.language,
-          email: formData.email
-        })
-        .select()
-        .single();
-
-      if (profileError) {
-        console.error('Failed to create patient profile:', profileError);
-        toast({
-          title: "Error",
-          description: "Could not create profile. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Link patient to clinician if referral code is valid
-      if (referralCodeInput) {
-        const { data: clinicianProfile, error: clinicianError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('referral_code', referralCodeInput)
-          .eq('role', 'clinician')
-          .single();
-
-        if (clinicianError || !clinicianProfile) {
-          console.warn('Clinician not found to link');
-        } else {
-          const { error: linkError } = await supabase
-            .from('patient_clinician_links')
-            .insert({
-              patient_id: patientProfile.id,
-              clinician_id: clinicianProfile.id
-            });
-
-          if (linkError) {
-            console.error('Error linking patient to clinician:', linkError);
-            toast({
-              title: "Warning",
-              description: "Account created, but failed to link to clinician.",
-              variant: "default"
-            });
-          } else {
-            console.log("✅ Patient linked to clinician successfully");
-          }
-        }
-      }
-
-      toast({
-        title: "Account Created",
-        description: "Please check your email to verify your account."
-      });
-
-      navigate('/login');
     } catch (err: any) {
       console.error("Signup error:", err);
       toast({
