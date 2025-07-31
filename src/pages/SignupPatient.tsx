@@ -8,7 +8,6 @@ import { PatientSignupStep2 } from '../components/auth/patient/PatientSignupStep
 import { useAuthFlow } from '../hooks/useAuthFlow';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { validatePasswordStrength } from '@/utils/enhancedSecurityUtils';
 
 export default function SignupPatient() {
   const [step, setStep] = useState(1);
@@ -50,12 +49,11 @@ export default function SignupPatient() {
         return;
       }
 
-      // Use enhanced password validation
-      const passwordValidation = validatePasswordStrength(formData.password);
-      if (!passwordValidation.isValid) {
+      // Simple password validation
+      if (formData.password.length < 6) {
         toast({
           title: "Password Requirements Not Met",
-          description: passwordValidation.errors.join('. '),
+          description: "Password must be at least 6 characters long.",
           variant: "destructive"
         });
         return;
@@ -75,6 +73,9 @@ export default function SignupPatient() {
     }
 
     try {
+      console.log("🔄 Starting patient signup process...");
+      console.log("Form data:", { email: formData.email, fullName: formData.fullName, language: formData.language });
+      
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ');
@@ -111,6 +112,8 @@ export default function SignupPatient() {
       console.log("Attempting patient signup with metadata:", metadata);
 
       const success = await signUp(formData.email.trim(), formData.password, metadata);
+      
+      console.log("Signup result:", success);
 
       if (success) {
         toast({

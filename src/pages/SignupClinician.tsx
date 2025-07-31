@@ -7,7 +7,6 @@ import { SignupForm } from '../components/auth/SignupForm';
 import { ClinicianSignupStep2 } from '../components/auth/clinician/ClinicianSignupStep2';
 import { useAuthFlow } from '../hooks/useAuthFlow';
 import { toast } from '@/hooks/use-toast';
-import { validatePasswordStrength } from '@/utils/enhancedSecurityUtils';
 
 export default function SignupClinician() {
   const [step, setStep] = useState(1);
@@ -50,12 +49,11 @@ export default function SignupClinician() {
         return;
       }
       
-      // Use enhanced password validation
-      const passwordValidation = validatePasswordStrength(formData.password);
-      if (!passwordValidation.isValid) {
+      // Simple password validation
+      if (formData.password.length < 6) {
         toast({
           title: "Password Requirements Not Met",
-          description: passwordValidation.errors.join('. '),
+          description: "Password must be at least 6 characters long.",
           variant: "destructive"
         });
         return;
