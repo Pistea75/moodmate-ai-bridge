@@ -94,7 +94,9 @@ export function useSecureRoleValidation(user: User | null): SecureRoleValidation
     if (!role || !Array.isArray(roles) || roles.length === 0) {
       return false;
     }
-    return roles.includes(role);
+    // Super admins have access to everything except when specifically checking for 'super_admin'
+    if (isSuperAdmin && !roles.includes('super_admin')) return true;
+    return roles.includes(role) || (roles.includes('super_admin') && isSuperAdmin);
   };
 
   const validateRole = (expectedRole: string): boolean => {

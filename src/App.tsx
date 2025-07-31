@@ -13,6 +13,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 // Import all your pages
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import SignupChoice from "./pages/SignupChoice";
 import SignupPatient from "./pages/SignupPatient";
 import SignupClinician from "./pages/SignupClinician";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -99,6 +100,10 @@ function App() {
                         <Route path="/" element={<Index />} />
                         <Route path="/landing" element={<Landing />} />
                         <Route path="/login" element={<Login />} />
+                        <Route path="/signup/choice" element={<SignupChoice />} />
+                        <Route path="/signup/patient" element={<SignupPatient />} />
+                        <Route path="/signup/clinician" element={<SignupClinician />} />
+                        {/* Keep old routes for compatibility */}
                         <Route path="/signup-patient" element={<SignupPatient />} />
                         <Route path="/signup-clinician" element={<SignupClinician />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -155,16 +160,19 @@ function App() {
                           </ProtectedRoute>
                         } />
 
-                        {/* Admin routes */}
+                        {/* Super Admin routes */}
                         <Route path="/admin/*" element={
-                          <ProtectedRoute>
+                          <ProtectedRoute requiredRole="super_admin">
                             <Routes>
                               <Route path="dashboard" element={<SuperAdminDashboard />} />
+                              <Route path="super-admin-dashboard" element={<SuperAdminDashboard />} />
                               <Route path="users" element={<UserManagement />} />
+                              <Route path="user-management" element={<UserManagement />} />
                               <Route path="system-health" element={<SystemHealth />} />
                               <Route path="audit-trail" element={<AuditTrail />} />
                               <Route path="security-logs" element={<SecurityLogs />} />
                               <Route path="settings" element={<SystemSettings />} />
+                              <Route path="system-settings" element={<SystemSettings />} />
                             </Routes>
                           </ProtectedRoute>
                         } />

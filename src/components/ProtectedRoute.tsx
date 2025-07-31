@@ -7,12 +7,12 @@ import { AlertTriangle } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: 'patient' | 'clinician';
+  requiredRole?: 'patient' | 'clinician' | 'super_admin';
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { userRole, hasRole, loading: roleLoading, error: roleError } = useSecureRoleValidation(user);
+  const { userRole, hasRole, loading: roleLoading, error: roleError, isSuperAdmin } = useSecureRoleValidation(user);
 
   const loading = authLoading || roleLoading;
 
@@ -46,8 +46,19 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
   }
 
   if (requiredRole && !hasRole([requiredRole])) {
+    // Special handling for super admin role
+    if (requiredRole === 'super_admin' && !isSuperAdmin) {
+      // Redirect to appropriate dashboard based on verified user role
+      if (userRole === 'clinician') {
+        return <Navigate to="/clinician/dashboard" replace />;
+      } else if (userRole === 'patient') {
+        return <Navigate to="/patient/dashboard" replace />;
+      } else {
+        return <Navigate to="/login" replace />;
+      }
+    }
     // Redirect to appropriate dashboard based on verified user role
-    if (userRole === 'clinician') {
+    if (userRole === 'clinician' || isSuperAdmin) {
       return <Navigate to="/clinician/dashboard" replace />;
     } else if (userRole === 'patient') {
       return <Navigate to="/patient/dashboard" replace />;

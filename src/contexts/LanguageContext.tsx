@@ -15,6 +15,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // Simple translations object
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    // Auth & Navigation
     welcomeBack: 'Welcome Back',
     email: 'Email',
     password: 'Password',
@@ -22,9 +23,42 @@ const translations: Record<Language, Record<string, string>> = {
     signUp: 'Sign Up',
     forgotPassword: 'Forgot Password?',
     loading: 'Loading...',
-    // Add more translations as needed
+    
+    // Landing Page
+    mentalHealthReimagined: 'Mental Health Reimagined',
+    landingSubtitle: 'The first AI-powered platform that combines professional therapy, real-time mood tracking, and 24/7 support in one seamless experience.',
+    startFreeTrial: 'Start Free Trial',
+    forClinicians: 'For Clinicians',
+    noCardRequired: 'No credit card required • Setup in 2 minutes • Cancel anytime',
+    trustedBy: 'Trusted by 10,000+ users worldwide',
+    
+    // Navigation
+    about: 'About',
+    features: 'Features',
+    pricing: 'Pricing',
+    contact: 'Contact',
+    privacy: 'Privacy',
+    help: 'Help',
+    logIn: 'Log In',
+    startYourJourney: 'Start Your Journey',
+    
+    // Dashboard & Common
+    dashboard: 'Dashboard',
+    profile: 'Profile',
+    settings: 'Settings',
+    patients: 'Patients',
+    sessions: 'Sessions',
+    tasks: 'Tasks',
+    reports: 'Reports',
+    analytics: 'Analytics',
+    chat: 'AI Chat',
+    directMessages: 'Direct Messages',
+    moodLog: 'Mood Log',
+    goals: 'Goals',
+    insights: 'Insights',
   },
   es: {
+    // Auth & Navigation
     welcomeBack: 'Bienvenido de Nuevo',
     email: 'Correo Electrónico',
     password: 'Contraseña',
@@ -32,6 +66,39 @@ const translations: Record<Language, Record<string, string>> = {
     signUp: 'Registrarse',
     forgotPassword: '¿Olvidaste tu Contraseña?',
     loading: 'Cargando...',
+    
+    // Landing Page
+    mentalHealthReimagined: 'Salud Mental Reimaginada',
+    landingSubtitle: 'La primera plataforma impulsada por IA que combina terapia profesional, seguimiento del estado de ánimo en tiempo real y soporte 24/7 en una experiencia perfecta.',
+    startFreeTrial: 'Comenzar Prueba Gratuita',
+    forClinicians: 'Para Clínicos',
+    noCardRequired: 'No se requiere tarjeta de crédito • Configuración en 2 minutos • Cancela en cualquier momento',
+    trustedBy: 'Confiado por más de 10,000 usuarios en todo el mundo',
+    
+    // Navigation
+    about: 'Acerca de',
+    features: 'Características',
+    pricing: 'Precios',
+    contact: 'Contacto',
+    privacy: 'Privacidad',
+    help: 'Ayuda',
+    logIn: 'Iniciar Sesión',
+    startYourJourney: 'Comienza tu Viaje',
+    
+    // Dashboard & Common
+    dashboard: 'Panel',
+    profile: 'Perfil',
+    settings: 'Configuración',
+    patients: 'Pacientes',
+    sessions: 'Sesiones',
+    tasks: 'Tareas',
+    reports: 'Reportes',
+    analytics: 'Análisis',
+    chat: 'Chat IA',
+    directMessages: 'Mensajes Directos',
+    moodLog: 'Registro de Ánimo',
+    goals: 'Objetivos',
+    insights: 'Perspectivas',
   },
   fr: {
     welcomeBack: 'Bon Retour',

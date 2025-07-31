@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import ClinicianLayout from '../../layouts/ClinicianLayout';
+import SuperAdminLayout from '../../layouts/SuperAdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,7 +82,7 @@ export default function UserManagement() {
   };
 
   return (
-    <ClinicianLayout>
+    <SuperAdminLayout>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Header */}
@@ -239,6 +239,6 @@ export default function UserManagement() {
           </Card>
         </div>
       </div>
-    </ClinicianLayout>
+    </SuperAdminLayout>
   );
 }

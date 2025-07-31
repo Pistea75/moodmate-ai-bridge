@@ -12,7 +12,6 @@ export default function Landing() {
       <PublicNav />
       <ModernHero />
       <ModernFeatures />
-      <ModernTestimonials />
       <ModernCTA />
       <ModernFooter />
     </div>

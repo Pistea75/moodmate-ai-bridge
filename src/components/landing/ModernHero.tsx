@@ -39,22 +39,37 @@ export function ModernHero() {
             </p>
           </div>
 
-          {/* Enhanced CTA Button */}
-          <div className="pt-8">
-            <Link to="/signup/patient">
-              <Button 
-                size="lg" 
-                className="group relative bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold px-12 py-6 rounded-full text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-2 border-white/20 backdrop-blur-sm"
-              >
-                <span className="relative z-10 flex items-center gap-3">
-                  Start Your Free Trial
-                  <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </Button>
-            </Link>
-            <p className="text-sm text-slate-400 mt-4 font-medium">
-              No credit card required • 14-day free trial • Cancel anytime
+          {/* Enhanced CTA Buttons */}
+          <div className="pt-8 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/signup/choice">
+                <Button 
+                  size="lg" 
+                  className="group relative bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold px-12 py-6 rounded-full text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-2 border-white/20 backdrop-blur-sm"
+                >
+                  <span className="relative z-10 flex items-center gap-3">
+                    Start Free Trial
+                    <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </Button>
+              </Link>
+              
+              <Link to="/signup/clinician">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="group relative bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white font-bold px-12 py-6 rounded-full text-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
+                >
+                  <span className="relative z-10 flex items-center gap-3">
+                    For Clinicians
+                    <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Button>
+              </Link>
+            </div>
+            <p className="text-sm text-slate-400 mt-4 font-medium text-center">
+              No credit card required • Setup in 2 minutes • Cancel anytime
             </p>
           </div>
 

@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Brain, MenuIcon, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { LanguageSelector } from './LanguageSelector';
 
 export function PublicNav() {
   const location = useLocation();
@@ -49,6 +50,7 @@ export function PublicNav() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSelector />
           <Link to="/login">
             <Button 
               variant="ghost" 
@@ -57,7 +59,7 @@ export function PublicNav() {
               Log In
             </Button>
           </Link>
-          <Link to="/signup/patient">
+          <Link to="/signup/choice">
             <Button className="text-sm font-semibold rounded-full px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
               Start Your Journey
             </Button>
@@ -130,6 +132,9 @@ export function PublicNav() {
 
                 {/* Footer Actions */}
                 <div className="p-6 border-t border-white/10 space-y-3">
+                  <div className="flex justify-center mb-3">
+                    <LanguageSelector />
+                  </div>
                   <Link to="/login" onClick={() => setIsOpen(false)}>
                     <Button 
                       variant="ghost" 
@@ -138,7 +143,7 @@ export function PublicNav() {
                       Log In
                     </Button>
                   </Link>
-                  <Link to="/signup/patient" onClick={() => setIsOpen(false)}>
+                  <Link to="/signup/choice" onClick={() => setIsOpen(false)}>
                     <Button className="w-full text-base font-semibold rounded-full py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg">
                       Start Your Journey
                     </Button>

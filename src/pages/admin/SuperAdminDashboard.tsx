@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSuperAdmin } from '@/hooks/useSuperAdmin';
+import SuperAdminLayout from '@/layouts/SuperAdminLayout';
 
 interface UserData {
   id: string;
@@ -207,8 +208,8 @@ export default function SuperAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <SuperAdminLayout>
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -448,6 +449,6 @@ export default function SuperAdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </SuperAdminLayout>
   );
 }
