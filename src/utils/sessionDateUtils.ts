@@ -2,7 +2,8 @@
 /**
  * Date utility functions for session scheduling
  */
-import { parseGMTOffset } from "./sessionValidationUtils";
+import { createDateTimeInZone, fromZonedTime } from "@/lib/utils/timezoneUtils";
+import { DateTime } from 'luxon';
 
 /**
  * Creates a UTC date from local date/time components and timezone
@@ -13,30 +14,29 @@ export const createUTCFromLocalDateTime = (
   minutes: number,
   timezone: string
 ): Date => {
-  // Create local date with the specified time
-  const localDateTime = new Date(
-    inputDate.getFullYear(),
-    inputDate.getMonth(),
-    inputDate.getDate(),
-    hours,
-    minutes,
-    0,
-    0
-  );
-  
-  console.log("📅 Local date/time constructed:", localDateTime.toLocaleString());
-  console.log("🌍 Selected timezone:", timezone);
-  
-  // Convert to UTC based on the selected timezone
-  const timezoneOffsetMinutes = parseGMTOffset(timezone);
-  const utcDateTime = new Date(localDateTime.getTime() - (timezoneOffsetMinutes * 60 * 1000));
-  
-  // Validate the final UTC date
-  if (isNaN(utcDateTime.getTime())) {
+  try {
+    console.log("📅 Creating session for:", inputDate.toDateString(), `${hours}:${minutes}`, "in", timezone);
+    
+    // Create date time in the specified timezone
+    const localDateTime = createDateTimeInZone(
+      inputDate.getFullYear(),
+      inputDate.getMonth() + 1, // Luxon uses 1-based months
+      inputDate.getDate(),
+      hours,
+      minutes,
+      timezone
+    );
+    
+    console.log("🌍 Local date/time in timezone:", localDateTime.toLocaleString());
+    
+    // Convert to UTC
+    const utcDateTime = fromZonedTime(localDateTime, timezone);
+    
+    console.log("🌐 Converted to UTC:", utcDateTime.toISOString());
+    
+    return utcDateTime;
+  } catch (error) {
+    console.error("Error creating UTC from local date time:", error);
     throw new Error("Failed to create valid UTC date");
   }
-  
-  console.log("🌐 Converted to UTC:", utcDateTime.toISOString());
-  
-  return utcDateTime;
 };

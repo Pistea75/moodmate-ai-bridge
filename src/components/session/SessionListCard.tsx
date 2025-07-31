@@ -1,6 +1,6 @@
 
 import { format, isBefore, addMinutes, parseISO, isValid } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+import { toZonedTime } from "@/lib/utils/timezoneUtils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Trash2 } from "lucide-react";

@@ -6,7 +6,7 @@ import { TimezoneSelector } from "./TimezoneSelector";
 import { PatientSelector } from "./PatientSelector";
 import { SessionTypeSelector } from "./SessionTypeSelector";
 import { AvailableTimeSlots } from "./AvailableTimeSlots";
-import { getCurrentTimezone } from "@/utils/sessionUtils";
+import { getCurrentTimezone } from "@/lib/utils/timezoneUtils";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

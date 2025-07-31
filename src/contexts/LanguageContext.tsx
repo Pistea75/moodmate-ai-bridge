@@ -56,6 +56,14 @@ const translations: Record<Language, Record<string, string>> = {
     moodLog: 'Mood Log',
     goals: 'Goals',
     insights: 'Insights',
+    
+    // Mobile App Section
+    'mobileApp.title': 'Access from any device',
+    'mobileApp.description': 'Our platform is optimized to work perfectly on your phone, tablet, or computer. Access your therapy sessions, track your mood, and communicate with your psychologist from anywhere.',
+    'mobileApp.feature1': 'Intuitive and easy-to-use interface',
+    'mobileApp.feature2': 'Real-time synchronization across devices',
+    'mobileApp.feature3': 'Security and privacy guaranteed',
+    'mobileApp.imageAlt': 'MoodMate mobile app preview',
   },
   es: {
     // Auth & Navigation
@@ -99,6 +107,14 @@ const translations: Record<Language, Record<string, string>> = {
     moodLog: 'Registro de Ánimo',
     goals: 'Objetivos',
     insights: 'Perspectivas',
+    
+    // Mobile App Section
+    'mobileApp.title': 'Acceso desde cualquier dispositivo',
+    'mobileApp.description': 'Nuestra plataforma está optimizada para funcionar perfectamente en tu teléfono, tablet o computadora. Accede a tus sesiones de terapia, realiza el seguimiento de tu estado de ánimo y comunícate con tu psicólogo desde cualquier lugar.',
+    'mobileApp.feature1': 'Interfaz intuitiva y fácil de usar',
+    'mobileApp.feature2': 'Sincronización en tiempo real entre dispositivos', 
+    'mobileApp.feature3': 'Seguridad y privacidad garantizadas',
+    'mobileApp.imageAlt': 'Vista previa de la aplicación móvil de MoodMate',
   },
   fr: {
     welcomeBack: 'Bon Retour',

@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentTimezone, getCommonTimezones } from "./timeUtils";
+import { getCurrentTimezone, getCommonTimezones } from "@/lib/utils/timezoneUtils";
 import { toast } from "sonner";
 
 /**

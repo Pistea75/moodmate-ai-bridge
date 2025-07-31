@@ -1,7 +1,7 @@
 
 import { Calendar, Clock } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
+import { toZonedTime } from '@/lib/utils/timezoneUtils';
 
 interface SessionMetadataProps {
   dateTime: string;

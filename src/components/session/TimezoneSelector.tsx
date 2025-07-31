@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getCommonTimezones, getCurrentTimezone } from "@/utils/sessionUtils";
+import { getCommonTimezones, getCurrentTimezone } from "@/lib/utils/timezoneUtils";
 
 interface TimezoneSelectorProps {
   value: string;
