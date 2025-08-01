@@ -87,7 +87,7 @@ export default function SignupPatient() {
         const { data: clinician, error } = await supabase
           .from('profiles')
           .select('id')
-          .ilike('referral_code', referralCodeInput)
+          .eq('referral_code', referralCodeInput)
           .eq('role', 'clinician')
           .maybeSingle();
 
