@@ -38,6 +38,7 @@ export default function SignupPatient() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔄 handleSubmit called, step:", step, "formData:", formData);
 
     if (step === 1) {
       if (formData.password !== formData.confirmPassword) {
@@ -74,7 +75,7 @@ export default function SignupPatient() {
 
     try {
       console.log("🔄 Starting patient signup process...");
-      console.log("Form data:", { email: formData.email, fullName: formData.fullName, language: formData.language });
+      console.log("Form data:", { email: formData.email, fullName: formData.fullName, language: formData.language, referralCode: formData.referralCode });
       
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0];
@@ -85,36 +86,46 @@ export default function SignupPatient() {
         const referralCodeInput = formData.referralCode.trim().toUpperCase();
         console.log("🔍 Validating referral code:", referralCodeInput);
 
-        const { data: clinician, error } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('referral_code', referralCodeInput)
-          .eq('role', 'clinician')
-          .maybeSingle();
+        try {
+          const { data: clinician, error } = await supabase
+            .from('profiles')
+            .select('id, referral_code, role')
+            .eq('referral_code', referralCodeInput)
+            .eq('role', 'clinician')
+            .maybeSingle();
 
-        console.log("🔍 Referral code query result:", { clinician, error });
+          console.log("🔍 Referral code query result:", { clinician, error });
 
-        if (error) {
-          console.error("❌ Database error during referral code validation:", error);
+          if (error) {
+            console.error("❌ Database error during referral code validation:", error);
+            toast({
+              title: "Database Error", 
+              description: `Error: ${error.message}. Please try again.`,
+              variant: "destructive"
+            });
+            return;
+          }
+
+          if (!clinician) {
+            console.log("❌ No clinician found with referral code:", referralCodeInput);
+            toast({
+              title: "Invalid Referral Code",
+              description: "Please check the referral code with your clinician",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          console.log("✅ Referral code validation successful, clinician found:", clinician.id);
+        } catch (err) {
+          console.error("❌ Exception during referral code validation:", err);
           toast({
-            title: "Database Error",
-            description: "There was an error validating the referral code. Please try again.",
+            title: "Validation Error",
+            description: "There was an error checking the referral code. Please try again.",
             variant: "destructive"
           });
           return;
         }
-
-        if (!clinician) {
-          console.log("❌ No clinician found with referral code:", referralCodeInput);
-          toast({
-            title: "Invalid Referral Code",
-            description: "Please check the referral code with your clinician",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        console.log("✅ Referral code validation successful, clinician found:", clinician.id);
       }
 
       const metadata = {
