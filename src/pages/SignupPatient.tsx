@@ -83,6 +83,7 @@ export default function SignupPatient() {
       // Validate referral code if provided
       if (formData.referralCode?.trim()) {
         const referralCodeInput = formData.referralCode.trim().toUpperCase();
+        console.log("🔍 Validating referral code:", referralCodeInput);
 
         const { data: clinician, error } = await supabase
           .from('profiles')
@@ -91,7 +92,20 @@ export default function SignupPatient() {
           .eq('role', 'clinician')
           .maybeSingle();
 
-        if (error || !clinician) {
+        console.log("🔍 Referral code query result:", { clinician, error });
+
+        if (error) {
+          console.error("❌ Database error during referral code validation:", error);
+          toast({
+            title: "Database Error",
+            description: "There was an error validating the referral code. Please try again.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        if (!clinician) {
+          console.log("❌ No clinician found with referral code:", referralCodeInput);
           toast({
             title: "Invalid Referral Code",
             description: "Please check the referral code with your clinician",
@@ -99,6 +113,8 @@ export default function SignupPatient() {
           });
           return;
         }
+
+        console.log("✅ Referral code validation successful, clinician found:", clinician.id);
       }
 
       const metadata = {
