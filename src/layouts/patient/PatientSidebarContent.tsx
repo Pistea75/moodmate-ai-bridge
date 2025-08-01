@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { PatientNavItems } from './PatientNavItems';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LogOut, User, Brain, Heart, Settings } from 'lucide-react';
@@ -15,7 +15,7 @@ interface PatientSidebarContentProps {
 }
 
 export function PatientSidebarContent({ patientFullName }: PatientSidebarContentProps) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { signOut } = useAuth();
   const navItems = PatientNavItems();
 
@@ -25,9 +25,9 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
     }
     if (React.isValidElement(patientFullName)) {
       const content = patientFullName.props?.children;
-      return typeof content === 'string' ? content : t('patient');
+      return typeof content === 'string' ? content : t('nav.profile');
     }
-    return t('patient');
+    return t('nav.profile');
   };
 
   const handleSignOut = async () => {
@@ -81,7 +81,7 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
             <p className="text-base font-semibold text-white truncate">
               {getDisplayName()}
             </p>
-            <p className="text-sm" style={{ color: `hsl(var(--sidebar-primary))` }}>Patient</p>
+            <p className="text-sm" style={{ color: `hsl(var(--sidebar-primary))` }}>{t('auth.patientAccount')}</p>
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
               })}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
-              <span className="flex-1">{capitalize(t(item.title as keyof typeof t) || item.title)}</span>
+              <span className="flex-1">{capitalize(t(item.title))}</span>
             </NavLink>
           ))}
         </nav>
@@ -143,7 +143,7 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
           })}
         >
           <User className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">Profile</span>
+          <span className="flex-1">{t('nav.profile')}</span>
         </NavLink>
         
         <NavLink
@@ -163,7 +163,7 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
           })}
         >
           <Settings className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">Settings</span>
+          <span className="flex-1">{t('nav.settings')}</span>
         </NavLink>
 
         <Button
@@ -172,7 +172,7 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
           className="flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700 active:scale-95"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">Logout</span>
+          <span className="flex-1">{t('nav.logout')}</span>
         </Button>
       </div>
     </div>

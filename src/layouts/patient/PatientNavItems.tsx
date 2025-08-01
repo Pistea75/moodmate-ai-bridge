@@ -14,42 +14,42 @@ import {
 
 export const patientNavItems = [
   {
-    title: 'dashboard',
+    title: 'nav.dashboard',
     href: '/patient/dashboard',
     icon: Home,
   },
   {
-    title: 'AI Chat',
+    title: 'nav.chat',
     href: '/patient/chat',
     icon: MessageSquare,
   },
   {
-    title: 'Direct Messages',
+    title: 'nav.messages',
     href: '/patient/messages',
     icon: Mail,
   },
   {
-    title: 'mood',
+    title: 'nav.mood',
     href: '/patient/mood-insights',
     icon: Heart,
   },
   {
-    title: 'tasks',
+    title: 'nav.tasks',
     href: '/patient/tasks',
     icon: CheckSquare,
   },
   {
-    title: 'goals',
+    title: 'nav.goals',
     href: '/patient/goals',
     icon: Target,
   },
   {
-    title: 'sessions',
+    title: 'nav.sessions',
     href: '/patient/sessions',
     icon: Calendar,
   },
   {
-    title: 'profile',
+    title: 'nav.profile',
     href: '/patient/profile',
     icon: User,
   },

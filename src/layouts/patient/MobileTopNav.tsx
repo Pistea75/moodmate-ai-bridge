@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { PatientSidebarContent } from './PatientSidebarContent';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 type MobileTopNavProps = {
   patientFullName: React.ReactNode;
@@ -14,6 +15,8 @@ type MobileTopNavProps = {
 };
 
 export function MobileTopNav({ patientFullName, isOpen, setIsOpen }: MobileTopNavProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="fixed top-0 left-0 right-0 h-16 bg-background/95 backdrop-blur-sm border-b border-border z-50 md:hidden">
       <div className="flex items-center justify-between px-4 h-full">
@@ -53,7 +56,7 @@ export function MobileTopNav({ patientFullName, isOpen, setIsOpen }: MobileTopNa
               className="h-9 px-3 bg-primary hover:bg-primary/90 active:bg-primary/80 transition-colors"
             >
               <MessageCircle className="h-4 w-4 mr-2" />
-              Chat
+              {t('nav.chat')}
             </Button>
           </Link>
           <Link to="/patient/mood">

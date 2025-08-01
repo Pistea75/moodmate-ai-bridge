@@ -1,11 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Quote } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 import { useMotivationalQuotes } from "@/hooks/useMotivationalQuotes";
 
 export function MotivationalQuoteCard() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { quote } = useMotivationalQuotes();
 
   return (

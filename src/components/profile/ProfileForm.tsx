@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ProfileAvatar } from './ProfileAvatar';
 import { ClinicianFields } from './ClinicianFields';
-import { LanguageSelect } from './LanguageSelect';
+
 
 interface ProfileFormData {
   first_name: string;
@@ -139,7 +139,7 @@ export function ProfileForm({ initialData, userRole }: ProfileFormProps) {
           )}
         />
 
-        <LanguageSelect form={form} />
+        {/* Language selection removed - handled by main language switcher */}
 
         {userRole === 'clinician' && <ClinicianFields form={form} />}
 

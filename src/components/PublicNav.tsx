@@ -5,18 +5,20 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Brain, MenuIcon, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { LanguageSelector } from './LanguageSelector';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export function PublicNav() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
   
   // Define navigation items
   const navItems = [
-    { name: "About", path: "/about" },
-    { name: "Features", path: "/features" },
+    { name: t('nav.about'), path: "/about" },
+    { name: t('nav.features'), path: "/features" },
     { name: "Pricing", path: "/pricing" },
-    { name: "Contact", path: "/contact" },
+    { name: t('nav.contact'), path: "/contact" },
     { name: "Privacy", path: "/privacy" },
     { name: "Help", path: "/help" },
   ];
@@ -50,18 +52,18 @@ export function PublicNav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <LanguageSelector />
+          <LanguageSwitcher />
           <Link to="/login">
             <Button 
               variant="ghost" 
               className="text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 transition-all duration-300 hover:scale-105"
             >
-              Log In
+              {t('nav.login')}
             </Button>
           </Link>
           <Link to="/signup/choice">
             <Button className="text-sm font-semibold rounded-full px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
-              Start Your Journey
+              {t('nav.signup')}
             </Button>
           </Link>
         </div>
@@ -133,19 +135,19 @@ export function PublicNav() {
                 {/* Footer Actions */}
                 <div className="p-6 border-t border-white/10 space-y-3">
                   <div className="flex justify-center mb-3">
-                    <LanguageSelector />
+                    <LanguageSwitcher />
                   </div>
                   <Link to="/login" onClick={() => setIsOpen(false)}>
                     <Button 
                       variant="ghost" 
                       className="w-full justify-start text-base font-medium text-white/90 hover:text-white hover:bg-white/10 py-4"
                     >
-                      Log In
+                      {t('nav.login')}
                     </Button>
                   </Link>
                   <Link to="/signup/choice" onClick={() => setIsOpen(false)}>
                     <Button className="w-full text-base font-semibold rounded-full py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg">
-                      Start Your Journey
+                      {t('nav.signup')}
                     </Button>
                   </Link>
                 </div>

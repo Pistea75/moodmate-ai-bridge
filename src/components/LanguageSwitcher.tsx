@@ -1,18 +1,21 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Globe, ChevronDown } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
-export function LanguageSelector() {
-  const { language, setLanguage, t } = useLanguage();
+export function LanguageSwitcher() {
+  const { i18n, t } = useTranslation();
   
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
     { code: 'es', name: 'Español', flag: '🇪🇸' }
   ];
 
-  const currentLanguage = languages.find(lang => lang.code === language);
+  const currentLanguage = languages.find(lang => lang.code === i18n.language);
+
+  const changeLanguage = (langCode: string) => {
+    i18n.changeLanguage(langCode);
+  };
 
   return (
     <DropdownMenu>
@@ -34,9 +37,9 @@ export function LanguageSelector() {
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => setLanguage(lang.code as 'en' | 'es')}
+            onClick={() => changeLanguage(lang.code)}
             className={`cursor-pointer hover:bg-slate-700 focus:bg-slate-700 ${
-              language === lang.code ? 'bg-slate-700' : ''
+              i18n.language === lang.code ? 'bg-slate-700' : ''
             }`}
           >
             <span className="flex items-center gap-2">

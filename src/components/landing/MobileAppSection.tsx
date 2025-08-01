@@ -1,7 +1,7 @@
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export function MobileAppSection() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <section className="relative py-24 overflow-hidden bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-indigo-950/20">

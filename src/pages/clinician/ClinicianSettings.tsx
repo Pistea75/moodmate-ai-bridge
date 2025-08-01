@@ -2,8 +2,7 @@
 import React from 'react';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
-import { useLanguage } from '@/contexts/LanguageContext';
-import { LanguageSelect } from '@/components/profile/LanguageSelect';
+import { useTranslation } from 'react-i18next';
 import { ColorPicker } from '@/components/theme/ColorPicker';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
@@ -11,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function ClinicianSettings() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { user } = useAuth();
   
   const form = useForm({

@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
+
 import { EnhancedSecurityProvider } from "@/components/security/EnhancedSecurityProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -91,8 +91,7 @@ function App() {
         <BrowserRouter>
           <ThemeProvider>
             <TooltipProvider>
-              <LanguageProvider>
-                <AuthProvider>
+              <AuthProvider>
                   <EnhancedSecurityProvider>
                     <div className="min-h-screen bg-background">
                       <Toaster />
@@ -185,7 +184,6 @@ function App() {
                     </div>
                   </EnhancedSecurityProvider>
                 </AuthProvider>
-              </LanguageProvider>
             </TooltipProvider>
           </ThemeProvider>
         </BrowserRouter>
