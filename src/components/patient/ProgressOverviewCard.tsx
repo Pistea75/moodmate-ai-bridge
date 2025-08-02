@@ -2,11 +2,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, Calendar, CheckSquare } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 import { usePatientDashboard } from "@/hooks/usePatientDashboard";
 
 export function ProgressOverviewCard() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { stats, loading } = usePatientDashboard();
 
   if (loading) {

@@ -4,12 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Brain, TrendingUp, Activity, Lightbulb, Target, Heart } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { usePatientDashboard } from '@/hooks/usePatientDashboard';
 import { useMoodEntries } from '@/hooks/useMoodEntries';
 
 export default function PatientInsights() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { stats, loading } = usePatientDashboard();
   const { moods } = useMoodEntries();
 

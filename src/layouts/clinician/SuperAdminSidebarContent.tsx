@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { 
   Shield, 
@@ -24,7 +24,7 @@ import {
 import { cn } from '@/lib/utils';
 
 export function SuperAdminSidebarContent() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { signOut } = useAuth();
 
   const superAdminNavItems = [

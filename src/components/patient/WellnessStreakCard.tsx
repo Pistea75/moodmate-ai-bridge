@@ -2,11 +2,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Award, Flame, Target } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 import { usePatientDashboard } from "@/hooks/usePatientDashboard";
 
 export function WellnessStreakCard() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { stats, loading } = usePatientDashboard();
 
   const achievements = [

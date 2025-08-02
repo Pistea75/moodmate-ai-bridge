@@ -4,12 +4,12 @@ import { TaskList } from '@/components/TaskList';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, CheckCircle, Clock, Target } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { usePatientTasks } from '@/hooks/usePatientTasks';
 import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export default function PatientTasks() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { tasks, loading, error, toggleTaskCompletion } = usePatientTasks();
 
   const completedTasks = tasks?.filter(task => task.completed) || [];

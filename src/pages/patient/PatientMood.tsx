@@ -4,14 +4,14 @@ import { MoodChart } from '@/components/mood/MoodChart';
 import { MoodLogModal } from '@/components/patient/MoodLogModal';
 import { Button } from '@/components/ui/button';
 import { Plus, TrendingUp, Brain, Heart, Activity } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePatientDashboard } from '@/hooks/usePatientDashboard';
 import { useMoodEntries } from '@/hooks/useMoodEntries';
 import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export default function PatientMood() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { stats, loading } = usePatientDashboard();
   const { moods, refetch } = useMoodEntries();
 

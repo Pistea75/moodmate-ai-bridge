@@ -3,14 +3,14 @@ import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { Card } from "@/components/ui/card";
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { LogoutButton } from '@/components/LogoutButton';
 import { DeleteProfileButton } from '@/components/profile/DeleteProfileButton';
 import { ReferralCodeDisplay } from '@/components/clinician/ReferralCodeDisplay';
 
 export default function ClinicianProfile() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   
   return (
     <ClinicianLayout>

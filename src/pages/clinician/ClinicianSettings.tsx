@@ -37,7 +37,7 @@ export default function ClinicianSettings() {
             <h2 className="text-lg font-semibold mb-4">{t('languageSettings')}</h2>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <LanguageSelect form={form} />
+                <p className="text-muted-foreground">{t('languageSettingsInfo')}</p>
                 <Button type="submit">{t('save')}</Button>
               </form>
             </Form>

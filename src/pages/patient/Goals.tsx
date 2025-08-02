@@ -1,10 +1,10 @@
 
 import PatientLayout from '../../layouts/PatientLayout';
 import { AIGoalSetting } from '@/components/patient/AIGoalSetting';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export default function Goals() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <PatientLayout>

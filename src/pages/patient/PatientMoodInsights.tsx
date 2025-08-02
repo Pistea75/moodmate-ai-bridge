@@ -3,7 +3,7 @@ import { MoodChart } from '@/components/mood/MoodChart';
 import { MoodLogModal } from '@/components/patient/MoodLogModal';
 import { Button } from '@/components/ui/button';
 import { Plus, TrendingUp, Brain, Heart, Activity, Target, Lightbulb } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -12,7 +12,7 @@ import { useMoodEntries } from '@/hooks/useMoodEntries';
 import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export default function PatientMoodInsights() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { stats, loading } = usePatientDashboard();
   const { moods, refetch } = useMoodEntries();
 
