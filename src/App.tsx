@@ -1,75 +1,77 @@
 
+import React, { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 import { EnhancedSecurityProvider } from "@/components/security/EnhancedSecurityProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import LoadingFallback from "@/components/common/LoadingFallback";
 
-// Import all your pages
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import SignupChoice from "./pages/SignupChoice";
-import SignupPatient from "./pages/SignupPatient";
-import SignupClinician from "./pages/SignupClinician";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+// Lazy loaded pages for better performance
+const Index = lazy(() => import("./pages/Index"));
+const Login = lazy(() => import("./pages/Login"));
+const SignupChoice = lazy(() => import("./pages/SignupChoice"));
+const SignupPatient = lazy(() => import("./pages/SignupPatient"));
+const SignupClinician = lazy(() => import("./pages/SignupClinician"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 // Patient pages
-import PatientDashboard from "./pages/patient/PatientDashboard";
-import PatientProfile from "./pages/patient/PatientProfile";
-import PatientSettings from "./pages/patient/PatientSettings";
-import PatientMood from "./pages/patient/PatientMood";
-import PatientTasks from "./pages/patient/PatientTasks";
-import PatientSessions from "./pages/patient/PatientSessions";
-import PatientChat from "./pages/patient/PatientChat";
-import PatientMessages from "./pages/patient/PatientMessages";
-import PatientInsights from "./pages/patient/PatientInsights";
-import PatientMoodInsights from "./pages/patient/PatientMoodInsights";
-import Goals from "./pages/patient/Goals";
+const PatientDashboard = lazy(() => import("./pages/patient/PatientDashboard"));
+const PatientProfile = lazy(() => import("./pages/patient/PatientProfile"));
+const PatientSettings = lazy(() => import("./pages/patient/PatientSettings"));
+const PatientMood = lazy(() => import("./pages/patient/PatientMood"));
+const PatientTasks = lazy(() => import("./pages/patient/PatientTasks"));
+const PatientSessions = lazy(() => import("./pages/patient/PatientSessions"));
+const PatientChat = lazy(() => import("./pages/patient/PatientChat"));
+const PatientMessages = lazy(() => import("./pages/patient/PatientMessages"));
+const PatientInsights = lazy(() => import("./pages/patient/PatientInsights"));
+const PatientMoodInsights = lazy(() => import("./pages/patient/PatientMoodInsights"));
+const Goals = lazy(() => import("./pages/patient/Goals"));
 
 // Clinician pages
-import ClinicianDashboard from "./pages/clinician/ClinicianDashboard";
-import ClinicianProfile from "./pages/clinician/ClinicianProfile";
-import ClinicianSettings from "./pages/clinician/ClinicianSettings";
-import Patients from "./pages/clinician/Patients";
-import PatientDetail from "./pages/clinician/PatientDetail";
-import Sessions from "./pages/clinician/Sessions";
-import Tasks from "./pages/clinician/Tasks";
-import Reports from "./pages/clinician/Reports";
-import Analytics from "./pages/clinician/Analytics";
-import Communications from "./pages/clinician/Communications";
-import TreatmentPlans from "./pages/clinician/TreatmentPlans";
-import TrainAI from "./pages/clinician/TrainAI";
-import Reminders from "./pages/clinician/Reminders";
-import ResourceLibraryPage from "./pages/clinician/ResourceLibrary";
-import RiskManagement from "./pages/clinician/RiskManagement";
+const ClinicianDashboard = lazy(() => import("./pages/clinician/ClinicianDashboard"));
+const ClinicianProfile = lazy(() => import("./pages/clinician/ClinicianProfile"));
+const ClinicianSettings = lazy(() => import("./pages/clinician/ClinicianSettings"));
+const Patients = lazy(() => import("./pages/clinician/Patients"));
+const PatientDetail = lazy(() => import("./pages/clinician/PatientDetail"));
+const Sessions = lazy(() => import("./pages/clinician/Sessions"));
+const Tasks = lazy(() => import("./pages/clinician/Tasks"));
+const Reports = lazy(() => import("./pages/clinician/Reports"));
+const Analytics = lazy(() => import("./pages/clinician/Analytics"));
+const Communications = lazy(() => import("./pages/clinician/Communications"));
+const TreatmentPlans = lazy(() => import("./pages/clinician/TreatmentPlans"));
+const TrainAI = lazy(() => import("./pages/clinician/TrainAI"));
+const Reminders = lazy(() => import("./pages/clinician/Reminders"));
+const ResourceLibraryPage = lazy(() => import("./pages/clinician/ResourceLibrary"));
+const RiskManagement = lazy(() => import("./pages/clinician/RiskManagement"));
 
 // Admin pages
-import SuperAdminDashboard from "./pages/admin/SuperAdminDashboard";
-import UserManagement from "./pages/admin/UserManagement";
-import SystemHealth from "./pages/admin/SystemHealth";
-import AuditTrail from "./pages/admin/AuditTrail";
-import SecurityLogs from "./pages/admin/SecurityLogs";
-import SystemSettings from "./pages/admin/SystemSettings";
+const SuperAdminDashboard = lazy(() => import("./pages/admin/SuperAdminDashboard"));
+const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
+const SystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
+const AuditTrail = lazy(() => import("./pages/admin/AuditTrail"));
+const SecurityLogs = lazy(() => import("./pages/admin/SecurityLogs"));
+const SystemSettings = lazy(() => import("./pages/admin/SystemSettings"));
 
 // Public pages
-import Landing from "./pages/Landing";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import FAQ from "./pages/FAQ";
-import Features from "./pages/Features";
-import Pricing from "./pages/Pricing";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Security from "./pages/Security";
-import HelpCenter from "./pages/HelpCenter";
-import NotFound from "./pages/NotFound";
+const Landing = lazy(() => import("./pages/Landing"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Features = lazy(() => import("./pages/Features"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Security = lazy(() => import("./pages/Security"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -96,7 +98,8 @@ function App() {
                     <div className="min-h-screen bg-background">
                       <Toaster />
                       <ShadcnToaster />
-                      <Routes>
+                      <Suspense fallback={<LoadingFallback />}>
+                        <Routes>
                         {/* Public routes */}
                         <Route path="/" element={<Index />} />
                         <Route path="/landing" element={<Landing />} />
@@ -181,6 +184,7 @@ function App() {
                         {/* 404 route */}
                         <Route path="*" element={<NotFound />} />
                       </Routes>
+                      </Suspense>
                     </div>
                   </EnhancedSecurityProvider>
                 </AuthProvider>
