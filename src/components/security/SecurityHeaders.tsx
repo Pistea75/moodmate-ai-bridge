@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { generateCSPNonce } from '@/utils/enhancedSecurityUtils';
 
