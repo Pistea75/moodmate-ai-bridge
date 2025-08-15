@@ -1,0 +1,17 @@
+{
+  "name": "MoodMate - Mental Health Platform",
+  "short_name": "MoodMate",
+  "description": "AI-powered mental health platform connecting patients and clinicians",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#8B5CF6",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}
