@@ -1,11 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, Settings, Play, Pause } from 'lucide-react';
 import { useAudioChat } from '@/hooks/useAudioChat';
+import { useTTS } from '@/hooks/useTTS';
+import { useVoiceSettings } from '@/hooks/useVoiceSettings';
+import { useVoiceConsent } from '@/hooks/useVoiceConsent';
 import { MessageList } from './chat/MessageList';
 import { TextInputMode } from './chat/TextInputMode';
 import { VoiceInputMode } from './chat/VoiceInputMode';
+import { VoiceConsentModal } from './voice/VoiceConsentModal';
+import { VoiceSettings } from './voice/VoiceSettings';
+import { FeatureGate } from './common/FeatureGate';
 
 interface AudioChatInterfaceProps {
   isClinicianView?: boolean;
@@ -22,11 +28,13 @@ export function AudioChatInterface({
   systemPrompt = "You are a supportive mental health assistant.",
   patientId
 }: AudioChatInterfaceProps) {
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(true);
   const [inputMode, setInputMode] = useState<'text' | 'voice'>('text');
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [currentPlayingId, setCurrentPlayingId] = useState<string | null>(null);
+
+  const { settings, updateSettings } = useVoiceSettings();
+  const { hasConsent } = useVoiceConsent();
 
   const {
     messages,
@@ -35,43 +43,43 @@ export function AudioChatInterface({
     handleSendMessage
   } = useAudioChat(systemPrompt, selectedPatientId || patientId, isClinicianView);
 
-  const handleSendAudio = async (audioBlob: Blob) => {
-    // For now, we'll convert audio to text placeholder
-    // In a real implementation, you'd use speech-to-text service
-    await handleSendMessage("Voice message transcription would appear here");
+  const { playText, isPlaying: isTTSPlaying } = useTTS({
+    onAudioStart: () => setCurrentPlayingId('tts-active'),
+    onAudioEnd: () => setCurrentPlayingId(null),
+  });
+
+  // Auto-play AI responses if enabled
+  useEffect(() => {
+    if (messages.length > 0 && settings.autoplay && settings.enabled) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.type === 'assistant' && lastMessage.content) {
+        playText(lastMessage.content);
+      }
+    }
+  }, [messages, settings.autoplay, settings.enabled, playText]);
+
+  const handleToggleVoiceMode = () => {
+    if (inputMode === 'voice' && !hasConsent) {
+      setShowConsentModal(true);
+      return;
+    }
+    setInputMode(inputMode === 'text' ? 'voice' : 'text');
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        handleSendAudio(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Error starting recording:', error);
-    }
+  const handleConsentGiven = () => {
+    updateSettings({ enabled: true });
+    setShowConsentModal(false);
+    setInputMode('voice');
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
+  const playMessage = async (messageId: string, text: string) => {
+    if (currentPlayingId === messageId) {
+      setCurrentPlayingId(null);
+      return;
     }
+    
+    setCurrentPlayingId(messageId);
+    await playText(text);
   };
 
   if (isFetchingHistory) {
@@ -90,26 +98,83 @@ export function AudioChatInterface({
           {isClinicianView ? 'AI Training Chat' : `Chat with Dr. ${clinicianName}`}
         </h2>
         <div className="flex items-center gap-2">
+          <FeatureGate capability="voiceChat">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleToggleVoiceMode}
+            >
+              {inputMode === 'text' ? <Mic className="h-4 w-4" /> : 'Text'}
+            </Button>
+          </FeatureGate>
+          <FeatureGate capability="voiceChat">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => updateSettings({ autoplay: !settings.autoplay })}
+              disabled={!settings.enabled}
+            >
+              {settings.autoplay ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </Button>
+          </FeatureGate>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setInputMode(inputMode === 'text' ? 'voice' : 'text')}
+            onClick={() => setShowSettings(!showSettings)}
           >
-            {inputMode === 'text' ? <Mic className="h-4 w-4" /> : 'Text'}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setAudioEnabled(!audioEnabled)}
-          >
-            {audioEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            <Settings className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Settings Panel */}
+      {showSettings && (
+        <div className="border-b p-4">
+          <VoiceSettings />
+        </div>
+      )}
+
+      {/* Messages with Audio Controls */}
       <div className="flex-1 overflow-hidden">
-        <MessageList messages={messages} clinicianName={clinicianName} />
+        <div className="h-full overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  message.type === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                }`}
+              >
+                <p className="text-sm">{message.content}</p>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-xs opacity-70">
+                    {new Date(message.timestamp).toLocaleTimeString()}
+                  </span>
+                  {message.type === 'assistant' && settings.enabled && (
+                    <FeatureGate capability="voiceChat">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => playMessage(message.id, message.content)}
+                        disabled={isTTSPlaying}
+                      >
+                        {currentPlayingId === message.id ? (
+                          <Pause className="h-3 w-3" />
+                        ) : (
+                          <Play className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </FeatureGate>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Input */}
@@ -126,6 +191,12 @@ export function AudioChatInterface({
           />
         )}
       </div>
+
+      <VoiceConsentModal
+        isOpen={showConsentModal}
+        onClose={() => setShowConsentModal(false)}
+        onConsent={handleConsentGiven}
+      />
     </Card>
   );
 }

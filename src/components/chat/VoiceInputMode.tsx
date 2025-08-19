@@ -1,8 +1,11 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Mic } from "lucide-react";
+import { Mic, Square } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useHybridSTT } from "@/hooks/useHybridSTT";
+import { useVoiceSettings } from "@/hooks/useVoiceSettings";
+import { FeatureGate } from "@/components/common/FeatureGate";
 
 interface VoiceInputModeProps {
   onSendMessage: (message: string) => Promise<void>;
@@ -11,52 +14,71 @@ interface VoiceInputModeProps {
 
 export function VoiceInputMode({ onSendMessage, isLoading }: VoiceInputModeProps) {
   const { toast } = useToast();
-  const [isRecording, setIsRecording] = useState(false);
+  const { settings } = useVoiceSettings();
+  const [transcript, setTranscript] = useState('');
 
-  const handleStartRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true
-      });
-      setIsRecording(true);
+  const { isRecording, isProcessing, startRecording, stopRecording } = useHybridSTT({
+    language: settings.sttLanguage,
+    onTranscription: async (text, method) => {
+      console.log(`Transcription via ${method}:`, text);
+      setTranscript(text);
+      
+      if (text.trim()) {
+        await onSendMessage(text);
+        setTranscript('');
+      }
+    },
+    onError: (error) => {
       toast({
-        title: "Recording started",
-        description: "Speak clearly into your microphone"
-      });
-    } catch (error) {
-      toast({
-        title: "Microphone access denied",
-        description: "Please allow microphone access to record",
+        title: "Voice Error",
+        description: error,
         variant: "destructive"
       });
     }
-  };
+  });
 
-  const handleStopRecording = async () => {
-    setIsRecording(false);
-    // This is a placeholder for actual speech-to-text functionality
-    const transcribedText = "Voice message transcription would appear here";
-    await onSendMessage(transcribedText);
+  const handleToggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
   };
 
   return (
-    <Button 
-      onClick={isRecording ? handleStopRecording : handleStartRecording} 
-      className="w-full gap-2" 
-      variant={isRecording ? "destructive" : "default"}
-      disabled={isLoading}
-    >
-      {isRecording ? (
-        <>
-          <Mic className="h-4 w-4 animate-pulse" />
-          Stop Recording
-        </>
-      ) : (
-        <>
-          <Mic className="h-4 w-4" />
-          Start Recording
-        </>
-      )}
-    </Button>
+    <FeatureGate capability="voiceChat">
+      <div className="space-y-2">
+        <Button 
+          onClick={handleToggleRecording}
+          className="w-full gap-2" 
+          variant={isRecording ? "destructive" : "default"}
+          disabled={isLoading || isProcessing}
+        >
+          {isRecording ? (
+            <>
+              <Square className="h-4 w-4" />
+              Stop Recording
+            </>
+          ) : isProcessing ? (
+            <>
+              <Mic className="h-4 w-4 animate-pulse" />
+              Processing...
+            </>
+          ) : (
+            <>
+              <Mic className="h-4 w-4" />
+              Start Recording
+            </>
+          )}
+        </Button>
+        
+        {transcript && (
+          <div className="p-2 bg-muted rounded text-sm">
+            <span className="text-muted-foreground">Transcription: </span>
+            {transcript}
+          </div>
+        )}
+      </div>
+    </FeatureGate>
   );
 }
