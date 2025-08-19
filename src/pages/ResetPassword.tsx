@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Lock, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SecurePasswordField } from '@/components/security/SecurePasswordField';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -128,33 +129,29 @@ export default function ResetPassword() {
               </Alert>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter new password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-                minLength={6}
-              />
-            </div>
+            <SecurePasswordField
+              id="password"
+              name="password"
+              label="New Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter new password"
+              required
+              disabled={loading}
+              autoComplete="new-password"
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                disabled={loading}
-                minLength={6}
-              />
-            </div>
+            <SecurePasswordField
+              id="confirm-password"
+              name="confirmPassword"
+              label="Confirm New Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+              required
+              disabled={loading}
+              autoComplete="new-password"
+            />
 
             <Button 
               type="submit" 

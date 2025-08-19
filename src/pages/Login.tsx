@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { fetchUserProfile } from '@/utils/supabase/profile';
+import { SecurePasswordField } from '@/components/security/SecurePasswordField';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -146,21 +147,19 @@ export default function Login() {
                 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label htmlFor="password" className="block text-sm font-medium">
-                      {t('auth.password')}
-                    </label>
                     <Link to="/forgot-password" className="text-xs text-mood-purple hover:underline">
                       {t('auth.forgotPassword')}
                     </Link>
                   </div>
-                  <Input
-                    type="password"
+                  <SecurePasswordField
                     id="password"
+                    name="password"
+                    label={t('auth.password')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full"
                     placeholder="••••••••"
+                    autoComplete="current-password"
                     disabled={isLoading || !isOnline}
                   />
                 </div>

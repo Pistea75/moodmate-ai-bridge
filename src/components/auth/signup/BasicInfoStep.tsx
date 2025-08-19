@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { validatePassword } from "@/utils/securityUtils";
+import { SecurePasswordField } from "@/components/security/SecurePasswordField";
 
 interface BasicInfoStepProps {
   formData: {
@@ -61,16 +62,16 @@ export function BasicInfoStep({ formData, handleChange, error }: BasicInfoStepPr
       </div>
       
       <div>
-        <Label htmlFor="password">Password</Label>
-        <Input
-          type="password"
+        <SecurePasswordField
           id="password"
           name="password"
+          label="Password"
           value={formData.password}
           onChange={handleChange}
           required
-          className={`mt-1 ${!passwordValidation.isValid && showPasswordValidation ? 'border-red-500' : ''}`}
           placeholder="Create a secure password"
+          className={`${!passwordValidation.isValid && showPasswordValidation ? 'border-red-500' : ''}`}
+          autoComplete="new-password"
         />
         
         {showPasswordValidation && (
@@ -93,16 +94,16 @@ export function BasicInfoStep({ formData, handleChange, error }: BasicInfoStepPr
       </div>
       
       <div>
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <Input
-          type="password"
+        <SecurePasswordField
           id="confirmPassword"
           name="confirmPassword"
+          label="Confirm Password"
           value={formData.confirmPassword}
           onChange={handleChange}
           required
-          className={`mt-1 ${showPasswordError ? 'border-red-500' : ''}`}
           placeholder="Confirm password"
+          className={`${showPasswordError ? 'border-red-500' : ''}`}
+          autoComplete="new-password"
         />
         {showPasswordError && (
           <div className="flex items-center gap-2 text-xs mt-1">
