@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -821,6 +821,39 @@ export type Database = {
         }
         Relationships: []
       }
+      security_rate_limits: {
+        Row: {
+          action_type: string
+          attempts: number
+          blocked_until: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string | null
+          window_start: string
+        }
+        Insert: {
+          action_type: string
+          attempts?: number
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+          window_start?: string
+        }
+        Update: {
+          action_type?: string
+          attempts?: number
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+          window_start?: string
+        }
+        Relationships: []
+      }
       sensitive_operations_log: {
         Row: {
           created_at: string | null
@@ -1263,6 +1296,69 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_consent_logs: {
+        Row: {
+          consent_date: string
+          consent_given: boolean
+          created_at: string
+          id: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          consent_date?: string
+          consent_given: boolean
+          created_at?: string
+          id?: string
+          user_id: string
+          version?: string
+        }
+        Update: {
+          consent_date?: string
+          consent_given?: boolean
+          created_at?: string
+          id?: string
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      voice_usage_logs: {
+        Row: {
+          cost_estimate: number | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          language: string | null
+          method: string | null
+          transcript_length: number | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          cost_estimate?: number | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          language?: string | null
+          method?: string | null
+          transcript_length?: number | null
+          type: string
+          user_id?: string
+        }
+        Update: {
+          cost_estimate?: number | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          language?: string | null
+          method?: string | null
+          transcript_length?: number | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       clinician_referral_codes: {
@@ -1282,19 +1378,33 @@ export type Database = {
       }
     }
     Functions: {
+      check_security_rate_limit: {
+        Args: {
+          p_action_type: string
+          p_block_minutes?: number
+          p_max_attempts?: number
+          p_user_id: string
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
       check_session_conflict: {
         Args:
           | Record<PropertyKey, never>
           | {
               p_clinician_id: string
-              p_proposed_start: string
               p_proposed_end: string
+              p_proposed_start: string
             }
         Returns: undefined
       }
       check_upcoming_sessions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      emergency_revoke_super_admin: {
+        Args: { reason: string; target_user_id: string }
+        Returns: boolean
       }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
@@ -1303,20 +1413,40 @@ export type Database = {
       get_patient_mood_summaries: {
         Args: { clinician_uuid: string }
         Returns: {
-          patient_id: string
-          first_name: string
-          last_name: string
           avg_mood: number
+          first_name: string
           last_entry: string
+          last_name: string
+          patient_id: string
         }[]
       }
       is_super_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      secure_update_user_role: {
+        Args: {
+          new_role: string
+          new_super_admin?: boolean
+          target_user_id: string
+        }
+        Returns: boolean
+      }
       sync_user_email: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      validate_edge_function_input: {
+        Args: {
+          input_data: Json
+          max_lengths?: Json
+          required_fields: string[]
+        }
+        Returns: boolean
+      }
+      verify_super_admin_access: {
+        Args: { action_description?: string }
+        Returns: boolean
       }
     }
     Enums: {
