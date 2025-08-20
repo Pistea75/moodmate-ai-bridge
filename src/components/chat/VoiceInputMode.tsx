@@ -1,88 +1,61 @@
-
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Mic, Square } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useHybridSTT } from "@/hooks/useHybridSTT";
-import { useVoiceSettings } from "@/hooks/useVoiceSettings";
-import { FeatureGate } from "@/components/common/FeatureGate";
+import { Button } from '@/components/ui/button';
+import { Mic, Square } from 'lucide-react';
+import { useHybridSTT } from '@/hooks/useHybridSTT';
 
-interface VoiceInputModeProps {
-  onSendMessage: (message: string) => Promise<void>;
-  isLoading: boolean;
-}
+type VoiceInputModeProps = {
+  onSendMessage: (text: string) => Promise<void> | void;
+  isLoading?: boolean;
+  /** Opcional: idioma para STT, por defecto es-ES */
+  language?: string;
+};
 
-export function VoiceInputMode({ onSendMessage, isLoading }: VoiceInputModeProps) {
-  const { toast } = useToast();
-  const { settings } = useVoiceSettings();
-  const [transcript, setTranscript] = useState('');
+export function VoiceInputMode({
+  onSendMessage,
+  isLoading,
+  language = 'es-ES',
+}: VoiceInputModeProps) {
+  const [transcript, setTranscript] = useState<string>('');
 
-  const { isRecording, isProcessing, startRecording, stopRecording } = useHybridSTT({
-    language: settings.sttLanguage,
-    onTranscription: async (text, method) => {
-      console.log(`🎤 Transcription received via ${method}:`, text);
+  const {
+    isRecording,
+    isProcessing,
+    startRecording,
+    stopRecording,
+  } = useHybridSTT({
+    language,
+    onTranscription: async (text: string, method: 'webspeech' | 'whisper') => {
+      // Log para verificar que llega
+      console.log('✅ onTranscription:', { text, method });
       setTranscript(text);
-      
-      if (text.trim()) {
-        console.log('📤 Sending transcribed message:', text);
-        await onSendMessage(text);
-        setTranscript('');
-      } else {
-        console.warn('⚠️ Empty transcription received');
-      }
+      await onSendMessage(String(text));
     },
-    onError: (error) => {
-      console.error('🎤 Voice error:', error);
-      toast({
-        title: "Voice Error",
-        description: error,
-        variant: "destructive"
-      });
-    }
+    onError: (err: string) => {
+      console.error('❌ STT Error:', err);
+    },
   });
 
-  const handleToggleRecording = () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  };
-
   return (
-    <FeatureGate capability="voiceChat">
-      <div className="space-y-2">
-        <Button 
-          onClick={handleToggleRecording}
-          className="w-full gap-2" 
-          variant={isRecording ? "destructive" : "default"}
-          disabled={isLoading || isProcessing}
-        >
-          {isRecording ? (
-            <>
-              <Square className="h-4 w-4" />
-              Stop Recording
-            </>
-          ) : isProcessing ? (
-            <>
-              <Mic className="h-4 w-4 animate-pulse" />
-              Processing...
-            </>
-          ) : (
-            <>
-              <Mic className="h-4 w-4" />
-              Start Recording
-            </>
-          )}
+    <div className="flex items-center gap-2">
+      {!isRecording ? (
+        <Button onClick={startRecording} disabled={isLoading || isProcessing}>
+          <Mic className="h-4 w-4 mr-2" /> Hablar
         </Button>
-        
-        {transcript && (
-          <div className="p-2 bg-muted rounded text-sm">
-            <span className="text-muted-foreground">Transcription: </span>
-            {transcript}
-          </div>
-        )}
+      ) : (
+        <Button variant="destructive" onClick={stopRecording}>
+          <Square className="h-4 w-4 mr-2" /> Detener
+        </Button>
+      )}
+
+      <div className="text-sm opacity-70 truncate">
+        {isProcessing
+          ? 'Procesando…'
+          : transcript
+          ? `Transcripción: ${transcript}`
+          : isRecording
+          ? 'Grabando…'
+          : 'Tocá “Hablar” para empezar'}
       </div>
-    </FeatureGate>
+    </div>
   );
 }
