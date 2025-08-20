@@ -4,44 +4,43 @@ import { Button } from '@/components/ui/button';
 import { Mic, Square } from 'lucide-react';
 import { useHybridSTT } from '@/hooks/useHybridSTT';
 
-type VoiceInputModeProps = {
+export interface VoiceInputModeProps {
   onSendMessage: (text: string) => Promise<void> | void;
   isLoading?: boolean;
-  /** Opcional: idioma para STT, por defecto es-ES */
+  // idioma opcional; si no viene, usamos 'es-ES'
   language?: string;
-};
+}
 
-export function VoiceInputMode({
-  onSendMessage,
-  isLoading,
-  language = 'es-ES',
-}: VoiceInputModeProps) {
+export function VoiceInputMode(props: VoiceInputModeProps) {
+  const { onSendMessage, isLoading } = props;
+  const language = props.language ?? 'es-ES';
+
   const [transcript, setTranscript] = useState<string>('');
 
-  const {
-    isRecording,
-    isProcessing,
-    startRecording,
-    stopRecording,
-  } = useHybridSTT({
+  // NO hacemos destructuring directo para evitar TS1005 en algunos setups
+  const stt = useHybridSTT({
     language,
-    onTranscription: async (
-      text: string,
-      method: 'webspeech' | 'whisper'
-    ) => {
-      console.log('✅ onTranscription:', { text, method });
+    onTranscription: async (text, method) => {
+      // logs para depurar
+      // alert('Transcription received (' + method + '): ' + text);
+      // console.log('✅ onTranscription:', { text, method });
       setTranscript(text);
-      await onSendMessage(text);
+      await onSendMessage(String(text));
     },
-    onError: (err: string) => {
+    onError: (err) => {
       console.error('❌ STT Error:', err);
     },
   });
 
+  const isRecording = stt.isRecording;
+  const isProcessing = stt.isProcessing;
+  const startRecording = stt.startRecording;
+  const stopRecording = stt.stopRecording;
+
   return (
     <div className="flex items-center gap-2">
       {!isRecording ? (
-        <Button onClick={startRecording} disabled={isLoading || isProcessing}>
+        <Button onClick={startRecording} disabled={Boolean(isLoading) || isProcessing}>
           <Mic className="h-4 w-4 mr-2" /> Hablar
         </Button>
       ) : (
