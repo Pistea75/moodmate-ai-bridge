@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, Square } from 'lucide-react';
@@ -24,11 +25,13 @@ export function VoiceInputMode({
     stopRecording,
   } = useHybridSTT({
     language,
-    onTranscription: async (text: string, method: 'webspeech' | 'whisper') => {
-      // Log para verificar que llega
+    onTranscription: async (
+      text: string,
+      method: 'webspeech' | 'whisper'
+    ) => {
       console.log('✅ onTranscription:', { text, method });
       setTranscript(text);
-      await onSendMessage(String(text));
+      await onSendMessage(text);
     },
     onError: (err: string) => {
       console.error('❌ STT Error:', err);
