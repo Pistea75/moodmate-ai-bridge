@@ -47,6 +47,12 @@ serve(async (req) => {
     const language = formData.get('language') as string || 'es-ES';
     const duration = parseInt(formData.get('duration') as string || '0');
 
+    console.log('Received form data:', {
+      audioFile: audioFile ? `${audioFile.name} (${audioFile.size} bytes)` : 'none',
+      language,
+      duration
+    });
+
     if (!audioFile) {
       return new Response(JSON.stringify({ error: 'No audio file provided' }), {
         status: 400,

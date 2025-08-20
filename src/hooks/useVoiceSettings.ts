@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS: VoiceSettings = {
   sttLanguage: 'es-ES',
   ttsLanguage: 'es',
   ttsVoice: 'alloy',
-  enabled: false
+  enabled: true
 };
 
 const STORAGE_KEY = 'voice_settings';

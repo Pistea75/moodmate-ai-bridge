@@ -34,16 +34,26 @@ export function VoiceConsentModal({ isOpen, onClose, onConsent }: VoiceConsentMo
     try {
       setLoading(true);
       
-      // Temporarily skip database update until types are generated
-      // TODO: Re-enable once Supabase types are updated
-      console.log('Voice consent recorded for user:', user.id);
+      // Record consent in database
+      const { error } = await supabase
+        .from('voice_consent_logs')
+        .insert({
+          user_id: user.id,
+          consent_given: true,
+          version: '1.0'
+        });
+
+      if (error) {
+        console.error('Error recording consent in database:', error);
+        // Continue even if database fails
+      }
 
       // Store consent in localStorage for quick access
       localStorage.setItem('voice_consent_given', 'true');
       localStorage.setItem('voice_consent_date', new Date().toISOString());
 
       toast({
-        title: "Consent recorded",
+        title: "Voice Features Enabled",
         description: "You can now use voice chat features.",
       });
 

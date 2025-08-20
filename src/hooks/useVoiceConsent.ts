@@ -27,9 +27,24 @@ export function useVoiceConsent() {
         return;
       }
 
-      // Temporarily skip database check until types are generated
-      // TODO: Re-enable once Supabase types are updated
-      setHasConsent(false);
+      // Check database for voice consent
+      const { data, error } = await supabase
+        .from('voice_consent_logs')
+        .select('consent_given')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking voice consent:', error);
+        setHasConsent(false);
+      } else if (data?.consent_given) {
+        setHasConsent(true);
+        localStorage.setItem('voice_consent_given', 'true');
+      } else {
+        setHasConsent(false);
+      }
     } catch (error) {
       console.error('Error checking voice consent:', error);
       setHasConsent(false);
