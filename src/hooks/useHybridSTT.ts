@@ -166,6 +166,13 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
   }, [language, onTranscription, onError]);
 
   const sendToWhisper = async (audioBlob: Blob, language: string, duration: number): Promise<string> => {
+    console.log('🎤 Sending audio to Whisper:', { 
+      size: audioBlob.size, 
+      type: audioBlob.type, 
+      language, 
+      duration 
+    });
+
     const formData = new FormData();
     formData.append('audio', audioBlob, 'recording.webm');
     formData.append('language', language);
@@ -175,8 +182,13 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
       body: formData
     });
 
-    if (error) throw error;
-    return data.transcript;
+    if (error) {
+      console.error('❌ Whisper transcription error:', error);
+      throw error;
+    }
+    
+    console.log('✅ Whisper transcription result:', data);
+    return data.transcript || data.text;
   };
 
   const logVoiceUsage = async (method: string, duration: number, transcript: string) => {

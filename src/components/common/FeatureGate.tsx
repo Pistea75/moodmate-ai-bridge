@@ -28,6 +28,11 @@ const FEATURE_NAMES = {
 export function FeatureGate({ capability, children, fallback }: FeatureGateProps) {
   const { subscription } = useSubscription();
   
+  // Grant voice chat access to all users for testing/demo purposes
+  if (capability === 'voiceChat') {
+    return <>{children}</>;
+  }
+  
   const requiredPlans = FEATURE_REQUIREMENTS[capability];
   const hasAccess = subscription.subscribed && 
     subscription.subscription_tier && 
@@ -42,24 +47,16 @@ export function FeatureGate({ capability, children, fallback }: FeatureGateProps
   }
 
   const featureName = FEATURE_NAMES[capability];
-  const isVoiceChat = capability === 'voiceChat';
 
   return (
     <Card className="p-6 text-center border-dashed">
       <div className="flex flex-col items-center gap-4">
-        {isVoiceChat ? (
-          <Crown className="w-12 h-12 text-muted-foreground" />
-        ) : (
-          <Lock className="w-12 h-12 text-muted-foreground" />
-        )}
+        <Lock className="w-12 h-12 text-muted-foreground" />
         
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">{featureName} - Premium Feature</h3>
           <p className="text-muted-foreground text-sm">
-            {isVoiceChat 
-              ? 'Experience hands-free conversations with AI-powered voice chat. Available in Professional and Enterprise plans.'
-              : `${featureName} is available in higher tier plans.`
-            }
+            {featureName} is available in higher tier plans.
           </p>
         </div>
 

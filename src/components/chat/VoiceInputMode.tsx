@@ -20,15 +20,19 @@ export function VoiceInputMode({ onSendMessage, isLoading }: VoiceInputModeProps
   const { isRecording, isProcessing, startRecording, stopRecording } = useHybridSTT({
     language: settings.sttLanguage,
     onTranscription: async (text, method) => {
-      console.log(`Transcription via ${method}:`, text);
+      console.log(`🎤 Transcription received via ${method}:`, text);
       setTranscript(text);
       
       if (text.trim()) {
+        console.log('📤 Sending transcribed message:', text);
         await onSendMessage(text);
         setTranscript('');
+      } else {
+        console.warn('⚠️ Empty transcription received');
       }
     },
     onError: (error) => {
+      console.error('🎤 Voice error:', error);
       toast({
         title: "Voice Error",
         description: error,
