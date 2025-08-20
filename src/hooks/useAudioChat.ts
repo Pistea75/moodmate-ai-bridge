@@ -42,17 +42,19 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
       isClinicianView
     );
     
-    // Add AI response to chat
-    const aiMessage: Message = {
-      id: uuidv4(),
-      type: 'assistant',
-      content: aiResponse,
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, aiMessage]);
-    
-    // Save AI response to database
-    await saveMessageToDatabase('assistant', aiResponse);
+    if (aiResponse) {
+      // Add AI response to chat
+      const aiMessage: Message = {
+        id: uuidv4(),
+        type: 'assistant',
+        content: aiResponse,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, aiMessage]);
+      
+      // Save AI response to database
+      await saveMessageToDatabase('assistant', aiResponse);
+    }
   };
 
   return {

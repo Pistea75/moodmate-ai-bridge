@@ -181,9 +181,14 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
 
   const logVoiceUsage = async (method: string, duration: number, transcript: string) => {
     try {
-    // Temporarily skip logging until types are generated
-    // TODO: Re-enable once Supabase types are updated
-    console.log('Voice usage logged:', { type: 'stt', duration, language, method, length: transcript.length });
+      await supabase.from('voice_usage_logs').insert({
+        type: 'stt',
+        duration_seconds: duration,
+        language: language,
+        method: method,
+        transcript_length: transcript.length
+      });
+      console.log('Voice usage logged:', { type: 'stt', duration, language, method, length: transcript.length });
     } catch (error) {
       console.error('Failed to log voice usage:', error);
     }
