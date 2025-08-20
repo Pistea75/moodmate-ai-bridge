@@ -17,7 +17,7 @@ export function VoiceInputMode({ onSendMessage, isLoading }: VoiceInputModeProps
     startRecording, 
     stopRecording 
   } = useHybridSTT({
-    language: 'es-UY', 'en-US' // o el idioma que necesites
+    language: 'es-ES', 'en-US' // o el idioma que necesites
     onTranscription: async (text) => {
       setTranscript(text);
       await onSendMessage(text); // Envía el mensaje automáticamente
