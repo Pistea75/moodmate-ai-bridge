@@ -39,7 +39,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
       recognition.lang = language;
 
       recognition.onstart = () => {
-        console.log('Web Speech started');
+        console.log('✅ Web Speech started');
         setIsRecording(true);
         startTimeRef.current = Date.now();
       };
@@ -59,7 +59,8 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
 
         if (finalTranscript) {
           const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
-          console.log('Web Speech final result:', finalTranscript);
+          console.log('📝 Web Speech final result:', finalTranscript);
+          console.log('👉 Sending to onTranscription (webspeech)');
           onTranscription(finalTranscript, 'webspeech');
           
           // Log usage
@@ -68,7 +69,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
       };
 
       recognition.onerror = (event) => {
-        console.error('Web Speech error:', event.error);
+        console.error('❌ Web Speech error:', event.error);
         setIsRecording(false);
         
         switch (event.error) {
@@ -87,7 +88,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
       };
 
       recognition.onend = () => {
-        console.log('Web Speech ended');
+        console.log('ℹ️ Web Speech ended');
         setIsRecording(false);
       };
 
@@ -95,7 +96,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
       recognition.start();
       return true;
     } catch (error) {
-      console.error('Error starting Web Speech:', error);
+      console.error('❌ Error starting Web Speech:', error);
       onError('Failed to start speech recognition');
       return false;
     }
@@ -140,13 +141,14 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
           const transcript = await sendToWhisper(audioBlob, language, duration);
           
           if (transcript) {
+            console.log('👉 Sending to onTranscription (whisper):', transcript);
             onTranscription(transcript, 'whisper');
             logVoiceUsage('whisper_fallback', duration, transcript);
           } else {
             onError('No speech detected in recording');
           }
         } catch (error) {
-          console.error('Error processing audio:', error);
+          console.error('❌ Error processing audio:', error);
           onError('Failed to process audio recording');
         } finally {
           setIsProcessing(false);
@@ -160,12 +162,12 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
       mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Error starting fallback recording:', error);
+      console.error('❌ Error starting fallback recording:', error);
       onError('Failed to access microphone');
     }
   }, [language, onTranscription, onError]);
 
-  // 🔧 FIX: usamos fetch en vez de supabase.functions.invoke para FormData
+  // Usamos fetch para enviar audio a Whisper Edge Function
   const sendToWhisper = async (audioBlob: Blob, language: string, duration: number): Promise<string> => {
     console.log('🎤 Sending audio to Whisper:', { 
       size: audioBlob.size, 
@@ -210,22 +212,22 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
         method: method,
         transcript_length: transcript.length
       });
-      console.log('Voice usage logged:', { type: 'stt', duration, language, method, length: transcript.length });
+      console.log('📊 Voice usage logged:', { type: 'stt', duration, language, method, length: transcript.length });
     } catch (error) {
-      console.error('Failed to log voice usage:', error);
+      console.error('❌ Failed to log voice usage:', error);
     }
   };
 
   const startRecording = useCallback(() => {
     if (isWebSpeechSupported()) {
-      console.log('Using Web Speech API');
+      console.log('🎙️ Using Web Speech API');
       const success = startWebSpeechRecording();
       if (!success) {
-        console.log('Web Speech failed, falling back to Whisper');
+        console.log('⚠️ Web Speech failed, falling back to Whisper');
         startFallbackRecording();
       }
     } else {
-      console.log('Using Whisper fallback');
+      console.log('🎙️ Using Whisper fallback');
       startFallbackRecording();
     }
   }, [isWebSpeechSupported, startWebSpeechRecording, startFallbackRecording]);
