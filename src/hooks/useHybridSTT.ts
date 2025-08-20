@@ -165,6 +165,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
     }
   }, [language, onTranscription, onError]);
 
+  // 🔧 FIX: usamos fetch en vez de supabase.functions.invoke para FormData
   const sendToWhisper = async (audioBlob: Blob, language: string, duration: number): Promise<string> => {
     console.log('🎤 Sending audio to Whisper:', { 
       size: audioBlob.size, 
@@ -178,17 +179,26 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
     formData.append('language', language);
     formData.append('duration', duration.toString());
 
-    const { data, error } = await supabase.functions.invoke('speech-to-text', {
-      body: formData
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+
+    const fnUrl = `${supabase.functions.url}/speech-to-text`;
+
+    const res = await fetch(fnUrl, {
+      method: 'POST',
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+      body: formData,
     });
 
-    if (error) {
-      console.error('❌ Whisper transcription error:', error);
-      throw error;
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      console.error('❌ Whisper HTTP error:', res.status, txt);
+      throw new Error(`Whisper failed: ${res.status}`);
     }
-    
+
+    const data = await res.json();
     console.log('✅ Whisper transcription result:', data);
-    return data.transcript || data.text;
+    return data.transcript || data.text || '';
   };
 
   const logVoiceUsage = async (method: string, duration: number, transcript: string) => {
