@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mic, MicOff, Volume2, VolumeX, Settings, Play, Pause } from 'lucide-react';
+import { Mic, Volume2, VolumeX, Settings, Play, Pause } from 'lucide-react';
 import { useAudioChat } from '@/hooks/useAudioChat';
 import { useTTS } from '@/hooks/useTTS';
 import { useVoiceSettings } from '@/hooks/useVoiceSettings';
 import { useVoiceConsent } from '@/hooks/useVoiceConsent';
-import { MessageList } from './chat/MessageList';
 import { TextInputMode } from './chat/TextInputMode';
 import { VoiceInputMode } from './chat/VoiceInputMode';
 import { VoiceConsentModal } from './voice/VoiceConsentModal';
@@ -48,22 +47,23 @@ export function AudioChatInterface({
     onAudioEnd: () => setCurrentPlayingId(null),
   });
 
-  // Auto-play AI responses if enabled
+  // Autoplay de respuestas de la IA
   useEffect(() => {
-    if (messages.length > 0 && settings.autoplay && settings.enabled) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.type === 'assistant' && lastMessage.content) {
-        playText(lastMessage.content);
-      }
+    if (!settings.enabled || !settings.autoplay || messages.length === 0) return;
+
+    const last = messages[messages.length - 1];
+    if (last.type === 'assistant' && last.content && !isTTSPlaying) {
+      playText(last.content);
     }
-  }, [messages, settings.autoplay, settings.enabled, playText]);
+  }, [messages, settings.autoplay, settings.enabled, playText, isTTSPlaying]);
 
   const handleToggleVoiceMode = () => {
-    if (inputMode === 'voice' && !hasConsent) {
+    const goingToVoice = inputMode === 'text';
+    if (goingToVoice && !hasConsent) {
       setShowConsentModal(true);
       return;
     }
-    setInputMode(inputMode === 'text' ? 'voice' : 'text');
+    setInputMode(goingToVoice ? 'voice' : 'text');
   };
 
   const handleConsentGiven = () => {
@@ -77,7 +77,6 @@ export function AudioChatInterface({
       setCurrentPlayingId(null);
       return;
     }
-    
     setCurrentPlayingId(messageId);
     await playText(text);
   };
@@ -134,7 +133,7 @@ export function AudioChatInterface({
         </div>
       )}
 
-      {/* Messages with Audio Controls */}
+      {/* Mensajes con controles de audio */}
       <div className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto p-4 space-y-4">
           {messages.map((message) => (
@@ -200,3 +199,4 @@ export function AudioChatInterface({
     </Card>
   );
 }
+
