@@ -3,11 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Mic, Square } from 'lucide-react';
 import { useHybridSTT } from '@/hooks/useHybridSTT';
 
-export function VoiceInputMode(props) {
-  const { onSendMessage, isLoading } = props || {};
-  const language = (props && props.language) ? props.language : 'es-ES';
+interface VoiceInputModeProps {
+  onSendMessage?: (text: string) => Promise<void> | void;
+  isLoading?: boolean;
+  language?: string;
+}
 
-  const [transcript, setTranscript] = useState('');
+export function VoiceInputMode(props: VoiceInputModeProps) {
+  const { onSendMessage, isLoading, language = 'es-ES' } = props;
+
+  const [transcript, setTranscript] = useState<string>('');
 
   const stt = useHybridSTT({
     language,

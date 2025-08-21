@@ -187,7 +187,8 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token;
 
-    const fnUrl = `${supabase.functions.url}/speech-to-text`;
+    const { data: { url } } = await supabase.functions.getConfig();
+    const fnUrl = `${url}/speech-to-text`;
 
     const res = await fetch(fnUrl, {
       method: 'POST',
