@@ -61,8 +61,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
           const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
           console.log('Web Speech final result:', finalTranscript);
 
-          // 🚨 ALERT para debug
-          alert('Transcription received (WebSpeech): ' + finalTranscript);
+          console.log('✅ Transcription received (WebSpeech):', finalTranscript);
 
           onTranscription(finalTranscript, 'webspeech');
           logVoiceUsage('webspeech', duration, finalTranscript);
@@ -142,8 +141,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
           const transcript = await sendToWhisper(audioBlob, language, duration);
           
           if (transcript) {
-            // 🚨 ALERT para debug
-            alert('Transcription received (Whisper): ' + transcript);
+            console.log('✅ Transcription received (Whisper):', transcript);
 
             onTranscription(transcript, 'whisper');
             logVoiceUsage('whisper_fallback', duration, transcript);
@@ -187,8 +185,9 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token;
 
-    const { data: { url } } = await supabase.functions.getConfig();
-    const fnUrl = `${url}/speech-to-text`;
+    // Get the Supabase project URL and construct function URL
+    const supabaseUrl = supabase.supabaseUrl;
+    const fnUrl = `${supabaseUrl}/functions/v1/speech-to-text`;
 
     const res = await fetch(fnUrl, {
       method: 'POST',

@@ -7,7 +7,7 @@ import { useTTS } from '@/hooks/useTTS';
 import { useVoiceSettings } from '@/hooks/useVoiceSettings';
 import { useVoiceConsent } from '@/hooks/useVoiceConsent';
 import { TextInputMode } from './chat/TextInputMode';
-import { VoiceInputMode } from './voice/VoiceInputMode';
+import { VoiceInputMode } from './chat/VoiceInputMode';
 import { VoiceConsentModal } from './voice/VoiceConsentModal';
 import { VoiceSettings } from './voice/VoiceSettings';
 import { FeatureGate } from './common/FeatureGate';
