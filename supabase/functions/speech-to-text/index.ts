@@ -47,10 +47,12 @@ serve(async (req) => {
     const language = formData.get('language') as string || 'es-ES';
     const duration = parseInt(formData.get('duration') as string || '0');
 
-    console.log('Received form data:', {
+    console.log('🎙️ STT Function - Received form data:', {
       audioFile: audioFile ? `${audioFile.name} (${audioFile.size} bytes)` : 'none',
       language,
-      duration
+      duration,
+      userId: user.id,
+      timestamp: new Date().toISOString()
     });
 
     if (!audioFile) {
@@ -60,11 +62,12 @@ serve(async (req) => {
       });
     }
 
-    console.log('Processing speech-to-text request:', {
+    console.log('🔄 STT Function - Processing request:', {
       userId: user.id,
       language,
       duration,
-      fileSize: audioFile.size
+      fileSize: audioFile.size,
+      openaiKeyExists: !!openaiApiKey
     });
 
     // Prepare form data for OpenAI
@@ -90,6 +93,13 @@ serve(async (req) => {
 
     const result = await response.json();
     const transcript = result.text;
+    
+    console.log('✅ STT Function - OpenAI response:', {
+      transcript: transcript?.substring(0, 100) + '...',
+      language,
+      duration,
+      success: true
+    });
 
     // Log voice usage for billing/limits
     try {
@@ -117,7 +127,11 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error in speech-to-text function:', error);
+    console.error('❌ STT Function - Error:', {
+      error: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString()
+    });
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

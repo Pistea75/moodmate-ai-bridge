@@ -61,7 +61,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
           const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
           console.log('Web Speech final result:', finalTranscript);
 
-          console.log('✅ Transcription received (WebSpeech):', finalTranscript);
+          console.log('✅ useHybridSTT - Transcription received (WebSpeech):', finalTranscript);
 
           onTranscription(finalTranscript, 'webspeech');
           logVoiceUsage('webspeech', duration, finalTranscript);
@@ -141,7 +141,7 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
           const transcript = await sendToWhisper(audioBlob, language, duration);
           
           if (transcript) {
-            console.log('✅ Transcription received (Whisper):', transcript);
+            console.log('✅ useHybridSTT - Transcription received (Whisper):', transcript);
 
             onTranscription(transcript, 'whisper');
             logVoiceUsage('whisper_fallback', duration, transcript);
@@ -186,8 +186,15 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
     const accessToken = sessionData?.session?.access_token;
 
     // Get the Supabase project URL and construct function URL
-    const supabaseUrl = supabase.supabaseUrl;
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://otrhbyzjrhsqrltdedon.supabase.co';
     const fnUrl = `${supabaseUrl}/functions/v1/speech-to-text`;
+    
+    console.log('🔄 useHybridSTT - Sending to Whisper:', {
+      url: fnUrl,
+      audioSize: audioBlob.size,
+      language,
+      duration
+    });
 
     const res = await fetch(fnUrl, {
       method: 'POST',
@@ -196,14 +203,19 @@ export function useHybridSTT({ language, onTranscription, onError }: UseHybridST
     });
 
     if (!res.ok) {
-      const txt = await res.text().catch(() => '');
-      console.error('❌ Whisper HTTP error:', res.status, txt);
-      throw new Error(`Whisper failed: ${res.status}`);
+      const errorText = await res.text();
+      console.error('❌ useHybridSTT - Whisper API error:', {
+        status: res.status,
+        statusText: res.statusText,
+        error: errorText
+      });
+      throw new Error(`Whisper API error: ${res.status} - ${errorText}`);
     }
 
     const data = await res.json();
-    console.log('✅ Whisper transcription result:', data);
-    return data.transcript || data.text || '';
+    console.log('✅ useHybridSTT - Whisper response:', data);
+    
+    return data.transcript;
   };
 
   const logVoiceUsage = async (method: string, duration: number, transcript: string) => {

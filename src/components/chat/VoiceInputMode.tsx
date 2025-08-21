@@ -21,14 +21,17 @@ export function VoiceInputMode(props: VoiceInputModeProps) {
   const stt = useHybridSTT({
     language,
     onTranscription: async (text, method) => {
-      // logs para depurar
-      // alert('Transcription received (' + method + '): ' + text);
-      // console.log('✅ onTranscription:', { text, method });
+      console.log('🎤 VoiceInputMode - Transcription received:', { text, method });
       setTranscript(text);
-      await onSendMessage(String(text));
+      try {
+        await onSendMessage(String(text));
+        console.log('✅ VoiceInputMode - Message sent successfully');
+      } catch (error) {
+        console.error('❌ VoiceInputMode - Error sending message:', error);
+      }
     },
     onError: (err) => {
-      console.error('❌ STT Error:', err);
+      console.error('❌ VoiceInputMode - STT Error:', err);
     },
   });
 
