@@ -752,6 +752,90 @@ export type Database = {
         }
         Relationships: []
       }
+      psychologist_points: {
+        Row: {
+          created_at: string
+          id: string
+          points_from_sessions: number | null
+          points_from_workshops: number | null
+          points_redeemed: number | null
+          psychologist_id: string | null
+          total_points: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_from_sessions?: number | null
+          points_from_workshops?: number | null
+          points_redeemed?: number | null
+          psychologist_id?: string | null
+          total_points?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_from_sessions?: number | null
+          points_from_workshops?: number | null
+          points_redeemed?: number | null
+          psychologist_id?: string | null
+          total_points?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      psychologist_profiles: {
+        Row: {
+          bio: string | null
+          country: string | null
+          created_at: string
+          display_name: string
+          experience_years: number | null
+          hourly_rate: number | null
+          id: string
+          is_accepting_patients: boolean | null
+          is_visible_marketplace: boolean | null
+          languages: string[] | null
+          region: string | null
+          specializations: string[] | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          display_name: string
+          experience_years?: number | null
+          hourly_rate?: number | null
+          id?: string
+          is_accepting_patients?: boolean | null
+          is_visible_marketplace?: boolean | null
+          languages?: string[] | null
+          region?: string | null
+          specializations?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string
+          experience_years?: number | null
+          hourly_rate?: number | null
+          id?: string
+          is_accepting_patients?: boolean | null
+          is_visible_marketplace?: boolean | null
+          languages?: string[] | null
+          region?: string | null
+          specializations?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       rate_limit_attempts: {
         Row: {
           action_type: string
@@ -918,6 +1002,47 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_ratings: {
+        Row: {
+          created_at: string
+          feedback: string | null
+          id: string
+          patient_id: string | null
+          points_awarded: number | null
+          psychologist_id: string | null
+          rating: number | null
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          patient_id?: string | null
+          points_awarded?: number | null
+          psychologist_id?: string | null
+          rating?: number | null
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          patient_id?: string | null
+          points_awarded?: number | null
+          psychologist_id?: string | null
+          rating?: number | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_ratings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -1146,6 +1271,13 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          last_message_reset: string | null
+          message_limit_daily: number | null
+          messages_used_today: number | null
+          patient_limit: number | null
+          patients_active: number | null
+          patients_sporadic: number | null
+          plan_type: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscribed: boolean
@@ -1158,6 +1290,13 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          last_message_reset?: string | null
+          message_limit_daily?: number | null
+          messages_used_today?: number | null
+          patient_limit?: number | null
+          patients_active?: number | null
+          patients_sporadic?: number | null
+          plan_type?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscribed?: boolean
@@ -1170,6 +1309,13 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          last_message_reset?: string | null
+          message_limit_daily?: number | null
+          messages_used_today?: number | null
+          patient_limit?: number | null
+          patients_active?: number | null
+          patients_sporadic?: number | null
+          plan_type?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscribed?: boolean
@@ -1359,6 +1505,89 @@ export type Database = {
         }
         Relationships: []
       }
+      workshop_participants: {
+        Row: {
+          attended: boolean | null
+          id: string
+          participant_id: string | null
+          registered_at: string
+          workshop_id: string | null
+        }
+        Insert: {
+          attended?: boolean | null
+          id?: string
+          participant_id?: string | null
+          registered_at?: string
+          workshop_id?: string | null
+        }
+        Update: {
+          attended?: boolean | null
+          id?: string
+          participant_id?: string | null
+          registered_at?: string
+          workshop_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshop_participants_workshop_id_fkey"
+            columns: ["workshop_id"]
+            isOneToOne: false
+            referencedRelation: "workshops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workshops: {
+        Row: {
+          created_at: string
+          current_participants: number | null
+          description: string | null
+          duration_minutes: number | null
+          host_psychologist_id: string | null
+          id: string
+          max_participants: number | null
+          points_reward: number | null
+          scheduled_date: string
+          status: string | null
+          title: string
+          topic: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_participants?: number | null
+          description?: string | null
+          duration_minutes?: number | null
+          host_psychologist_id?: string | null
+          id?: string
+          max_participants?: number | null
+          points_reward?: number | null
+          scheduled_date: string
+          status?: string | null
+          title: string
+          topic: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_participants?: number | null
+          description?: string | null
+          duration_minutes?: number | null
+          host_psychologist_id?: string | null
+          id?: string
+          max_participants?: number | null
+          points_reward?: number | null
+          scheduled_date?: string
+          status?: string | null
+          title?: string
+          topic?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       clinician_referral_codes: {
@@ -1378,6 +1607,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_send_message: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
       check_security_rate_limit: {
         Args: {
           p_action_type: string
@@ -1423,6 +1656,10 @@ export type Database = {
       is_super_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      reset_daily_message_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       secure_update_user_role: {
         Args: {
