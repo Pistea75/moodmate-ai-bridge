@@ -1,5 +1,5 @@
 
-import { Home, Calendar, MessageSquare, BarChart, ListCheck, Users, Bot, User, Heart, Target } from "lucide-react";
+import { Home, Calendar, MessageSquare, BarChart, ListCheck, Users, Bot, User, Heart, Target, Store } from "lucide-react";
 
 export const patientNavItems = [
   { name: 'Dashboard', path: '/patient/dashboard', icon: Home },
@@ -21,6 +21,7 @@ export const clinicianNavItems = [
   { name: 'AI Reports', path: '/clinician/reports', icon: MessageSquare },
   { name: 'Train AI', path: '/clinician/train-ai', icon: Bot },
   { name: 'Direct Messages', path: '/clinician/communications', icon: MessageSquare },
+  { name: 'Marketplace Profile', path: '/clinician/marketplace-profile', icon: Store },
   { name: 'Analytics', path: '/clinician/analytics', icon: BarChart },
   { name: 'Settings', path: '/clinician/settings', icon: User },
 ];

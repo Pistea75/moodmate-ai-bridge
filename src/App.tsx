@@ -49,6 +49,7 @@ const Analytics = lazy(() => import("./pages/clinician/Analytics"));
 const Communications = lazy(() => import("./pages/clinician/Communications"));
 const TreatmentPlans = lazy(() => import("./pages/clinician/TreatmentPlans"));
 const TrainAI = lazy(() => import("./pages/clinician/TrainAI"));
+const MarketplaceProfile = lazy(() => import("./pages/clinician/MarketplaceProfile"));
 const Reminders = lazy(() => import("./pages/clinician/Reminders"));
 const ResourceLibraryPage = lazy(() => import("./pages/clinician/ResourceLibrary"));
 const RiskManagement = lazy(() => import("./pages/clinician/RiskManagement"));
@@ -161,6 +162,7 @@ function App() {
                               <Route path="communications" element={<Communications />} />
                               <Route path="treatment-plans" element={<TreatmentPlans />} />
                               <Route path="train-ai" element={<TrainAI />} />
+                              <Route path="marketplace-profile" element={<MarketplaceProfile />} />
                               <Route path="reminders" element={<Reminders />} />
                               <Route path="resource-library" element={<ResourceLibraryPage />} />
                               <Route path="risk-management" element={<RiskManagement />} />
