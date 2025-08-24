@@ -34,6 +34,7 @@ const PatientMessages = lazy(() => import("./pages/patient/PatientMessages"));
 const PatientInsights = lazy(() => import("./pages/patient/PatientInsights"));
 const PatientMoodInsights = lazy(() => import("./pages/patient/PatientMoodInsights"));
 const Goals = lazy(() => import("./pages/patient/Goals"));
+const Marketplace = lazy(() => import("./pages/patient/Marketplace"));
 
 // Clinician pages
 const ClinicianDashboard = lazy(() => import("./pages/clinician/ClinicianDashboard"));
@@ -139,6 +140,7 @@ function App() {
                               <Route path="insights" element={<PatientInsights />} />
                               <Route path="mood-insights" element={<PatientMoodInsights />} />
                               <Route path="goals" element={<Goals />} />
+                              <Route path="marketplace" element={<Marketplace />} />
                             </Routes>
                           </ProtectedRoute>
                         } />
