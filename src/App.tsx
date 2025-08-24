@@ -71,6 +71,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Security = lazy(() => import("./pages/Security"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -121,6 +122,7 @@ function App() {
                         <Route path="/terms" element={<Terms />} />
                         <Route path="/security" element={<Security />} />
                         <Route path="/help" element={<HelpCenter />} />
+                        <Route path="/subscription/success" element={<SubscriptionSuccess />} />
 
                         {/* Patient routes */}
                         <Route path="/patient/*" element={

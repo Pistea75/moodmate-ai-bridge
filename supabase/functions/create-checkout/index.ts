@@ -52,11 +52,11 @@ serve(async (req) => {
     }
     logStep("Customer lookup", { customerId });
 
-    // Define plan prices
+    // Define plan prices based on MoodMate structure
     const planPrices = {
-      basic: { amount: 2900, name: "Basic Plan" },
-      professional: { amount: 9900, name: "Professional Plan" },
-      enterprise: { amount: 19900, name: "Enterprise Plan" }
+      personal: { amount: 500, name: "Personal Plan", planType: "personal" }, // $5 USD
+      professional_basic: { amount: 5000, name: "Professional Basic", planType: "professional_basic" }, // $50 USD  
+      professional_advanced: { amount: 7500, name: "Professional Advanced", planType: "professional_advanced" } // $75 USD
     };
 
     const selectedPlan = planPrices[plan as keyof typeof planPrices];
@@ -77,8 +77,12 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/subscription/success`,
-      cancel_url: `${req.headers.get("origin")}/subscription/cancel`,
+      metadata: {
+        plan_type: selectedPlan.planType,
+        user_id: user.id,
+      },
+      success_url: `${req.headers.get("origin")}/subscription/success?plan=${plan}`,
+      cancel_url: `${req.headers.get("origin")}/pricing`,
     });
 
     logStep("Checkout session created", { sessionId: session.id });

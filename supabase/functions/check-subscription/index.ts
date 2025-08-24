@@ -51,6 +51,9 @@ serve(async (req) => {
         subscribed: false,
         subscription_tier: null,
         subscription_end: null,
+        plan_type: 'free',
+        message_limit_daily: 3,
+        patient_limit: 0,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'email' });
       
@@ -84,12 +87,31 @@ serve(async (req) => {
       const price = await stripe.prices.retrieve(priceId);
       const amount = price.unit_amount || 0;
       
-      if (amount <= 3000) {
-        subscriptionTier = "basic";
-      } else if (amount <= 10000) {
-        subscriptionTier = "professional";
+      // Map amounts to MoodMate plan types
+      if (amount <= 500) {
+        subscriptionTier = "personal";
+      } else if (amount <= 5000) {
+        subscriptionTier = "professional_basic";
       } else {
-        subscriptionTier = "enterprise";
+        subscriptionTier = "professional_advanced";
+      }
+      
+      // Set plan limits based on tier
+      let planType = 'free';
+      let messageLimit = 3;
+      let patientLimit = 0;
+      
+      if (subscriptionTier === 'personal') {
+        planType = 'personal';
+        messageLimit = -1; // unlimited
+      } else if (subscriptionTier === 'professional_basic') {
+        planType = 'professional_basic';
+        messageLimit = -1; // unlimited
+        patientLimit = 30; // 20 active + 10 sporadic
+      } else if (subscriptionTier === 'professional_advanced') {
+        planType = 'professional_advanced';
+        messageLimit = -1; // unlimited
+        patientLimit = 50; // 35 active + 15 sporadic  
       }
       
       logStep("Active subscription found", { 
@@ -109,6 +131,9 @@ serve(async (req) => {
       subscription_tier: subscriptionTier,
       subscription_end: subscriptionEnd,
       stripe_subscription_id: stripeSubscriptionId,
+      plan_type: hasActiveSub ? planType : 'free',
+      message_limit_daily: hasActiveSub ? messageLimit : 3,
+      patient_limit: hasActiveSub ? patientLimit : 0,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'email' });
 

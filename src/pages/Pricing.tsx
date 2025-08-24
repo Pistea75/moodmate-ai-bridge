@@ -5,67 +5,108 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Sparkles, ArrowRight, Star, Zap } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const plans = [
   {
-    name: "Starter",
-    price: "Free",
-    description: "Perfect for getting started with your mental health journey",
+    name: "Free",
+    price: "$0",
+    period: "/month",
+    description: "Try Brodi with basic features",
     features: [
-      "Basic AI companion access",
-      "Mood tracking",
-      "5 chat sessions per month",
-      "Basic analytics",
-      "Community support"
+      "3 messages per day with Brodi",
+      "Basic mood tracking",
+      "Community support",
+      "Mobile app access"
     ],
     buttonText: "Get Started Free",
     buttonLink: "/signup/patient",
     popular: false,
-    gradient: "from-slate-500 to-slate-600"
+    gradient: "from-slate-500 to-slate-600",
+    planId: "free"
   },
   {
     name: "Personal",
-    price: "$29",
+    price: "$5",
     period: "/month",
-    description: "Comprehensive mental health support for individuals",
+    description: "Unlimited access to Brodi + psychologist marketplace",
     features: [
-      "Unlimited AI companion",
-      "Advanced mood analytics",
-      "Unlimited chat sessions",
-      "Crisis support access",
-      "Therapist matching",
-      "2 video sessions/month",
+      "Unlimited messages with Brodi",
+      "Complete mood tracking & history",
+      "Access to psychologist marketplace",
+      "Book sessions with verified psychologists",
       "Progress reports",
-      "Mobile app access"
+      "Monthly workshops (free)",
+      "Priority support"
     ],
     buttonText: "Start Personal Plan",
     buttonLink: "/signup/patient",
     popular: true,
-    gradient: "from-purple-500 to-pink-500"
+    gradient: "from-purple-500 to-pink-500",
+    planId: "personal"
   },
   {
-    name: "Professional",
-    price: "$99",
+    name: "Professional Basic",
+    price: "$50",
     period: "/month",
-    description: "For mental health professionals and clinics",
+    description: "For psychologists - up to 30 patients",
     features: [
-      "Everything in Personal",
-      "Patient management dashboard",
-      "Unlimited video sessions",
-      "Advanced analytics suite",
-      "Custom AI training",
-      "White-label options",
-      "Priority support",
-      "API access"
+      "20 active patients + 10 sporadic",
+      "Complete patient management dashboard",
+      "Patient AI chat logs & analytics",
+      "Session management tools",
+      "Points system for marketplace visibility",
+      "Host workshops for points",
+      "Priority support"
     ],
     buttonText: "Start Professional",
     buttonLink: "/signup/clinician",
     popular: false,
-    gradient: "from-blue-500 to-cyan-500"
+    gradient: "from-blue-500 to-cyan-500",
+    planId: "professional_basic"
+  },
+  {
+    name: "Professional Advanced",
+    price: "$75",
+    period: "/month",
+    description: "For busy psychologists - up to 50 patients",
+    features: [
+      "35 active patients + 15 sporadic",
+      "Everything in Professional Basic",
+      "Advanced analytics & reporting",
+      "Custom AI personalization",
+      "API access",
+      "White-label options",
+      "Dedicated support"
+    ],
+    buttonText: "Upgrade to Advanced",
+    buttonLink: "/signup/clinician",
+    popular: false,
+    gradient: "from-emerald-500 to-teal-500",
+    planId: "professional_advanced"
   }
 ];
 
 export default function Pricing() {
+  const { user } = useAuth();
+  const { createCheckout, subscription } = useSubscription();
+
+  const handleSubscribe = async (planId: string) => {
+    if (!user) {
+      // Redirect to signup if not authenticated
+      return;
+    }
+    
+    if (planId === 'free') return; // Free plan doesn't need checkout
+    
+    try {
+      await createCheckout(planId);
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-900">
       <PublicNav />
@@ -128,16 +169,34 @@ export default function Pricing() {
                     ))}
                   </ul>
                   
-                  <Link to={plan.buttonLink} className="block">
-                    <Button className={`w-full py-3 font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 ${
-                      plan.popular 
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl'
-                        : 'bg-white text-slate-900 hover:bg-slate-100'
-                    }`}>
-                      {plan.buttonText}
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                  {user ? (
+                    <Button 
+                      onClick={() => handleSubscribe(plan.planId)}
+                      disabled={subscription.plan_type === plan.planId}
+                      className={`w-full py-3 font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 ${
+                        subscription.plan_type === plan.planId
+                          ? 'bg-green-500 text-white cursor-default'
+                          : plan.popular 
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl'
+                            : 'bg-white text-slate-900 hover:bg-slate-100'
+                      }`}>
+                      {subscription.plan_type === plan.planId 
+                        ? 'Current Plan' 
+                        : plan.buttonText}
+                      {subscription.plan_type !== plan.planId && <ArrowRight className="ml-2 h-5 w-5" />}
                     </Button>
-                  </Link>
+                  ) : (
+                    <Link to={plan.buttonLink} className="block">
+                      <Button className={`w-full py-3 font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 ${
+                        plan.popular 
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl'
+                          : 'bg-white text-slate-900 hover:bg-slate-100'
+                      }`}>
+                        {plan.buttonText}
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
+                    </Link>
+                  )}
                 </CardContent>
               </Card>
             ))}

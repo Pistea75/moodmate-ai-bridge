@@ -6,6 +6,9 @@ export interface SubscriptionData {
   subscribed: boolean;
   subscription_tier: string | null;
   subscription_end: string | null;
+  plan_type: string;
+  message_limit_daily: number;
+  patient_limit: number;
 }
 
 export function useSubscription() {
@@ -13,7 +16,10 @@ export function useSubscription() {
   const [subscription, setSubscription] = useState<SubscriptionData>({
     subscribed: false,
     subscription_tier: null,
-    subscription_end: null
+    subscription_end: null,
+    plan_type: 'free',
+    message_limit_daily: 3,
+    patient_limit: 0
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +29,10 @@ export function useSubscription() {
       setSubscription({
         subscribed: false,
         subscription_tier: null,
-        subscription_end: null
+        subscription_end: null,
+        plan_type: 'free',
+        message_limit_daily: 3,
+        patient_limit: 0
       });
       setLoading(false);
       return;
@@ -44,7 +53,10 @@ export function useSubscription() {
       setSubscription({
         subscribed: data.subscribed || false,
         subscription_tier: data.subscription_tier || null,
-        subscription_end: data.subscription_end || null
+        subscription_end: data.subscription_end || null,
+        plan_type: data.plan_type || 'free',
+        message_limit_daily: data.message_limit_daily || 3,
+        patient_limit: data.patient_limit || 0
       });
       setError(null);
     } catch (err) {

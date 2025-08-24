@@ -2,6 +2,7 @@
 import PatientLayout from '../../layouts/PatientLayout';
 import { AudioChatInterface } from '@/components/AudioChatInterface';
 import { useClinicianDetails } from '@/hooks/useClinicianDetails';
+import { MessageLimitIndicator } from '@/components/subscription/MessageLimitIndicator';
 
 export default function PatientChat() {
   const { clinicianName } = useClinicianDetails();
@@ -18,6 +19,9 @@ export default function PatientChat() {
             AI personalized by your clinician
           </p>
         </div>
+
+        {/* Message Limit Indicator */}
+        <MessageLimitIndicator />
 
         {/* Chat Interface */}
         <div className="bg-white rounded-xl shadow-sm border">

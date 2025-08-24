@@ -4,7 +4,9 @@ import { usePersonalization } from "./audioChat/usePersonalization";
 import { useChatHistory } from "./audioChat/useChatHistory";
 import { useMessageService } from "./audioChat/useMessageService";
 import { useAIService } from "./audioChat/useAIService";
+import { useMessageLimits } from "./useMessageLimits";
 import { Message } from "./audioChat/types";
+import { toast } from "@/hooks/use-toast";
 
 export function useAudioChat(baseSystemPrompt: string, patientId?: string, isClinicianView: boolean = false) {
   const personalizedSystemPrompt = usePersonalization(baseSystemPrompt);
@@ -17,9 +19,23 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
   } = useChatHistory();
   const { saveMessageToDatabase } = useMessageService();
   const { sendToAI, isLoading } = useAIService();
+  const { checkMessageLimit, messageData } = useMessageLimits();
 
   const handleSendMessage = async (messageText: string) => {
     if (!messageText.trim()) return;
+    
+    // Check message limits for patients (clinicians have unlimited)
+    if (!isClinicianView) {
+      const canSend = await checkMessageLimit();
+      if (!canSend) {
+        toast({
+          title: "Daily Message Limit Reached",
+          description: `You've used all ${messageData.dailyLimit} messages today. Upgrade to Personal plan for unlimited messages.`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
     
     // Add user message to chat
     const userMessage: Message = {
@@ -61,6 +77,7 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
     messages,
     isLoading,
     isFetchingHistory,
-    handleSendMessage
+    handleSendMessage,
+    messageData
   };
 }
