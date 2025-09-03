@@ -2,7 +2,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { LogOut } from 'lucide-react';
-import { toast } from './ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface LogoutButtonProps {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | null;
@@ -14,15 +14,18 @@ export function LogoutButton({ variant = 'ghost', className = '' }: LogoutButton
 
   const handleLogout = async () => {
     try {
+      console.log('🔄 Attempting logout...');
       await signOut();
+      console.log('✅ Logout successful');
       toast({
         title: "Logged out successfully",
         description: "You have been logged out of your account."
       });
     } catch (error: any) {
+      console.error('❌ Logout error:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to log out",
+        description: error?.message || "Failed to log out",
         variant: "destructive",
       });
     }

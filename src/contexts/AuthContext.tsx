@@ -173,14 +173,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, secureUserRole, roleLoading, loading, location.pathname]);
 
   const signOut = async () => {
-    setAuthError(null);
-    
-    // Log sign out attempt
-    logSecurityEvent('sign_out_attempt', 'authentication', { 
-      user_id: user?.id 
-    }, true);
-    
-    await supabase.auth.signOut();
+    try {
+      setAuthError(null);
+      
+      // Log sign out attempt
+      logSecurityEvent('sign_out_attempt', 'authentication', { 
+        user_id: user?.id 
+      }, true);
+      
+      console.log('🔄 Signing out user...');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('❌ Supabase signOut error:', error);
+        throw error;
+      }
+      
+      console.log('✅ Sign out completed');
+    } catch (error) {
+      console.error('❌ Sign out failed:', error);
+      setAuthError('Failed to sign out. Please try again.');
+      throw error;
+    }
   };
 
   const deleteAccount = async () => {
