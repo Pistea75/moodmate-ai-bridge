@@ -54,11 +54,6 @@ export const patientNavItems = [
     href: '/patient/sessions',
     icon: Calendar,
   },
-  {
-    title: 'nav.profile',
-    href: '/patient/profile',
-    icon: User,
-  },
 ];
 
 export function PatientNavItems() {

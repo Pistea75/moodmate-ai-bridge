@@ -172,9 +172,20 @@ export default function MarketplaceProfile() {
           {/* Sidebar Widgets - Takes up 1/3 of the space */}
           <div className="space-y-6">
             {/* Session Inquiries */}
-            <InquiriesWidget />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  Solicitudes de Sesión
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-center py-4">
+                  Las solicitudes de sesión aparecerán aquí cuando los pacientes reserven citas contigo.
+                </p>
+              </CardContent>
+            </Card>
             
-            {/* Recent Activity */}
             {/* Recent Activity */}
             <Card>
               <CardHeader>
