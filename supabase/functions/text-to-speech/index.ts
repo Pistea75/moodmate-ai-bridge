@@ -48,7 +48,11 @@ serve(async (req) => {
 
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
-      throw new Error('OpenAI API key not configured');
+      console.error('OpenAI API key not configured');
+      return new Response(JSON.stringify({ error: 'OpenAI API key not configured. Please add your OpenAI API key to continue using text-to-speech.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Generate speech from text using OpenAI TTS
@@ -68,8 +72,19 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'Failed to generate speech');
+      console.error('OpenAI TTS API error:', response.status, response.statusText);
+      let errorMessage = 'Failed to generate speech';
+      try {
+        const error = await response.json();
+        errorMessage = error.error?.message || errorMessage;
+        console.error('OpenAI TTS API error details:', error);
+      } catch (e) {
+        console.error('Could not parse OpenAI error response');
+      }
+      return new Response(JSON.stringify({ error: errorMessage }), {
+        status: response.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Convert audio buffer to base64

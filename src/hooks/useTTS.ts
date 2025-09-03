@@ -32,7 +32,8 @@ export function useTTS({ onAudioStart, onAudioEnd, onError }: UseTTSProps = {}) 
       });
 
       if (error) {
-        throw new Error(error.message);
+        console.error('TTS function error:', error);
+        throw new Error(error.message || 'Text-to-speech service failed');
       }
 
       if (!data?.audioContent) {
@@ -74,11 +75,15 @@ export function useTTS({ onAudioStart, onAudioEnd, onError }: UseTTSProps = {}) 
       setIsPlaying(false);
       const errorMsg = error instanceof Error ? error.message : 'Text-to-speech failed';
       onError?.(errorMsg);
-      toast({
-        title: "TTS Error",
-        description: errorMsg,
-        variant: "destructive"
-      });
+      
+      // Only show toast if it's not an API key issue (which should be handled at app level)
+      if (!errorMsg.includes('OpenAI API key not configured')) {
+        toast({
+          title: "Audio Error",
+          description: errorMsg,
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsLoading(false);
     }
