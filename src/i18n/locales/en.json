@@ -185,6 +185,23 @@
     "offline": "Offline",
     "lastSeen": "Last seen"
   },
+  "marketplace": {
+    "title": "Psychologist Marketplace",
+    "subtitle": "Find and connect with verified psychologists specialized in your needs",
+    "upgradeTitle": "Psychologist Marketplace",
+    "upgradeDescription": "Connect with verified psychologists and book personalized sessions",
+    "upgradeMessage": "Currently you don't have the plan needed. Upgrade it for just $5USD!",
+    "upgradeButton": "Upgrade for $5USD",
+    "existingClinician": "You already have an assigned psychologist",
+    "additionalSessions": "You can still book additional sessions with other professionals from the marketplace",
+    "noClinician": "You currently have no assigned psychologist. Explore our marketplace to find the ideal professional",
+    "searching": "Searching...",
+    "psychologistsFound": "psychologist(s) found",
+    "errorLoading": "Error loading psychologists",
+    "noPsychologistsFound": "No psychologists found",
+    "adjustFilters": "Try adjusting your search filters to find more results",
+    "clearFilters": "Clear Filters"
+  },
   "landing": {
     "hero": {
       "title": "Transform Mental Healthcare with AI-Powered Support",

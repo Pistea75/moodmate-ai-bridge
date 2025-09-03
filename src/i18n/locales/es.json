@@ -17,6 +17,23 @@
     "logout": "Cerrar Sesión",
     "marketplace": "Mercado"
   },
+  "marketplace": {
+    "title": "Marketplace de Psicólogos",
+    "subtitle": "Encuentra y conecta con psicólogos verificados especializados en tus necesidades",
+    "upgradeTitle": "Marketplace de Psicólogos",
+    "upgradeDescription": "Conecta con psicólogos verificados y reserva sesiones personalizadas",
+    "upgradeMessage": "Actualmente no tienes el plan necesario. ¡Actualízalo por solo $5USD!",
+    "upgradeButton": "Actualizar por $5USD",
+    "existingClinician": "Ya tienes un psicólogo asignado",
+    "additionalSessions": "Aún puedes reservar sesiones adicionales con otros profesionales del marketplace",
+    "noClinician": "No tienes un psicólogo asignado actualmente. Explora nuestro marketplace para encontrar el profesional ideal",
+    "searching": "Buscando...",
+    "psychologistsFound": "psicólogo(s) encontrado(s)",
+    "errorLoading": "Error al cargar los psicólogos",
+    "noPsychologistsFound": "No se encontraron psicólogos",
+    "adjustFilters": "Intenta ajustar tus filtros de búsqueda para encontrar más resultados",
+    "clearFilters": "Limpiar Filtros"
+  },
   "auth": {
     "welcome": "Bienvenido de vuelta",
     "welcomeSignup": "Crea tu cuenta",
