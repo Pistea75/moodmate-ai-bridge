@@ -127,26 +127,6 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
       {/* Footer */}
       <div className="p-4 border-t border-gray-800 dark:border-gray-700 space-y-1 flex-shrink-0">
         <NavLink
-          to="/patient/profile"
-          className={({ isActive }) =>
-            cn(
-              "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
-              isActive
-                ? 'text-white border'
-                : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
-            )
-          }
-          style={({ isActive }) => ({
-            backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
-            borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
-            color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
-          })}
-        >
-          <User className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">{t('nav.profile')}</span>
-        </NavLink>
-        
-        <NavLink
           to="/patient/settings"
           className={({ isActive }) =>
             cn(
@@ -164,6 +144,26 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
         >
           <Settings className="h-4 w-4 flex-shrink-0" />
           <span className="flex-1">{t('nav.settings')}</span>
+        </NavLink>
+        
+        <NavLink
+          to="/patient/profile"
+          className={({ isActive }) =>
+            cn(
+              "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
+              isActive
+                ? 'text-white border'
+                : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
+            )
+          }
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
+            borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+            color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+          })}
+        >
+          <User className="h-4 w-4 flex-shrink-0" />
+          <span className="flex-1">{t('nav.profile')}</span>
         </NavLink>
 
         <Button
