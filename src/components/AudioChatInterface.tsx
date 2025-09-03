@@ -43,6 +43,7 @@ export function AudioChatInterface({
   } = useAudioChat(systemPrompt, selectedPatientId || patientId, isClinicianView);
 
   const [ttsError, setTtsError] = useState<string | null>(null);
+  const [errorShown, setErrorShown] = useState(false);
   const { playText, isPlaying: isTTSPlaying } = useTTS({
     onAudioStart: () => setCurrentPlayingId('tts-active'),
     onAudioEnd: () => setCurrentPlayingId(null),
@@ -50,9 +51,12 @@ export function AudioChatInterface({
       console.error('TTS Error:', error);
       setTtsError(error);
       setCurrentPlayingId(null);
-      // Disable autoplay on quota errors
+      // Disable autoplay on quota errors and show error only once
       if (error.includes('quota') || error.includes('exceeded')) {
         updateSettings({ autoplay: false });
+        if (!errorShown) {
+          setErrorShown(true);
+        }
       }
     }
   });

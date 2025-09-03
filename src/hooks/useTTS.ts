@@ -76,14 +76,8 @@ export function useTTS({ onAudioStart, onAudioEnd, onError }: UseTTSProps = {}) 
       const errorMsg = error instanceof Error ? error.message : 'Text-to-speech failed';
       onError?.(errorMsg);
       
-      // Only show toast for non-quota errors to avoid spam
-      if (!errorMsg.includes('quota') && !errorMsg.includes('exceeded')) {
-        toast({
-          title: "Audio Error",
-          description: errorMsg,
-          variant: "destructive"
-        });
-      }
+      // Suppress all error toasts for TTS to prevent spam
+      // Error handling is done at component level
     } finally {
       setIsLoading(false);
     }
