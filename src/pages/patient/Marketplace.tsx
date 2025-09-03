@@ -60,20 +60,19 @@ export default function Marketplace() {
               </p>
             </div>
 
-            <Alert className="text-left">
-              <Crown className="h-4 w-4" />
-              <AlertDescription>
-                El marketplace de psicólogos está disponible para usuarios con plan Personal o superior. 
-                Actualiza tu plan para acceder a psicólogos verificados y reservar sesiones.
-              </AlertDescription>
-            </Alert>
+             <Alert className="text-left">
+               <Crown className="h-4 w-4" />
+               <AlertDescription>
+                 Currently you don't have the plan needed. Upgrade it for just $5USD!
+               </AlertDescription>
+             </Alert>
 
-            <Button asChild size="lg" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-              <Link to="/pricing">
-                <Crown className="h-5 w-5 mr-2" />
-                Actualizar Plan
-              </Link>
-            </Button>
+             <Button asChild size="lg" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+               <Link to="/pricing">
+                 <Crown className="h-5 w-5 mr-2" />
+                 Upgrade for $5USD
+               </Link>
+             </Button>
           </div>
         </div>
       </PatientLayout>
