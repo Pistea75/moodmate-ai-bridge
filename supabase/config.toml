@@ -49,3 +49,5 @@ verify_jwt = true
 verify_jwt = true
 [functions.speech-to-text]
 verify_jwt = true
+[functions.ai-learning]
+verify_jwt = true

@@ -112,12 +112,68 @@ serve(async (req) => {
       );
     }
 
+    // Auto-query AI patient profile for personalization
+    let aiProfile = null;
+    const targetPatientId = patientId || user.id;
+    
+    try {
+      const { data: profileData } = await supabaseClient
+        .from('ai_patient_profiles')
+        .select('preferences')
+        .eq('patient_id', targetPatientId)
+        .maybeSingle();
+      
+      if (profileData?.preferences) {
+        aiProfile = profileData.preferences;
+      }
+    } catch (error) {
+      console.error('Error fetching AI profile:', error);
+    }
+
+    // Get patient context data for better responses
+    let patientContext = '';
+    if (targetPatientId) {
+      try {
+        // Get recent mood entries
+        const { data: moodData } = await supabaseClient
+          .from('mood_entries')
+          .select('mood_score, triggers, created_at')
+          .eq('patient_id', targetPatientId)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        // Get pending tasks
+        const { data: taskData } = await supabaseClient
+          .from('tasks')
+          .select('title, completed, due_date')
+          .eq('patient_id', targetPatientId)
+          .eq('completed', false)
+          .limit(5);
+
+        if (moodData && moodData.length > 0) {
+          const avgMood = moodData.reduce((sum, entry) => sum + entry.mood_score, 0) / moodData.length;
+          patientContext += `\nRecent mood context: Average mood ${avgMood.toFixed(1)}/10 over last ${moodData.length} entries.`;
+          
+          const recentTriggers = moodData.flatMap(entry => entry.triggers || []).filter(Boolean);
+          if (recentTriggers.length > 0) {
+            patientContext += ` Recent triggers: ${recentTriggers.slice(0, 3).join(', ')}.`;
+          }
+        }
+
+        if (taskData && taskData.length > 0) {
+          patientContext += `\nPending tasks: ${taskData.length} incomplete tasks.`;
+        }
+      } catch (error) {
+        console.error('Error fetching patient context:', error);
+      }
+    }
+
     // Build system prompt with AI personalization
     let systemPrompt = `You are a helpful, empathetic AI assistant specializing in mental health support. 
     You provide compassionate, evidence-based guidance while maintaining professional boundaries.
     
     IMPORTANT: You can receive messages from users both as typed text and as voice messages that have been 
-    transcribed to text using speech-to-text technology. Treat both types of input equally and respond 
+    transcribed to text using speech-to-text technology. Treat both types of input equals and respond 
     naturally to the content, regardless of whether it was originally spoken or typed.
     
     Important guidelines:
@@ -130,8 +186,38 @@ serve(async (req) => {
     - Use person-first language when discussing mental health
     - Accept and respond to voice messages that have been converted to text`;
 
+    // Add AI personalization if available
+    if (aiProfile) {
+      systemPrompt += `\n\nPersonalization Profile:`;
+      if (aiProfile.tone) systemPrompt += `\n- Preferred tone: ${aiProfile.tone}`;
+      if (aiProfile.strategies) systemPrompt += `\n- Recommended coping strategies: ${aiProfile.strategies}`;
+      if (aiProfile.triggersToAvoid) systemPrompt += `\n- Important triggers to avoid: ${aiProfile.triggersToAvoid}`;
+      if (aiProfile.motivators) systemPrompt += `\n- Patient motivators/interests: ${aiProfile.motivators}`;
+      if (aiProfile.dosAndDonts) systemPrompt += `\n- Do's and Don'ts: ${aiProfile.dosAndDonts}`;
+      if (aiProfile.diagnosis) systemPrompt += `\n- Diagnosis context: ${aiProfile.diagnosis}`;
+      if (aiProfile.personality_traits) systemPrompt += `\n- Personality traits: ${aiProfile.personality_traits}`;
+      if (aiProfile.helpful_strategies) systemPrompt += `\n- Helpful strategies: ${aiProfile.helpful_strategies}`;
+      if (aiProfile.things_to_avoid) systemPrompt += `\n- Things to avoid: ${aiProfile.things_to_avoid}`;
+      if (aiProfile.clinical_goals) systemPrompt += `\n- Clinical goals: ${aiProfile.clinical_goals}`;
+    }
+
+    // Add patient context
+    if (patientContext) {
+      systemPrompt += `\n\nCurrent Patient Context:${patientContext}`;
+    }
+
+    // Add legacy personality support
     if (aiPersonality) {
-      systemPrompt += `\n\nPersonalized instructions from the clinician:\n${aiPersonality}`;
+      systemPrompt += `\n\nAdditional instructions from the clinician:\n${aiPersonality}`;
+    }
+
+    // Detect if this is a clinician configuring AI for a patient
+    const isClinicianConfiguring = clinicianId && patientId && user.id === clinicianId;
+    if (isClinicianConfiguring) {
+      systemPrompt += `\n\nSPECIAL MODE: You are helping a clinician configure AI preferences for their patient. 
+      Listen for instructions about how to interact with the patient and extract key personalization preferences. 
+      When the clinician gives specific instructions (e.g., "always use a calm tone" or "avoid discussing work stress"), 
+      note these as important configuration details.`;
     }
 
     // Prepare messages for OpenAI with input sanitization

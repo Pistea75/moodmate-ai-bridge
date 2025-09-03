@@ -6,7 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Brain, Settings } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Brain, Settings, Sparkles } from 'lucide-react';
 
 interface AIPersonalizationFormProps {
   patientId: string;
@@ -18,7 +19,14 @@ const defaultPrefs = {
   strategies: '',
   triggersToAvoid: '',
   motivators: '',
-  dosAndDonts: ''
+  dosAndDonts: '',
+  diagnosis: '',
+  personality_traits: '',
+  helpful_strategies: '',
+  things_to_avoid: '',
+  clinical_goals: '',
+  learned_from_conversation: false,
+  last_learning_date: null
 };
 
 export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizationFormProps) {
@@ -125,8 +133,19 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Brain className="h-5 w-5 text-purple-600" />
-          Personalize AI for Patient
+          Personalización de IA para Paciente
+          {prefs.learned_from_conversation && (
+            <Badge variant="secondary" className="ml-auto">
+              <Sparkles className="h-3 w-3 mr-1" />
+              Aprendizaje Automático Activo
+            </Badge>
+          )}
         </CardTitle>
+        {prefs.last_learning_date && (
+          <p className="text-sm text-muted-foreground">
+            Última actualización automática: {new Date(prefs.last_learning_date).toLocaleDateString()}
+          </p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4">
@@ -198,6 +217,71 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
               value={prefs.dosAndDonts}
               onChange={(e) => handleChange('dosAndDonts', e.target.value)}
               placeholder="e.g. DO: Use simple language, ask about progress. DON'T: Rush conversations, use clinical jargon"
+              className="resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Diagnóstico
+            </label>
+            <Textarea
+              rows={2}
+              value={prefs.diagnosis}
+              onChange={(e) => handleChange('diagnosis', e.target.value)}
+              placeholder="e.g. Ansiedad generalizada, Depresión mayor, etc."
+              className="resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Rasgos de Personalidad
+            </label>
+            <Textarea
+              rows={2}
+              value={prefs.personality_traits}
+              onChange={(e) => handleChange('personality_traits', e.target.value)}
+              placeholder="e.g. Introvertido, perfeccionista, sensible, creativo"
+              className="resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Estrategias Útiles Adicionales
+            </label>
+            <Textarea
+              rows={2}
+              value={prefs.helpful_strategies}
+              onChange={(e) => handleChange('helpful_strategies', e.target.value)}
+              placeholder="e.g. Técnicas de relajación progresiva, escritura libre"
+              className="resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Temas a Evitar
+            </label>
+            <Textarea
+              rows={2}
+              value={prefs.things_to_avoid}
+              onChange={(e) => handleChange('things_to_avoid', e.target.value)}
+              placeholder="e.g. Eventos traumáticos específicos, temas familiares sensibles"
+              className="resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Objetivos Clínicos
+            </label>
+            <Textarea
+              rows={2}
+              value={prefs.clinical_goals}
+              onChange={(e) => handleChange('clinical_goals', e.target.value)}
+              placeholder="e.g. Reducir ansiedad, mejorar autoestima, desarrollar habilidades de afrontamiento"
               className="resize-none"
             />
           </div>

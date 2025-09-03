@@ -14,14 +14,14 @@ export function useMessageService() {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const saveMessageToDatabase = async (role: 'user' | 'assistant', message: string) => {
+  const saveMessageToDatabase = async (role: 'user' | 'assistant', message: string, patientId?: string) => {
     if (!user) return;
     
     try {
       const { error } = await supabase
         .from('ai_chat_logs')
         .insert({
-          patient_id: user.id,
+          patient_id: patientId || user.id,
           role: role,
           message: message
         });
@@ -31,16 +31,17 @@ export function useMessageService() {
       }
 
       // Handle exercise tracking logic only for new messages
+      const targetPatientId = patientId || user.id;
       if (role === 'assistant' && isExerciseRecommendation(message)) {
         const exerciseText = extractExerciseFromText(message);
-        await logExercise(user.id, exerciseText);
+        await logExercise(targetPatientId, exerciseText);
       }
 
       if (role === 'user') {
         if (isUserConfirmation(message)) {
-          await markExerciseCompleted(user.id, true);
+          await markExerciseCompleted(targetPatientId, true);
         } else if (isUserDenial(message)) {
-          await markExerciseCompleted(user.id, false);
+          await markExerciseCompleted(targetPatientId, false);
         }
       }
         

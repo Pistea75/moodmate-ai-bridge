@@ -15,7 +15,8 @@ export function useAIService() {
     conversationHistory: ConversationMessage[], 
     personalizedSystemPrompt: string,
     setConversationHistory: (history: ConversationMessage[]) => void,
-    isClinicianView: boolean = false
+    isClinicianView: boolean = false,
+    patientId?: string
   ) => {
     if (!user) {
       toast({
@@ -32,12 +33,10 @@ export function useAIService() {
       
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: {
-          message: messageContent,
           messages: updatedHistory,
-          systemPrompt: personalizedSystemPrompt,
-          userId: user.id,
-          isClinicianView: isClinicianView,
-          patientId: isClinicianView ? null : user.id
+          aiPersonality: personalizedSystemPrompt,
+          patientId: patientId,
+          clinicianId: isClinicianView ? user?.id : undefined
         }
       });
 

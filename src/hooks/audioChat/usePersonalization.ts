@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AIPreferences, isValidAIPreferences } from "@/types/aiPersonalization";
 import { hasUnconfirmedExercise, getLatestPendingExercise } from "@/lib/ai/exerciseLogging";
 
-export function usePersonalization(baseSystemPrompt: string) {
+export function usePersonalization(baseSystemPrompt: string, patientId?: string) {
   const { user } = useAuth();
   const [personalizedSystemPrompt, setPersonalizedSystemPrompt] = useState(baseSystemPrompt);
 
@@ -13,16 +13,18 @@ export function usePersonalization(baseSystemPrompt: string) {
     const fetchAIPersonalization = async () => {
       if (!user) return;
       
+      const targetPatientId = patientId || user.id;
+      
       try {
         const { data: profile } = await supabase
           .from('ai_patient_profiles')
           .select('preferences')
-          .eq('patient_id', user.id)
+          .eq('patient_id', targetPatientId)
           .maybeSingle();
 
         // Check for pending exercises
-        const hasPendingExercise = await hasUnconfirmedExercise(user.id);
-        const pendingExercise = hasPendingExercise ? await getLatestPendingExercise(user.id) : null;
+        const hasPendingExercise = await hasUnconfirmedExercise(targetPatientId);
+        const pendingExercise = hasPendingExercise ? await getLatestPendingExercise(targetPatientId) : null;
 
         let personalizationContext = '';
         if (profile?.preferences && isValidAIPreferences(profile.preferences)) {
@@ -85,7 +87,7 @@ Instructions:
     };
 
     fetchAIPersonalization();
-  }, [user, baseSystemPrompt]);
+  }, [user, baseSystemPrompt, patientId]);
 
   return personalizedSystemPrompt;
 }
