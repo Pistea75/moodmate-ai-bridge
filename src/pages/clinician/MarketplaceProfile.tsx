@@ -171,6 +171,10 @@ export default function MarketplaceProfile() {
 
           {/* Sidebar Widgets - Takes up 1/3 of the space */}
           <div className="space-y-6">
+            {/* Session Inquiries */}
+            <InquiriesWidget />
+            
+            {/* Recent Activity */}
             {/* Recent Activity */}
             <Card>
               <CardHeader>

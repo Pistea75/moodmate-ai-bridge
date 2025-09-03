@@ -2,17 +2,19 @@ import React from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { usePsychologistMarketplace } from '@/hooks/usePsychologistMarketplace';
 import { useSubscription } from '@/hooks/useSubscription';
+import { usePatientClinicianLink } from '@/hooks/usePatientClinicianLink';
 import { PsychologistCard } from '@/components/marketplace/PsychologistCard';
 import { MarketplaceFiltersComponent } from '@/components/marketplace/MarketplaceFilters';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Crown, Users, Search, Filter } from 'lucide-react';
+import { Crown, Users, Search, Filter, UserCheck, UserX, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Marketplace() {
   const { subscription, loading: subscriptionLoading } = useSubscription();
+  const { hasExistingClinician, clinicianInfo, loading: clinicianLoading } = usePatientClinicianLink();
   const { 
     psychologists, 
     loading, 
@@ -28,7 +30,7 @@ export default function Marketplace() {
      subscription.plan_type === 'professional_basic' || 
      subscription.plan_type === 'professional_advanced');
 
-  if (subscriptionLoading) {
+  if (subscriptionLoading || clinicianLoading) {
     return (
       <PatientLayout>
         <div className="p-8">
@@ -81,6 +83,31 @@ export default function Marketplace() {
   return (
     <PatientLayout>
       <div className="p-8">
+        {/* Clinician Status Banner */}
+        {!clinicianLoading && (
+          <Alert className="mb-6">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {hasExistingClinician ? (
+                  <>
+                    <UserCheck className="h-4 w-4 text-green-600" />
+                    <span>
+                      Ya tienes un psicólogo asignado: <strong>{clinicianInfo?.first_name} {clinicianInfo?.last_name}</strong>. 
+                      Aún puedes reservar sesiones adicionales con otros profesionales del marketplace.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <UserX className="h-4 w-4 text-orange-600" />
+                    <span>No tienes un psicólogo asignado actualmente. Explora nuestro marketplace para encontrar el profesional ideal.</span>
+                  </>
+                )}
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Header */}
         <div className="space-y-2 mb-8">
           <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">

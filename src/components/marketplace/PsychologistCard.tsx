@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { MapPin, Clock, Star, DollarSign, Globe } from 'lucide-react';
+import { MapPin, Clock, Star, DollarSign, Globe, Calendar } from 'lucide-react';
 import { PsychologistProfile } from '@/hooks/usePsychologistMarketplace';
-import { Link } from 'react-router-dom';
+import { SessionBookingModal } from './SessionBookingModal';
 
 interface PsychologistCardProps {
   psychologist: PsychologistProfile;
 }
 
 export function PsychologistCard({ psychologist }: PsychologistCardProps) {
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -98,19 +100,30 @@ export function PsychologistCard({ psychologist }: PsychologistCardProps) {
 
         {/* Actions */}
         <div className="flex gap-2 pt-2">
-          <Button asChild className="flex-1" size="sm">
-            <Link to={`/patient/marketplace/${psychologist.id}`}>
-              Ver Perfil
-            </Link>
+          <Button variant="outline" size="sm" className="flex-1">
+            Ver Perfil
           </Button>
           
-          <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link to={`/patient/marketplace/${psychologist.id}/book`}>
-              Reservar Sesión
-            </Link>
+          <Button 
+            size="sm" 
+            className="flex-1"
+            onClick={() => setShowBookingModal(true)}
+          >
+            <Calendar className="h-4 w-4 mr-1" />
+            Reservar Sesión
           </Button>
         </div>
       </CardContent>
+
+      <SessionBookingModal
+        isOpen={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+        psychologist={{
+          id: psychologist.id,
+          display_name: psychologist.display_name,
+          user_id: psychologist.user_id
+        }}
+      />
     </Card>
   );
 }
