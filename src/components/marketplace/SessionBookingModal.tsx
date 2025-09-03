@@ -5,9 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, User, MessageSquare } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Calendar, Clock, User, MessageSquare, DollarSign, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
 
 interface SessionBookingModalProps {
@@ -17,11 +19,13 @@ interface SessionBookingModalProps {
     id: string;
     display_name: string;
     user_id: string;
+    hourly_rate?: number;
   };
 }
 
 export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBookingModalProps) {
   const { user } = useAuth();
+  const { subscription } = useSubscription();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -42,6 +46,18 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
     '16:00 - 17:00',
     '17:00 - 18:00'
   ];
+
+  // Get session management fee based on plan
+  const getSessionManagementFee = () => {
+    if (!subscription.subscribed || subscription.plan_type === 'free') return 5;
+    if (subscription.plan_type === 'personal') return 2;
+    if (subscription.plan_type === 'premium') return 0;
+    return 5; // Default for unknown plans
+  };
+
+  const sessionFee = getSessionManagementFee();
+  const sessionRate = psychologist.hourly_rate || 75; // Default rate if not provided
+  const totalCost = sessionRate + sessionFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +115,34 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
             Reservar sesión con {psychologist.display_name}
           </DialogTitle>
         </DialogHeader>
+
+        {/* Pricing Breakdown */}
+        <Alert className="border-primary/20 bg-primary/5">
+          <DollarSign className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Tarifa de sesión:</span>
+                <span className="font-semibold">${sessionRate}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Tarifa de gestión:</span>
+                <span className={`font-semibold ${sessionFee === 0 ? 'text-green-600' : ''}`}>
+                  {sessionFee === 0 ? 'GRATIS' : `$${sessionFee}`}
+                </span>
+              </div>
+              <div className="border-t pt-2 flex justify-between items-center">
+                <span className="font-semibold">Total:</span>
+                <span className="text-lg font-bold text-primary">${totalCost}</span>
+              </div>
+              {sessionFee === 0 && (
+                <div className="text-xs text-green-600 mt-1">
+                  ¡Sin tarifa de gestión con tu plan Premium!
+                </div>
+              )}
+            </div>
+          </AlertDescription>
+        </Alert>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">

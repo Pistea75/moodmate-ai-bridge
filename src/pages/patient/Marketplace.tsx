@@ -53,37 +53,13 @@ export default function Marketplace() {
 
   return (
     <PatientLayout>
-      <div className="p-8 relative">
-        {/* Session Management Fee Info */}
-        <Alert className="mb-6">
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            <div className="flex items-center justify-between">
-              <div>
-                <strong>{t('marketplace.sessionManagementFee', 'Session Management Fee')}: </strong>
-                <span className="text-lg font-semibold text-primary">{getSessionManagementFee()}</span>
-                {getSessionManagementFee() === '$0' && (
-                  <span className="ml-2 text-sm text-green-600 font-semibold">
-                    {t('marketplace.freeWithPremium', '¡Free with Premium plan!')}
-                  </span>
-                )}
-              </div>
-              {getSessionManagementFee() !== '$0' && (
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/pricing">
-                    {t('marketplace.upgradePlan', 'Upgrade Plan')}
-                  </Link>
-                </Button>
-              )}
-            </div>
-          </AlertDescription>
-        </Alert>
-
-        {/* Main Content - Always shown but blurred if no access */}
-        <div className={!hasMarketplaceAccess ? 'blur-sm pointer-events-none' : ''}>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
+        {/* Main Content */}
+        <div className="">
           {/* Clinician Status Banner */}
           {!clinicianLoading && (
-            <Alert className="mb-6">
+            <Alert className="mb-6 border-l-4 border-l-primary bg-primary/5">
               <Info className="h-4 w-4" />
               <AlertDescription className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -107,41 +83,55 @@ export default function Marketplace() {
           )}
 
           {/* Header */}
-          <div className="space-y-2 mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-              <Users className="h-8 w-8 text-primary" />
-              {t('marketplace.title', 'Psychologist Marketplace')}
-            </h1>
-            <p className="text-xl text-gray-600">
-              {t('marketplace.subtitle', 'Find and connect with verified psychologists specialized in your needs')}
-            </p>
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">
+                  {t('marketplace.title', 'Psychologist Marketplace')}
+                </h1>
+                <p className="text-muted-foreground mt-1">
+                  {t('marketplace.subtitle', 'Find and connect with verified psychologists specialized in your needs')}
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
             {/* Filters Sidebar */}
-            <div className="lg:col-span-1">
-              <MarketplaceFiltersComponent
-                filters={filters}
-                onFiltersChange={updateFilters}
-                onClearFilters={clearFilters}
-              />
+            <div className="xl:col-span-1">
+              <div className="sticky top-6">
+                <MarketplaceFiltersComponent
+                  filters={filters}
+                  onFiltersChange={updateFilters}
+                  onClearFilters={clearFilters}
+                />
+              </div>
             </div>
 
             {/* Main Content */}
-            <div className="lg:col-span-3">
+            <div className="xl:col-span-3">
               {/* Results Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Search className="h-5 w-5" />
-                  <span>
+              <div className="flex items-center justify-between mb-6 p-4 bg-card border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Search className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm font-medium text-muted-foreground">
                     {loading ? t('marketplace.searching', 'Searching...') : `${psychologists.length} ${t('marketplace.psychologistsFound', 'psychologist(s) found')}`}
                   </span>
                 </div>
+                {psychologists.length > 0 && (
+                  <Button variant="outline" size="sm" onClick={clearFilters}>
+                    <Filter className="h-4 w-4 mr-2" />
+                    {t('marketplace.clearFilters', 'Clear Filters')}
+                  </Button>
+                )}
               </div>
 
               {/* Error State */}
               {error && (
-                <Alert className="mb-6">
+                <Alert variant="destructive" className="mb-6">
                   <AlertDescription>
                     {t('marketplace.errorLoading', 'Error loading psychologists')}: {error}
                   </AlertDescription>
@@ -150,16 +140,17 @@ export default function Marketplace() {
 
               {/* Loading State */}
               {loading && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <Card key={i}>
+                    <Card key={i} className="border-0 bg-card shadow-sm">
                       <CardContent className="p-6">
                         <div className="space-y-4">
                           <div className="flex items-start gap-4">
                             <Skeleton className="h-16 w-16 rounded-full" />
                             <div className="space-y-2 flex-1">
-                              <Skeleton className="h-6 w-48" />
+                              <Skeleton className="h-5 w-48" />
                               <Skeleton className="h-4 w-32" />
+                              <Skeleton className="h-4 w-24" />
                             </div>
                           </div>
                           <Skeleton className="h-16 w-full" />
@@ -167,6 +158,7 @@ export default function Marketplace() {
                             <Skeleton className="h-6 w-20" />
                             <Skeleton className="h-6 w-16" />
                           </div>
+                          <Skeleton className="h-10 w-full" />
                         </div>
                       </CardContent>
                     </Card>
@@ -176,21 +168,21 @@ export default function Marketplace() {
 
               {/* Empty State */}
               {!loading && !error && psychologists.length === 0 && (
-                <Card className="text-center py-12">
+                <Card className="text-center py-16 border-dashed border-2">
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                        <Search className="h-8 w-8 text-gray-400" />
+                    <div className="space-y-6">
+                      <div className="mx-auto w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+                        <Search className="h-10 w-10 text-muted-foreground" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-semibold text-gray-900">
+                        <h3 className="text-xl font-semibold text-foreground">
                           {t('marketplace.noPsychologistsFound', 'No psychologists found')}
                         </h3>
-                        <p className="text-gray-600">
+                        <p className="text-muted-foreground max-w-md mx-auto">
                           {t('marketplace.adjustFilters', 'Try adjusting your search filters to find more results')}
                         </p>
                       </div>
-                      <Button variant="outline" onClick={clearFilters}>
+                      <Button variant="outline" onClick={clearFilters} size="lg">
                         <Filter className="h-4 w-4 mr-2" />
                         {t('marketplace.clearFilters', 'Clear Filters')}
                       </Button>
@@ -201,7 +193,7 @@ export default function Marketplace() {
 
               {/* Results Grid */}
               {!loading && !error && psychologists.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {psychologists.map((psychologist) => (
                     <PsychologistCard 
                       key={psychologist.id} 
@@ -212,6 +204,7 @@ export default function Marketplace() {
               )}
             </div>
           </div>
+        </div>
         </div>
       </div>
     </PatientLayout>
