@@ -106,13 +106,13 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
           <Label>Especialización</Label>
           <Select 
             value={filters.specialization || ''} 
-            onValueChange={(value) => onFiltersChange({ specialization: value || undefined })}
+            onValueChange={(value) => onFiltersChange({ specialization: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Todas las especialidades" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas las especialidades</SelectItem>
+              <SelectItem value="all">Todas las especialidades</SelectItem>
               {specializations.map((spec) => (
                 <SelectItem key={spec} value={spec}>
                   {spec}
@@ -127,13 +127,13 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
           <Label>Idioma</Label>
           <Select 
             value={filters.language || ''} 
-            onValueChange={(value) => onFiltersChange({ language: value || undefined })}
+            onValueChange={(value) => onFiltersChange({ language: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Todos los idiomas" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos los idiomas</SelectItem>
+              <SelectItem value="all">Todos los idiomas</SelectItem>
               {languages.map((lang) => (
                 <SelectItem key={lang} value={lang}>
                   {lang}
@@ -148,13 +148,13 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
           <Label>País</Label>
           <Select 
             value={filters.country || ''} 
-            onValueChange={(value) => onFiltersChange({ country: value || undefined })}
+            onValueChange={(value) => onFiltersChange({ country: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Todos los países" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos los países</SelectItem>
+              <SelectItem value="all">Todos los países</SelectItem>
               {countries.map((country) => (
                 <SelectItem key={country} value={country}>
                   {country}
@@ -198,13 +198,13 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
           <Label>Experiencia mínima</Label>
           <Select 
             value={filters.experienceYears?.toString() || ''} 
-            onValueChange={(value) => onFiltersChange({ experienceYears: value ? Number(value) : undefined })}
+            onValueChange={(value) => onFiltersChange({ experienceYears: value === 'all' ? undefined : Number(value) })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Cualquier experiencia" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Cualquier experiencia</SelectItem>
+              <SelectItem value="all">Cualquier experiencia</SelectItem>
               <SelectItem value="1">1+ años</SelectItem>
               <SelectItem value="3">3+ años</SelectItem>
               <SelectItem value="5">5+ años</SelectItem>
