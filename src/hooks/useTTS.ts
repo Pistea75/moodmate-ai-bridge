@@ -76,8 +76,8 @@ export function useTTS({ onAudioStart, onAudioEnd, onError }: UseTTSProps = {}) 
       const errorMsg = error instanceof Error ? error.message : 'Text-to-speech failed';
       onError?.(errorMsg);
       
-      // Only show toast if it's not an API key issue (which should be handled at app level)
-      if (!errorMsg.includes('OpenAI API key not configured')) {
+      // Only show toast for non-quota errors to avoid spam
+      if (!errorMsg.includes('quota') && !errorMsg.includes('exceeded')) {
         toast({
           title: "Audio Error",
           description: errorMsg,

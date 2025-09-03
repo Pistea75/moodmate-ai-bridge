@@ -42,20 +42,30 @@ export function AudioChatInterface({
     handleSendMessage
   } = useAudioChat(systemPrompt, selectedPatientId || patientId, isClinicianView);
 
+  const [ttsError, setTtsError] = useState<string | null>(null);
   const { playText, isPlaying: isTTSPlaying } = useTTS({
     onAudioStart: () => setCurrentPlayingId('tts-active'),
     onAudioEnd: () => setCurrentPlayingId(null),
+    onError: (error: string) => {
+      console.error('TTS Error:', error);
+      setTtsError(error);
+      setCurrentPlayingId(null);
+      // Disable autoplay on quota errors
+      if (error.includes('quota') || error.includes('exceeded')) {
+        updateSettings({ autoplay: false });
+      }
+    }
   });
 
-  // Autoplay de respuestas de la IA
+  // Autoplay de respuestas de la IA (disabled if TTS has errors)
   useEffect(() => {
-    if (!settings.enabled || !settings.autoplay || messages.length === 0) return;
+    if (!settings.enabled || !settings.autoplay || messages.length === 0 || ttsError) return;
 
     const last = messages[messages.length - 1];
     if (last.type === 'assistant' && last.content && !isTTSPlaying) {
       playText(last.content);
     }
-  }, [messages, settings.autoplay, settings.enabled, playText, isTTSPlaying]);
+  }, [messages, settings.autoplay, settings.enabled, playText, isTTSPlaying, ttsError]);
 
   const handleToggleVoiceMode = () => {
     const goingToVoice = inputMode === 'text';
@@ -77,6 +87,9 @@ export function AudioChatInterface({
       setCurrentPlayingId(null);
       return;
     }
+    
+    // Clear previous TTS errors when manually trying to play
+    setTtsError(null);
     setCurrentPlayingId(messageId);
     await playText(text);
   };
