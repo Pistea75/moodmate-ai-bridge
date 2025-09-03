@@ -1,10 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { Search, X, Filter } from 'lucide-react';
 import { MarketplaceFilters } from '@/hooks/usePsychologistMarketplace';
 
@@ -63,32 +61,30 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
   );
 
   return (
-    <Card className="sticky top-4">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Filter className="h-5 w-5" />
-            Filtros
-          </CardTitle>
-          
-          {hasActiveFilters && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onClearFilters}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Limpiar
-            </Button>
-          )}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-foreground">Filtros</h3>
         </div>
-      </CardHeader>
+        
+        {hasActiveFilters && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClearFilters}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Limpiar
+          </Button>
+        )}
+      </div>
 
-      <CardContent className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         {/* Search */}
-        <div className="space-y-2">
-          <Label htmlFor="search">Buscar</Label>
+        <div className="lg:col-span-2">
+          <Label htmlFor="search" className="text-xs text-muted-foreground">Buscar</Label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -96,20 +92,20 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
               placeholder="Nombre o especialidad..."
               value={filters.search || ''}
               onChange={(e) => onFiltersChange({ search: e.target.value })}
-              className="pl-10"
+              className="pl-10 h-9"
             />
           </div>
         </div>
 
         {/* Specialization */}
-        <div className="space-y-2">
-          <Label>Especialización</Label>
+        <div>
+          <Label className="text-xs text-muted-foreground">Especialización</Label>
           <Select 
             value={filters.specialization || ''} 
             onValueChange={(value) => onFiltersChange({ specialization: value === 'all' ? undefined : value })}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Todas las especialidades" />
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Todas" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas las especialidades</SelectItem>
@@ -123,14 +119,14 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
         </div>
 
         {/* Language */}
-        <div className="space-y-2">
-          <Label>Idioma</Label>
+        <div>
+          <Label className="text-xs text-muted-foreground">Idioma</Label>
           <Select 
             value={filters.language || ''} 
             onValueChange={(value) => onFiltersChange({ language: value === 'all' ? undefined : value })}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Todos los idiomas" />
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los idiomas</SelectItem>
@@ -144,14 +140,14 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
         </div>
 
         {/* Country */}
-        <div className="space-y-2">
-          <Label>País</Label>
+        <div>
+          <Label className="text-xs text-muted-foreground">País</Label>
           <Select 
             value={filters.country || ''} 
             onValueChange={(value) => onFiltersChange({ country: value === 'all' ? undefined : value })}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Todos los países" />
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los países</SelectItem>
@@ -164,44 +160,15 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
           </Select>
         </div>
 
-        {/* Rate Range */}
-        <div className="space-y-3">
-          <Label>Tarifa por hora</Label>
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <Label htmlFor="minRate" className="text-xs text-muted-foreground">Mínimo</Label>
-                <Input
-                  id="minRate"
-                  type="number"
-                  placeholder="$0"
-                  value={filters.minRate || ''}
-                  onChange={(e) => onFiltersChange({ minRate: e.target.value ? Number(e.target.value) : undefined })}
-                />
-              </div>
-              <div className="flex-1">
-                <Label htmlFor="maxRate" className="text-xs text-muted-foreground">Máximo</Label>
-                <Input
-                  id="maxRate"
-                  type="number"
-                  placeholder="$200"
-                  value={filters.maxRate || ''}
-                  onChange={(e) => onFiltersChange({ maxRate: e.target.value ? Number(e.target.value) : undefined })}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Experience Years */}
-        <div className="space-y-2">
-          <Label>Experiencia mínima</Label>
+        <div>
+          <Label className="text-xs text-muted-foreground">Experiencia</Label>
           <Select 
             value={filters.experienceYears?.toString() || ''} 
             onValueChange={(value) => onFiltersChange({ experienceYears: value === 'all' ? undefined : Number(value) })}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Cualquier experiencia" />
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Cualquiera" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Cualquier experiencia</SelectItem>
@@ -213,7 +180,34 @@ export function MarketplaceFiltersComponent({ filters, onFiltersChange, onClearF
             </SelectContent>
           </Select>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Rate Range - Separate row for better spacing */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="lg:col-span-2">
+          <Label className="text-xs text-muted-foreground">Tarifa por hora</Label>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <Input
+                type="number"
+                placeholder="Min $"
+                value={filters.minRate || ''}
+                onChange={(e) => onFiltersChange({ minRate: e.target.value ? Number(e.target.value) : undefined })}
+                className="h-9"
+              />
+            </div>
+            <div className="flex-1">
+              <Input
+                type="number"
+                placeholder="Max $"
+                value={filters.maxRate || ''}
+                onChange={(e) => onFiltersChange({ maxRate: e.target.value ? Number(e.target.value) : undefined })}
+                className="h-9"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

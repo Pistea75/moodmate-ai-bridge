@@ -108,13 +108,15 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-hidden">
+        <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
             Reservar sesión con {psychologist.display_name}
           </DialogTitle>
         </DialogHeader>
+
+        <div className="max-h-[calc(90vh-120px)] overflow-y-auto pr-2">{/* Scrollable content */}
 
         {/* Pricing Breakdown */}
         <Alert className="border-primary/20 bg-primary/5">
@@ -234,6 +236,7 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
             </Button>
           </div>
         </form>
+        </div>{/* End scrollable content */}
       </DialogContent>
     </Dialog>
   );

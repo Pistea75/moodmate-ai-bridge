@@ -57,30 +57,6 @@ export default function Marketplace() {
         <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Main Content */}
         <div className="">
-          {/* Clinician Status Banner */}
-          {!clinicianLoading && (
-            <Alert className="mb-6 border-l-4 border-l-primary bg-primary/5">
-              <Info className="h-4 w-4" />
-              <AlertDescription className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {hasExistingClinician ? (
-                    <>
-                      <UserCheck className="h-4 w-4 text-green-600" />
-                      <span>
-                        {t('marketplace.existingClinician', 'You already have an assigned psychologist')}: <strong>{clinicianInfo?.first_name} {clinicianInfo?.last_name}</strong>. 
-                        {t('marketplace.additionalSessions', 'You can still book additional sessions with other professionals from the marketplace')}.
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <UserX className="h-4 w-4 text-orange-600" />
-                      <span>{t('marketplace.noClinician', 'You currently have no assigned psychologist. Explore our marketplace to find the ideal professional')}</span>
-                    </>
-                  )}
-                </div>
-              </AlertDescription>
-            </Alert>
-          )}
 
           {/* Header */}
           <div className="mb-8">
@@ -90,41 +66,64 @@ export default function Marketplace() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-foreground">
-                  {t('marketplace.title', 'Psychologist Marketplace')}
+                  {t('marketplace.title', 'Marketplace de Psicólogos')}
                 </h1>
                 <p className="text-muted-foreground mt-1">
-                  {t('marketplace.subtitle', 'Find and connect with verified psychologists specialized in your needs')}
+                  {t('marketplace.subtitle', 'Encuentra y conecta con psicólogos verificados especializados en tus necesidades')}
                 </p>
               </div>
             </div>
+
+            {/* Clinician Status Banner - Moved here */}
+            {!clinicianLoading && (
+              <Alert className="border-l-4 border-l-primary bg-primary/5">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {hasExistingClinician ? (
+                      <>
+                        <UserCheck className="h-4 w-4 text-green-600" />
+                        <span>
+                          {t('marketplace.existingClinician', 'Ya tienes un psicólogo asignado')}: <strong>{clinicianInfo?.first_name} {clinicianInfo?.last_name}</strong>. 
+                          {t('marketplace.additionalSessions', 'Aún puedes reservar sesiones adicionales con otros profesionales del marketplace')}.
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <UserX className="h-4 w-4 text-orange-600" />
+                        <span>{t('marketplace.noClinician', 'Actualmente no tienes un psicólogo asignado. Explora nuestro marketplace para encontrar el profesional ideal')}</span>
+                      </>
+                    )}
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-            {/* Filters Sidebar */}
-            <div className="xl:col-span-1">
-              <div className="sticky top-6">
-                <MarketplaceFiltersComponent
-                  filters={filters}
-                  onFiltersChange={updateFilters}
-                  onClearFilters={clearFilters}
-                />
-              </div>
+          <div className="space-y-6">
+            {/* Compact Filters */}
+            <div className="bg-card border rounded-lg p-4">
+              <MarketplaceFiltersComponent
+                filters={filters}
+                onFiltersChange={updateFilters}
+                onClearFilters={clearFilters}
+              />
             </div>
 
             {/* Main Content */}
-            <div className="xl:col-span-3">
+            <div>
               {/* Results Header */}
               <div className="flex items-center justify-between mb-6 p-4 bg-card border rounded-lg">
                 <div className="flex items-center gap-3">
                   <Search className="h-5 w-5 text-muted-foreground" />
                   <span className="text-sm font-medium text-muted-foreground">
-                    {loading ? t('marketplace.searching', 'Searching...') : `${psychologists.length} ${t('marketplace.psychologistsFound', 'psychologist(s) found')}`}
+                    {loading ? t('marketplace.searching', 'Buscando...') : `${psychologists.length} ${t('marketplace.psychologistsFound', 'psicólogo(s) encontrado(s)')}`}
                   </span>
                 </div>
                 {psychologists.length > 0 && (
                   <Button variant="outline" size="sm" onClick={clearFilters}>
                     <Filter className="h-4 w-4 mr-2" />
-                    {t('marketplace.clearFilters', 'Clear Filters')}
+                    {t('marketplace.clearFilters', 'Limpiar Filtros')}
                   </Button>
                 )}
               </div>
@@ -133,7 +132,7 @@ export default function Marketplace() {
               {error && (
                 <Alert variant="destructive" className="mb-6">
                   <AlertDescription>
-                    {t('marketplace.errorLoading', 'Error loading psychologists')}: {error}
+                    {t('marketplace.errorLoading', 'Error cargando psicólogos')}: {error}
                   </AlertDescription>
                 </Alert>
               )}
@@ -176,15 +175,15 @@ export default function Marketplace() {
                       </div>
                       <div className="space-y-2">
                         <h3 className="text-xl font-semibold text-foreground">
-                          {t('marketplace.noPsychologistsFound', 'No psychologists found')}
+                          {t('marketplace.noPsychologistsFound', 'No se encontraron psicólogos')}
                         </h3>
                         <p className="text-muted-foreground max-w-md mx-auto">
-                          {t('marketplace.adjustFilters', 'Try adjusting your search filters to find more results')}
+                          {t('marketplace.adjustFilters', 'Intenta ajustar tus filtros de búsqueda para encontrar más resultados')}
                         </p>
                       </div>
                       <Button variant="outline" onClick={clearFilters} size="lg">
                         <Filter className="h-4 w-4 mr-2" />
-                        {t('marketplace.clearFilters', 'Clear Filters')}
+                        {t('marketplace.clearFilters', 'Limpiar Filtros')}
                       </Button>
                     </div>
                   </CardContent>
