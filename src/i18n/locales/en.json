@@ -14,7 +14,8 @@
     "contact": "Contact",
     "login": "Login",
     "signup": "Sign Up",
-    "logout": "Logout"
+    "logout": "Logout",
+    "marketplace": "Marketplace"
   },
   "auth": {
     "welcome": "Welcome back",

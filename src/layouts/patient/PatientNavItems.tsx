@@ -25,7 +25,7 @@ export const patientNavItems = [
     icon: MessageSquare,
   },
   {
-    title: 'Marketplace',
+    title: 'nav.marketplace',
     href: '/patient/marketplace',
     icon: Users,
   },

@@ -14,7 +14,8 @@
     "contact": "Contacto",
     "login": "Iniciar Sesión",
     "signup": "Registrarse",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "marketplace": "Mercado"
   },
   "auth": {
     "welcome": "Bienvenido de vuelta",
