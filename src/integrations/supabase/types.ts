@@ -1006,6 +1006,57 @@ export type Database = {
           },
         ]
       }
+      session_inquiries: {
+        Row: {
+          clinician_response: string | null
+          created_at: string
+          id: string
+          patient_first_name: string
+          patient_id: string
+          patient_last_name: string
+          patient_message: string
+          preferred_date: string | null
+          preferred_time_slot: string | null
+          psychologist_id: string
+          session_id: string | null
+          session_topic: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          clinician_response?: string | null
+          created_at?: string
+          id?: string
+          patient_first_name: string
+          patient_id: string
+          patient_last_name: string
+          patient_message: string
+          preferred_date?: string | null
+          preferred_time_slot?: string | null
+          psychologist_id: string
+          session_id?: string | null
+          session_topic: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          clinician_response?: string | null
+          created_at?: string
+          id?: string
+          patient_first_name?: string
+          patient_id?: string
+          patient_last_name?: string
+          patient_message?: string
+          preferred_date?: string | null
+          preferred_time_slot?: string | null
+          psychologist_id?: string
+          session_id?: string | null
+          session_topic?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       session_ratings: {
         Row: {
           created_at: string
