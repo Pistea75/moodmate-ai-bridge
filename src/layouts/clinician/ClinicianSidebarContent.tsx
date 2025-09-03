@@ -19,7 +19,8 @@ import {
   User,
   Brain,
   BookOpen,
-  Bell
+  Bell,
+  Store
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -32,6 +33,7 @@ export function ClinicianSidebarContent() {
     { title: 'Patients', href: '/clinician/patients', icon: Users },
     { title: 'Sessions', href: '/clinician/sessions', icon: Calendar },
     { title: 'Communications', href: '/clinician/communications', icon: MessageSquare },
+    { title: 'Marketplace Profile', href: '/clinician/marketplace-profile', icon: Store },
     { title: 'Analytics', href: '/clinician/analytics', icon: BarChart3 },
     { title: 'Tasks', href: '/clinician/tasks', icon: CheckSquare },
     { title: 'Reports', href: '/clinician/reports', icon: FileText },
