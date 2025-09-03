@@ -1,96 +1,167 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Square } from 'lucide-react';
-import { useHybridSTT } from '@/hooks/useHybridSTT';
+import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 
 export interface VoiceInputModeProps {
-  onSendMessage: (text: string) => Promise<void> | void;
+  onSendMessage?: (text: string) => Promise<void> | void;
   isLoading?: boolean;
   language?: string;
 }
 
 export function VoiceInputMode(props: VoiceInputModeProps) {
-  const { onSendMessage, isLoading } = props;
-  const language = props.language ?? 'es-ES';
+  const { 
+    isConnected, 
+    isListening, 
+    isSpeaking, 
+    messages, 
+    userTranscript, 
+    assistantTranscript,
+    connect, 
+    disconnect 
+  } = useRealtimeChat();
 
-  const [transcript, setTranscript] = useState<string>('');
+  const getStatusText = () => {
+    if (!isConnected) return 'Conectando...';
+    if (isSpeaking) return 'AI hablando...';
+    if (isListening) return 'Escuchando...';
+    return 'Toca para comenzar';
+  };
 
-  const stt = useHybridSTT({
-    language,
-    onTranscription: async (text, method) => {
-      console.log('🎤 VoiceInputMode - Transcription received:', { text, method });
-      setTranscript(text);
-      try {
-        await onSendMessage(String(text));
-        console.log('✅ VoiceInputMode - Message sent successfully');
-      } catch (error) {
-        console.error('❌ VoiceInputMode - Error sending message:', error);
-      }
-    },
-    onError: (err) => {
-      console.error('❌ VoiceInputMode - STT Error:', err);
-    },
-  });
+  const getButtonState = () => {
+    if (!isConnected) return 'connecting';
+    if (isSpeaking) return 'speaking';
+    if (isListening) return 'listening';
+    return 'ready';
+  };
 
-  const isRecording = stt.isRecording;
-  const isProcessing = stt.isProcessing;
-  const startRecording = stt.startRecording;
-  const stopRecording = stt.stopRecording;
+  const buttonState = getButtonState();
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 space-y-6">
-      {/* Large circular recording button */}
+    <div className="flex flex-col items-center justify-center p-8 space-y-8">
+      {/* Connection/Control Button */}
       <div className="relative">
         <button
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={Boolean(isLoading) || isProcessing}
+          onClick={isConnected ? disconnect : connect}
+          disabled={buttonState === 'connecting'}
           className={`
-            relative w-24 h-24 rounded-full border-4 transition-all duration-300 ease-in-out
-            ${isRecording 
-              ? 'bg-red-500 border-red-400 animate-pulse shadow-lg shadow-red-500/50' 
-              : 'bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-gray-500'
+            relative w-32 h-32 rounded-full border-4 transition-all duration-500 ease-in-out
+            flex items-center justify-center text-white font-medium
+            ${buttonState === 'listening' 
+              ? 'bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 shadow-2xl shadow-blue-500/40' 
+              : buttonState === 'speaking'
+              ? 'bg-gradient-to-br from-green-500 to-green-600 border-green-400 shadow-2xl shadow-green-500/40 animate-pulse'
+              : buttonState === 'connecting'
+              ? 'bg-gradient-to-br from-gray-500 to-gray-600 border-gray-400 opacity-75'
+              : 'bg-gradient-to-br from-gray-700 to-gray-800 border-gray-600 hover:from-gray-600 hover:to-gray-700 hover:border-gray-500 hover:shadow-xl'
             }
-            ${(Boolean(isLoading) || isProcessing) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-            flex items-center justify-center
+            ${buttonState === 'connecting' ? 'cursor-not-allowed' : 'cursor-pointer'}
+            transform hover:scale-105 active:scale-95
           `}
         >
-          {isRecording ? (
-            <Square className="h-8 w-8 text-white" />
-          ) : (
-            <Mic className="h-8 w-8 text-white" />
+          {buttonState === 'connecting' && (
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent" />
+          )}
+          {buttonState === 'listening' && (
+            <Mic className="h-12 w-12" />
+          )}
+          {buttonState === 'speaking' && (
+            <Volume2 className="h-12 w-12" />
+          )}
+          {buttonState === 'ready' && (
+            <Mic className="h-12 w-12" />
           )}
         </button>
         
-        {/* Recording indicator rings */}
-        {isRecording && (
+        {/* Animated rings for active states */}
+        {(buttonState === 'listening' || buttonState === 'speaking') && (
           <>
-            <div className="absolute inset-0 w-24 h-24 rounded-full border-2 border-red-400 animate-ping opacity-75" />
-            <div className="absolute inset-0 w-28 h-28 -m-2 rounded-full border border-red-300 animate-ping opacity-50" />
+            <div className={`absolute inset-0 w-32 h-32 rounded-full border-2 animate-ping opacity-75 ${
+              buttonState === 'listening' ? 'border-blue-400' : 'border-green-400'
+            }`} />
+            <div className={`absolute inset-0 w-40 h-40 -m-4 rounded-full border animate-ping opacity-50 ${
+              buttonState === 'listening' ? 'border-blue-300' : 'border-green-300'
+            }`} />
+            <div className={`absolute inset-0 w-48 h-48 -m-8 rounded-full border animate-ping opacity-25 ${
+              buttonState === 'listening' ? 'border-blue-200' : 'border-green-200'
+            }`} />
           </>
         )}
       </div>
 
-      {/* Status text */}
-      <div className="text-center space-y-2">
-        <div className="text-lg font-medium text-gray-900 dark:text-gray-100">
-          {isProcessing
-            ? 'Procesando audio...'
-            : isRecording
-            ? 'Escuchando...'
-            : 'Toca para hablar'}
+      {/* Status and Transcription */}
+      <div className="text-center space-y-4 max-w-2xl">
+        <div className="text-2xl font-semibold text-foreground">
+          {getStatusText()}
         </div>
         
-        {transcript && (
-          <div className="text-sm text-gray-600 dark:text-gray-400 max-w-md">
-            <span className="font-medium">Transcripción:</span> {transcript}
+        {/* Live transcription */}
+        {(userTranscript || assistantTranscript) && (
+          <div className="space-y-3">
+            {userTranscript && (
+              <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-blue-500">
+                <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
+                  Tú estás diciendo:
+                </div>
+                <div className="text-muted-foreground italic">
+                  {userTranscript}
+                </div>
+              </div>
+            )}
+            
+            {assistantTranscript && (
+              <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-green-500">
+                <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">
+                  AI está diciendo:
+                </div>
+                <div className="text-muted-foreground italic">
+                  {assistantTranscript}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Instructions */}
+        {!isConnected && (
+          <div className="text-muted-foreground text-center max-w-md mx-auto">
+            Toca el botón para iniciar una conversación de voz natural con la IA. 
+            La conversación será continua - simplemente habla y la IA responderá automáticamente.
+          </div>
+        )}
+        
+        {isConnected && !isListening && !isSpeaking && (
+          <div className="text-muted-foreground text-center max-w-md mx-auto">
+            Conversación activa. Simplemente comienza a hablar y la IA responderá automáticamente.
           </div>
         )}
       </div>
 
-      {/* Instructions */}
-      {!isRecording && !transcript && (
-        <div className="text-sm text-gray-500 dark:text-gray-500 text-center max-w-sm">
-          Mantén presionado para grabar tu mensaje de voz
+      {/* Recent Messages (last 3) */}
+      {messages.length > 0 && (
+        <div className="w-full max-w-2xl space-y-3">
+          <div className="text-sm font-medium text-muted-foreground text-center mb-4">
+            Conversación reciente
+          </div>
+          {messages.slice(-3).map((message) => (
+            <div
+              key={message.id}
+              className={`p-3 rounded-lg ${
+                message.role === 'user'
+                  ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 ml-8'
+                  : 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 mr-8'
+              }`}
+            >
+              <div className={`text-xs font-medium mb-1 ${
+                message.role === 'user' ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'
+              }`}>
+                {message.role === 'user' ? 'Tú' : 'AI'}
+              </div>
+              <div className="text-sm text-foreground">
+                {message.content}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

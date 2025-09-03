@@ -51,3 +51,5 @@ verify_jwt = true
 verify_jwt = true
 [functions.ai-learning]
 verify_jwt = true
+[functions.realtime-chat]
+verify_jwt = true
