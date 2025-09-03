@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Settings,
   Mail,
-  Users
+  Store
 } from 'lucide-react';
 
 export const patientNavItems = [
@@ -27,7 +27,7 @@ export const patientNavItems = [
   {
     title: 'nav.marketplace',
     href: '/patient/marketplace',
-    icon: Users,
+    icon: Store,
   },
   {
     title: 'nav.messages',

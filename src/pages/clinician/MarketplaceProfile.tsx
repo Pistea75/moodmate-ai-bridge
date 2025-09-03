@@ -53,12 +53,12 @@ export default function MarketplaceProfile() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <MessageSquare className="h-5 w-5 text-green-600" />
-                </div>
+           <Card>
+             <CardContent className="p-4">
+               <div className="flex items-center gap-3">
+                 <div className="p-2 bg-primary/10 rounded-lg">
+                   <MessageSquare className="h-5 w-5 text-primary" />
+                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Inquiries</p>
                   <p className="text-2xl font-bold">12</p>
@@ -67,12 +67,12 @@ export default function MarketplaceProfile() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Calendar className="h-5 w-5 text-blue-600" />
-                </div>
+           <Card>
+             <CardContent className="p-4">
+               <div className="flex items-center gap-3">
+                 <div className="p-2 bg-primary/10 rounded-lg">
+                   <Calendar className="h-5 w-5 text-primary" />
+                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Sessions Booked</p>
                   <p className="text-2xl font-bold">8</p>
@@ -81,12 +81,12 @@ export default function MarketplaceProfile() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <Star className="h-5 w-5 text-yellow-600" />
-                </div>
+           <Card>
+             <CardContent className="p-4">
+               <div className="flex items-center gap-3">
+                 <div className="p-2 bg-primary/10 rounded-lg">
+                   <Star className="h-5 w-5 text-primary" />
+                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Rating</p>
                   <p className="text-2xl font-bold">4.9</p>
