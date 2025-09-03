@@ -48,8 +48,8 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
       backgroundColor: `hsl(var(--sidebar-background))`,
     }}>
       {/* Logo and Title */}
-      <div className="p-6 border-b border-gray-800 dark:border-gray-700 flex-shrink-0">
-        <div className="flex items-center justify-between mb-2">
+      <div className="p-4 border-b border-gray-800 dark:border-gray-700 flex-shrink-0">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style={{
               background: `linear-gradient(135deg, hsl(var(--sidebar-primary)), hsl(var(--sidebar-accent)))`,
@@ -66,7 +66,7 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
       </div>
 
       {/* User Info */}
-      <div className="p-4 border-b border-gray-800 dark:border-gray-700 flex-shrink-0">
+      <div className="px-4 py-3 border-b border-gray-800 dark:border-gray-700 flex-shrink-0">
         <div className="flex items-center gap-3 p-3 rounded-lg" style={{
           backgroundColor: `hsl(var(--sidebar-accent))`,
         }}>
