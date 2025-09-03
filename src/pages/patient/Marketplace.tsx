@@ -85,7 +85,7 @@ export default function Marketplace() {
         {/* Main Content - Always shown but blurred if no access */}
         <div className={!hasMarketplaceAccess ? 'blur-sm pointer-events-none' : ''}>
           {/* Clinician Status Banner */}
-          {!clinicianLoading && hasMarketplaceAccess && (
+          {!clinicianLoading && (
             <Alert className="mb-6">
               <Info className="h-4 w-4" />
               <AlertDescription className="flex items-center justify-between">
