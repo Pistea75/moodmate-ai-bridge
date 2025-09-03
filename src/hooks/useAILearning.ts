@@ -11,11 +11,14 @@ export function useAILearning() {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const learnFromConversation = async (
+  const triggerManualLearning = async (
     patientId: string,
     conversationMessages: ConversationMessage[]
   ) => {
-    if (!user || !patientId || conversationMessages.length === 0) return;
+    if (!user || !patientId || conversationMessages.length === 0) {
+      console.log('Missing required data for manual learning trigger');
+      return;
+    }
 
     try {
       // Check if user is a clinician with access to this patient
@@ -27,9 +30,11 @@ export function useAILearning() {
         .single();
 
       if (!linkData) {
-        console.error('No clinician-patient link found');
+        console.error('No clinician-patient link found for manual learning');
         return;
       }
+
+      console.log('Triggering manual AI learning for patient:', patientId);
 
       // Call the AI learning edge function
       const { data, error } = await supabase.functions.invoke('ai-learning', {
@@ -42,23 +47,35 @@ export function useAILearning() {
 
       if (error) {
         console.error('Error calling AI learning function:', error);
+        toast({
+          title: "Error en aprendizaje de IA",
+          description: "Hubo un problema al analizar la conversación.",
+          variant: "destructive",
+        });
         return;
       }
 
       if (data?.newPreferences && Object.keys(data.newPreferences).length > 0) {
         toast({
           title: "IA ha aprendido nuevas preferencias",
-          description: "Las configuraciones de IA se han actualizado automáticamente basándose en la conversación.",
+          description: "Las configuraciones de IA se han actualizado automáticamente.",
           duration: 5000,
         });
         
         return data.updatedPreferences;
+      } else {
+        console.log('No new preferences learned from manual trigger');
       }
 
     } catch (error) {
-      console.error('Error in AI learning:', error);
+      console.error('Error in manual AI learning:', error);
+      toast({
+        title: "Error en aprendizaje de IA",
+        description: "Hubo un error inesperado durante el análisis.",
+        variant: "destructive",
+      });
     }
   };
 
-  return { learnFromConversation };
+  return { triggerManualLearning };
 }

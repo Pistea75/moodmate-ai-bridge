@@ -23,7 +23,7 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
   const { saveMessageToDatabase } = useMessageService();
   const { sendToAI, isLoading } = useAIService();
   const { checkMessageLimit, messageData } = useMessageLimits();
-  const { learnFromConversation } = useAILearning();
+  const { triggerManualLearning } = useAILearning();
 
   const handleSendMessage = async (messageText: string) => {
     if (!messageText.trim()) return;
@@ -75,27 +75,6 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
       
       // Save AI response to database
       await saveMessageToDatabase('assistant', aiResponse, patientId);
-      
-      // If this is a clinician configuring AI for a patient, learn from the conversation
-      if (isClinicianView && patientId && user) {
-        const recentMessages = [
-          { role: 'user' as const, content: messageText },
-          { role: 'assistant' as const, content: aiResponse }
-        ];
-        
-        // Add previous conversation context for better learning
-        const contextMessages = messages.slice(-4).map(msg => ({
-          role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
-          content: msg.content
-        }));
-        
-        const fullConversation = [...contextMessages, ...recentMessages];
-        
-        // Trigger AI learning (non-blocking)
-        learnFromConversation(patientId, fullConversation).catch(error => {
-          console.error('Error during AI learning:', error);
-        });
-      }
     }
   };
 

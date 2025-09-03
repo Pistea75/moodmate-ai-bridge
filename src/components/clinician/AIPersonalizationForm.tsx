@@ -287,14 +287,26 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
           </div>
         </div>
 
-        <Button 
-          onClick={handleSave} 
-          disabled={saving}
-          className="w-full"
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          {saving ? 'Saving...' : 'Save AI Preferences'}
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            onClick={handleSave} 
+            disabled={saving}
+            className="flex-1"
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            {saving ? 'Guardando...' : 'Guardar Preferencias de IA'}
+          </Button>
+        </div>
+
+        {prefs.learned_from_conversation && (
+          <div className="mt-4 p-3 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              <Sparkles className="inline h-4 w-4 mr-1" />
+              La IA ha aprendido automáticamente de las conversaciones del psicólogo.
+              Las preferencias se actualizan en tiempo real durante las sesiones de configuración.
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

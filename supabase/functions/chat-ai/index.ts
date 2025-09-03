@@ -258,7 +258,7 @@ serve(async (req) => {
     const openaiData = await openaiResponse.json();
     const aiResponse = openaiData.choices[0]?.message?.content || 'I apologize, but I encountered an error. Please try again.';
 
-    // Log the conversation (with data minimization)
+    // Log the conversation (with data minimization) and trigger AI learning if needed
     const logPromises = [
       // Log user message
       supabaseClient.from('ai_chat_logs').insert({
@@ -280,6 +280,25 @@ serve(async (req) => {
     Promise.all(logPromises).catch(error => {
       console.error('Logging error:', error);
     });
+
+    // If this is a clinician configuring AI, trigger learning analysis (non-blocking)
+    if (isClinicianConfiguring) {
+      const conversationMessages = [
+        { role: 'user', content: messages[messages.length - 1].content },
+        { role: 'assistant', content: aiResponse }
+      ];
+      
+      // Call AI learning function asynchronously
+      supabaseClient.functions.invoke('ai-learning', {
+        body: {
+          patientId: patientId,
+          clinicianId: clinicianId,
+          conversationMessages: conversationMessages
+        }
+      }).catch(error => {
+        console.error('AI learning error:', error);
+      });
+    }
 
     return new Response(
       JSON.stringify({ 

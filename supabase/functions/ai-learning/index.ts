@@ -59,6 +59,8 @@ serve(async (req) => {
       );
     }
 
+    console.log(`AI Learning request from user ${user.id} for patient ${patientId}`);
+
     // Verify user is the clinician
     if (user.id !== clinicianId) {
       return new Response(
@@ -81,6 +83,8 @@ serve(async (req) => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log(`Clinician-patient link verified for patient ${patientId} and clinician ${clinicianId}`);
 
     // Get OpenAI API key
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
@@ -177,6 +181,7 @@ If no new preferences are detected, return an empty object: {}`;
     let newPreferences = {};
     try {
       newPreferences = JSON.parse(analysisResult);
+      console.log('Parsed new preferences:', newPreferences);
     } catch (error) {
       console.error('Error parsing AI analysis result:', error);
       return new Response(
@@ -187,6 +192,7 @@ If no new preferences are detected, return an empty object: {}`;
 
     // Only update if there are new preferences
     if (Object.keys(newPreferences).length === 0) {
+      console.log('No new preferences detected, skipping update');
       return new Response(
         JSON.stringify({ 
           message: 'No new preferences detected',
@@ -195,6 +201,8 @@ If no new preferences are detected, return an empty object: {}`;
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log('Updating preferences with new data:', newPreferences);
 
     // Merge with existing preferences
     const updatedPreferences = { ...currentPreferences, ...newPreferences };
