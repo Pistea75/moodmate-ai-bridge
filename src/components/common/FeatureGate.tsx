@@ -6,23 +6,27 @@ import { Lock, Crown, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface FeatureGateProps {
-  capability: 'voiceChat' | 'advancedAnalytics' | 'prioritySupport' | 'customIntegrations';
+  capability: 'voiceChat' | 'advancedAnalytics' | 'prioritySupport' | 'customIntegrations' | 'monthlyWorkshops' | 'exclusiveContent';
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }
 
 const FEATURE_REQUIREMENTS = {
-  voiceChat: ['professional', 'enterprise'],
-  advancedAnalytics: ['professional', 'enterprise'],
-  prioritySupport: ['professional', 'enterprise'],
-  customIntegrations: ['enterprise']
+  voiceChat: ['personal', 'premium', 'professional_basic', 'professional_advanced'],
+  advancedAnalytics: ['professional_basic', 'professional_advanced'],
+  prioritySupport: ['personal', 'premium', 'professional_basic', 'professional_advanced'],
+  customIntegrations: ['professional_advanced'],
+  monthlyWorkshops: ['premium'],
+  exclusiveContent: ['premium']
 };
 
 const FEATURE_NAMES = {
   voiceChat: 'Voice Chat',
   advancedAnalytics: 'Advanced Analytics',
   prioritySupport: 'Priority Support',
-  customIntegrations: 'Custom Integrations'
+  customIntegrations: 'Custom Integrations',
+  monthlyWorkshops: 'Monthly Workshops',
+  exclusiveContent: 'Exclusive Content'
 };
 
 export function FeatureGate({ capability, children, fallback }: FeatureGateProps) {

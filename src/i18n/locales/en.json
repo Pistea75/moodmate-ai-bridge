@@ -202,6 +202,28 @@
     "adjustFilters": "Try adjusting your search filters to find more results",
     "clearFilters": "Clear Filters"
   },
+  "pricing": {
+    "simpleTransparent": "Simple, Transparent Pricing",
+    "heroTitle": "Choose the perfect plan",
+    "heroSubtitle": "for your wellness journey",
+    "heroDescription": "Start free and upgrade as your needs grow. All plans include our core AI companion and basic mental health tracking features.",
+    "chooseUserType": "Choose Your Account Type",
+    "userTypeDescription": "Select the option that best describes your role to see personalized pricing",
+    "patientAccount": "I am a Patient",
+    "patientDescription": "I want to access AI-powered mental health support, mood tracking, and connect with psychologists.",
+    "clinicianAccount": "I am a Clinician",
+    "clinicianDescription": "I want to manage patients, access analytics, and provide enhanced care with AI insights.",
+    "viewPatientPlans": "View Patient Plans",
+    "viewClinicianPlans": "View Clinician Plans",
+    "backToSelection": "Back to Selection",
+    "patientPlansTitle": "Plans for Patients",
+    "clinicianPlansTitle": "Plans for Clinicians",
+    "patientPlansDescription": "Choose the plan that best fits your mental wellness journey",
+    "clinicianPlansDescription": "Professional tools for mental health practitioners",
+    "sessionManagementFee": "Session Management Fee",
+    "freeWithPremium": "¡Free with Premium plan!",
+    "upgradePlan": "Upgrade Plan"
+  },
   "landing": {
     "hero": {
       "title": "Transform Mental Healthcare with AI-Powered Support",

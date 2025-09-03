@@ -4,23 +4,27 @@ import { ModernFooter } from '@/components/landing/ModernFooter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Sparkles, ArrowRight, Star, Zap } from 'lucide-react';
+import { CheckCircle, Sparkles, ArrowRight, Star, Zap, User, Stethoscope, Users, Brain } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const plans = [
+const patientPlans = [
   {
-    name: "Free",
+    name: "Gratuito",
     price: "$0",
-    period: "/month",
-    description: "Try Brodi with basic features",
+    period: "/mes",
+    description: "Acceso básico a Brodi (sin personalización)",
     features: [
-      "3 messages per day with Brodi",
-      "Basic mood tracking",
-      "Community support",
-      "Mobile app access"
+      "Acceso básico a Brodi (sin personalización)",
+      "No guarda historial emocional ni ejercicios",
+      "Acceso al marketplace de psicólogos",
+      "Puede agendar sesiones con tarifa de gestión de $5 por sesión",
+      "Sin acceso a talleres mensuales",
+      "Sin acceso a contenidos (meditaciones, ejercicios)"
     ],
-    buttonText: "Get Started Free",
+    buttonText: "Comenzar Gratis",
     buttonLink: "/signup/patient",
     popular: false,
     gradient: "from-slate-500 to-slate-600",
@@ -28,24 +32,47 @@ const plans = [
   },
   {
     name: "Personal",
-    price: "$5",
-    period: "/month",
-    description: "Unlimited access to Brodi + psychologist marketplace",
+    price: "$4.99",
+    period: "/mes",
+    description: "Acceso completo y personalizado a Brodi",
     features: [
-      "Unlimited messages with Brodi",
-      "Complete mood tracking & history",
-      "Access to psychologist marketplace",
-      "Book sessions with verified psychologists",
-      "Progress reports",
-      "Monthly workshops (free)",
-      "Priority support"
+      "Acceso completo y personalizado a Brodi",
+      "Guarda historial, reflexiones y ejercicios",
+      "Acceso al marketplace de psicólogos",
+      "Puede agendar sesiones con tarifa de gestión reducida de $2 por sesión",
+      "Permite cambiar de psicólogo sin perder historial",
+      "No incluye acceso a talleres mensuales",
+      "No incluye acceso a contenidos exclusivos"
     ],
-    buttonText: "Start Personal Plan",
+    buttonText: "Plan Personal",
     buttonLink: "/signup/patient",
     popular: true,
-    gradient: "from-purple-500 to-pink-500",
+    gradient: "from-blue-500 to-purple-500",
     planId: "personal"
   },
+  {
+    name: "Premium",
+    price: "$10",
+    period: "/mes",
+    description: "Todo lo incluido en el Plan Personal + beneficios premium",
+    features: [
+      "Todo lo incluido en el Plan Personal",
+      "Sin tarifa de gestión al agendar sesiones",
+      "Acceso a taller mensual grupal gratuito",
+      "Meditaciones guiadas exclusivas",
+      "Ejercicios prácticos avanzados",
+      "Material educativo y psicoeducativo",
+      "Acceso anticipado a nuevas funciones"
+    ],
+    buttonText: "Plan Premium",
+    buttonLink: "/signup/patient",
+    popular: false,
+    gradient: "from-purple-500 to-pink-500",
+    planId: "premium"
+  }
+];
+
+const clinicianPlans = [
   {
     name: "Professional Basic",
     price: "$50",
@@ -62,7 +89,7 @@ const plans = [
     ],
     buttonText: "Start Professional",
     buttonLink: "/signup/clinician",
-    popular: false,
+    popular: true,
     gradient: "from-blue-500 to-cyan-500",
     planId: "professional_basic"
   },
@@ -91,6 +118,8 @@ const plans = [
 export default function Pricing() {
   const { user } = useAuth();
   const { createCheckout, subscription } = useSubscription();
+  const { t } = useTranslation();
+  const [selectedUserType, setSelectedUserType] = useState<'patient' | 'clinician' | null>(null);
 
   const handleSubscribe = async (planId: string) => {
     if (!user) {
@@ -107,6 +136,8 @@ export default function Pricing() {
     }
   };
 
+  const currentPlans = selectedUserType === 'patient' ? patientPlans : clinicianPlans;
+
   return (
     <div className="min-h-screen bg-slate-900">
       <PublicNav />
@@ -116,27 +147,110 @@ export default function Pricing() {
         <div className="container mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-2 text-white font-semibold mb-8">
             <Zap className="h-4 w-4" />
-            Simple, Transparent Pricing
+            {t('pricing.simpleTransparent', 'Simple, Transparent Pricing')}
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            Choose the perfect plan
+            {t('pricing.heroTitle', 'Choose the perfect plan')}
             <br />
             <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              for your wellness journey
+              {t('pricing.heroSubtitle', 'for your wellness journey')}
             </span>
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Start free and upgrade as your needs grow. All plans include our core AI companion 
-            and basic mental health tracking features.
+            {t('pricing.heroDescription', 'Start free and upgrade as your needs grow. All plans include our core AI companion and basic mental health tracking features.')}
           </p>
         </div>
       </section>
 
+      {/* User Type Selection */}
+      {!selectedUserType && (
+        <section className="py-24 bg-slate-800">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-white mb-6">
+                {t('pricing.chooseUserType', 'Choose Your Account Type')}
+              </h2>
+              <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+                {t('pricing.userTypeDescription', 'Select the option that best describes your role to see personalized pricing')}
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <Card 
+                className="relative border-0 bg-slate-700/50 backdrop-blur-md border border-slate-600/50 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer hover:scale-105"
+                onClick={() => setSelectedUserType('patient')}
+              >
+                <CardContent className="p-8 text-center">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-6 mx-auto shadow-lg">
+                    <User className="h-10 w-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white">
+                    {t('pricing.patientAccount', 'I am a Patient')}
+                  </h3>
+                  <p className="text-slate-300 mb-6">
+                    {t('pricing.patientDescription', 'I want to access AI-powered mental health support, mood tracking, and connect with psychologists.')}
+                  </p>
+                  <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold px-8 py-3 rounded-full">
+                    {t('pricing.viewPatientPlans', 'View Patient Plans')}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card 
+                className="relative border-0 bg-slate-700/50 backdrop-blur-md border border-slate-600/50 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer hover:scale-105"
+                onClick={() => setSelectedUserType('clinician')}
+              >
+                <CardContent className="p-8 text-center">
+                  <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mb-6 mx-auto shadow-lg">
+                    <Stethoscope className="h-10 w-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white">
+                    {t('pricing.clinicianAccount', 'I am a Clinician')}
+                  </h3>
+                  <p className="text-slate-300 mb-6">
+                    {t('pricing.clinicianDescription', 'I want to manage patients, access analytics, and provide enhanced care with AI insights.')}
+                  </p>
+                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold px-8 py-3 rounded-full">
+                    {t('pricing.viewClinicianPlans', 'View Clinician Plans')}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Pricing Cards */}
-      <section className="py-24 bg-slate-800">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {plans.map((plan, index) => (
+      {selectedUserType && (
+        <section className="py-24 bg-slate-800">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <Button 
+                variant="outline" 
+                onClick={() => setSelectedUserType(null)}
+                className="mb-6 border-slate-600 text-slate-300 hover:bg-slate-700"
+              >
+                <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
+                {t('pricing.backToSelection', 'Back to Selection')}
+              </Button>
+              <h2 className="text-4xl font-bold text-white mb-6">
+                {selectedUserType === 'patient' 
+                  ? t('pricing.patientPlansTitle', 'Plans for Patients') 
+                  : t('pricing.clinicianPlansTitle', 'Plans for Clinicians')
+                }
+              </h2>
+              <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+                {selectedUserType === 'patient'
+                  ? t('pricing.patientPlansDescription', 'Choose the plan that best fits your mental wellness journey')
+                  : t('pricing.clinicianPlansDescription', 'Professional tools for mental health practitioners')
+                }
+              </p>
+            </div>
+            
+            <div className={`grid gap-8 max-w-6xl mx-auto ${selectedUserType === 'patient' ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
+              {currentPlans.map((plan, index) => (
               <Card key={index} className={`relative border-0 bg-slate-700/50 backdrop-blur-md border border-slate-600/50 shadow-lg hover:shadow-2xl transition-all duration-500 ${
                 plan.popular ? 'ring-2 ring-purple-500 transform scale-105' : ''
               }`}>
@@ -200,9 +314,10 @@ export default function Pricing() {
                 </CardContent>
               </Card>
             ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* FAQ Section */}
       <section className="py-24 bg-slate-900">

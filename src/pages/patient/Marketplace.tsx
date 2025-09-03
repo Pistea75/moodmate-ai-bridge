@@ -26,11 +26,16 @@ export default function Marketplace() {
     clearFilters 
   } = usePsychologistMarketplace();
 
-  // Check if user has access to marketplace
-  const hasMarketplaceAccess = subscription.subscribed && 
-    (subscription.plan_type === 'personal' || 
-     subscription.plan_type === 'professional_basic' || 
-     subscription.plan_type === 'professional_advanced');
+  // All users have marketplace access now, but with different session fees
+  const hasMarketplaceAccess = true;
+  
+  // Get session management fee based on plan
+  const getSessionManagementFee = () => {
+    if (!subscription.subscribed || subscription.plan_type === 'free') return '$5';
+    if (subscription.plan_type === 'personal') return '$2';
+    if (subscription.plan_type === 'premium') return '$0';
+    return '$5'; // Default for unknown plans
+  };
 
   if (subscriptionLoading || clinicianLoading) {
     return (
@@ -49,38 +54,30 @@ export default function Marketplace() {
   return (
     <PatientLayout>
       <div className="p-8 relative">
-        {/* Upgrade Overlay for non-subscribers */}
-        {!hasMarketplaceAccess && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-            <div className="max-w-md mx-auto text-center space-y-6 bg-white p-8 rounded-xl shadow-2xl">
-              <div className="space-y-2">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <Crown className="h-8 w-8 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {t('marketplace.upgradeTitle', 'Psychologist Marketplace')}
-                </h2>
-                <p className="text-gray-600">
-                  {t('marketplace.upgradeDescription', 'Connect with verified psychologists and book personalized sessions')}
-                </p>
+        {/* Session Management Fee Info */}
+        <Alert className="mb-6">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <strong>{t('marketplace.sessionManagementFee', 'Session Management Fee')}: </strong>
+                <span className="text-lg font-semibold text-primary">{getSessionManagementFee()}</span>
+                {getSessionManagementFee() === '$0' && (
+                  <span className="ml-2 text-sm text-green-600 font-semibold">
+                    {t('marketplace.freeWithPremium', '¡Free with Premium plan!')}
+                  </span>
+                )}
               </div>
-
-              <Alert className="text-left">
-                <Crown className="h-4 w-4" />
-                <AlertDescription>
-                  {t('marketplace.upgradeMessage', "Currently you don't have the plan needed. Upgrade it for just $5USD!")}
-                </AlertDescription>
-              </Alert>
-
-              <Button asChild size="lg" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 w-full">
-                <Link to="/pricing">
-                  <Crown className="h-5 w-5 mr-2" />
-                  {t('marketplace.upgradeButton', 'Upgrade for $5USD')}
-                </Link>
-              </Button>
+              {getSessionManagementFee() !== '$0' && (
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/pricing">
+                    {t('marketplace.upgradePlan', 'Upgrade Plan')}
+                  </Link>
+                </Button>
+              )}
             </div>
-          </div>
-        )}
+          </AlertDescription>
+        </Alert>
 
         {/* Main Content - Always shown but blurred if no access */}
         <div className={!hasMarketplaceAccess ? 'blur-sm pointer-events-none' : ''}>
