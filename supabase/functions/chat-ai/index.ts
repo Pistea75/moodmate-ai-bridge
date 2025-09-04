@@ -42,20 +42,31 @@ serve(async (req) => {
       );
     }
 
-    // Verify the user's session using anon key for client verification
-    const clientSupabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
-
-    const { data: { user }, error: authError } = await clientSupabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    // Extract the JWT token
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify the user's session using service role for proper authentication
+    const { data: { user }, error: authError } = await supabaseClient.auth.admin.getUserById(token);
     
     if (authError || !user) {
-      console.error('Authentication error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Invalid authentication' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      // Try alternative method using anon key
+      const clientSupabase = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? ''
       );
+      
+      const { data: { user: clientUser }, error: clientAuthError } = await clientSupabase.auth.getUser(token);
+      
+      if (clientAuthError || !clientUser) {
+        console.error('Authentication error:', authError || clientAuthError);
+        return new Response(
+          JSON.stringify({ error: 'Invalid authentication' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      // Use the authenticated user from client
+      user = clientUser;
     }
 
     const { messages, patientId, clinicianId, aiPersonality }: ChatRequest = await req.json();
@@ -294,7 +305,7 @@ serve(async (req) => {
       ];
       
       // Call AI learning function asynchronously with proper auth
-      clientSupabase.functions.invoke('ai-learning', {
+      supabaseClient.functions.invoke('ai-learning', {
         headers: {
           Authorization: authHeader,
         },
