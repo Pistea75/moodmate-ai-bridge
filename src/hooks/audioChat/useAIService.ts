@@ -31,7 +31,16 @@ export function useAIService() {
     try {
       const updatedHistory = [...conversationHistory, { role: 'user', content: messageContent }];
       
+      // Get current session to ensure we have a valid token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('No valid session found');
+      }
+      
       const { data, error } = await supabase.functions.invoke('chat-ai', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: {
           messages: updatedHistory,
           aiPersonality: personalizedSystemPrompt,

@@ -16,11 +16,15 @@ export function usePersonalization(baseSystemPrompt: string, patientId?: string)
       const targetPatientId = patientId || user.id;
       
       try {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('ai_patient_profiles')
           .select('preferences')
           .eq('patient_id', targetPatientId)
           .maybeSingle();
+
+        if (profileError) {
+          console.error('Error fetching AI personalization:', profileError);
+        }
 
         // Check for pending exercises
         const hasPendingExercise = await hasUnconfirmedExercise(targetPatientId);

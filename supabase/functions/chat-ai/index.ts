@@ -42,8 +42,13 @@ serve(async (req) => {
       );
     }
 
-    // Verify the user's session
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(authHeader.replace('Bearer ', ''));
+    // Verify the user's session using anon key for client verification
+    const clientSupabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const { data: { user }, error: authError } = await clientSupabase.auth.getUser(authHeader.replace('Bearer ', ''));
     
     if (authError || !user) {
       console.error('Authentication error:', authError);
@@ -288,8 +293,11 @@ serve(async (req) => {
         { role: 'assistant', content: aiResponse }
       ];
       
-      // Call AI learning function asynchronously
-      supabaseClient.functions.invoke('ai-learning', {
+      // Call AI learning function asynchronously with proper auth
+      clientSupabase.functions.invoke('ai-learning', {
+        headers: {
+          Authorization: authHeader,
+        },
         body: {
           patientId: patientId,
           clinicianId: clinicianId,
