@@ -293,5 +293,23 @@
     "managementFee": "Tarifa de Gestión de Sesión",
     "freeWithPremium": "¡Gratis con plan Premium!",
     "upgrade": "Mejorar Plan"
+  },
+  "settings": {
+    "description": "Personaliza tu experiencia y preferencias",
+    "appearance": "Apariencia",
+    "appearanceDescription": "Personaliza la apariencia de tu panel de control",
+    "themeColor": "Color del Tema",
+    "notifications": "Notificaciones",
+    "notificationsDescription": "Configura cómo quieres recibir notificaciones",
+    "sessionReminders": "Recordatorios de Sesión",
+    "sessionRemindersDescription": "Recibe notificaciones sobre próximas sesiones",
+    "taskNotifications": "Notificaciones de Tareas",
+    "taskNotificationsDescription": "Recibe notificaciones sobre nuevas tareas y fechas límite",
+    "patientUpdates": "Actualizaciones de Pacientes",
+    "patientUpdatesDescription": "Recibe notificaciones sobre progreso y actividades de pacientes",
+    "comingSoon": "Próximamente",
+    "languageDescription": "Elige tu idioma preferido para la interfaz",
+    "selectLanguage": "Seleccionar Idioma",
+    "languageNote": "La interfaz se actualizará inmediatamente cuando cambies el idioma."
   }
 }

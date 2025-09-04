@@ -4,29 +4,35 @@ import PatientLayout from '../../layouts/PatientLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ColorPicker } from '@/components/theme/ColorPicker';
+import { LanguageSelector } from '@/components/settings/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 export default function PatientSettings() {
+  const { t } = useTranslation();
+  
   return (
     <PatientLayout>
       <div className="container mx-auto px-4 py-6 space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
+          <h1 className="text-3xl font-bold">{t('nav.settings')}</h1>
           <p className="text-muted-foreground">
-            Customize your experience and preferences
+            {t('settings.description', 'Customize your experience and preferences')}
           </p>
         </div>
 
         <div className="space-y-6">
+          <LanguageSelector />
+          
           <Card>
             <CardHeader>
-              <CardTitle>Appearance</CardTitle>
+              <CardTitle>{t('settings.appearance', 'Appearance')}</CardTitle>
               <CardDescription>
-                Customize the look and feel of your dashboard
+                {t('settings.appearanceDescription', 'Customize the look and feel of your dashboard')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Theme Color</label>
+                <label className="text-sm font-medium">{t('settings.themeColor', 'Theme Color')}</label>
                 <ColorPicker />
               </div>
             </CardContent>
@@ -34,21 +40,21 @@ export default function PatientSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Notifications</CardTitle>
+              <CardTitle>{t('settings.notifications', 'Notifications')}</CardTitle>
               <CardDescription>
-                Configure how you want to receive notifications
+                {t('settings.notificationsDescription', 'Configure how you want to receive notifications')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">Session Reminders</div>
+                  <div className="font-medium">{t('settings.sessionReminders', 'Session Reminders')}</div>
                   <div className="text-sm text-muted-foreground">
-                    Get notified about upcoming sessions
+                    {t('settings.sessionRemindersDescription', 'Get notified about upcoming sessions')}
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Coming soon
+                  {t('settings.comingSoon', 'Coming soon')}
                 </div>
               </div>
               
@@ -56,13 +62,13 @@ export default function PatientSettings() {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">Task Notifications</div>
+                  <div className="font-medium">{t('settings.taskNotifications', 'Task Notifications')}</div>
                   <div className="text-sm text-muted-foreground">
-                    Get notified about new tasks and deadlines
+                    {t('settings.taskNotificationsDescription', 'Get notified about new tasks and deadlines')}
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Coming soon
+                  {t('settings.comingSoon', 'Coming soon')}
                 </div>
               </div>
             </CardContent>

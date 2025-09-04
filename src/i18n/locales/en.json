@@ -290,5 +290,23 @@
     "managementFee": "Session Management Fee",
     "freeWithPremium": "Free with Premium plan!",
     "upgrade": "Upgrade Plan"
+  },
+  "settings": {
+    "description": "Customize your experience and preferences",
+    "appearance": "Appearance",
+    "appearanceDescription": "Customize the look and feel of your dashboard",
+    "themeColor": "Theme Color",
+    "notifications": "Notifications",
+    "notificationsDescription": "Configure how you want to receive notifications",
+    "sessionReminders": "Session Reminders",
+    "sessionRemindersDescription": "Get notified about upcoming sessions",
+    "taskNotifications": "Task Notifications",
+    "taskNotificationsDescription": "Get notified about new tasks and deadlines",
+    "patientUpdates": "Patient Updates",
+    "patientUpdatesDescription": "Get notified about patient progress and activities",
+    "comingSoon": "Coming soon",
+    "languageDescription": "Choose your preferred language for the interface",
+    "selectLanguage": "Select Language",
+    "languageNote": "The interface will update immediately when you change the language."
   }
 }

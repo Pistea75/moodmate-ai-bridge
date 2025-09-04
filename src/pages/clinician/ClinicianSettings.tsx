@@ -1,56 +1,81 @@
 
 import React from 'react';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from 'react-i18next';
 import { ColorPicker } from '@/components/theme/ColorPicker';
-import { useForm } from 'react-hook-form';
-import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { LanguageSelector } from '@/components/settings/LanguageSelector';
+import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function ClinicianSettings() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  
-  const form = useForm({
-    defaultValues: {
-      language: user?.user_metadata?.language || 'en',
-    }
-  });
-
-  const onSubmit = (data: any) => {
-    console.log('Settings updated:', data);
-  };
 
   return (
     <ClinicianLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{t('settings')}</h1>
+          <div>
+            <h1 className="text-2xl font-bold">{t('nav.settings')}</h1>
+            <p className="text-muted-foreground">
+              {t('settings.description', 'Customize your experience and preferences')}
+            </p>
+          </div>
         </div>
         
         <div className="grid gap-6">
-          <ColorPicker />
+          <LanguageSelector />
           
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('languageSettings')}</h2>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <p className="text-muted-foreground">{t('languageSettingsInfo')}</p>
-                <Button type="submit">{t('save')}</Button>
-              </form>
-            </Form>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('settings.appearance', 'Appearance')}</CardTitle>
+              <CardDescription>
+                {t('settings.appearanceDescription', 'Customize the look and feel of your dashboard')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('settings.themeColor', 'Theme Color')}</label>
+                <ColorPicker />
+              </div>
+            </CardContent>
           </Card>
 
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('accountSettings')}</h2>
-            <p className="text-muted-foreground">{t('noDataAvailable')}</p>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('notificationSettings')}</h2>
-            <p className="text-muted-foreground">{t('noDataAvailable')}</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('settings.notifications', 'Notifications')}</CardTitle>
+              <CardDescription>
+                {t('settings.notificationsDescription', 'Configure how you want to receive notifications')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">{t('settings.sessionReminders', 'Session Reminders')}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t('settings.sessionRemindersDescription', 'Get notified about upcoming sessions')}
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {t('settings.comingSoon', 'Coming soon')}
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">{t('settings.patientUpdates', 'Patient Updates')}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t('settings.patientUpdatesDescription', 'Get notified about patient progress and activities')}
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {t('settings.comingSoon', 'Coming soon')}
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </div>
       </div>
