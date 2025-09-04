@@ -12,6 +12,7 @@ import { VoiceConsentModal } from './voice/VoiceConsentModal';
 import { VoiceSettings } from './voice/VoiceSettings';
 import { FeatureGate } from './common/FeatureGate';
 import { TTSQuotaModal } from './TTSQuotaModal';
+import { VoiceRecordingModal } from './VoiceRecordingModal';
 
 interface AudioChatInterfaceProps {
   isClinicianView?: boolean;
@@ -88,7 +89,11 @@ export function AudioChatInterface({
       return;
     }
     setShowVoiceRecorder(true);
-    // TODO: Implement voice recording modal/component
+  };
+
+  const handleVoiceTranscription = async (text: string) => {
+    setShowVoiceRecorder(false);
+    await handleSendMessage(text);
   };
 
   const handleConsentGiven = () => {
@@ -229,6 +234,12 @@ export function AudioChatInterface({
       <TTSQuotaModal 
         open={showQuotaModal}
         onClose={() => setShowQuotaModal(false)}
+      />
+
+      <VoiceRecordingModal
+        isOpen={showVoiceRecorder}
+        onClose={() => setShowVoiceRecorder(false)}
+        onTranscription={handleVoiceTranscription}
       />
     </Card>
   );
