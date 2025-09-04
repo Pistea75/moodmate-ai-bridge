@@ -11,6 +11,7 @@ import { VoiceInputMode } from './chat/VoiceInputMode';
 import { VoiceConsentModal } from './voice/VoiceConsentModal';
 import { VoiceSettings } from './voice/VoiceSettings';
 import { FeatureGate } from './common/FeatureGate';
+import { TTSQuotaModal } from './TTSQuotaModal';
 
 interface AudioChatInterfaceProps {
   isClinicianView?: boolean;
@@ -30,6 +31,7 @@ export function AudioChatInterface({
   const [inputMode, setInputMode] = useState<'text' | 'voice'>('text');
   const [showSettings, setShowSettings] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
+  const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [currentPlayingId, setCurrentPlayingId] = useState<string | null>(null);
 
   const { settings, updateSettings } = useVoiceSettings();
@@ -51,13 +53,12 @@ export function AudioChatInterface({
       console.error('TTS Error:', error);
       setTtsError(error);
       setCurrentPlayingId(null);
-      // Disable autoplay on quota errors and show error only once
-      if (error.includes('quota') || error.includes('exceeded')) {
-        updateSettings({ autoplay: false });
-        if (!errorShown) {
-          setErrorShown(true);
-        }
-      }
+    },
+    onQuotaError: () => {
+      console.log('TTS quota error - showing modal');
+      setCurrentPlayingId(null);
+      setShowQuotaModal(true);
+      updateSettings({ autoplay: false });
     }
   });
 
@@ -212,6 +213,11 @@ export function AudioChatInterface({
         isOpen={showConsentModal}
         onClose={() => setShowConsentModal(false)}
         onConsent={handleConsentGiven}
+      />
+      
+      <TTSQuotaModal 
+        open={showQuotaModal}
+        onClose={() => setShowQuotaModal(false)}
       />
     </Card>
   );

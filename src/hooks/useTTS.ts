@@ -7,9 +7,10 @@ interface UseTTSProps {
   onAudioStart?: () => void;
   onAudioEnd?: () => void;
   onError?: (error: string) => void;
+  onQuotaError?: () => void;
 }
 
-export function useTTS({ onAudioStart, onAudioEnd, onError }: UseTTSProps = {}) {
+export function useTTS({ onAudioStart, onAudioEnd, onError, onQuotaError }: UseTTSProps = {}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { settings } = useVoiceSettings();
@@ -33,7 +34,15 @@ export function useTTS({ onAudioStart, onAudioEnd, onError }: UseTTSProps = {}) 
 
       if (error) {
         console.error('TTS function error:', error);
-        throw new Error(error.message || 'Text-to-speech service failed');
+        const errorMessage = error.message || 'Text-to-speech service failed';
+        
+        // Check if it's a quota/credit error
+        if (errorMessage.includes('insufficient') || errorMessage.includes('quota') || errorMessage.includes('credits')) {
+          onQuotaError?.();
+          return; // Don't throw, just return silently
+        }
+        
+        throw new Error(errorMessage);
       }
 
       if (!data?.audioContent) {
@@ -74,6 +83,13 @@ export function useTTS({ onAudioStart, onAudioEnd, onError }: UseTTSProps = {}) 
       console.error('TTS Error:', error);
       setIsPlaying(false);
       const errorMsg = error instanceof Error ? error.message : 'Text-to-speech failed';
+      
+      // Check if it's a quota/credit error
+      if (errorMsg.includes('insufficient') || errorMsg.includes('quota') || errorMsg.includes('credits')) {
+        onQuotaError?.();
+        return; // Don't call onError for quota issues
+      }
+      
       onError?.(errorMsg);
       
       // Suppress all error toasts for TTS to prevent spam
