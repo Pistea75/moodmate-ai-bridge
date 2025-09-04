@@ -45,28 +45,21 @@ serve(async (req) => {
     // Extract the JWT token
     const token = authHeader.replace('Bearer ', '');
     
-    // Verify the user's session using service role for proper authentication
-    const { data: { user }, error: authError } = await supabaseClient.auth.admin.getUserById(token);
+    // Create client with anon key for proper JWT verification
+    const clientSupabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+    
+    // Verify the user's session using the client
+    const { data: { user }, error: authError } = await clientSupabase.auth.getUser(token);
     
     if (authError || !user) {
-      // Try alternative method using anon key
-      const clientSupabase = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      console.error('Authentication error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-      
-      const { data: { user: clientUser }, error: clientAuthError } = await clientSupabase.auth.getUser(token);
-      
-      if (clientAuthError || !clientUser) {
-        console.error('Authentication error:', authError || clientAuthError);
-        return new Response(
-          JSON.stringify({ error: 'Invalid authentication' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      // Use the authenticated user from client
-      user = clientUser;
     }
 
     const { messages, patientId, clinicianId, aiPersonality }: ChatRequest = await req.json();
