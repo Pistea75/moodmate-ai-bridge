@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useHybridSTT } from '@/hooks/useHybridSTT';
+import { useVoiceSettings } from '@/hooks/useVoiceSettings';
 
 interface VoiceRecordingModalProps {
   isOpen: boolean;
@@ -12,162 +13,42 @@ interface VoiceRecordingModalProps {
 }
 
 export function VoiceRecordingModal({ isOpen, onClose, onTranscription }: VoiceRecordingModalProps) {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [audioLevel, setAudioLevel] = useState(0);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
   const { toast } = useToast();
+  const { settings } = useVoiceSettings();
 
-  useEffect(() => {
-    return () => {
-      stopRecording();
-      cleanup();
-    };
-  }, []);
-
-  const cleanup = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current = null;
-    }
-    chunksRef.current = [];
+  const handleTranscription = (text: string) => {
+    onTranscription(text);
+    onClose();
+    toast({
+      title: "Success",
+      description: "Audio transcribed successfully!",
+    });
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          sampleRate: 16000,
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        }
-      });
-      
-      streamRef.current = stream;
-      chunksRef.current = [];
-
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        processRecording();
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-
-      // Visual feedback for audio level
-      const audioContext = new AudioContext();
-      const analyser = audioContext.createAnalyser();
-      const source = audioContext.createMediaStreamSource(stream);
-      source.connect(analyser);
-
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-      const updateAudioLevel = () => {
-        if (isRecording) {
-          analyser.getByteFrequencyData(dataArray);
-          const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-          setAudioLevel(average);
-          requestAnimationFrame(updateAudioLevel);
-        }
-      };
-      updateAudioLevel();
-
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      toast({
-        title: "Error",
-        description: "Could not access microphone. Please check your permissions.",
-        variant: "destructive",
-      });
-    }
+  const handleError = (error: string) => {
+    toast({
+      title: "Error",
+      description: error,
+      variant: "destructive",
+    });
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      setAudioLevel(0);
-    }
-  };
-
-  const processRecording = async () => {
-    setIsProcessing(true);
-    
-    try {
-      const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
-      
-      // Convert blob to base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64Audio = (reader.result as string).split(',')[1];
-        
-        try {
-          const { data, error } = await supabase.functions.invoke('speech-to-text', {
-            body: { audio: base64Audio }
-          });
-
-          if (error) {
-            throw error;
-          }
-
-          if (data?.text) {
-            onTranscription(data.text);
-            onClose();
-            toast({
-              title: "Success",
-              description: "Audio transcribed successfully!",
-            });
-          } else {
-            throw new Error('No transcription received');
-          }
-        } catch (error) {
-          console.error('Transcription error:', error);
-          toast({
-            title: "Error",
-            description: "Failed to transcribe audio. Please try again.",
-            variant: "destructive",
-          });
-        } finally {
-          setIsProcessing(false);
-          cleanup();
-        }
-      };
-      
-      reader.readAsDataURL(audioBlob);
-    } catch (error) {
-      console.error('Processing error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to process recording. Please try again.",
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-      cleanup();
-    }
-  };
+  const {
+    isRecording,
+    isProcessing,
+    startRecording,
+    stopRecording,
+    isWebSpeechSupported
+  } = useHybridSTT({
+    language: settings.sttLanguage,
+    onTranscription: handleTranscription,
+    onError: handleError
+  });
 
   const handleClose = () => {
     if (isRecording) {
       stopRecording();
     }
-    cleanup();
     onClose();
   };
 
@@ -187,9 +68,6 @@ export function VoiceRecordingModal({ isOpen, onClose, onTranscription }: VoiceR
                   ? 'bg-red-500 animate-pulse' 
                   : 'bg-primary hover:bg-primary/90'
               }`}
-              style={{
-                transform: isRecording ? `scale(${1 + (audioLevel / 255) * 0.3})` : 'scale(1)'
-              }}
             >
               {isProcessing ? (
                 <Loader2 className="h-8 w-8 text-white animate-spin" />
