@@ -29,17 +29,17 @@ export function ClinicianSidebarContent() {
   const { signOut } = useAuth();
 
   const navItems = [
-    { title: 'Dashboard', href: '/clinician/dashboard', icon: LayoutDashboard },
-    { title: 'Patients', href: '/clinician/patients', icon: Users },
-    { title: 'Sessions', href: '/clinician/sessions', icon: Calendar },
-    { title: 'Communications', href: '/clinician/communications', icon: MessageSquare },
-    { title: 'Marketplace', href: '/clinician/marketplace-profile', icon: Store },
-    { title: 'Analytics', href: '/clinician/analytics', icon: BarChart3 },
-    { title: 'Tasks', href: '/clinician/tasks', icon: CheckSquare },
-    { title: 'Reports', href: '/clinician/reports', icon: FileText },
-    { title: 'Resource Library', href: '/clinician/resource-library', icon: BookOpen },
-    { title: 'Reminders', href: '/clinician/reminders', icon: Bell },
-    { title: 'Train AI', href: '/clinician/train-ai', icon: Brain },
+    { title: t('nav.dashboard'), href: '/clinician/dashboard', icon: LayoutDashboard },
+    { title: t('nav.patients'), href: '/clinician/patients', icon: Users },
+    { title: t('nav.sessions'), href: '/clinician/sessions', icon: Calendar },
+    { title: t('nav.messages'), href: '/clinician/communications', icon: MessageSquare },
+    { title: t('nav.marketplace'), href: '/clinician/marketplace-profile', icon: Store },
+    { title: t('nav.analytics'), href: '/clinician/analytics', icon: BarChart3 },
+    { title: t('nav.tasks'), href: '/clinician/tasks', icon: CheckSquare },
+    { title: t('nav.reports'), href: '/clinician/reports', icon: FileText },
+    { title: t('nav.resources', 'Resource Library'), href: '/clinician/resource-library', icon: BookOpen },
+    { title: t('nav.notifications', 'Reminders'), href: '/clinician/reminders', icon: Bell },
+    { title: t('nav.trainAI'), href: '/clinician/train-ai', icon: Brain },
   ];
 
   const handleSignOut = async () => {
@@ -65,7 +65,7 @@ export function ClinicianSidebarContent() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">MoodMate</h1>
-              <p className="text-sm font-medium" style={{ color: `hsl(var(--sidebar-primary))` }}>Clinician Portal</p>
+              <p className="text-sm font-medium" style={{ color: `hsl(var(--sidebar-primary))` }}>{t('auth.clinicianAccount', 'Clinician Portal')}</p>
             </div>
           </div>
           <ThemeToggle />
@@ -78,7 +78,7 @@ export function ClinicianSidebarContent() {
       }}>
         <div className="flex items-center gap-2" style={{ color: `hsl(var(--sidebar-primary))` }}>
           <Users className="h-4 w-4" />
-          <span className="text-xs font-medium uppercase tracking-wide">CLINICAL PORTAL</span>
+          <span className="text-xs font-medium uppercase tracking-wide">{t('clinician.portal', 'CLINICAL PORTAL')}</span>
         </div>
       </div>
 
@@ -129,7 +129,7 @@ export function ClinicianSidebarContent() {
           })}
         >
           <User className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">Profile</span>
+          <span className="flex-1">{t('nav.profile')}</span>
         </NavLink>
         
         <NavLink
@@ -149,7 +149,7 @@ export function ClinicianSidebarContent() {
           })}
         >
           <Settings className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">Settings</span>
+          <span className="flex-1">{t('nav.settings')}</span>
         </NavLink>
 
         <Button
@@ -158,7 +158,7 @@ export function ClinicianSidebarContent() {
           className="flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700 active:scale-95"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">Logout</span>
+          <span className="flex-1">{t('nav.logout')}</span>
         </Button>
       </div>
     </div>

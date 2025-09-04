@@ -1,24 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Globe, Check } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Español', flag: '🇪🇸' }
 ];
 
-export function LanguageSelector() {
+interface LanguageSelectorProps {
+  onSave?: () => void;
+}
+
+export function LanguageSelector({ onSave }: LanguageSelectorProps = {}) {
   const { i18n, t } = useTranslation();
+  const { toast } = useToast();
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    setHasChanges(selectedLanguage !== i18n.language);
+  }, [selectedLanguage, i18n.language]);
 
   const handleLanguageChange = (langCode: string) => {
-    i18n.changeLanguage(langCode);
-    // Save language preference to localStorage
-    localStorage.setItem('i18nextLng', langCode);
+    setSelectedLanguage(langCode);
   };
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language);
+  const handleSaveChanges = () => {
+    i18n.changeLanguage(selectedLanguage);
+    // Save language preference to localStorage
+    localStorage.setItem('i18nextLng', selectedLanguage);
+    setHasChanges(false);
+    
+    toast({
+      title: t('settings.saved', 'Settings Saved'),
+      description: t('settings.languageSaved', 'Language preference has been saved successfully.'),
+      duration: 3000,
+    });
+
+    onSave?.();
+  };
+
+  const currentLanguage = languages.find(lang => lang.code === selectedLanguage);
 
   return (
     <Card>
@@ -36,7 +62,7 @@ export function LanguageSelector() {
           <label className="text-sm font-medium">
             {t('settings.selectLanguage', 'Select Language')}
           </label>
-          <Select value={i18n.language} onValueChange={handleLanguageChange}>
+          <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
             <SelectTrigger className="w-full">
               <SelectValue>
                 <div className="flex items-center gap-2">
@@ -57,8 +83,21 @@ export function LanguageSelector() {
             </SelectContent>
           </Select>
         </div>
+        
+        {hasChanges && (
+          <div className="flex items-center gap-2 pt-4 border-t">
+            <Button onClick={handleSaveChanges} className="flex items-center gap-2">
+              <Check className="h-4 w-4" />
+              {t('settings.saveChanges', 'Save Changes')}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              {t('settings.unsavedChanges', 'You have unsaved language changes.')}
+            </p>
+          </div>
+        )}
+        
         <p className="text-xs text-muted-foreground">
-          {t('settings.languageNote', 'The interface will update immediately when you change the language.')}
+          {t('settings.languageNote', 'The interface will update immediately when you save the language.')}
         </p>
       </CardContent>
     </Card>

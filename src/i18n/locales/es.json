@@ -20,7 +20,11 @@
     "reports": "Reportes",
     "patients": "Pacientes",
     "insights": "Insights",
-    "trainAI": "Entrenar IA"
+    "trainAI": "Entrenar IA",
+    "resources": "Recursos",
+    "notifications": "Notificaciones",
+    "riskManagement": "Gestión de Riesgos",
+    "treatmentPlans": "Planes de Tratamiento"
   },
   "marketplace": {
     "title": "Marketplace de Psicólogos",
@@ -310,6 +314,26 @@
     "comingSoon": "Próximamente",
     "languageDescription": "Elige tu idioma preferido para la interfaz",
     "selectLanguage": "Seleccionar Idioma",
-    "languageNote": "La interfaz se actualizará inmediatamente cuando cambies el idioma."
+    "languageNote": "La interfaz se actualizará inmediatamente cuando guardes el idioma.",
+    "saved": "Configuraciones Guardadas",
+    "languageSaved": "La preferencia de idioma se ha guardado exitosamente.",
+    "saveChanges": "Guardar Cambios",
+    "unsavedChanges": "Tienes cambios de idioma sin guardar."
+  },
+  "admin": {
+    "systemOverview": "Resumen del Sistema",
+    "userManagement": "Gestión de Usuarios",
+    "phiAccess": "Panel de Acceso PHI",
+    "database": "Gestión de Base de Datos",
+    "securityLogs": "Registros de Seguridad",
+    "systemHealth": "Salud del Sistema",
+    "auditTrail": "Registro de Auditoría",
+    "systemMaintenance": "Mantenimiento del Sistema",
+    "superAdmin": "SÚPER ADMINISTRADOR",
+    "elevatedPrivileges": "PRIVILEGIOS ELEVADOS ACTIVOS",
+    "adminProfile": "Perfil de Administrador"
+  },
+  "clinician": {
+    "portal": "PORTAL CLÍNICO"
   }
 }

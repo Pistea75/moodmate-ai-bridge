@@ -20,7 +20,11 @@
     "reports": "Reports",
     "patients": "Patients",
     "insights": "Insights",
-    "trainAI": "Train AI"
+    "trainAI": "Train AI",
+    "resources": "Resources",
+    "notifications": "Notifications",
+    "riskManagement": "Risk Management",
+    "treatmentPlans": "Treatment Plans"
   },
   "auth": {
     "welcome": "Welcome back",
@@ -307,6 +311,26 @@
     "comingSoon": "Coming soon",
     "languageDescription": "Choose your preferred language for the interface",
     "selectLanguage": "Select Language",
-    "languageNote": "The interface will update immediately when you change the language."
+    "languageNote": "The interface will update immediately when you save the language.",
+    "saved": "Settings Saved",
+    "languageSaved": "Language preference has been saved successfully.",
+    "saveChanges": "Save Changes",
+    "unsavedChanges": "You have unsaved language changes."
+  },
+  "admin": {
+    "systemOverview": "System Overview",
+    "userManagement": "User Management",
+    "phiAccess": "PHI Access Panel",
+    "database": "Database Management",
+    "securityLogs": "Security Logs",
+    "systemHealth": "System Health",
+    "auditTrail": "Audit Trail",
+    "systemMaintenance": "System Maintenance",
+    "superAdmin": "SUPER ADMIN",
+    "elevatedPrivileges": "ELEVATED PRIVILEGES ACTIVE",
+    "adminProfile": "Admin Profile"
+  },
+  "clinician": {
+    "portal": "CLINICAL PORTAL"
   }
 }

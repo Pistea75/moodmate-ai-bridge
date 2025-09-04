@@ -28,15 +28,15 @@ export function SuperAdminSidebarContent() {
   const { signOut } = useAuth();
 
   const superAdminNavItems = [
-    { title: 'System Overview', href: '/admin/super-admin-dashboard', icon: BarChart3 },
-    { title: 'User Management', href: '/admin/user-management', icon: Users },
-    { title: 'PHI Access Panel', href: '/admin/super-admin-panel', icon: Shield },
-    { title: 'System Settings', href: '/admin/system-settings', icon: Settings },
-    { title: 'Database Management', href: '/admin/database', icon: Database },
-    { title: 'Security Logs', href: '/admin/security-logs', icon: Eye },
-    { title: 'System Health', href: '/admin/system-health', icon: Server },
-    { title: 'Audit Trail', href: '/admin/audit-trail', icon: FileText },
-    { title: 'System Maintenance', href: '/admin/maintenance', icon: Lock },
+    { title: t('admin.systemOverview', 'System Overview'), href: '/admin/super-admin-dashboard', icon: BarChart3 },
+    { title: t('admin.userManagement', 'User Management'), href: '/admin/user-management', icon: Users },
+    { title: t('admin.phiAccess', 'PHI Access Panel'), href: '/admin/super-admin-panel', icon: Shield },
+    { title: t('nav.settings'), href: '/admin/system-settings', icon: Settings },
+    { title: t('admin.database', 'Database Management'), href: '/admin/database', icon: Database },
+    { title: t('admin.securityLogs', 'Security Logs'), href: '/admin/security-logs', icon: Eye },
+    { title: t('admin.systemHealth', 'System Health'), href: '/admin/system-health', icon: Server },
+    { title: t('admin.auditTrail', 'Audit Trail'), href: '/admin/audit-trail', icon: FileText },
+    { title: t('admin.systemMaintenance', 'System Maintenance'), href: '/admin/maintenance', icon: Lock },
   ];
 
   const handleSignOut = async () => {
@@ -58,7 +58,7 @@ export function SuperAdminSidebarContent() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">MoodMate</h1>
-              <p className="text-sm text-blue-400 font-medium">SUPER ADMIN</p>
+              <p className="text-sm text-blue-400 font-medium">{t('admin.superAdmin', 'SUPER ADMIN')}</p>
             </div>
           </div>
           <ThemeToggle />
@@ -69,7 +69,7 @@ export function SuperAdminSidebarContent() {
       <div className="p-4 bg-blue-950 dark:bg-blue-950/50 border-b border-gray-800 dark:border-gray-800">
         <div className="flex items-center gap-2 text-blue-300">
           <AlertTriangle className="h-4 w-4" />
-          <span className="text-xs font-medium">ELEVATED PRIVILEGES ACTIVE</span>
+          <span className="text-xs font-medium">{t('admin.elevatedPrivileges', 'ELEVATED PRIVILEGES ACTIVE')}</span>
         </div>
       </div>
 
@@ -110,7 +110,7 @@ export function SuperAdminSidebarContent() {
           }
         >
           <User className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">Admin Profile</span>
+          <span className="flex-1">{t('admin.adminProfile', 'Admin Profile')}</span>
         </NavLink>
 
         <Button
@@ -119,7 +119,7 @@ export function SuperAdminSidebarContent() {
           className="flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full justify-start text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700 active:scale-95"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">Sign Out</span>
+          <span className="flex-1">{t('nav.logout', 'Sign Out')}</span>
         </Button>
       </div>
     </div>
