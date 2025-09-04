@@ -2,17 +2,19 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/providers/ThemeProvider";
-import { patientNavItems, clinicianNavItems } from "./navigation/NavigationItems";
+import { getPatientNavItems, getClinicianNavItems } from "./navigation/NavigationItems";
 import { MobileNavigation } from "./navigation/MobileNavigation";
 import { DesktopNavigation } from "./navigation/DesktopNavigation";
+import { useTranslation } from 'react-i18next';
 
 export function MainNav() {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const { user, userRole } = useAuth();
   const { themeColor } = useTheme();
   
   const isLoggedIn = !!user;
-  const navItems = userRole === 'clinician' ? clinicianNavItems : patientNavItems;
+  const navItems = userRole === 'clinician' ? getClinicianNavItems(t) : getPatientNavItems(t);
   const username = user?.user_metadata?.full_name || 'User';
 
   // For clinician views, don't render MainNav since ClinicianLayout handles its own navigation

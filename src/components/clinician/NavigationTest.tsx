@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, X, AlertTriangle } from 'lucide-react';
-import { patientNavItems, clinicianNavItems } from '../navigation/NavigationItems';
+import { getPatientNavItems, getClinicianNavItems } from '../navigation/NavigationItems';
+import { useTranslation } from 'react-i18next';
 
 interface TestResult {
   path: string;
@@ -15,9 +16,12 @@ interface TestResult {
 }
 
 export function NavigationTest() {
+  const { t } = useTranslation();
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const navigate = useNavigate();
+  
+  const clinicianNavItems = getClinicianNavItems(t);
 
   const runNavigationTest = async () => {
     setIsRunning(true);

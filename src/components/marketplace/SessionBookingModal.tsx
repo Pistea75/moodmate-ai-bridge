@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface SessionBookingModalProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ interface SessionBookingModalProps {
 }
 
 export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBookingModalProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { subscription } = useSubscription();
   const { toast } = useToast();
@@ -81,8 +83,8 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
       if (error) throw error;
 
       toast({
-        title: "Solicitud enviada",
-        description: "Tu solicitud de sesión ha sido enviada al psicólogo. Te contactarán pronto."
+        title: t('booking.sendRequest'),
+        description: t('booking.requestSent', 'Your session request has been sent to the psychologist. They will contact you soon.')
       });
 
       onClose();
@@ -97,8 +99,8 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
     } catch (error) {
       console.error('Error creating session inquiry:', error);
       toast({
-        title: "Error",
-        description: "No se pudo enviar la solicitud. Inténtalo de nuevo.",
+        title: t('common.error'),
+        description: t('booking.errorSending', 'Could not send the request. Please try again.'),
         variant: "destructive"
       });
     } finally {
@@ -112,7 +114,7 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Reservar sesión con {psychologist.display_name}
+            {t('booking.title')} {psychologist.display_name}
           </DialogTitle>
         </DialogHeader>
 
@@ -124,22 +126,22 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
           <AlertDescription>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm">Tarifa de sesión:</span>
+                <span className="text-sm">{t('booking.sessionFee', 'Session fee')}:</span>
                 <span className="font-semibold">${sessionRate}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm">Tarifa de gestión:</span>
+                <span className="text-sm">{t('subscription.managementFee')}:</span>
                 <span className={`font-semibold ${sessionFee === 0 ? 'text-green-600' : ''}`}>
-                  {sessionFee === 0 ? 'GRATIS' : `$${sessionFee}`}
+                  {sessionFee === 0 ? t('common.free', 'FREE') : `$${sessionFee}`}
                 </span>
               </div>
               <div className="border-t pt-2 flex justify-between items-center">
-                <span className="font-semibold">Total:</span>
+                <span className="font-semibold">{t('booking.total', 'Total')}:</span>
                 <span className="text-lg font-bold text-primary">${totalCost}</span>
               </div>
               {sessionFee === 0 && (
                 <div className="text-xs text-green-600 mt-1">
-                  ¡Sin tarifa de gestión con tu plan Premium!
+                  {t('subscription.freeWithPremium')}
                 </div>
               )}
             </div>
@@ -149,7 +151,7 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="firstName">Nombre</Label>
+              <Label htmlFor="firstName">{t('profile.firstName')}</Label>
               <Input
                 id="firstName"
                 value={formData.firstName}
@@ -158,7 +160,7 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
               />
             </div>
             <div>
-              <Label htmlFor="lastName">Apellido</Label>
+              <Label htmlFor="lastName">{t('profile.lastName')}</Label>
               <Input
                 id="lastName"
                 value={formData.lastName}
@@ -169,23 +171,23 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
           </div>
 
           <div>
-            <Label htmlFor="sessionTopic">Tema de la sesión</Label>
+            <Label htmlFor="sessionTopic">{t('booking.sessionTopic', 'Session Topic')}</Label>
             <Input
               id="sessionTopic"
               value={formData.sessionTopic}
               onChange={(e) => setFormData(prev => ({ ...prev, sessionTopic: e.target.value }))}
-              placeholder="ej. Ansiedad, depresión, terapia de pareja..."
+              placeholder={t('booking.sessionTopicPlaceholder', 'e.g. Anxiety, depression, couples therapy...')}
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="message">¿Qué te gustaría tratar en esta sesión?</Label>
+            <Label htmlFor="message">{t('booking.notes')}</Label>
             <Textarea
               id="message"
               value={formData.message}
               onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-              placeholder="Describe brevemente lo que te gustaría trabajar o discutir..."
+              placeholder={t('booking.notesPlaceholder')}
               rows={3}
               required
             />
@@ -194,7 +196,7 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
           <div>
             <Label htmlFor="preferredDate" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Fecha preferida (opcional)
+              {t('booking.selectDate')} ({t('booking.optional', 'optional')})
             </Label>
             <Input
               id="preferredDate"
@@ -208,14 +210,14 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
           <div>
             <Label className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Horario preferido (opcional)
+              {t('booking.selectTime')} ({t('booking.optional', 'optional')})
             </Label>
             <Select
               value={formData.timeSlot}
               onValueChange={(value) => setFormData(prev => ({ ...prev, timeSlot: value }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecciona un horario" />
+                <SelectValue placeholder={t('booking.selectTimeSlot', 'Select a time slot')} />
               </SelectTrigger>
               <SelectContent>
                 {timeSlots.map((slot) => (
@@ -229,10 +231,10 @@ export function SessionBookingModal({ isOpen, onClose, psychologist }: SessionBo
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancelar
+              {t('booking.cancel')}
             </Button>
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? 'Enviando...' : 'Enviar solicitud'}
+              {loading ? t('booking.sending') : t('booking.sendRequest')}
             </Button>
           </div>
         </form>

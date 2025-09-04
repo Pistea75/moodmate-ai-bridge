@@ -6,12 +6,14 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MapPin, Clock, Star, DollarSign, Globe, Calendar } from 'lucide-react';
 import { PsychologistProfile } from '@/hooks/usePsychologistMarketplace';
 import { SessionBookingModal } from './SessionBookingModal';
+import { useTranslation } from 'react-i18next';
 
 interface PsychologistCardProps {
   psychologist: PsychologistProfile;
 }
 
 export function PsychologistCard({ psychologist }: PsychologistCardProps) {
+  const { t } = useTranslation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   
   const getInitials = (name: string) => {
@@ -53,7 +55,7 @@ export function PsychologistCard({ psychologist }: PsychologistCardProps) {
                   <div className="flex items-center gap-1 text-primary font-bold">
                     <DollarSign className="h-4 w-4" />
                     <span className="text-lg">${psychologist.hourly_rate}</span>
-                    <span className="text-sm text-muted-foreground font-normal">/hr</span>
+                    <span className="text-sm text-muted-foreground font-normal">{t('marketplace.hourly')}</span>
                   </div>
                 </div>
               </div>
@@ -66,7 +68,7 @@ export function PsychologistCard({ psychologist }: PsychologistCardProps) {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
-              <span>{psychologist.experience_years} años exp.</span>
+              <span>{psychologist.experience_years} {t('marketplace.yearsExp')}</span>
             </div>
             
             <div className="flex items-center gap-1.5">
@@ -94,7 +96,7 @@ export function PsychologistCard({ psychologist }: PsychologistCardProps) {
               ))}
               {psychologist.specializations.length > 3 && (
                 <Badge variant="outline" className="text-xs px-2 py-1">
-                  +{psychologist.specializations.length - 3} más
+                  +{psychologist.specializations.length - 3} {t('marketplace.more')}
                 </Badge>
               )}
             </div>
@@ -103,7 +105,7 @@ export function PsychologistCard({ psychologist }: PsychologistCardProps) {
           {/* Actions */}
           <div className="flex gap-2 pt-3">
             <Button variant="outline" size="sm" className="flex-1 hover:bg-primary/5 hover:border-primary/20">
-              Ver Perfil
+              {t('marketplace.viewProfile')}
             </Button>
             
             <Button 
@@ -112,7 +114,7 @@ export function PsychologistCard({ psychologist }: PsychologistCardProps) {
               onClick={() => setShowBookingModal(true)}
             >
               <Calendar className="h-3.5 w-3.5 mr-1.5" />
-              Reservar
+              {t('marketplace.bookSession')}
             </Button>
           </div>
         </CardContent>

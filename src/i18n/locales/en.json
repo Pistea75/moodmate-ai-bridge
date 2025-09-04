@@ -15,7 +15,12 @@
     "login": "Login",
     "signup": "Sign Up",
     "logout": "Logout",
-    "marketplace": "Marketplace"
+    "marketplace": "Marketplace",
+    "analytics": "Analytics",
+    "reports": "Reports",
+    "patients": "Patients",
+    "insights": "Insights",
+    "trainAI": "Train AI"
   },
   "auth": {
     "welcome": "Welcome back",
@@ -174,7 +179,8 @@
     "download": "Download",
     "upload": "Upload",
     "language": "Language",
-    "theme": "Theme"
+    "theme": "Theme",
+    "free": "FREE"
   },
   "messages": {
     "noMessages": "No messages yet",
@@ -200,7 +206,12 @@
     "errorLoading": "Error loading psychologists",
     "noPsychologistsFound": "No psychologists found",
     "adjustFilters": "Try adjusting your search filters to find more results",
-    "clearFilters": "Clear Filters"
+    "clearFilters": "Clear Filters",
+    "viewProfile": "View Profile",
+    "bookSession": "Book Session",
+    "yearsExp": "years exp.",
+    "more": "more",
+    "hourly": "/hr"
   },
   "pricing": {
     "simpleTransparent": "Simple, Transparent Pricing",
@@ -252,5 +263,32 @@
     "testimonials": {
       "title": "Trusted by Healthcare Professionals"
     }
+  },
+  "booking": {
+    "title": "Book Session with",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "sessionType": "Session Type",
+    "individual": "Individual",
+    "group": "Group",
+    "notes": "Notes",
+    "notesPlaceholder": "Add any specific topics or concerns you'd like to discuss",
+    "confirm": "Confirm Booking",
+    "cancel": "Cancel",
+    "sendRequest": "Send Request",
+    "sending": "Sending...",
+    "sessionTopic": "Session Topic",
+    "sessionTopicPlaceholder": "e.g. Anxiety, depression, couples therapy...",
+    "optional": "optional",
+    "selectTimeSlot": "Select a time slot",
+    "sessionFee": "Session fee",
+    "total": "Total",
+    "requestSent": "Your session request has been sent to the psychologist. They will contact you soon.",
+    "errorSending": "Could not send the request. Please try again."
+  },
+  "subscription": {
+    "managementFee": "Session Management Fee",
+    "freeWithPremium": "Free with Premium plan!",
+    "upgrade": "Upgrade Plan"
   }
 }

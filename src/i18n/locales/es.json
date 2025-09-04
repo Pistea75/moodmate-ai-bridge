@@ -15,7 +15,12 @@
     "login": "Iniciar Sesión",
     "signup": "Registrarse",
     "logout": "Cerrar Sesión",
-    "marketplace": "Marketplace"
+    "marketplace": "Marketplace",
+    "analytics": "Análisis",
+    "reports": "Reportes",
+    "patients": "Pacientes",
+    "insights": "Insights",
+    "trainAI": "Entrenar IA"
   },
   "marketplace": {
     "title": "Marketplace de Psicólogos",
@@ -35,7 +40,12 @@
     "clearFilters": "Limpiar Filtros",
     "sessionManagementFee": "Tarifa de Gestión de Sesión",
     "freeWithPremium": "¡Gratis con plan Premium!",
-    "upgradePlan": "Mejorar Plan"
+    "upgradePlan": "Mejorar Plan",
+    "viewProfile": "Ver Perfil",
+    "bookSession": "Reservar",
+    "yearsExp": "años exp.",
+    "more": "más",
+    "hourly": "/hr"
   },
   "auth": {
     "welcome": "Bienvenido de vuelta",
@@ -194,7 +204,8 @@
     "download": "Descargar",
     "upload": "Subir",
     "language": "Idioma",
-    "theme": "Tema"
+    "theme": "Tema",
+    "free": "GRATIS"
   },
   "messages": {
     "noMessages": "Aún no hay mensajes",
@@ -255,5 +266,32 @@
     "testimonials": {
       "title": "Confiado por Profesionales de la Salud"
     }
+  },
+  "booking": {
+    "title": "Reservar Sesión con",
+    "selectDate": "Seleccionar Fecha",
+    "selectTime": "Seleccionar Hora",
+    "sessionType": "Tipo de Sesión",
+    "individual": "Individual",
+    "group": "Grupal",
+    "notes": "Notas",
+    "notesPlaceholder": "Agrega cualquier tema específico o inquietud que te gustaría discutir",
+    "confirm": "Confirmar Reserva",
+    "cancel": "Cancelar",
+    "sendRequest": "Enviar Solicitud",
+    "sending": "Enviando...",
+    "sessionTopic": "Tema de la Sesión",
+    "sessionTopicPlaceholder": "ej. Ansiedad, depresión, terapia de pareja...",
+    "optional": "opcional",
+    "selectTimeSlot": "Selecciona un horario",
+    "sessionFee": "Tarifa de sesión",
+    "total": "Total",
+    "requestSent": "Tu solicitud de sesión ha sido enviada al psicólogo. Te contactarán pronto.",
+    "errorSending": "No se pudo enviar la solicitud. Inténtalo de nuevo."
+  },
+  "subscription": {
+    "managementFee": "Tarifa de Gestión de Sesión",
+    "freeWithPremium": "¡Gratis con plan Premium!",
+    "upgrade": "Mejorar Plan"
   }
 }
