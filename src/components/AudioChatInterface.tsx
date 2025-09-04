@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mic, Volume2, VolumeX, Settings, Play, Pause } from 'lucide-react';
+import { Mic, Volume2, VolumeX, Settings, Play, Pause, MessageSquareText } from 'lucide-react';
 import { useAudioChat } from '@/hooks/useAudioChat';
 import { useTTS } from '@/hooks/useTTS';
 import { useVoiceSettings } from '@/hooks/useVoiceSettings';
@@ -33,6 +33,7 @@ export function AudioChatInterface({
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [currentPlayingId, setCurrentPlayingId] = useState<string | null>(null);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
   const { settings, updateSettings } = useVoiceSettings();
   const { hasConsent } = useVoiceConsent();
@@ -81,6 +82,15 @@ export function AudioChatInterface({
     setInputMode(goingToVoice ? 'voice' : 'text');
   };
 
+  const handleVoiceRecord = () => {
+    if (!hasConsent) {
+      setShowConsentModal(true);
+      return;
+    }
+    setShowVoiceRecorder(true);
+    // TODO: Implement voice recording modal/component
+  };
+
   const handleConsentGiven = () => {
     updateSettings({ enabled: true });
     setShowConsentModal(false);
@@ -121,7 +131,7 @@ export function AudioChatInterface({
               size="sm"
               onClick={handleToggleVoiceMode}
             >
-              {inputMode === 'text' ? <Mic className="h-4 w-4" /> : 'Text'}
+              {inputMode === 'text' ? <MessageSquareText className="h-4 w-4" /> : 'Text'}
             </Button>
           </FeatureGate>
           <FeatureGate capability="voiceChat">
@@ -199,6 +209,7 @@ export function AudioChatInterface({
         {inputMode === 'text' ? (
           <TextInputMode
             onSendMessage={handleSendMessage}
+            onVoiceRecord={handleVoiceRecord}
             isLoading={isLoading}
           />
         ) : (

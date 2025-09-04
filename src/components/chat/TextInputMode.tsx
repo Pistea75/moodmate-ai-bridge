@@ -2,14 +2,16 @@
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send, Mic } from "lucide-react";
+import { FeatureGate } from '../common/FeatureGate';
 
 interface TextInputModeProps {
   onSendMessage: (message: string) => Promise<void>;
+  onVoiceRecord?: () => void;
   isLoading: boolean;
 }
 
-export function TextInputMode({ onSendMessage, isLoading }: TextInputModeProps) {
+export function TextInputMode({ onSendMessage, onVoiceRecord, isLoading }: TextInputModeProps) {
   const [newMessage, setNewMessage] = useState('');
 
   const handleSend = async () => {
@@ -29,6 +31,15 @@ export function TextInputMode({ onSendMessage, isLoading }: TextInputModeProps) 
         className="flex-1" 
         disabled={isLoading}
       />
+      <FeatureGate capability="voiceChat">
+        <Button 
+          variant="outline"
+          onClick={onVoiceRecord}
+          disabled={isLoading}
+        >
+          <Mic className="h-4 w-4" />
+        </Button>
+      </FeatureGate>
       <Button 
         onClick={handleSend} 
         disabled={!newMessage.trim() || isLoading}
