@@ -1,11 +1,11 @@
 {
   "sessions": "Sesiones",
-  "manageAppointments": "Gestiona citas y registra resultados de sesiones",
+  "manageAppointments": "Gestiona citas y registra resultados de sesiones",  
   "templates": "Plantillas",
   "thisWeek": "Esta semana",
   "totalSessions": "Total de sesiones",
   "completedToday": "Completadas hoy",
-  "sessionsFinished": "Sesiones terminadas",
+  "sessionsFinished": "Sesiones terminadas", 
   "upcomingToday": "Próximas hoy",
   "sessionsRemaining": "Sesiones restantes",
   "averageRating": "Calificación promedio",
