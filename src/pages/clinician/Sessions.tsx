@@ -4,6 +4,7 @@ import ClinicianLayout from "../../layouts/ClinicianLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { isSameDay, isBefore, addMinutes } from "date-fns";
+import { useTranslation } from 'react-i18next';
 import { SessionTabs } from "@/components/SessionTabs";
 import { SessionHeader } from "@/components/SessionHeader";
 import { ScheduleSessionModal } from "@/components/session/ScheduleSessionModal";
@@ -38,6 +39,7 @@ interface SessionWithPatient {
 }
 
 export default function Sessions() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [sessions, setSessions] = useState<SessionWithPatient[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -204,10 +206,10 @@ export default function Sessions() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Clock className="h-8 w-8 text-blue-600" />
-              Sessions
+              {t('sessions')}
             </h1>
             <p className="text-gray-600 mt-1">
-              Manage appointments and track session outcomes
+              {t('manageAppointments')}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -216,7 +218,7 @@ export default function Sessions() {
               onClick={() => setOpenTemplateModal(true)}
             >
               <FileText className="h-4 w-4 mr-2" />
-              Templates
+              {t('templates')}
             </Button>
           </div>
         </div>
@@ -225,47 +227,47 @@ export default function Sessions() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">This Week</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('thisWeek')}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{sessionStats.totalThisWeek}</div>
-              <p className="text-xs text-muted-foreground">Total sessions</p>
+              <p className="text-xs text-muted-foreground">{t('totalSessions')}</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Today</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('completedToday')}</CardTitle>
               <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">{sessionStats.completedToday}</div>
-              <p className="text-xs text-muted-foreground">Sessions finished</p>
+              <p className="text-xs text-muted-foreground">{t('sessionsFinished')}</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Upcoming Today</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('upcomingToday')}</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">{sessionStats.upcomingToday}</div>
-              <p className="text-xs text-muted-foreground">Sessions remaining</p>
+              <p className="text-xs text-muted-foreground">{t('sessionsRemaining')}</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('averageRating')}</CardTitle>
               <Star className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-yellow-600">
                 {sessionStats.averageRating || '--'}/5
               </div>
-              <p className="text-xs text-muted-foreground">Session outcomes</p>
+              <p className="text-xs text-muted-foreground">{t('sessionOutcomes')}</p>
             </CardContent>
           </Card>
         </div>

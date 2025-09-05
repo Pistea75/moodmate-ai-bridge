@@ -11,6 +11,7 @@ import {
   Heart,
   Activity
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { MoodChart } from '@/components/mood/MoodChart';
 import { MoodLogModal } from '@/components/patient/MoodLogModal';
 import { TasksCompletedCard } from './TasksCompletedCard';
@@ -22,6 +23,7 @@ import { useMoodEntries } from '@/hooks/useMoodEntries';
 import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export function EnhancedPatientDashboard() {
+  const { t } = useTranslation();
   const { stats, loading } = usePatientDashboard();
   const { moods, refetch } = useMoodEntries();
 
@@ -62,10 +64,10 @@ export function EnhancedPatientDashboard() {
       <div className="flex justify-between items-start">
         <div className="space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Welcome Back!
+            {t('welcomeBack')}
           </h1>
           <p className="text-xl text-muted-foreground">
-            Here's how you're doing today
+            {t('todayProgress')}
           </p>
         </div>
         <MoodLogModal 
@@ -73,7 +75,7 @@ export function EnhancedPatientDashboard() {
           trigger={
             <Button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700">
               <Plus className="h-4 w-4" />
-              Log Mood
+              {t('logMood')}
             </Button>
           }
         />
@@ -83,13 +85,13 @@ export function EnhancedPatientDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Week</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('thisWeek')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">{averageMood}</div>
             <p className="text-xs text-muted-foreground">
-              Average mood score
+              {t('averageMoodScore')}
             </p>
           </CardContent>
         </Card>
@@ -98,13 +100,13 @@ export function EnhancedPatientDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sessions Today</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('sessionsToday')}</CardTitle>
             <Calendar className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{stats.upcomingSessions}</div>
             <p className="text-xs text-muted-foreground">
-              Scheduled sessions
+              {t('scheduledSessions')}
             </p>
           </CardContent>
         </Card>
@@ -117,7 +119,7 @@ export function EnhancedPatientDashboard() {
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="h-5 w-5 text-purple-600" />
-              <h2 className="text-xl font-semibold">Mood Trends</h2>
+              <h2 className="text-xl font-semibold">{t('moodTrends')}</h2>
             </div>
             <MoodChart showLogButton={false} />
           </div>
@@ -144,7 +146,7 @@ export function EnhancedPatientDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-purple-600" />
-            AI Insights
+            {t('aiInsights')}
           </CardTitle>
         </CardHeader>
         <CardContent>

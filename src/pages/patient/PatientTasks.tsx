@@ -61,39 +61,39 @@ export default function PatientTasks() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('totalTasks')}</CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{tasks?.length || 0}</div>
               <p className="text-xs text-muted-foreground">
-                All assigned tasks
+                {t('allAssignedTasks')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('completed')}</CardTitle>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">{completedTasks.length}</div>
               <p className="text-xs text-muted-foreground">
-                {tasks?.length ? Math.round((completedTasks.length / tasks.length) * 100) : 0}% completion rate
+                {tasks?.length ? Math.round((completedTasks.length / tasks.length) * 100) : 0}% {t('completionRate')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('pending')}</CardTitle>
               <Clock className="h-4 w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-orange-600">{pendingTasks.length}</div>
               <p className="text-xs text-muted-foreground">
-                Tasks remaining
+                {t('tasksRemaining')}
               </p>
             </CardContent>
           </Card>
@@ -107,7 +107,7 @@ export default function PatientTasks() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="h-5 w-5 text-orange-600" />
-                  Pending Tasks ({pendingTasks.length})
+                  {t('pendingTasks')} ({pendingTasks.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -125,7 +125,7 @@ export default function PatientTasks() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  Completed Tasks ({completedTasks.length})
+                  {t('completedTasks')} ({completedTasks.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -142,9 +142,9 @@ export default function PatientTasks() {
             <Card className="text-center py-12">
               <CardContent>
                 <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Tasks Yet</h3>
+                <h3 className="text-lg font-semibold mb-2">{t('noTasksYet')}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Your clinician will assign tasks to help with your mental health journey.
+                  {t('clinicianWillAssignTasks')}
                 </p>
               </CardContent>
             </Card>

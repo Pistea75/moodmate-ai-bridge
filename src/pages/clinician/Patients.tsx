@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 import { PatientCard, PatientCardData } from '@/components/clinician/PatientCard';
 import { PatientFilters } from '@/components/clinician/PatientFilters';
 import { PatientOnboardingModal } from '@/components/clinician/PatientOnboardingModal';
@@ -14,6 +15,7 @@ import { toast } from 'sonner';
 import ClinicianLayout from '@/layouts/ClinicianLayout';
 
 export default function Patients() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [patients, setPatients] = useState<PatientCardData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -206,9 +208,9 @@ export default function Patients() {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Users className="h-7 w-7 text-blue-600" />
-              Patients
+              {t('patients')}
             </h1>
-            <p className="text-muted-foreground">Manage and monitor your patients</p>
+            <p className="text-muted-foreground">{t('managePatientsDescription')}</p>
           </div>
         </div>
 
@@ -216,7 +218,7 @@ export default function Patients() {
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('totalPatients')}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -226,7 +228,7 @@ export default function Patients() {
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('active')}</CardTitle>
               <Badge className="bg-green-100 text-green-800">Active</Badge>
             </CardHeader>
             <CardContent>
@@ -236,7 +238,7 @@ export default function Patients() {
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">At Risk</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('atRisk')}</CardTitle>
               <AlertTriangle className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
@@ -246,7 +248,7 @@ export default function Patients() {
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Onboarding</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('pendingOnboarding')}</CardTitle>
               <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
             </CardHeader>
             <CardContent>
@@ -269,11 +271,11 @@ export default function Patients() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Users className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-2">No patients found</h3>
+              <h3 className="text-lg font-medium mb-2">{t('noPatientsFound')}</h3>
               <p className="text-muted-foreground text-center mb-4">
                 {filters.search || filters.status !== 'all' || filters.riskLevel !== 'all'
-                  ? 'Try adjusting your search criteria or filters.'
-                  : 'Start by adding your first patient to begin monitoring their progress.'}
+                  ? t('adjustSearchCriteria')
+                  : t('addFirstPatientPrompt')}
               </p>
             </CardContent>
           </Card>

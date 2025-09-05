@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, ClipboardList } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { WelcomeBanner } from '@/components/clinician/WelcomeBanner';
 import { QuickStats } from '@/components/clinician/QuickStats';
@@ -17,6 +18,7 @@ import { DashboardInsights } from '@/components/clinician/DashboardInsights';
 import { useDashboardData } from '@/hooks/useDashboardData';
 
 export default function ClinicianDashboard() {
+  const { t } = useTranslation();
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [taskRefreshKey, setTaskRefreshKey] = useState(0);
@@ -95,7 +97,7 @@ export default function ClinicianDashboard() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <ClipboardList className="h-5 w-5" />
-                  My Tasks
+                  {t('myTasks')}
                 </CardTitle>
                 <Button 
                   size="sm" 
@@ -103,7 +105,7 @@ export default function ClinicianDashboard() {
                   className="bg-mood-purple hover:bg-mood-purple/90"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Task
+                  {t('addTask')}
                 </Button>
               </CardHeader>
               <CardContent>
