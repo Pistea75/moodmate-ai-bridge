@@ -2,31 +2,33 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Calendar, Clock, CheckCircle } from 'lucide-react';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { useTranslation } from 'react-i18next';
 
 export function QuickStats() {
+  const { t } = useTranslation();
   const { patients, sessionsToday, pendingTaskCount, loadingPatients, loadingSessions } = useDashboardData();
   
   const stats = [
     {
-      title: 'Total Patients',
+      title: t('totalPatients'),
       value: patients.length,
       icon: Users,
       loading: loadingPatients
     },
     {
-      title: 'Sessions Today',
+      title: t('sessionsToday'),
       value: sessionsToday.length,
       icon: Calendar,
       loading: loadingSessions
     },
     {
-      title: 'Pending Tasks',
+      title: t('pendingTasks'),
       value: pendingTaskCount,
       icon: Clock,
       loading: false
     },
     {
-      title: 'Completed Today',
+      title: t('completedToday'),
       value: 0,
       icon: CheckCircle,
       loading: false

@@ -4,8 +4,10 @@ import { Card } from '@/components/ui/card';
 import { CheckCircle2 } from 'lucide-react';
 import { usePatientTasks } from '@/hooks/usePatientTasks';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 export function TasksCompletedCard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     completed: 0,
     total: 0,
@@ -29,7 +31,7 @@ export function TasksCompletedCard() {
   
   return (
     <Card className="p-4">
-      <h3 className="text-sm font-medium text-muted-foreground mb-1">Tasks Completed</h3>
+      <h3 className="text-sm font-medium text-muted-foreground mb-1">{t('tasksCompleted')}</h3>
       {loading ? (
         <div className="space-y-2">
           <Skeleton className="h-8 w-20" />
@@ -38,14 +40,14 @@ export function TasksCompletedCard() {
       ) : (
         <>
           <div className="text-2xl font-bold">
-            {tasks.length === 0 ? "No Tasks" : `${stats.completed}/${stats.total}`}
+            {tasks.length === 0 ? t('noTasks') : `${stats.completed}/${stats.total}`}
           </div>
           <div className="flex items-center gap-1 text-sm mt-1">
             <CheckCircle2 className="h-4 w-4 text-green-500" />
             <span>
               {tasks.length === 0 
-                ? "No tasks assigned" 
-                : `${stats.percentage}% completion rate`}
+                ? t('noTasksAssigned') 
+                : `${stats.percentage}% ${t('completionRate')}`}
             </span>
           </div>
         </>
