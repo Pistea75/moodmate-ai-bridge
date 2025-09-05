@@ -30,8 +30,9 @@ export async function fetchLogsLogic(
   
   console.log('Logs fetched without filter, count:', fetchedLogs.length);
   
-  // Only if we found logs, try applying the filter
-  if (fetchedLogs.length > 0 && isFilterActive && startDate && endDate) {
+  // Apply filtering if active, regardless of whether we found logs initially
+  if (isFilterActive && startDate && endDate) {
+    console.log('Applying date filter...');
     const filteredLogs = await fetchPatientChatLogs(
       patientId, 
       startDate, 
@@ -44,11 +45,12 @@ export async function fetchLogsLogic(
     if (filteredLogs.length > 0) {
       fetchedLogs = filteredLogs;
     } else {
-      console.log('No logs in filtered range, using all logs instead');
+      console.log('No logs in filtered range');
       toast({
         title: "No logs in date range",
-        description: `No logs found in the selected date range. Showing all ${fetchedLogs.length} logs instead.`,
+        description: `No logs found in the selected date range.`,
       });
+      fetchedLogs = []; // Show empty results when filter is active but no results found
     }
   }
   
