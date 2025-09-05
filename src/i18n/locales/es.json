@@ -1,4 +1,15 @@
 {
+  "sessions": "Sesiones",
+  "manageAppointments": "Gestiona citas y registra resultados de sesiones",
+  "templates": "Plantillas",
+  "thisWeek": "Esta semana",
+  "totalSessions": "Total de sesiones",
+  "completedToday": "Completadas hoy",
+  "sessionsFinished": "Sesiones terminadas",
+  "upcomingToday": "Próximas hoy",
+  "sessionsRemaining": "Sesiones restantes",
+  "averageRating": "Calificación promedio",
+  "resultadosPromedio": "Resultados promedio de sesiones",
   "nav": {
     "dashboard": "Panel",
     "chat": "Chat IA",
