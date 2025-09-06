@@ -5,7 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
  * Enhanced security utilities with comprehensive protection
  */
 
-// Password validation with consistent 12+ character requirement
+/**
+ * Enhanced password validation with stronger security requirements
+ */
 export const validatePasswordStrength = (password: string): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
   
@@ -14,6 +16,7 @@ export const validatePasswordStrength = (password: string): { isValid: boolean; 
     return { isValid: false, errors };
   }
   
+  // Minimum 12 characters for enhanced security
   if (password.length < 12) {
     errors.push('Password must be at least 12 characters long');
   }
@@ -39,17 +42,28 @@ export const validatePasswordStrength = (password: string): { isValid: boolean; 
     errors.push('Password cannot contain repeated characters');
   }
   
+  // Enhanced common pattern detection
   const commonPatterns = [
     'password', 'Password', 'PASSWORD',
     '123456', '12345678', '123456789',
     'qwerty', 'QWERTY', 'qwertyuiop',
     'admin', 'Admin', 'ADMIN',
     'welcome', 'Welcome', 'WELCOME',
-    'letmein', 'monkey', 'dragon'
+    'letmein', 'monkey', 'dragon',
+    '11111', '12345', 'abc123', 'iloveyou', 'sunshine', 'master'
   ];
   
   if (commonPatterns.some(pattern => password.toLowerCase().includes(pattern.toLowerCase()))) {
     errors.push('Password cannot contain common words or patterns');
+  }
+  
+  // Check for keyboard patterns
+  const keyboardPatterns = [
+    /qwertyuiop/, /asdfghjkl/, /zxcvbnm/, /1234567890/
+  ];
+  
+  if (keyboardPatterns.some(pattern => pattern.test(password.toLowerCase()))) {
+    errors.push('Password cannot contain keyboard patterns');
   }
   
   return { isValid: errors.length === 0, errors };
