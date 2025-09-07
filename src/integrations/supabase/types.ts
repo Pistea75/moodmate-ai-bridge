@@ -527,6 +527,45 @@ export type Database = {
           },
         ]
       }
+      invited_patients: {
+        Row: {
+          created_at: string
+          email: string | null
+          first_name: string
+          id: string
+          last_name: string
+          phone_e164: string
+          psychologist_id: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          phone_e164: string
+          psychologist_id: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone_e164?: string
+          psychologist_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       mood_entries: {
         Row: {
           created_at: string | null
@@ -643,6 +682,44 @@ export type Database = {
           patient_id?: string | null
         }
         Relationships: []
+      }
+      patient_invitations: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          patient_id: string
+          psychologist_id: string
+          used_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          patient_id: string
+          psychologist_id: string
+          used_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          patient_id?: string
+          psychologist_id?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_invitations_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "invited_patients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       patient_risk_assessments: {
         Row: {
@@ -1690,6 +1767,10 @@ export type Database = {
         Args: { reason: string; target_user_id: string }
         Returns: boolean
       }
+      generate_invitation_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1707,6 +1788,10 @@ export type Database = {
       is_super_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      normalize_phone_e164: {
+        Args: { phone_input: string }
+        Returns: string
       }
       reset_daily_message_counts: {
         Args: Record<PropertyKey, never>
