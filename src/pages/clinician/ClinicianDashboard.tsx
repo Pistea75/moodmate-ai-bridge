@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, ClipboardList } from 'lucide-react';
+import { Plus, ClipboardList, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ClinicianLayout from '../../layouts/ClinicianLayout';
 import { WelcomeBanner } from '@/components/clinician/WelcomeBanner';
@@ -16,11 +16,13 @@ import { RecentReports } from '@/components/clinician/RecentReports';
 import { RiskAlertBanner } from '@/components/clinician/RiskAlertBanner';
 import { DashboardInsights } from '@/components/clinician/DashboardInsights';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { InvitePatientForm } from '@/components/patient/InvitePatientForm';
 
 export default function ClinicianDashboard() {
   const { t } = useTranslation();
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showSessionModal, setShowSessionModal] = useState(false);
+  const [showInviteForm, setShowInviteForm] = useState(false);
   const [taskRefreshKey, setTaskRefreshKey] = useState(0);
 
   const {
@@ -90,8 +92,8 @@ export default function ClinicianDashboard() {
           {/* Practice Insights - Full Width */}
           <DashboardInsights />
           
-          {/* Bottom Grid - Tasks and Recent Reports */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Bottom Grid - Tasks, Recent Reports, and Invite Patient */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* My Tasks */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
@@ -123,6 +125,19 @@ export default function ClinicianDashboard() {
             <Card>
               <CardContent className="p-6">
                 <RecentReports patients={patients} />
+              </CardContent>
+            </Card>
+            
+            {/* Invite Patient */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <UserPlus className="h-5 w-5" />
+                  Invitar Paciente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <InvitePatientForm onSuccess={() => {}} />
               </CardContent>
             </Card>
           </div>

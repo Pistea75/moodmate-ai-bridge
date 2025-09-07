@@ -75,6 +75,7 @@ const Security = lazy(() => import("./pages/Security"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const PatientInviteSignup = lazy(() => import("./pages/PatientInviteSignup"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -125,6 +126,7 @@ function App() {
                         <Route path="/security" element={<Security />} />
                         <Route path="/help" element={<HelpCenter />} />
                         <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+                        <Route path="/invite/:code" element={<PatientInviteSignup />} />
 
                         {/* Patient routes */}
                         <Route path="/patient/*" element={
