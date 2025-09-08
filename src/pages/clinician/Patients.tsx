@@ -10,6 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { PatientCard, PatientCardData } from '@/components/clinician/PatientCard';
 import { PatientFilters } from '@/components/clinician/PatientFilters';
 import { PatientOnboardingModal } from '@/components/clinician/PatientOnboardingModal';
+import { InvitePatientForm } from '@/components/patient/InvitePatientForm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import ClinicianLayout from '@/layouts/ClinicianLayout';
@@ -20,6 +22,7 @@ export default function Patients() {
   const [patients, setPatients] = useState<PatientCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   
   // Updated filters to match PatientFilters interface
@@ -212,6 +215,13 @@ export default function Patients() {
             </h1>
             <p className="text-muted-foreground">{t('managePatientsDescription')}</p>
           </div>
+          <Button
+            onClick={() => setShowInviteModal(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Invitar Nuevo Paciente
+          </Button>
         </div>
 
         {/* Stats Cards */}
@@ -310,6 +320,21 @@ export default function Patients() {
             fetchPatients(); // Refresh data
           }}
         />
+
+        {/* Invite Patient Modal */}
+        <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Invitar Nuevo Paciente</DialogTitle>
+            </DialogHeader>
+            <InvitePatientForm
+              onSuccess={() => {
+                setShowInviteModal(false);
+                fetchPatients(); // Refresh patient list
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </ClinicianLayout>
   );
