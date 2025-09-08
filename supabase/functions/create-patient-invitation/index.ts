@@ -179,7 +179,7 @@ serve(async (req) => {
     }
 
     // Build URLs
-    const baseUrl = Deno.env.get('SITE_URL') || 'https://d5f6f819-d32f-4a69-9d15-a0ee7a0c0771.lovableproject.com';
+    const baseUrl = 'https://moodmate.io';
     const inviteUrl = `${baseUrl}/invite/${invitation.code}`;
     
     // Generate WhatsApp message

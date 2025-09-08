@@ -206,7 +206,7 @@ export default function Sessions() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Clock className="h-8 w-8 text-blue-600" />
-              {t('sessions')}
+              {t('nav.sessions', 'Sessions')}
             </h1>
             <p className="text-gray-600 mt-1">
               {t('manageAppointments')}
