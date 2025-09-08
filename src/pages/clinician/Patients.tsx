@@ -160,6 +160,11 @@ export default function Patients() {
     });
   };
 
+  const handleUnlinkPatient = async (patientId: string) => {
+    // Refresh the patient list after unlinking
+    fetchPatients();
+  };
+
   const handleFiltersChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
   };
@@ -299,6 +304,7 @@ export default function Patients() {
                 onAssessRisk={handleAssessRisk}
                 onStartOnboarding={handleStartOnboarding}
                 onMessagePatient={handleMessagePatient}
+                onUnlinkPatient={handleUnlinkPatient}
               />
             ))}
           </div>

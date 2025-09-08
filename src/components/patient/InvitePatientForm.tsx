@@ -53,7 +53,7 @@ export function InvitePatientForm({ onSuccess }: InvitePatientFormProps) {
 
       setInvitation(data);
       toast.success('Invitación creada exitosamente');
-      onSuccess?.();
+      // Don't call onSuccess immediately to allow user to copy link/open WhatsApp
     } catch (error) {
       console.error('Unexpected error:', error);
       toast.error('Error inesperado al crear la invitación');
@@ -84,6 +84,7 @@ export function InvitePatientForm({ onSuccess }: InvitePatientFormProps) {
     setFormData({ first_name: '', last_name: '', phone: '' });
     setInvitation(null);
     setCopiedUrl(false);
+    onSuccess?.(); // Notify parent to refresh list and close modal
   };
 
   if (invitation) {

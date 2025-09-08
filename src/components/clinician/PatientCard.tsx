@@ -14,7 +14,8 @@ import {
   Clock,
   MoreHorizontal,
   UserPlus,
-  Brain
+  Brain,
+  UserMinus
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
@@ -44,6 +45,7 @@ interface PatientCardProps {
   onAssessRisk: (patientId: string) => void;
   onStartOnboarding: (patientId: string) => void;
   onMessagePatient?: (patientId: string) => void;
+  onUnlinkPatient?: (patientId: string) => void;
 }
 
 export function PatientCard({ 
@@ -51,7 +53,8 @@ export function PatientCard({
   onViewProfile, 
   onAssessRisk,
   onStartOnboarding,
-  onMessagePatient 
+  onMessagePatient,
+  onUnlinkPatient
 }: PatientCardProps) {
   const [isAssessing, setIsAssessing] = useState(false);
   const { toast } = useToast();
@@ -139,6 +142,37 @@ export function PatientCard({
     }
   };
 
+  const handleUnlinkPatient = async () => {
+    if (!onUnlinkPatient) return;
+    
+    try {
+      const { data: currentUser } = await supabase.auth.getUser();
+      if (!currentUser.user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('patient_clinician_links')
+        .delete()
+        .eq('patient_id', patient.id)
+        .eq('clinician_id', currentUser.user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Patient Unlinked',
+        description: `${patient.first_name} ${patient.last_name} has been unlinked from your profile.`
+      });
+
+      onUnlinkPatient(patient.id);
+    } catch (error: any) {
+      console.error('Error unlinking patient:', error);
+      toast({
+        title: 'Failed to Unlink',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow h-full">
       <CardContent className="p-4 h-full flex flex-col">
@@ -193,6 +227,15 @@ export function PatientCard({
                   <DropdownMenuItem onClick={() => onStartOnboarding(patient.id)}>
                     <UserPlus className="h-4 w-4 mr-2" />
                     Complete Onboarding
+                  </DropdownMenuItem>
+                )}
+                {onUnlinkPatient && (
+                  <DropdownMenuItem 
+                    onClick={handleUnlinkPatient}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <UserMinus className="h-4 w-4 mr-2" />
+                    Unlink Patient
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
