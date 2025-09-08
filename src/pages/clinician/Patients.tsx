@@ -220,7 +220,7 @@ export default function Patients() {
             className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
-            Invitar Nuevo Paciente
+            {t('newPatient', 'New Patient')}
           </Button>
         </div>
 
