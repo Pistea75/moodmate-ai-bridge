@@ -1015,6 +1015,39 @@ export type Database = {
         }
         Relationships: []
       }
+      security_rate_limits_enhanced: {
+        Row: {
+          action_type: string
+          attempts: number
+          blocked_until: string | null
+          created_at: string | null
+          id: string
+          identifier: string
+          updated_at: string | null
+          window_start: string
+        }
+        Insert: {
+          action_type: string
+          attempts?: number
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          identifier: string
+          updated_at?: string | null
+          window_start?: string
+        }
+        Update: {
+          action_type?: string
+          attempts?: number
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          identifier?: string
+          updated_at?: string | null
+          window_start?: string
+        }
+        Relationships: []
+      }
       sensitive_operations_log: {
         Row: {
           created_at: string | null
@@ -1816,6 +1849,10 @@ export type Database = {
           required_fields: string[]
         }
         Returns: boolean
+      }
+      validate_invitation_code_secure: {
+        Args: { invitation_code: string }
+        Returns: Json
       }
       verify_super_admin_access: {
         Args: { action_description?: string }

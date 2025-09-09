@@ -14,7 +14,7 @@ export function SecurityHeaders() {
       },
       {
         name: 'X-Frame-Options',
-        content: 'DENY'
+        content: 'SAMEORIGIN'
       },
       {
         name: 'X-XSS-Protection',
@@ -41,15 +41,17 @@ export function SecurityHeaders() {
       }
     });
 
-    // Set CSP via meta tag (backup for when headers aren't available)
+    // Set improved CSP via meta tag (backup for when headers aren't available)
     const cspContent = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "script-src 'self' 'nonce-" + nonce + "' https://cdn.jsdelivr.net",
+      "style-src 'self' 'nonce-" + nonce + "' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https:",
-      "connect-src 'self' https://otrhbyzjrhsqrltdedon.supabase.co wss://otrhbyzjrhsqrltdedon.supabase.co",
-      "frame-ancestors 'none'"
+      "connect-src 'self' https://otrhbyzjrhsqrltdedon.supabase.co wss://otrhbyzjrhsqrltdedon.supabase.co https://moodmate.io",
+      "frame-ancestors 'self'",
+      "object-src 'none'",
+      "base-uri 'self'"
     ].join('; ');
 
     const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');

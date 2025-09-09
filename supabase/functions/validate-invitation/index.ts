@@ -1,112 +1,136 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4'
+import { corsHeaders } from '../_shared/cors.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+)
 
-serve(async (req) => {
-  // Handle CORS preflight requests
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
 
-    const url = new URL(req.url);
-    const code = url.pathname.split('/').pop();
+    const { code } = await req.json();
+    console.log('[VALIDATE-INVITATION] Validating code:', code);
 
-    if (!code) {
+    // Enhanced input validation
+    if (!code || typeof code !== 'string') {
+      console.log('[VALIDATE-INVITATION] Invalid input - missing or invalid code');
       return new Response(
-        JSON.stringify({ error: 'Invitation code is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          valid: false, 
+          error: 'Invalid invitation code format' 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
       );
     }
 
-    // Get invitation details
-    const { data: invitation, error: inviteError } = await supabase
-      .from('patient_invitations')
-      .select(`
-        code,
-        expires_at,
-        used_at,
-        invited_patients (
-          first_name,
-          last_name,
-          status
-        ),
-        profiles (
-          first_name,
-          last_name
-        )
-      `)
-      .eq('code', code)
+    // Sanitize and validate code format
+    const sanitizedCode = code.trim().toUpperCase();
+    if (sanitizedCode.length !== 8 || !/^[A-Z0-9]+$/.test(sanitizedCode)) {
+      console.log('[VALIDATE-INVITATION] Invalid code format:', sanitizedCode);
+      return new Response(
+        JSON.stringify({ 
+          valid: false, 
+          error: 'Invalid invitation code format' 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    // Rate limiting check - basic implementation
+    const clientIP = req.headers.get('cf-connecting-ip') || 
+                     req.headers.get('x-forwarded-for') || 
+                     'unknown';
+
+    // Check rate limit
+    const { data: rateLimitData } = await supabase
+      .from('security_rate_limits_enhanced')
+      .select('*')
+      .eq('identifier', clientIP)
+      .eq('action_type', 'invitation_validation')
+      .gte('window_start', new Date(Date.now() - 15 * 60 * 1000).toISOString())
       .single();
 
-    if (inviteError || !invitation) {
+    if (rateLimitData && rateLimitData.attempts >= 10) {
+      console.log('[VALIDATE-INVITATION] Rate limit exceeded for IP:', clientIP);
       return new Response(
         JSON.stringify({ 
           valid: false, 
-          error: 'Invalid invitation code' 
+          error: 'Too many attempts. Please try again later.' 
         }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { 
+          status: 429, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
       );
     }
 
-    // Check if invitation is expired
-    const now = new Date();
-    const expiresAt = new Date(invitation.expires_at);
-    
-    if (now > expiresAt) {
+    // Update rate limit counter
+    if (rateLimitData) {
+      await supabase
+        .from('security_rate_limits_enhanced')
+        .update({ 
+          attempts: rateLimitData.attempts + 1,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', rateLimitData.id);
+    } else {
+      await supabase
+        .from('security_rate_limits_enhanced')
+        .insert({
+          identifier: clientIP,
+          action_type: 'invitation_validation',
+          attempts: 1
+        });
+    }
+
+    // Use the secure validation function
+    const { data: validationResult, error: validationError } = await supabase
+      .rpc('validate_invitation_code_secure', { invitation_code: sanitizedCode });
+
+    if (validationError) {
+      console.error('[VALIDATE-INVITATION] Database error:', validationError);
       return new Response(
         JSON.stringify({ 
           valid: false, 
-          error: 'Invitation code has expired' 
+          error: 'Validation service unavailable' 
         }),
-        { status: 410, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
       );
     }
 
-    // Check if invitation is already used
-    if (invitation.used_at) {
-      return new Response(
-        JSON.stringify({ 
-          valid: false, 
-          error: 'Invitation code has already been used' 
-        }),
-        { status: 410, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    console.log('[VALIDATE-INVITATION] Validation result:', validationResult);
 
-    // Check if patient is already registered
-    if (invitation.invited_patients?.status === 'registered') {
-      return new Response(
-        JSON.stringify({ 
-          valid: false, 
-          error: 'Patient is already registered' 
-        }),
-        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const psychologistName = invitation.profiles 
-      ? `${invitation.profiles.first_name || ''} ${invitation.profiles.last_name || ''}`.trim()
-      : 'tu psicólogo/a';
+    // Log security event
+    await supabase
+      .from('enhanced_security_logs')
+      .insert({
+        action: 'invitation_validation',
+        resource: 'patient_invitations',
+        success: validationResult?.valid || false,
+        details: {
+          code: sanitizedCode,
+          ip_address: clientIP,
+          result: validationResult
+        },
+        ip_address: clientIP
+      });
 
     return new Response(
-      JSON.stringify({
-        valid: true,
-        patient_preview: {
-          first_name: invitation.invited_patients?.first_name || '',
-          last_name: invitation.invited_patients?.last_name || ''
-        },
-        psychologist_name: psychologistName
-      }),
+      JSON.stringify(validationResult),
       { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -114,10 +138,30 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('[VALIDATE-INVITATION] Unexpected error:', error);
+    
+    // Log security event for error
+    await supabase
+      .from('enhanced_security_logs')
+      .insert({
+        action: 'invitation_validation_error',
+        resource: 'patient_invitations',
+        success: false,
+        details: {
+          error: error.message,
+          ip_address: req.headers.get('cf-connecting-ip') || 'unknown'
+        }
+      });
+
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        valid: false, 
+        error: 'Service temporarily unavailable' 
+      }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     );
   }
 });
