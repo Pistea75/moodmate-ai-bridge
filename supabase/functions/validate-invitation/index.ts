@@ -1,5 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4'
 import { corsHeaders } from '../_shared/cors.ts'
+import { 
+  validateInvitationCode, 
+  checkRateLimit, 
+  logSecurityEvent, 
+  getSecurityHeaders
+} from '../_shared/security.ts';
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
@@ -7,8 +13,11 @@ const supabase = createClient(
 )
 
 Deno.serve(async (req) => {
+  const isDevelopment = Deno.env.get('RUNTIME_ENV') === 'development';
+  const securityHeaders = getSecurityHeaders(isDevelopment);
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: { ...corsHeaders, ...securityHeaders } });
   }
 
   try {
@@ -33,7 +42,7 @@ Deno.serve(async (req) => {
 
     // Sanitize and validate code format
     const sanitizedCode = code.trim().toUpperCase();
-    if (sanitizedCode.length !== 8 || !/^[A-Z0-9]+$/.test(sanitizedCode)) {
+    if (!validateInvitationCode(sanitizedCode)) {
       console.log('[VALIDATE-INVITATION] Invalid code format:', sanitizedCode);
       return new Response(
         JSON.stringify({ 
@@ -42,7 +51,7 @@ Deno.serve(async (req) => {
         }),
         { 
           status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          headers: { ...corsHeaders, ...securityHeaders, 'Content-Type': 'application/json' } 
         }
       );
     }

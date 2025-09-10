@@ -6,16 +6,21 @@ export function SecurityHeaders() {
     // Generate CSP nonce for inline scripts if needed
     const nonce = generateCSPNonce();
     
+    // Check if we're in development (Lovable preview)
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname.includes('lovable.dev');
+    
     // Set security-related meta tags
     const metaTags = [
       {
         name: 'X-Content-Type-Options',
         content: 'nosniff'
       },
-      {
+      // Don't set X-Frame-Options in development for Lovable iframe
+      ...(isDevelopment ? [] : [{
         name: 'X-Frame-Options',
-        content: 'SAMEORIGIN'
-      },
+        content: 'DENY'
+      }]),
       {
         name: 'X-XSS-Protection',
         content: '1; mode=block'
@@ -27,7 +32,12 @@ export function SecurityHeaders() {
       {
         name: 'Permissions-Policy',
         content: 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
-      }
+      },
+      // Add HSTS only in production
+      ...(isDevelopment ? [] : [{
+        name: 'Strict-Transport-Security',
+        content: 'max-age=63072000; includeSubDomains; preload'
+      }])
     ];
 
     // Add meta tags to head
@@ -44,15 +54,15 @@ export function SecurityHeaders() {
     // Set improved CSP via meta tag (backup for when headers aren't available)
     const cspContent = [
       "default-src 'self'",
-      "script-src 'self' 'nonce-" + nonce + "' https://cdn.jsdelivr.net",
-      "style-src 'self' 'nonce-" + nonce + "' https://fonts.googleapis.com",
+      "script-src 'self' 'nonce-" + nonce + "' https://cdn.jsdelivr.net" + (isDevelopment ? " 'unsafe-eval'" : ""),
+      "style-src 'self' 'nonce-" + nonce + "' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: https:",
-      "connect-src 'self' https://otrhbyzjrhsqrltdedon.supabase.co wss://otrhbyzjrhsqrltdedon.supabase.co https://moodmate.io",
-      "frame-ancestors 'self'",
+      "img-src 'self' data: blob: https:",
+      "connect-src 'self' https://otrhbyzjrhsqrltdedon.supabase.co wss://otrhbyzjrhsqrltdedon.supabase.co https://api.openai.com",
+      isDevelopment ? "" : "frame-ancestors 'none'",
       "object-src 'none'",
       "base-uri 'self'"
-    ].join('; ');
+    ].filter(Boolean).join('; ');
 
     const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
     if (!cspMeta) {
