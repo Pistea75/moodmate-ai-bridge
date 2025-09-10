@@ -68,13 +68,6 @@ export type Database = {
             foreignKeyName: "ai_chat_logs_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "clinician_discovery"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ai_chat_logs_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -132,13 +125,6 @@ export type Database = {
             foreignKeyName: "ai_chat_reports_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
-            referencedRelation: "clinician_discovery"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ai_chat_reports_clinician_id_fkey"
-            columns: ["clinician_id"]
-            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -147,13 +133,6 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ai_chat_reports_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "clinician_discovery"
             referencedColumns: ["id"]
           },
           {
@@ -199,13 +178,6 @@ export type Database = {
             foreignKeyName: "ai_patient_profiles_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
-            referencedRelation: "clinician_discovery"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ai_patient_profiles_clinician_id_fkey"
-            columns: ["clinician_id"]
-            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -214,13 +186,6 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ai_patient_profiles_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "clinician_discovery"
             referencedColumns: ["id"]
           },
           {
@@ -418,6 +383,63 @@ export type Database = {
           },
         ]
       }
+      clinician_marketplace: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          display_name: string
+          experience_years: number | null
+          hourly_rate: number | null
+          id: string
+          is_accepting_patients: boolean | null
+          languages: string[] | null
+          region: string | null
+          specializations: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          display_name: string
+          experience_years?: number | null
+          hourly_rate?: number | null
+          id: string
+          is_accepting_patients?: boolean | null
+          languages?: string[] | null
+          region?: string | null
+          specializations?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string
+          experience_years?: number | null
+          hourly_rate?: number | null
+          id?: string
+          is_accepting_patients?: boolean | null
+          languages?: string[] | null
+          region?: string | null
+          specializations?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinician_marketplace_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "clinician_marketplace_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       csrf_tokens: {
         Row: {
           created_at: string | null
@@ -550,13 +572,6 @@ export type Database = {
             foreignKeyName: "exercise_logs_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "clinician_discovery"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "exercise_logs_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -668,13 +683,6 @@ export type Database = {
             foreignKeyName: "mood_entries_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "clinician_discovery"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mood_entries_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -725,13 +733,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "notifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "clinician_discovery"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
@@ -1513,13 +1514,6 @@ export type Database = {
             foreignKeyName: "sessions_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
-            referencedRelation: "clinician_discovery"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sessions_clinician_id_fkey"
-            columns: ["clinician_id"]
-            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -1528,13 +1522,6 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sessions_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "clinician_discovery"
             referencedColumns: ["id"]
           },
           {
@@ -1686,13 +1673,6 @@ export type Database = {
             foreignKeyName: "tasks_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
-            referencedRelation: "clinician_discovery"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tasks_clinician_id_fkey"
-            columns: ["clinician_id"]
-            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -1701,13 +1681,6 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tasks_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "clinician_discovery"
             referencedColumns: ["id"]
           },
           {
@@ -1898,30 +1871,6 @@ export type Database = {
       }
     }
     Views: {
-      clinician_discovery: {
-        Row: {
-          display_name: string | null
-          id: string | null
-          languages: string[] | null
-          region: string | null
-          specializations: string | null
-        }
-        Insert: {
-          display_name?: string | null
-          id?: string | null
-          languages?: never
-          region?: never
-          specializations?: never
-        }
-        Update: {
-          display_name?: string | null
-          id?: string | null
-          languages?: never
-          region?: never
-          specializations?: never
-        }
-        Relationships: []
-      }
       clinician_referral_codes: {
         Row: {
           referral_code: string | null
@@ -1988,6 +1937,10 @@ export type Database = {
           last_name: string
           patient_id: string
         }[]
+      }
+      is_current_user_super_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       is_super_admin: {
         Args: Record<PropertyKey, never>
