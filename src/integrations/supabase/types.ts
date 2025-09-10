@@ -68,6 +68,13 @@ export type Database = {
             foreignKeyName: "ai_chat_logs_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
+            referencedRelation: "clinician_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_chat_logs_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -125,6 +132,13 @@ export type Database = {
             foreignKeyName: "ai_chat_reports_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
+            referencedRelation: "clinician_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_chat_reports_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -133,6 +147,13 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_chat_reports_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_discovery"
             referencedColumns: ["id"]
           },
           {
@@ -178,6 +199,13 @@ export type Database = {
             foreignKeyName: "ai_patient_profiles_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
+            referencedRelation: "clinician_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_patient_profiles_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -186,6 +214,13 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_patient_profiles_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_discovery"
             referencedColumns: ["id"]
           },
           {
@@ -515,6 +550,13 @@ export type Database = {
             foreignKeyName: "exercise_logs_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
+            referencedRelation: "clinician_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exercise_logs_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -526,6 +568,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      invitation_rate_limits: {
+        Row: {
+          attempts: number | null
+          blocked_until: string | null
+          created_at: string | null
+          id: string
+          ip_address: unknown
+          updated_at: string | null
+          window_start: string | null
+        }
+        Insert: {
+          attempts?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address: unknown
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          attempts?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
       }
       invited_patients: {
         Row: {
@@ -596,6 +668,13 @@ export type Database = {
             foreignKeyName: "mood_entries_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
+            referencedRelation: "clinician_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mood_entries_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -646,6 +725,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_discovery"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
@@ -977,6 +1063,39 @@ export type Database = {
           ip_address?: unknown | null
           resource?: string
           success?: boolean
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_events_log: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          severity: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          severity?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          severity?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
@@ -1394,6 +1513,13 @@ export type Database = {
             foreignKeyName: "sessions_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
+            referencedRelation: "clinician_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -1402,6 +1528,13 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_discovery"
             referencedColumns: ["id"]
           },
           {
@@ -1553,6 +1686,13 @@ export type Database = {
             foreignKeyName: "tasks_clinician_id_fkey"
             columns: ["clinician_id"]
             isOneToOne: false
+            referencedRelation: "clinician_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
             referencedRelation: "clinician_referral_codes"
             referencedColumns: ["user_id"]
           },
@@ -1561,6 +1701,13 @@ export type Database = {
             columns: ["clinician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_discovery"
             referencedColumns: ["id"]
           },
           {
@@ -1751,6 +1898,30 @@ export type Database = {
       }
     }
     Views: {
+      clinician_discovery: {
+        Row: {
+          display_name: string | null
+          id: string | null
+          languages: string[] | null
+          region: string | null
+          specializations: string | null
+        }
+        Insert: {
+          display_name?: string | null
+          id?: string | null
+          languages?: never
+          region?: never
+          specializations?: never
+        }
+        Update: {
+          display_name?: string | null
+          id?: string | null
+          languages?: never
+          region?: never
+          specializations?: never
+        }
+        Relationships: []
+      }
       clinician_referral_codes: {
         Row: {
           referral_code: string | null
