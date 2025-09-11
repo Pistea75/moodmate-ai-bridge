@@ -103,9 +103,13 @@ Deno.serve(async (req) => {
         });
     }
 
-    // Use the secure validation function
+    // Use the new secure validation function that doesn't expose codes
     const { data: validationResult, error: validationError } = await supabase
-      .rpc('validate_invitation_code_secure', { invitation_code: sanitizedCode });
+      .rpc('validate_invitation_secure', { 
+        p_code: sanitizedCode,
+        p_ip_address: clientIP,
+        p_user_agent: req.headers.get('user-agent')
+      });
 
     if (validationError) {
       console.error('[VALIDATE-INVITATION] Database error:', validationError);

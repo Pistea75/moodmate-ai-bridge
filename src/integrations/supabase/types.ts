@@ -614,6 +614,47 @@ export type Database = {
         }
         Relationships: []
       }
+      invitation_validations: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          invitation_id: string | null
+          ip_address: unknown | null
+          user_agent: string | null
+          validated_at: string | null
+          validation_token: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          invitation_id?: string | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+          validated_at?: string | null
+          validation_token: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          invitation_id?: string | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+          validated_at?: string | null
+          validation_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitation_validations_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "patient_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invited_patients: {
         Row: {
           created_at: string
@@ -1976,6 +2017,10 @@ export type Database = {
       }
       validate_invitation_code_secure: {
         Args: { invitation_code: string }
+        Returns: Json
+      }
+      validate_invitation_secure: {
+        Args: { p_code: string; p_ip_address?: unknown; p_user_agent?: string }
         Returns: Json
       }
       verify_super_admin_access: {
