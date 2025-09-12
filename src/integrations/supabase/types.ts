@@ -385,6 +385,7 @@ export type Database = {
       }
       clinician_marketplace: {
         Row: {
+          accepts_insurance: boolean | null
           bio: string | null
           created_at: string | null
           display_name: string
@@ -393,11 +394,15 @@ export type Database = {
           id: string
           is_accepting_patients: boolean | null
           languages: string[] | null
+          pricing_tier: string | null
+          rating_average: number | null
           region: string | null
           specializations: string[] | null
+          total_reviews: number | null
           updated_at: string | null
         }
         Insert: {
+          accepts_insurance?: boolean | null
           bio?: string | null
           created_at?: string | null
           display_name: string
@@ -406,11 +411,15 @@ export type Database = {
           id: string
           is_accepting_patients?: boolean | null
           languages?: string[] | null
+          pricing_tier?: string | null
+          rating_average?: number | null
           region?: string | null
           specializations?: string[] | null
+          total_reviews?: number | null
           updated_at?: string | null
         }
         Update: {
+          accepts_insurance?: boolean | null
           bio?: string | null
           created_at?: string | null
           display_name?: string
@@ -419,8 +428,11 @@ export type Database = {
           id?: string
           is_accepting_patients?: boolean | null
           languages?: string[] | null
+          pricing_tier?: string | null
+          rating_average?: number | null
           region?: string | null
           specializations?: string[] | null
+          total_reviews?: number | null
           updated_at?: string | null
         }
         Relationships: [
