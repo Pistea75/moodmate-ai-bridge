@@ -7,6 +7,7 @@ interface PatientSignupStep2Props {
   formData: {
     referralCode: string;
     acceptTerms: boolean;
+    phone: string;
   };
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -15,8 +16,24 @@ export function PatientSignupStep2({ formData, handleChange }: PatientSignupStep
   return (
     <div className="space-y-4">
       <div>
+        <Label htmlFor="phone" className="block text-sm font-medium mb-1">
+          Phone Number
+        </Label>
+        <Input
+          type="tel"
+          id="phone"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          className="w-full"
+          placeholder="Enter your phone number"
+          readOnly={!!(formData.phone && formData.referralCode)}
+        />
+      </div>
+      
+      <div>
         <Label htmlFor="referralCode" className="block text-sm font-medium mb-1">
-          Clinician Referral Code (Optional)
+          Clinician Referral Code {formData.referralCode ? '(Pre-filled)' : '(Optional)'}
         </Label>
         <Input
           type="text"
@@ -27,9 +44,13 @@ export function PatientSignupStep2({ formData, handleChange }: PatientSignupStep
           className="w-full uppercase"
           placeholder="Enter referral code if you have one"
           maxLength={6}
+          readOnly={Boolean(formData.referralCode)}
         />
         <p className="text-xs text-muted-foreground mt-1">
-          If your clinician gave you a referral code, enter it here to connect your account
+          {formData.referralCode 
+            ? 'Referral code provided by your clinician'
+            : 'If your clinician gave you a referral code, enter it here to connect your account'
+          }
         </p>
       </div>
       

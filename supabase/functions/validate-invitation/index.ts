@@ -48,10 +48,22 @@ Deno.serve(async (req) => {
     }
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
-    // 4) Validar invitación (ajusta la tabla/campos a tu esquema real)
+    // 4) Validar invitación y obtener datos del paciente
     const { data, error } = await supabase
-      .from('invitations')
-      .select('id, code, expires_at, used_at')
+      .from('patient_invitations')
+      .select(`
+        id, code, expires_at, used_at,
+        patient_id,
+        psychologist_id,
+        invited_patients!inner(
+          first_name,
+          last_name,
+          phone_e164
+        ),
+        profiles!psychologist_id(
+          referral_code
+        )
+      `)
       .eq('code', code)
       .single();
 
@@ -71,8 +83,20 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 5) OK
-    return new Response(JSON.stringify({ ok: true, invitationId: data.id }), {
+    // 5) OK - Devolver datos del paciente y código del clínico
+    const patientData = data.invited_patients;
+    const referralCode = data.profiles?.referral_code;
+    
+    return new Response(JSON.stringify({ 
+      ok: true, 
+      invitationId: data.id,
+      patientData: {
+        firstName: patientData.first_name,
+        lastName: patientData.last_name,
+        phone: patientData.phone_e164,
+        referralCode: referralCode
+      }
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });

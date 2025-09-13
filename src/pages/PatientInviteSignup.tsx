@@ -26,8 +26,18 @@ export default function PatientInviteSignup() {
         setLoading(false);
         return;
       }
-      // Continúa con el flujo de registro (mostrar formulario, etc.)
-      setLoading(false);
+      
+      // Redirigir a signup con datos pre-completados
+      const { patientData } = data;
+      const fullName = `${patientData.firstName} ${patientData.lastName}`.trim();
+      const queryParams = new URLSearchParams({
+        fullName,
+        phone: patientData.phone,
+        referralCode: patientData.referralCode || '',
+        fromInvite: 'true'
+      });
+      
+      navigate(`/signup-patient?${queryParams.toString()}`);
     };
 
     validate();

@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthFormLayout } from '../components/auth/AuthFormLayout';
 import { StepIndicator } from '../components/auth/StepIndicator';
 import { SignupForm } from '../components/auth/SignupForm';
@@ -18,11 +18,30 @@ export default function SignupPatient() {
     confirmPassword: '',
     language: 'en',
     referralCode: '',
-    acceptTerms: false
+    acceptTerms: false,
+    phone: ''
   });
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isLoading, error, signUp, clearError } = useAuthFlow();
+
+  // Pre-fill form data from invitation
+  useEffect(() => {
+    const fullName = searchParams.get('fullName');
+    const phone = searchParams.get('phone');
+    const referralCode = searchParams.get('referralCode');
+    const fromInvite = searchParams.get('fromInvite');
+
+    if (fromInvite === 'true' && fullName) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: fullName || '',
+        phone: phone || '',
+        referralCode: referralCode || ''
+      }));
+    }
+  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
