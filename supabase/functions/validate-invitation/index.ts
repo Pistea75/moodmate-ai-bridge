@@ -1,180 +1,85 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4'
-import { corsHeaders } from '../_shared/cors.ts'
-import { 
-  validateInvitationCode, 
-  checkRateLimit, 
-  logSecurityEvent, 
-  getSecurityHeaders
-} from '../_shared/security.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-)
+// ----- CORS -----
+function buildCorsHeaders(origin: string | null) {
+  const allowed = new Set([
+    'https://moodmate.io',
+    'https://staging.moodmate.io',
+    'http://localhost:5173'
+  ]);
+  const allowOrigin = origin && allowed.has(origin) ? origin : 'https://moodmate.io';
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Vary': 'Origin'
+  } as const;
+}
 
 Deno.serve(async (req) => {
-  const isDevelopment = Deno.env.get('RUNTIME_ENV') === 'development';
-  const securityHeaders = getSecurityHeaders(isDevelopment);
+  const origin = req.headers.get('Origin');
+  const corsHeaders = buildCorsHeaders(origin);
 
+  // 1) Preflight OK siempre
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: { ...corsHeaders, ...securityHeaders } });
+    return new Response('ok', { status: 200, headers: { ...corsHeaders } });
   }
 
   try {
-
-    const { code } = await req.json();
-    console.log('[VALIDATE-INVITATION] Validating code:', code);
-
-    // Enhanced input validation
-    if (!code || typeof code !== 'string') {
-      console.log('[VALIDATE-INVITATION] Invalid input - missing or invalid code');
-      return new Response(
-        JSON.stringify({ 
-          valid: false, 
-          error: 'Invalid invitation code format' 
-        }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    // 2) Obtener el code desde query o body
+    const url = new URL(req.url);
+    let code = url.searchParams.get('code');
+    if (!code) {
+      const body = await req.json().catch(() => ({}));
+      code = body?.code ?? null;
+    }
+    if (!code) {
+      return new Response(JSON.stringify({ ok: false, error: 'Missing code' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
     }
 
-    // Sanitize and validate code format
-    const sanitizedCode = code.trim().toUpperCase();
-    if (!validateInvitationCode(sanitizedCode)) {
-      console.log('[VALIDATE-INVITATION] Invalid code format:', sanitizedCode);
-      return new Response(
-        JSON.stringify({ 
-          valid: false, 
-          error: 'Invalid invitation code format' 
-        }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, ...securityHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    // 3) Supabase client (Service Role para leer invitaciones)
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!SUPABASE_URL || !SERVICE_ROLE) {
+      throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
     }
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
-    // Rate limiting check - basic implementation
-    const clientIP = req.headers.get('cf-connecting-ip') || 
-                     req.headers.get('x-forwarded-for') || 
-                     'unknown';
-
-    // Check rate limit
-    const { data: rateLimitData } = await supabase
-      .from('security_rate_limits_enhanced')
-      .select('*')
-      .eq('identifier', clientIP)
-      .eq('action_type', 'invitation_validation')
-      .gte('window_start', new Date(Date.now() - 15 * 60 * 1000).toISOString())
+    // 4) Validar invitación (ajusta la tabla/campos a tu esquema real)
+    const { data, error } = await supabase
+      .from('invitations')
+      .select('id, code, expires_at, used_at')
+      .eq('code', code)
       .single();
 
-    if (rateLimitData && rateLimitData.attempts >= 10) {
-      console.log('[VALIDATE-INVITATION] Rate limit exceeded for IP:', clientIP);
-      return new Response(
-        JSON.stringify({ 
-          valid: false, 
-          error: 'Too many attempts. Please try again later.' 
-        }),
-        { 
-          status: 429, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    if (error || !data) {
+      return new Response(JSON.stringify({ ok: false, error: 'INVALID_CODE' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
     }
 
-    // Update rate limit counter
-    if (rateLimitData) {
-      await supabase
-        .from('security_rate_limits_enhanced')
-        .update({ 
-          attempts: rateLimitData.attempts + 1,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', rateLimitData.id);
-    } else {
-      await supabase
-        .from('security_rate_limits_enhanced')
-        .insert({
-          identifier: clientIP,
-          action_type: 'invitation_validation',
-          attempts: 1
-        });
+    const now = new Date();
+    const expires = data.expires_at ? new Date(data.expires_at) : null;
+    if (!expires || expires < now || data.used_at) {
+      return new Response(JSON.stringify({ ok: false, error: 'EXPIRED_OR_USED' }), {
+        status: 410,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
     }
 
-    // Use the new secure validation function that doesn't expose codes
-    const { data: validationResult, error: validationError } = await supabase
-      .rpc('validate_invitation_secure', { 
-        p_code: sanitizedCode,
-        p_ip_address: clientIP,
-        p_user_agent: req.headers.get('user-agent')
-      });
-
-    if (validationError) {
-      console.error('[VALIDATE-INVITATION] Database error:', validationError);
-      return new Response(
-        JSON.stringify({ 
-          valid: false, 
-          error: 'Validation service unavailable' 
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    console.log('[VALIDATE-INVITATION] Validation result:', validationResult);
-
-    // Log security event
-    await supabase
-      .from('enhanced_security_logs')
-      .insert({
-        action: 'invitation_validation',
-        resource: 'patient_invitations',
-        success: validationResult?.valid || false,
-        details: {
-          code: sanitizedCode,
-          ip_address: clientIP,
-          result: validationResult
-        },
-        ip_address: clientIP
-      });
-
-    return new Response(
-      JSON.stringify(validationResult),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
-
-  } catch (error) {
-    console.error('[VALIDATE-INVITATION] Unexpected error:', error);
-    
-    // Log security event for error
-    await supabase
-      .from('enhanced_security_logs')
-      .insert({
-        action: 'invitation_validation_error',
-        resource: 'patient_invitations',
-        success: false,
-        details: {
-          error: error.message,
-          ip_address: req.headers.get('cf-connecting-ip') || 'unknown'
-        }
-      });
-
-    return new Response(
-      JSON.stringify({ 
-        valid: false, 
-        error: 'Service temporarily unavailable' 
-      }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    // 5) OK
+    return new Response(JSON.stringify({ ok: true, invitationId: data.id }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ ok: false, error: String(e) }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
   }
 });
