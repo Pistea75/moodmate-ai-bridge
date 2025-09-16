@@ -19,7 +19,8 @@ import {
   Eye,
   Lock,
   Server,
-  BarChart3
+  BarChart3,
+  Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,6 +31,7 @@ export function SuperAdminSidebarContent() {
   const superAdminNavItems = [
     { title: t('admin.systemOverview', 'System Overview'), href: '/admin/super-admin-dashboard', icon: BarChart3 },
     { title: t('admin.userManagement', 'User Management'), href: '/admin/user-management', icon: Users },
+    { title: 'Waiting List', href: '/admin/waiting-list', icon: Clock },
     { title: t('admin.phiAccess', 'PHI Access Panel'), href: '/admin/super-admin-panel', icon: Shield },
     { title: t('nav.settings'), href: '/admin/system-settings', icon: Settings },
     { title: t('admin.database', 'Database Management'), href: '/admin/database', icon: Database },

@@ -1839,6 +1839,63 @@ export type Database = {
         }
         Relationships: []
       }
+      waiting_list: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          message: string | null
+          status: string
+          updated_at: string
+          user_type: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+          user_type?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+          user_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waiting_list_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "waiting_list_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workshop_participants: {
         Row: {
           attended: boolean | null
@@ -1963,7 +2020,7 @@ export type Database = {
               p_proposed_end: string
               p_proposed_start: string
             }
-        Returns: undefined
+        Returns: boolean
       }
       check_upcoming_sessions: {
         Args: Record<PropertyKey, never>

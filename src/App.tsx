@@ -61,6 +61,7 @@ const SystemHealth = lazy(() => import("./pages/admin/SystemHealth"));
 const AuditTrail = lazy(() => import("./pages/admin/AuditTrail"));
 const SecurityLogs = lazy(() => import("./pages/admin/SecurityLogs"));
 const SystemSettings = lazy(() => import("./pages/admin/SystemSettings"));
+const WaitingListManagement = lazy(() => import("./pages/admin/WaitingListManagement"));
 
 // Public pages
 const Landing = lazy(() => import("./pages/Landing"));
@@ -76,6 +77,8 @@ const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const PatientInviteSignup = lazy(() => import("./pages/PatientInviteSignup"));
+const WaitingList = lazy(() => import("./pages/WaitingList"));
+const SignupBlocked = lazy(() => import("./pages/SignupBlocked"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -108,12 +111,14 @@ function App() {
                         <Route path="/" element={<Index />} />
                         <Route path="/landing" element={<Landing />} />
                         <Route path="/login" element={<Login />} />
-                        <Route path="/signup/choice" element={<SignupChoice />} />
-                        <Route path="/signup/patient" element={<SignupPatient />} />
-                        <Route path="/signup/clinician" element={<SignupClinician />} />
+                        <Route path="/waitlist" element={<WaitingList />} />
+                        {/* Blocked signup routes - redirect to waiting list */}
+                        <Route path="/signup/choice" element={<SignupBlocked />} />
+                        <Route path="/signup/patient" element={<SignupBlocked />} />
+                        <Route path="/signup/clinician" element={<SignupBlocked />} />
                         {/* Keep old routes for compatibility */}
-                        <Route path="/signup-patient" element={<SignupPatient />} />
-                        <Route path="/signup-clinician" element={<SignupClinician />} />
+                        <Route path="/signup-patient" element={<SignupBlocked />} />
+                        <Route path="/signup-clinician" element={<SignupBlocked />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/reset-password" element={<ResetPassword />} />
                         <Route path="/about" element={<About />} />
@@ -185,6 +190,7 @@ function App() {
                               <Route path="security-logs" element={<SecurityLogs />} />
                               <Route path="settings" element={<SystemSettings />} />
                               <Route path="system-settings" element={<SystemSettings />} />
+                              <Route path="waiting-list" element={<WaitingListManagement />} />
                             </Routes>
                           </ProtectedRoute>
                         } />
