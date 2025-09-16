@@ -35,7 +35,7 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
       
       {/* Main Content */}
       <main className={`flex-1 ${isMobile ? 'pt-16' : 'md:ml-64'} bg-gray-50 min-h-screen`}>
-        <div className={`w-full min-h-screen ${isMobile ? 'px-4 py-6' : 'p-6'}`}>
+        <div className={`w-full min-h-screen ${isMobile ? 'px-3 py-4' : 'p-4'}`}>
           {children}
         </div>
       </main>

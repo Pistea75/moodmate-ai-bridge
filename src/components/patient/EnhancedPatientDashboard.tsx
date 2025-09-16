@@ -59,7 +59,7 @@ export function EnhancedPatientDashboard() {
   }
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="space-y-4 md:space-y-6">
       {/* Welcome Header */}
       <div className="flex justify-between items-start">
         <div className="space-y-2">
@@ -82,7 +82,7 @@ export function EnhancedPatientDashboard() {
       </div>
 
       {/* Top Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('thisWeek')}</CardTitle>
@@ -113,11 +113,11 @@ export function EnhancedPatientDashboard() {
       </div>
 
       {/* Mood Trends Chart and Wellness Streak */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
         {/* Mood Chart */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-sm border p-6">
-            <div className="flex items-center gap-2 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
+            <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="h-5 w-5 text-purple-600" />
               <h2 className="text-xl font-semibold">{t('moodTrends')}</h2>
             </div>

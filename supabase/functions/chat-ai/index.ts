@@ -195,19 +195,28 @@ serve(async (req) => {
     - Use person-first language when discussing mental health
     - Accept and respond to voice messages that have been converted to text`;
 
-    // Add AI personalization if available
+    // Add AI personalization if available - ENHANCED VERSION
     if (aiProfile) {
-      systemPrompt += `\n\nPersonalization Profile:`;
-      if (aiProfile.tone) systemPrompt += `\n- Preferred tone: ${aiProfile.tone}`;
-      if (aiProfile.strategies) systemPrompt += `\n- Recommended coping strategies: ${aiProfile.strategies}`;
-      if (aiProfile.triggersToAvoid) systemPrompt += `\n- Important triggers to avoid: ${aiProfile.triggersToAvoid}`;
-      if (aiProfile.motivators) systemPrompt += `\n- Patient motivators/interests: ${aiProfile.motivators}`;
-      if (aiProfile.dosAndDonts) systemPrompt += `\n- Do's and Don'ts: ${aiProfile.dosAndDonts}`;
-      if (aiProfile.diagnosis) systemPrompt += `\n- Diagnosis context: ${aiProfile.diagnosis}`;
-      if (aiProfile.personality_traits) systemPrompt += `\n- Personality traits: ${aiProfile.personality_traits}`;
-      if (aiProfile.helpful_strategies) systemPrompt += `\n- Helpful strategies: ${aiProfile.helpful_strategies}`;
-      if (aiProfile.things_to_avoid) systemPrompt += `\n- Things to avoid: ${aiProfile.things_to_avoid}`;
-      if (aiProfile.clinical_goals) systemPrompt += `\n- Clinical goals: ${aiProfile.clinical_goals}`;
+      systemPrompt += `\n\n=== PERSONALIZED AI CONFIGURATION ===
+IMPORTANT: This AI has been personalized by the patient's clinician through a detailed configuration form.
+I have access to the following patient-specific settings and MUST follow them strictly:`;
+      
+      if (aiProfile.tone) systemPrompt += `\n- COMMUNICATION TONE: ${aiProfile.tone}`;
+      if (aiProfile.strategies) systemPrompt += `\n- RECOMMENDED COPING STRATEGIES: ${aiProfile.strategies}`;
+      if (aiProfile.triggersToAvoid || aiProfile.things_to_avoid) {
+        const triggers = aiProfile.triggersToAvoid || aiProfile.things_to_avoid;
+        systemPrompt += `\n- CRITICAL - TRIGGERS TO ABSOLUTELY AVOID: ${triggers}`;
+      }
+      if (aiProfile.motivators) systemPrompt += `\n- PATIENT MOTIVATORS/INTERESTS: ${aiProfile.motivators}`;
+      if (aiProfile.dosAndDonts) systemPrompt += `\n- SPECIFIC DO'S AND DON'TS: ${aiProfile.dosAndDonts}`;
+      if (aiProfile.diagnosis) systemPrompt += `\n- DIAGNOSIS CONTEXT: ${aiProfile.diagnosis}`;
+      if (aiProfile.personality_traits) systemPrompt += `\n- PERSONALITY TRAITS TO CONSIDER: ${aiProfile.personality_traits}`;
+      if (aiProfile.helpful_strategies) systemPrompt += `\n- CLINICIAN-APPROVED HELPFUL STRATEGIES: ${aiProfile.helpful_strategies}`;
+      if (aiProfile.clinical_goals) systemPrompt += `\n- CLINICAL TREATMENT GOALS: ${aiProfile.clinical_goals}`;
+      
+      systemPrompt += `\n\nI CONFIRM: I have access to this personalized configuration form and will adapt all my responses accordingly. This configuration was created by the patient's clinician specifically for this individual.`;
+    } else {
+      systemPrompt += `\n\nNOTE: No personalized AI configuration has been set up yet by the clinician. I will use general mental health support guidelines.`;
     }
 
     // Add patient context

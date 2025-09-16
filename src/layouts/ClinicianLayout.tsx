@@ -37,7 +37,7 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
       
       {/* Main Content */}
       <main className={`flex-1 ${isMobile ? 'pt-16' : 'md:ml-64'} ${isSuperAdmin ? 'bg-gray-100 dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-900'} min-h-screen`}>
-        <div className={`w-full min-h-screen ${isMobile ? 'px-4 py-6' : 'p-6'}`}>
+        <div className={`w-full min-h-screen ${isMobile ? 'px-3 py-4' : 'p-4'}`}>
           {children}
         </div>
       </main>

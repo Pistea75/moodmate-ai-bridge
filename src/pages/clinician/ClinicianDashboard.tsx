@@ -60,7 +60,7 @@ export default function ClinicianDashboard() {
 
   return (
     <ClinicianLayout>
-      <div className="space-y-6 p-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Welcome Banner */}
         <WelcomeBanner />
         
@@ -71,7 +71,7 @@ export default function ClinicianDashboard() {
         <QuickStats />
         
         {/* Main Content */}
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {/* Upcoming Sessions - Full Width */}
           <UpcomingSessions 
             sessions={upcomingSessions} 
@@ -93,7 +93,7 @@ export default function ClinicianDashboard() {
           <DashboardInsights />
           
           {/* Bottom Grid - Tasks, Recent Reports, and Invite Patient */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
             {/* My Tasks */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
