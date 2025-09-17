@@ -20,7 +20,6 @@ import { QuickActionsCard } from './QuickActionsCard';
 import { WellnessStreakCard } from './WellnessStreakCard';
 import { usePatientDashboard } from '@/hooks/usePatientDashboard';
 import { useMoodEntries } from '@/hooks/useMoodEntries';
-import { BrodiNudgeSystem } from '@/components/brodi/BrodiNudgeSystem';
 
 export function EnhancedPatientDashboard() {
   const { t } = useTranslation();
@@ -62,23 +61,14 @@ export function EnhancedPatientDashboard() {
     <div className="space-y-4 md:space-y-6">
       {/* Welcome Header */}
       <div className="flex justify-between items-start">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             {t('welcomeBack')}
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-lg text-muted-foreground">
             {t('todayProgress')}
           </p>
         </div>
-        <MoodLogModal 
-          onLogComplete={handleMoodLogComplete}
-          trigger={
-            <Button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700">
-              <Plus className="h-4 w-4" />
-              {t('logMood')}
-            </Button>
-          }
-        />
       </div>
 
       {/* Top Metrics Cards */}
@@ -117,9 +107,20 @@ export function EnhancedPatientDashboard() {
         {/* Mood Chart */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
-              <h2 className="text-xl font-semibold">{t('moodTrends')}</h2>
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-purple-600" />
+                <h2 className="text-xl font-semibold">{t('moodTrends')}</h2>
+              </div>
+              <MoodLogModal 
+                onLogComplete={handleMoodLogComplete}
+                trigger={
+                  <Button size="sm" className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700">
+                    <Plus className="h-4 w-4" />
+                    {t('logMood')}
+                  </Button>
+                }
+              />
             </div>
             <MoodChart showLogButton={false} />
           </div>
@@ -184,18 +185,16 @@ export function EnhancedPatientDashboard() {
         </CardContent>
       </Card>
       
-      {/* Brodi Nudge System */}
-      <BrodiNudgeSystem 
-        context="mood_logging"
-        trigger={{
-          type: 'page_visit',
-          data: { 
-            averageMood: parseFloat(averageMood),
-            totalEntries: moods.length,
-            streak: currentStreak
-          }
-        }}
-      />
+      {/* Floating AI Chat Button */}
+      <div className="fixed bottom-6 right-6 z-50 md:hidden">
+        <Button
+          onClick={() => window.location.href = '/patient/chat'}
+          className="h-14 w-14 rounded-full shadow-lg bg-purple-600 hover:bg-purple-700 text-white"
+          size="icon"
+        >
+          <MessageSquare className="h-6 w-6" />
+        </Button>
+      </div>
     </div>
   );
 }

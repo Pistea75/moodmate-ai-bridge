@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mic, Volume2, VolumeX, Settings, Play, Pause, MessageSquareText } from 'lucide-react';
+import { Mic, Volume2, VolumeX, Settings, Play, Pause, MessageSquareText, ChevronDown, X } from 'lucide-react';
 import { useAudioChat } from '@/hooks/useAudioChat';
 import { useTTS } from '@/hooks/useTTS';
 import { useVoiceSettings } from '@/hooks/useVoiceSettings';
@@ -35,6 +35,10 @@ export function AudioChatInterface({
   const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [currentPlayingId, setCurrentPlayingId] = useState<string | null>(null);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { settings, updateSettings } = useVoiceSettings();
   const { hasConsent } = useVoiceConsent();
@@ -114,6 +118,32 @@ export function AudioChatInterface({
     await playText(text);
   };
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleScroll = () => {
+    if (messagesContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollButton(!isNearBottom && messages.length > 3);
+    }
+  };
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages]);
+
   if (isFetchingHistory) {
     return (
       <Card className="flex items-center justify-center h-[600px] w-full max-w-4xl mx-auto">
@@ -166,9 +196,31 @@ export function AudioChatInterface({
         </div>
       )}
 
+      {/* AI Disclaimer */}
+      {showDisclaimer && !isClinicianView && (
+        <div className="p-4 bg-blue-50 border-l-4 border-blue-400 relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDisclaimer(false)}
+            className="absolute top-2 right-2 h-6 w-6 p-0"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+          <div className="pr-8">
+            <p className="text-sm text-blue-800">
+              <strong>Acceso completo a datos y configuración:</strong> Esta IA tiene acceso a toda tu información de perfil, historial de estados de ánimo, tareas asignadas, y las configuraciones personalizadas por tu psicólogo para brindarte apoyo específico y personalizado.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Mensajes con controles de audio */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-hidden relative">
+        <div 
+          ref={messagesContainerRef}
+          className="h-full overflow-y-auto p-4 space-y-4"
+        >
           {messages.map((message) => (
             <div
               key={message.id}
@@ -206,7 +258,19 @@ export function AudioChatInterface({
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
+        
+        {/* Scroll to bottom button */}
+        {showScrollButton && (
+          <Button
+            onClick={scrollToBottom}
+            className="absolute bottom-4 right-4 h-10 w-10 rounded-full shadow-lg z-10"
+            size="icon"
+          >
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Input */}

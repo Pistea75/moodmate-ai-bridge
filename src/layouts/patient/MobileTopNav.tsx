@@ -50,25 +50,6 @@ export function MobileTopNav({ patientFullName, isOpen, setIsOpen }: MobileTopNa
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link to="/patient/chat">
-            <Button 
-              size="sm" 
-              className="h-9 px-3 bg-primary hover:bg-primary/90 active:bg-primary/80 transition-colors"
-            >
-              <MessageCircle className="h-4 w-4 mr-2" />
-              {t('nav.chat')}
-            </Button>
-          </Link>
-          <Link to="/patient/mood">
-            <Button 
-              variant="outline" 
-              size="icon"
-              className="h-9 w-9 border-primary/20 text-primary hover:bg-primary/10 active:bg-primary/20 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="sr-only">Log mood</span>
-            </Button>
-          </Link>
         </div>
       </div>
     </div>

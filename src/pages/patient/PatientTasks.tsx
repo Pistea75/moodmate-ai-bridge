@@ -50,7 +50,7 @@ export default function PatientTasks() {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-4xl font-bold text-gray-900">
-            {t('tasks')}
+            {t('tasks.title')}
           </h1>
           <p className="text-xl text-gray-600">
             {t('progressOverview')}
