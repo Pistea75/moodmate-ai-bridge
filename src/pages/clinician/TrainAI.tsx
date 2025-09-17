@@ -18,9 +18,9 @@ export default function TrainAI() {
     <ClinicianLayout>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Dr. {firstName} AI Chat</h1>
+          <h1 className="text-2xl font-bold mb-2">Chat IA Dr. {firstName}</h1>
           <p className="text-muted-foreground -mt-1">
-            Train your AI with complete access to patient data
+            Entrena tu IA con acceso completo a datos de pacientes y configuración personalizada
           </p>
         </div>
       </div>
@@ -31,69 +31,78 @@ export default function TrainAI() {
           <div className="flex items-start gap-4">
             <Brain className="h-6 w-6 text-blue-600 mt-1 flex-shrink-0" />
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">Full Data Access AI Assistant</h3>
+              <h3 className="font-semibold text-blue-900 mb-2">IA con Acceso Completo a Datos y Configuración</h3>
               <p className="text-sm text-blue-800 mb-3">
-                The AI now has comprehensive access to all your patient data for in-depth clinical discussions:
+                La IA tiene acceso completo a todos los datos del paciente Y al formulario de configuración personalizada:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-700">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  <span>Patient profiles & contact information</span>
+                  <span>Perfiles de pacientes e información de contacto</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <BarChart className="h-4 w-4" />
-                  <span>Mood logs, charts & trend analysis</span>
+                  <span>Registros de humor, gráficos y análisis de tendencias</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Brain className="h-4 w-4" />
-                  <span>AI personalization settings & preferences</span>
+                  <span>Configuración de personalización IA y preferencias</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckSquare className="h-4 w-4" />
-                  <span>Task completion & exercise logs</span>
+                  <span>Finalización de tareas y registros de ejercicios</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  <span>Session notes & attendance history</span>
+                  <span>Notas de sesión e historial de asistencia</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
-                  <span>Treatment goals & clinical assessments</span>
+                  <span>Objetivos de tratamiento y evaluaciones clínicas</span>
                 </div>
               </div>
               <p className="text-sm text-blue-800 mt-3 font-medium">
-                Ask about specific patients, analyze trends, compare progress, or get clinical insights based on real data.
+                Pregunta sobre pacientes específicos, analiza tendencias, compara progreso, u obtén insights clínicos basados en datos reales y configuración personalizada.
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Patient Selection */}
       <div className="bg-white rounded-lg border p-4 mb-6">
-        <div className="flex items-center justify-between">
-          <PatientSelectorForAI
-            selectedPatientId={selectedPatientId}
-            onPatientSelect={setSelectedPatientId}
-          />
-          {selectedPatientId && (
-            <AIPersonalizationModal
-              patientId={selectedPatientId}
-              clinicianId={user?.id}
-              trigger={
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Settings className="h-4 w-4" />
-                  Configure AI Personalization
-                </Button>
-              }
+        <h3 className="font-semibold mb-3 flex items-center gap-2">
+          <Brain className="h-5 w-5 text-purple-600" />
+          Selección de Paciente y Configuración IA
+        </h3>
+          <div className="flex items-center justify-between">
+            <PatientSelectorForAI
+              selectedPatientId={selectedPatientId}
+              onPatientSelect={setSelectedPatientId}
             />
-          )}
-        </div>
-        {selectedPatientId && (
-          <div className="mt-2 text-sm text-muted-foreground">
-            AI responses will be personalized based on this patient's profile and preferences.
+            {selectedPatientId && (
+              <AIPersonalizationModal
+                patientId={selectedPatientId}
+                clinicianId={user?.id}
+                trigger={
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Settings className="h-4 w-4" />
+                    Configurar Personalización IA
+                  </Button>
+                }
+              />
+            )}
           </div>
-        )}
+          {selectedPatientId && (
+            <div className="mt-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Brain className="h-4 w-4 text-green-600" />
+                <span>
+                  ✅ La IA tiene <strong>acceso completo</strong> al formulario de configuración de este paciente.
+                  Puede consultar y actualizar preferencias, estrategias, desencadenantes y más en tiempo real.
+                </span>
+              </div>
+            </div>
+          )}
       </div>
 
       <AudioChatInterface 

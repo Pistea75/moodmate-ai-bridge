@@ -34,7 +34,7 @@ export function ClinicianSidebarContent() {
     { title: t('nav.sessions'), href: '/clinician/sessions', icon: Calendar },
     { title: t('nav.messages'), href: '/clinician/communications', icon: MessageSquare },
     { title: t('nav.marketplace'), href: '/clinician/marketplace-profile', icon: Store },
-    { title: t('nav.analytics'), href: '/clinician/analytics', icon: BarChart3 },
+    
     { title: t('nav.tasks'), href: '/clinician/tasks', icon: CheckSquare },
     { title: t('nav.reports'), href: '/clinician/reports', icon: FileText },
     { title: t('nav.resources', 'Resource Library'), href: '/clinician/resource-library', icon: BookOpen },

@@ -100,15 +100,15 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
       }
 
       toast({ 
-        title: 'Success',
-        description: 'AI personalization saved successfully!' 
+        title: 'Éxito',
+        description: 'Configuración de IA guardada exitosamente!' 
       });
     } catch (error) {
       console.error('Error saving preferences:', error);
       toast({
         variant: 'destructive',
-        title: 'Error saving preferences',
-        description: error instanceof Error ? error.message : 'Failed to save preferences'
+        title: 'Error al guardar configuración',
+        description: error instanceof Error ? error.message : 'Error al guardar configuración'
       });
     } finally {
       setSaving(false);
@@ -121,7 +121,7 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
         <CardContent className="p-6">
           <div className="flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <span className="ml-2">Loading AI preferences...</span>
+            <span className="ml-2">Cargando configuración de IA...</span>
           </div>
         </CardContent>
       </Card>
@@ -151,72 +151,72 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
         <div className="grid gap-4">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Preferred Tone
+              Tono Preferido
             </label>
             <Select value={prefs.tone} onValueChange={(value) => handleChange('tone', value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Select preferred tone" />
+                <SelectValue placeholder="Seleccionar tono preferido" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">-- Select --</SelectItem>
-                <SelectItem value="empathetic">Empathetic</SelectItem>
-                <SelectItem value="motivational">Motivational</SelectItem>
-                <SelectItem value="calm">Calm</SelectItem>
+                <SelectItem value="none">-- Seleccionar --</SelectItem>
+                <SelectItem value="empathetic">Empático</SelectItem>
+                <SelectItem value="motivational">Motivacional</SelectItem>
+                <SelectItem value="calm">Calmado</SelectItem>
                 <SelectItem value="neutral">Neutral</SelectItem>
-                <SelectItem value="gentle">Gentle</SelectItem>
-                <SelectItem value="encouraging">Encouraging</SelectItem>
+                <SelectItem value="gentle">Gentil</SelectItem>
+                <SelectItem value="encouraging">Alentador</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Coping Strategies
+              Estrategias de Afrontamiento
             </label>
             <Textarea
               rows={3}
               value={prefs.strategies}
               onChange={(e) => handleChange('strategies', e.target.value)}
-              placeholder="e.g. breathing exercises, CBT thought log, music playlist, mindfulness meditation"
+              placeholder="ej. ejercicios de respiración, registro de pensamientos, listas de música, meditación mindfulness"
               className="resize-none"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Triggers to Avoid
+              Desencadenantes a Evitar
             </label>
             <Textarea
               rows={3}
               value={prefs.triggersToAvoid}
               onChange={(e) => handleChange('triggersToAvoid', e.target.value)}
-              placeholder="e.g. avoid discussing family trauma, work stress topics, financial issues"
+              placeholder="ej. evitar discutir trauma familiar, temas de estrés laboral, problemas financieros"
               className="resize-none"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Motivators / Interests
+              Motivadores / Intereses
             </label>
             <Textarea
               rows={3}
               value={prefs.motivators}
               onChange={(e) => handleChange('motivators', e.target.value)}
-              placeholder="e.g. loves music, enjoys nature walks, motivated by family goals"
+              placeholder="ej. ama la música, disfruta caminar en la naturaleza, motivado por objetivos familiares"
               className="resize-none"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Do's and Don'ts
+              Qué Hacer y Qué No Hacer
             </label>
             <Textarea
               rows={3}
               value={prefs.dosAndDonts}
               onChange={(e) => handleChange('dosAndDonts', e.target.value)}
-              placeholder="e.g. DO: Use simple language, ask about progress. DON'T: Rush conversations, use clinical jargon"
+              placeholder="ej. HACER: Usar lenguaje simple, preguntar sobre progreso. NO HACER: Apurar conversaciones, usar jerga clínica"
               className="resize-none"
             />
           </div>
@@ -294,7 +294,7 @@ export function AIPersonalizationForm({ patientId, clinicianId }: AIPersonalizat
             className="flex-1"
           >
             <Settings className="mr-2 h-4 w-4" />
-            {saving ? 'Guardando...' : 'Guardar Preferencias de IA'}
+            {saving ? 'Guardando...' : 'Guardar Configuración de IA'}
           </Button>
         </div>
 

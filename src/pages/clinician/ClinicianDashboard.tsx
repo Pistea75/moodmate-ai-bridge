@@ -12,7 +12,7 @@ import { PatientSpotlight } from '@/components/clinician/PatientSpotlight';
 import { ClinicianTasks } from '@/components/clinician/ClinicianTasks';
 import { TaskForm } from '@/components/clinician/TaskForm/index';
 import { ScheduleSessionModal } from '@/components/session/ScheduleSessionModal';
-import { RecentReports } from '@/components/clinician/RecentReports';
+
 import { RiskAlertBanner } from '@/components/clinician/RiskAlertBanner';
 import { DashboardInsights } from '@/components/clinician/DashboardInsights';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -92,8 +92,8 @@ export default function ClinicianDashboard() {
           {/* Practice Insights - Full Width */}
           <DashboardInsights />
           
-          {/* Bottom Grid - Tasks, Recent Reports, and Invite Patient */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
+          {/* Bottom Grid - Tasks and Invite Patient */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
             {/* My Tasks */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
@@ -118,13 +118,6 @@ export default function ClinicianDashboard() {
                   onAddTaskClick={handleAddTaskClick}
                   onTaskUpdate={handleTaskUpdate}
                 />
-              </CardContent>
-            </Card>
-            
-            {/* Recent Reports */}
-            <Card>
-              <CardContent className="p-6">
-                <RecentReports patients={patients} />
               </CardContent>
             </Card>
             

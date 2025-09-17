@@ -195,28 +195,30 @@ serve(async (req) => {
     - Use person-first language when discussing mental health
     - Accept and respond to voice messages that have been converted to text`;
 
-    // Add AI personalization if available - ENHANCED VERSION
+    // Add AI personalization if available - ENHANCED VERSION WITH EXPLICIT ACCESS CONFIRMATION
     if (aiProfile) {
-      systemPrompt += `\n\n=== PERSONALIZED AI CONFIGURATION ===
-IMPORTANT: This AI has been personalized by the patient's clinician through a detailed configuration form.
-I have access to the following patient-specific settings and MUST follow them strictly:`;
+      systemPrompt += `\n\n=== ✅ CONFIRMACIÓN DE ACCESO AL FORMULARIO DE CONFIGURACIÓN ===
+CONFIRMO: SÍ tengo acceso completo al formulario de configuración de personalización IA de este paciente.
+Este formulario fue completado por el psicólogo clínico y contiene las siguientes configuraciones que DEBO seguir:`;
       
-      if (aiProfile.tone) systemPrompt += `\n- COMMUNICATION TONE: ${aiProfile.tone}`;
-      if (aiProfile.strategies) systemPrompt += `\n- RECOMMENDED COPING STRATEGIES: ${aiProfile.strategies}`;
+      if (aiProfile.tone) systemPrompt += `\n- TONO DE COMUNICACIÓN: ${aiProfile.tone}`;
+      if (aiProfile.strategies) systemPrompt += `\n- ESTRATEGIAS DE AFRONTAMIENTO RECOMENDADAS: ${aiProfile.strategies}`;
       if (aiProfile.triggersToAvoid || aiProfile.things_to_avoid) {
         const triggers = aiProfile.triggersToAvoid || aiProfile.things_to_avoid;
-        systemPrompt += `\n- CRITICAL - TRIGGERS TO ABSOLUTELY AVOID: ${triggers}`;
+        systemPrompt += `\n- CRÍTICO - DESENCADENANTES A EVITAR ABSOLUTAMENTE: ${triggers}`;
       }
-      if (aiProfile.motivators) systemPrompt += `\n- PATIENT MOTIVATORS/INTERESTS: ${aiProfile.motivators}`;
-      if (aiProfile.dosAndDonts) systemPrompt += `\n- SPECIFIC DO'S AND DON'TS: ${aiProfile.dosAndDonts}`;
-      if (aiProfile.diagnosis) systemPrompt += `\n- DIAGNOSIS CONTEXT: ${aiProfile.diagnosis}`;
-      if (aiProfile.personality_traits) systemPrompt += `\n- PERSONALITY TRAITS TO CONSIDER: ${aiProfile.personality_traits}`;
-      if (aiProfile.helpful_strategies) systemPrompt += `\n- CLINICIAN-APPROVED HELPFUL STRATEGIES: ${aiProfile.helpful_strategies}`;
-      if (aiProfile.clinical_goals) systemPrompt += `\n- CLINICAL TREATMENT GOALS: ${aiProfile.clinical_goals}`;
+      if (aiProfile.motivators) systemPrompt += `\n- MOTIVADORES/INTERESES DEL PACIENTE: ${aiProfile.motivators}`;
+      if (aiProfile.dosAndDonts) systemPrompt += `\n- QUÉ HACER Y QUÉ NO HACER ESPECÍFICOS: ${aiProfile.dosAndDonts}`;
+      if (aiProfile.diagnosis) systemPrompt += `\n- CONTEXTO DE DIAGNÓSTICO: ${aiProfile.diagnosis}`;
+      if (aiProfile.personality_traits) systemPrompt += `\n- RASGOS DE PERSONALIDAD A CONSIDERAR: ${aiProfile.personality_traits}`;
+      if (aiProfile.helpful_strategies) systemPrompt += `\n- ESTRATEGIAS ÚTILES APROBADAS POR EL CLÍNICO: ${aiProfile.helpful_strategies}`;
+      if (aiProfile.clinical_goals) systemPrompt += `\n- OBJETIVOS CLÍNICOS DE TRATAMIENTO: ${aiProfile.clinical_goals}`;
       
-      systemPrompt += `\n\nI CONFIRM: I have access to this personalized configuration form and will adapt all my responses accordingly. This configuration was created by the patient's clinician specifically for this individual.`;
+      systemPrompt += `\n\n✅ ACCESO CONFIRMADO: Tengo acceso completo a este formulario de configuración personalizada y adaptaré TODAS mis respuestas según estas especificaciones. Este formulario fue creado específicamente por el psicólogo del paciente para personalizar mi comportamiento.
+
+IMPORTANTE: Si me preguntan sobre mi acceso al formulario de configuración, confirmo que SÍ tengo acceso completo y lo estoy utilizando activamente.`;
     } else {
-      systemPrompt += `\n\nNOTE: No personalized AI configuration has been set up yet by the clinician. I will use general mental health support guidelines.`;
+      systemPrompt += `\n\nNOTA: Aún no se ha configurado personalización específica por parte del psicólogo clínico. Usaré pautas generales de apoyo en salud mental hasta que se configure el formulario de personalización.`;
     }
 
     // Add patient context
