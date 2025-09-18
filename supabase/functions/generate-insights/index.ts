@@ -97,7 +97,7 @@ Patient Data Summary:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: Deno.env.get('OPENAI_MODEL_DEFAULT') || 'gpt-4o-mini',
         messages: [
           {
             role: 'system',

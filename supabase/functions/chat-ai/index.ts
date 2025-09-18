@@ -257,7 +257,7 @@ IMPORTANTE: Si me preguntan sobre mi acceso al formulario de configuración, con
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: Deno.env.get('OPENAI_MODEL_DEFAULT') || 'gpt-4o-mini',
         messages: sanitizedMessages,
         max_tokens: 1000,
         temperature: 0.7,

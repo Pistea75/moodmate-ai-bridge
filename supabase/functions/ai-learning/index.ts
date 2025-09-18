@@ -163,7 +163,7 @@ If no new preferences are detected, return an empty object: {}`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: Deno.env.get('OPENAI_MODEL_DEFAULT') || 'gpt-4o-mini',
         messages: [
           { role: 'system', content: 'You are an expert at analyzing clinical conversations to extract AI personalization preferences. Always return valid JSON.' },
           { role: 'user', content: analysisPrompt }

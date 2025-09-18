@@ -122,7 +122,7 @@ Base your recommendations on evidence-based practice and the patient's specific 
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4.1-2025-04-14',
+            model: Deno.env.get('OPENAI_MODEL_DEFAULT') || 'gpt-4o-mini',
             messages: [
               { role: 'system', content: optimizationPrompt },
               { role: 'user', content: JSON.stringify(preferences) }
