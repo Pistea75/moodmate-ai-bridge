@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Clock, Check, X, Users, Filter } from 'lucide-react';
+import { Clock, Check, X, Users, Filter, Copy, Link2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -30,6 +30,7 @@ export default function WaitingListManagement() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const { user } = useAuth();
   const { toast } = useToast();
+  const [registrationTokens, setRegistrationTokens] = useState<{[key: string]: string}>({});
 
   const fetchEntries = async () => {
     try {
@@ -66,6 +67,15 @@ export default function WaitingListManagement() {
   useEffect(() => {
     fetchEntries();
   }, [statusFilter, typeFilter]);
+
+  useEffect(() => {
+    // Load registration tokens for approved entries
+    entries.filter(e => e.status === 'approved').forEach(entry => {
+      if (!registrationTokens[entry.id]) {
+        getRegistrationToken(entry.id);
+      }
+    });
+  }, [entries]);
 
   const updateEntryStatus = async (entryId: string, newStatus: 'approved' | 'rejected') => {
     try {
@@ -116,6 +126,9 @@ export default function WaitingListManagement() {
               description: 'Se ha enviado un email con instrucciones de registro al usuario.'
             });
           }
+          
+          // Get the registration token to show it in the UI
+          await getRegistrationToken(entryId);
         } catch (emailError) {
           console.error('Error invoking email function:', emailError);
           toast({
@@ -140,6 +153,43 @@ export default function WaitingListManagement() {
         description: 'No se pudo actualizar el status de la solicitud.'
       });
     }
+  };
+
+  const getRegistrationToken = async (waitingListId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('registration_tokens')
+        .select('token')
+        .eq('waiting_list_id', waitingListId)
+        .eq('used_at', null)
+        .single();
+
+      if (data && !error) {
+        setRegistrationTokens(prev => ({
+          ...prev,
+          [waitingListId]: data.token
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching registration token:', error);
+    }
+  };
+
+  const copyRegistrationLink = (token: string) => {
+    const link = `${window.location.origin}/complete-registration/${token}`;
+    navigator.clipboard.writeText(link);
+    toast({
+      title: 'Link copiado',
+      description: 'El link de registro ha sido copiado al portapapeles.'
+    });
+  };
+
+  const copyToken = (token: string) => {
+    navigator.clipboard.writeText(token);
+    toast({
+      title: 'Token copiado',
+      description: 'El token de registro ha sido copiado al portapapeles.'
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -296,6 +346,7 @@ export default function WaitingListManagement() {
                   <TableHead>Status</TableHead>
                   <TableHead>Mensaje</TableHead>
                   <TableHead>Fecha</TableHead>
+                  <TableHead>Link/Token</TableHead>
                   <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -318,6 +369,28 @@ export default function WaitingListManagement() {
                       )}
                     </TableCell>
                     <TableCell>{format(new Date(entry.created_at), 'dd/MM/yyyy')}</TableCell>
+                    <TableCell>
+                      {entry.status === 'approved' && registrationTokens[entry.id] && (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyRegistrationLink(registrationTokens[entry.id])}
+                            title="Copiar link de registro"
+                          >
+                            <Link2 className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyToken(registrationTokens[entry.id])}
+                            title="Copiar token"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell>
                       {entry.status === 'pending' && (
                         <div className="flex gap-2">
