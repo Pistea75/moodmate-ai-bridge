@@ -1086,6 +1086,56 @@ export type Database = {
         }
         Relationships: []
       }
+      registration_tokens: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          first_name: string
+          id: string
+          last_name: string
+          token: string
+          updated_at: string
+          used_at: string | null
+          user_type: string
+          waiting_list_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at?: string
+          first_name: string
+          id?: string
+          last_name: string
+          token?: string
+          updated_at?: string
+          used_at?: string | null
+          user_type: string
+          waiting_list_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          token?: string
+          updated_at?: string
+          used_at?: string | null
+          user_type?: string
+          waiting_list_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_tokens_waiting_list_id_fkey"
+            columns: ["waiting_list_id"]
+            isOneToOne: false
+            referencedRelation: "waiting_list"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_audit_logs: {
         Row: {
           action: string

@@ -69,6 +69,16 @@ export default function WaitingListManagement() {
 
   const updateEntryStatus = async (entryId: string, newStatus: 'approved' | 'rejected') => {
     try {
+      const entry = entries.find(e => e.id === entryId);
+      if (!entry) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'No se encontró la entrada.'
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('waiting_list')
         .update({
@@ -80,10 +90,46 @@ export default function WaitingListManagement() {
 
       if (error) throw error;
 
-      toast({
-        title: 'Status actualizado',
-        description: `Solicitud ${newStatus === 'approved' ? 'aprobada' : 'rechazada'} exitosamente.`
-      });
+      // If approved, send notification email
+      if (newStatus === 'approved') {
+        try {
+          const { error: emailError } = await supabase.functions.invoke('notify-approved-user', {
+            body: {
+              waitingListId: entryId,
+              email: entry.email,
+              firstName: entry.first_name,
+              lastName: entry.last_name,
+              userType: entry.user_type
+            }
+          });
+
+          if (emailError) {
+            console.error('Error sending approval email:', emailError);
+            toast({
+              title: 'Parcialmente completado',
+              description: 'Usuario aprobado pero no se pudo enviar el email de notificación.',
+              variant: 'destructive'
+            });
+          } else {
+            toast({
+              title: 'Usuario aprobado',
+              description: 'Se ha enviado un email con instrucciones de registro al usuario.'
+            });
+          }
+        } catch (emailError) {
+          console.error('Error invoking email function:', emailError);
+          toast({
+            title: 'Parcialmente completado',
+            description: 'Usuario aprobado pero no se pudo enviar el email de notificación.',
+            variant: 'destructive'
+          });
+        }
+      } else {
+        toast({
+          title: 'Status actualizado',
+          description: 'Solicitud rechazada exitosamente.'
+        });
+      }
 
       fetchEntries();
     } catch (error) {

@@ -79,6 +79,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const PatientInviteSignup = lazy(() => import("./pages/PatientInviteSignup"));
 const WaitingList = lazy(() => import("./pages/WaitingList"));
 const SignupBlocked = lazy(() => import("./pages/SignupBlocked"));
+const CompleteRegistration = lazy(() => import("./pages/CompleteRegistration"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -132,6 +133,7 @@ function App() {
                         <Route path="/help" element={<HelpCenter />} />
                         <Route path="/subscription/success" element={<SubscriptionSuccess />} />
                         <Route path="/invite/:code" element={<PatientInviteSignup />} />
+                        <Route path="/complete-registration/:token" element={<CompleteRegistration />} />
 
                         {/* Patient routes */}
                         <Route path="/patient/*" element={
