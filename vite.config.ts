@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    sourcemap: true, // Generate source maps for production debugging
     rollupOptions: {
       output: {
         manualChunks: (id) => {
