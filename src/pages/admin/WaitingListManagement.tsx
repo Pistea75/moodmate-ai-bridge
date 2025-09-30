@@ -103,7 +103,15 @@ export default function WaitingListManagement() {
       // If approved, send notification email
       if (newStatus === 'approved') {
         try {
-          const { error: emailError } = await supabase.functions.invoke('notify-approved-user', {
+          console.log('Calling notify-approved-user edge function with:', {
+            waitingListId: entryId,
+            email: entry.email,
+            firstName: entry.first_name,
+            lastName: entry.last_name,
+            userType: entry.user_type
+          });
+
+          const { data: functionData, error: emailError } = await supabase.functions.invoke('notify-approved-user', {
             body: {
               waitingListId: entryId,
               email: entry.email,
@@ -113,6 +121,8 @@ export default function WaitingListManagement() {
             }
           });
 
+          console.log('Edge function response:', { data: functionData, error: emailError });
+
           if (emailError) {
             console.error('Error sending approval email:', emailError);
             toast({
@@ -121,6 +131,7 @@ export default function WaitingListManagement() {
               variant: 'destructive'
             });
           } else {
+            console.log('Email sent successfully, registration URL:', functionData?.registrationUrl);
             toast({
               title: 'Usuario aprobado',
               description: 'Se ha enviado un email con instrucciones de registro al usuario.'

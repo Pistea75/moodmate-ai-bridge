@@ -25,16 +25,27 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log('=== NOTIFY APPROVED USER FUNCTION STARTED ===');
+    
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { waitingListId, email, firstName, lastName, userType }: NotifyUserRequest = await req.json();
+    const requestBody = await req.json();
+    console.log('Request body received:', { ...requestBody, email: requestBody.email });
+    
+    const { waitingListId, email, firstName, lastName, userType }: NotifyUserRequest = requestBody;
+
+    if (!waitingListId || !email || !firstName || !lastName || !userType) {
+      console.error('Missing required fields:', { waitingListId, email, firstName, lastName, userType });
+      throw new Error('Missing required fields');
+    }
 
     console.log('Creating registration token for approved user:', { email, firstName, lastName, userType });
 
     // Create registration token
+    console.log('Inserting registration token into database...');
     const { data: tokenData, error: tokenError } = await supabase
       .from('registration_tokens')
       .insert([{
@@ -49,12 +60,19 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (tokenError) {
       console.error('Error creating registration token:', tokenError);
-      throw new Error('Failed to create registration token');
+      throw new Error(`Failed to create registration token: ${tokenError.message}`);
     }
 
-    const registrationUrl = `${Deno.env.get('SUPABASE_URL')?.replace('supabase.co', 'lovableproject.com') || 'https://project.lovableproject.com'}/complete-registration/${tokenData.token}`;
+    console.log('Registration token created successfully:', { token: tokenData.token.substring(0, 10) + '...' });
+
+    // Use the correct app domain
+    const appDomain = 'https://moodmate-ai-bridge.lovable.app';
+    const registrationUrl = `${appDomain}/complete-registration/${tokenData.token}`;
+    
+    console.log('Registration URL generated:', registrationUrl);
 
     // Send approval email with registration link
+    console.log('Attempting to send email via Resend to:', email);
     const emailResponse = await resend.emails.send({
       from: "MoodMate <noreply@moodmate.com>",
       to: [email],
@@ -108,7 +126,12 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Approval email sent successfully:", emailResponse);
+    console.log("Approval email sent successfully:", { 
+      id: emailResponse.id || emailResponse,
+      to: email 
+    });
+
+    console.log('=== NOTIFY APPROVED USER FUNCTION COMPLETED SUCCESSFULLY ===');
 
     return new Response(JSON.stringify({ 
       success: true, 
@@ -122,9 +145,16 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("Error in notify-approved-user function:", error);
+    console.error("=== ERROR in notify-approved-user function ===");
+    console.error("Error type:", error.constructor.name);
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
