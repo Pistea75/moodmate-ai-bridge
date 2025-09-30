@@ -24,4 +24,32 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Group all lucide-react icons together
+          'icons': ['lucide-react'],
+          // Group UI components
+          'ui-components': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-select',
+            '@radix-ui/react-slot',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-tooltip',
+            '@radix-ui/react-navigation-menu',
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-tabs',
+          ],
+          // Group React and core dependencies
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          // Group utilities
+          'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+  },
 }));
