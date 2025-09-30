@@ -52,6 +52,7 @@ export function SecurityHeaders() {
     });
 
     // Set improved CSP via meta tag (backup for when headers aren't available)
+    // Note: frame-ancestors directive is not supported in meta tags, use X-Frame-Options instead
     const cspContent = [
       "default-src 'self'",
       "script-src 'self' 'nonce-" + nonce + "' https://cdn.jsdelivr.net" + (isDevelopment ? " 'unsafe-eval'" : ""),
@@ -59,7 +60,6 @@ export function SecurityHeaders() {
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
       "connect-src 'self' https://otrhbyzjrhsqrltdedon.supabase.co wss://otrhbyzjrhsqrltdedon.supabase.co https://api.openai.com",
-      isDevelopment ? "" : "frame-ancestors 'none'",
       "object-src 'none'",
       "base-uri 'self'"
     ].filter(Boolean).join('; ');
