@@ -6,7 +6,8 @@ import {
   logEnhancedSecurityEvent, 
   authRateLimiter, 
   csrfManager,
-  invalidateSessionOnRoleChange 
+  invalidateSessionOnRoleChange,
+  startCSRFCleanup 
 } from '@/utils/enhancedSecurityUtils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -31,6 +32,11 @@ export function EnhancedSecurityProvider({ children }: EnhancedSecurityProviderP
   const [securityAlerts, setSecurityAlerts] = useState<string[]>([]);
   const [previousRole, setPreviousRole] = useState<string | null>(null);
   const [securityScore, setSecurityScore] = useState(100);
+
+  // Initialize CSRF cleanup on mount
+  useEffect(() => {
+    startCSRFCleanup();
+  }, []);
 
   // Monitor for role changes
   useEffect(() => {
