@@ -12,7 +12,6 @@ import { EnhancedSecurityProvider } from "@/components/security/EnhancedSecurity
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import LoadingFallback from "@/components/common/LoadingFallback";
-import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 
 // Lazy loaded pages for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -104,7 +103,6 @@ function App() {
             <TooltipProvider>
               <AuthProvider>
                   <EnhancedSecurityProvider>
-                    <SecurityHeaders />
                     <div className="min-h-screen bg-background">
                       <Toaster />
                       <ShadcnToaster />
