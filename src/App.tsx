@@ -95,6 +95,8 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  console.log('✅ App component is rendering');
+  
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -102,8 +104,7 @@ function App() {
           <ThemeProvider>
             <TooltipProvider>
               <AuthProvider>
-                  <EnhancedSecurityProvider>
-                    <div className="min-h-screen bg-background">
+                <div className="min-h-screen bg-background">
                       <Toaster />
                       <ShadcnToaster />
                       <Suspense fallback={<LoadingFallback />}>
@@ -202,7 +203,6 @@ function App() {
                       </Routes>
                       </Suspense>
                     </div>
-                  </EnhancedSecurityProvider>
                 </AuthProvider>
             </TooltipProvider>
           </ThemeProvider>
