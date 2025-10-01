@@ -5,7 +5,6 @@ import App from './App.tsx'
 import './index.css'
 import './i18n'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { SecurityHeaders } from '@/components/security/SecurityHeaders'
 
 const rootElement = document.getElementById("root");
 
@@ -14,8 +13,9 @@ if (!rootElement) {
 }
 
 createRoot(rootElement).render(
-  <ErrorBoundary>
-    <SecurityHeaders />
-    <App />
-  </ErrorBoundary>
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </React.StrictMode>
 );
