@@ -435,11 +435,7 @@ export const authRateLimiter = new EnhancedRateLimiter(60000, 5, 300000); // 5 a
 export const apiRateLimiter = new EnhancedRateLimiter(60000, 30, 60000); // 30 requests per minute, 1 min block
 export const csrfManager = new CSRFManager();
 
-// Function to start periodic cleanup (call this from a React component)
-export const startCSRFCleanup = () => {
-  if (typeof window !== 'undefined') {
-    setInterval(() => {
-      csrfManager.cleanup();
-    }, 15 * 60 * 1000);
-  }
-};
+// Periodic cleanup every 15 minutes for better security
+setInterval(() => {
+  csrfManager.cleanup();
+}, 15 * 60 * 1000);
