@@ -118,7 +118,7 @@ export function MoodReportPDF({ patientId, patientName }: MoodReportPDFProps) {
     }
 
     const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const blob = new Blob([new Uint8Array(pdfBytes.buffer as ArrayBuffer)], { type: 'application/pdf' });
     saveAs(blob, `${patientName}_MoodMate_Report.pdf`);
   };
 

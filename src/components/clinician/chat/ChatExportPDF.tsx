@@ -17,7 +17,7 @@ export const ChatExportPDF = ({ logs, summary, patientName }: ChatExportPDFProps
       const pdfGenerator = new ChatPDFGenerator();
       const pdfBytes = await pdfGenerator.generatePDF(logs, summary, patientName);
       
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(pdfBytes.buffer as ArrayBuffer)], { type: 'application/pdf' });
       const sanitizedFileName = sanitizeTextForPDF(patientName).replace(/\s+/g, '_');
       saveAs(blob, `${sanitizedFileName}_Chat_Log_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
     } catch (error) {
