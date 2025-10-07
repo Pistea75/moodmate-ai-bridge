@@ -1094,6 +1094,7 @@ export type Database = {
           first_name: string
           id: string
           last_name: string
+          referral_code: string | null
           token: string
           updated_at: string
           used_at: string | null
@@ -1107,6 +1108,7 @@ export type Database = {
           first_name: string
           id?: string
           last_name: string
+          referral_code?: string | null
           token?: string
           updated_at?: string
           used_at?: string | null
@@ -1120,6 +1122,7 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string
+          referral_code?: string | null
           token?: string
           updated_at?: string
           used_at?: string | null
@@ -1899,6 +1902,7 @@ export type Database = {
           id: string
           last_name: string
           message: string | null
+          referral_code: string | null
           status: string
           updated_at: string
           user_type: string
@@ -1912,6 +1916,7 @@ export type Database = {
           id?: string
           last_name: string
           message?: string | null
+          referral_code?: string | null
           status?: string
           updated_at?: string
           user_type?: string
@@ -1925,6 +1930,7 @@ export type Database = {
           id?: string
           last_name?: string
           message?: string | null
+          referral_code?: string | null
           status?: string
           updated_at?: string
           user_type?: string

@@ -16,6 +16,7 @@ interface NotifyUserRequest {
   firstName: string;
   lastName: string;
   userType: string;
+  referralCode?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -35,14 +36,14 @@ const handler = async (req: Request): Promise<Response> => {
     const requestBody = await req.json();
     console.log('Request body received:', { ...requestBody, email: requestBody.email });
     
-    const { waitingListId, email, firstName, lastName, userType }: NotifyUserRequest = requestBody;
+    const { waitingListId, email, firstName, lastName, userType, referralCode }: NotifyUserRequest = requestBody;
 
     if (!waitingListId || !email || !firstName || !lastName || !userType) {
       console.error('Missing required fields:', { waitingListId, email, firstName, lastName, userType });
       throw new Error('Missing required fields');
     }
 
-    console.log('Creating registration token for approved user:', { email, firstName, lastName, userType });
+    console.log('Creating registration token for approved user:', { email, firstName, lastName, userType, referralCode });
 
     // Create registration token
     console.log('Inserting registration token into database...');
@@ -53,7 +54,8 @@ const handler = async (req: Request): Promise<Response> => {
         email,
         first_name: firstName,
         last_name: lastName,
-        user_type: userType
+        user_type: userType,
+        referral_code: referralCode || null
       }])
       .select('token')
       .single();

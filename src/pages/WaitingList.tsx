@@ -16,6 +16,7 @@ export default function WaitingList() {
   const [email, setEmail] = useState('');
   const [userType, setUserType] = useState('patient');
   const [message, setMessage] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
@@ -33,7 +34,8 @@ export default function WaitingList() {
           last_name: lastName,
           email: email,
           user_type: userType,
-          message: message || null
+          message: message || null,
+          referral_code: referralCode || null
         });
 
       if (error) {
@@ -160,6 +162,25 @@ export default function WaitingList() {
                 </SelectContent>
               </Select>
             </div>
+
+            {userType === 'patient' && (
+              <div className="space-y-2">
+                <Label htmlFor="referralCode" className="text-white">
+                  Código de referido del psicólogo (opcional)
+                </Label>
+                <Input
+                  id="referralCode"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  placeholder="Ej: ABC123"
+                  className="bg-white/10 border-white/30 text-white placeholder:text-white/50 uppercase"
+                  maxLength={8}
+                />
+                <p className="text-xs text-white/60">
+                  Si un psicólogo te proporcionó un código, ingrésalo aquí para vincularte automáticamente.
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="message" className="text-white">Mensaje (opcional)</Label>

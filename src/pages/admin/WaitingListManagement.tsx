@@ -18,6 +18,7 @@ interface WaitingListEntry {
   user_type: string;
   status: 'pending' | 'approved' | 'rejected';
   message: string | null;
+  referral_code: string | null;
   approved_by: string | null;
   approved_at: string | null;
   created_at: string;
@@ -108,7 +109,8 @@ export default function WaitingListManagement() {
             email: entry.email,
             firstName: entry.first_name,
             lastName: entry.last_name,
-            userType: entry.user_type
+            userType: entry.user_type,
+            referralCode: entry.referral_code
           });
 
           const { data: functionData, error: emailError } = await supabase.functions.invoke('notify-approved-user', {
@@ -117,7 +119,8 @@ export default function WaitingListManagement() {
               email: entry.email,
               firstName: entry.first_name,
               lastName: entry.last_name,
-              userType: entry.user_type
+              userType: entry.user_type,
+              referralCode: entry.referral_code || null
             }
           });
 

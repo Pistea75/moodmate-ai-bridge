@@ -15,6 +15,7 @@ interface RegistrationToken {
   first_name: string;
   last_name: string;
   user_type: string;
+  referral_code: string | null;
   expires_at: string;
   used_at: string | null;
 }
@@ -128,7 +129,7 @@ export default function CompleteRegistration() {
             last_name: tokenData.last_name,
             role: tokenData.user_type,
             language: 'es',
-            referral_code: null
+            referral_code: tokenData.referral_code || null
           }
         }
       });
@@ -143,6 +144,37 @@ export default function CompleteRegistration() {
           variant: "destructive"
         });
         return;
+      }
+
+      // If patient with referral code, create clinician link
+      if (tokenData.user_type === 'patient' && tokenData.referral_code && authData.user) {
+        console.log('Creating patient-clinician link with referral code:', tokenData.referral_code);
+        
+        // Find psychologist by referral code
+        const { data: psychologist, error: psychError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('referral_code', tokenData.referral_code)
+          .eq('role', 'psychologist')
+          .single();
+
+        if (psychologist && !psychError) {
+          console.log('Found psychologist, creating link...');
+          const { error: linkError } = await supabase
+            .from('patient_clinician_links')
+            .insert({
+              patient_id: authData.user.id,
+              clinician_id: psychologist.id
+            });
+
+          if (linkError) {
+            console.error('Error creating patient-clinician link:', linkError);
+          } else {
+            console.log('Patient-clinician link created successfully');
+          }
+        } else {
+          console.warn('Psychologist not found for referral code:', tokenData.referral_code);
+        }
       }
 
       // Mark token as used
