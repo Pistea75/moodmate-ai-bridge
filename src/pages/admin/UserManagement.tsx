@@ -7,9 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, UserPlus, MoreHorizontal, Shield, Users, Activity } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Search, UserPlus, MoreHorizontal, Shield, Users, Activity, Ban, CheckCircle, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 
 interface User {
   id: string;
@@ -29,6 +31,7 @@ export default function UserManagement() {
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const { toast } = useToast();
+  const { disableUser, enableUser } = useSuperAdmin();
 
   useEffect(() => {
     fetchUsers();
@@ -78,6 +81,48 @@ export default function UserManagement() {
       case 'inactive': return 'bg-red-500 text-white';
       case 'suspended': return 'bg-yellow-500 text-white';
       default: return 'bg-gray-500 text-white';
+    }
+  };
+
+  const handleSuspendUser = async (userId: string) => {
+    const success = await disableUser(userId, 'Suspended by admin');
+    if (success) {
+      fetchUsers();
+    }
+  };
+
+  const handleActivateUser = async (userId: string) => {
+    const success = await enableUser(userId, 'Activated by admin');
+    if (success) {
+      fetchUsers();
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente al usuario ${userName}? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.functions.invoke('delete-user', {
+        body: { userId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Usuario eliminado',
+        description: 'El usuario ha sido eliminado exitosamente',
+      });
+      
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo eliminar el usuario',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -226,9 +271,40 @@ export default function UserManagement() {
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {user.status === 'active' ? (
+                                <DropdownMenuItem 
+                                  onClick={() => handleSuspendUser(user.id)}
+                                  className="text-yellow-600"
+                                >
+                                  <Ban className="h-4 w-4 mr-2" />
+                                  Suspender usuario
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem 
+                                  onClick={() => handleActivateUser(user.id)}
+                                  className="text-green-600"
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Activar usuario
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteUser(user.id, `${user.first_name} ${user.last_name}`)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Eliminar cuenta
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))
