@@ -65,8 +65,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Registration token created successfully:', { token: tokenData.token.substring(0, 10) + '...' });
 
-    // Use the correct app domain
-    const appDomain = 'https://moodmate-ai-bridge.lovable.app';
+    // Use the custom domain
+    const appDomain = 'https://www.moodmate.io';
     const registrationUrl = `${appDomain}/complete-registration/${tokenData.token}`;
     
     console.log('Registration URL generated:', registrationUrl);

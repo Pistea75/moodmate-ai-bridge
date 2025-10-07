@@ -122,11 +122,13 @@ export default function CompleteRegistration() {
         email: tokenData.email,
         password: formData.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/login`,
           data: {
             first_name: tokenData.first_name,
             last_name: tokenData.last_name,
             role: tokenData.user_type,
-            language: 'es'
+            language: 'es',
+            referral_code: null
           }
         }
       });
