@@ -74,7 +74,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send approval email with registration link
     console.log('Attempting to send email via Resend to:', email);
     const emailResponse = await resend.emails.send({
-      from: "MoodMate <onboarding@resend.dev>",
+      from: "MoodMate <noreply@moodmate.io>",
       to: [email],
       subject: "¡Tu solicitud de acceso ha sido aprobada! - MoodMate",
       html: `
