@@ -88,7 +88,8 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
                         recordingEnabled: session.recording_enabled || false,
                         recordingStatus: session.recording_status || 'none',
                         transcriptionStatus: session.transcription_status || 'none',
-                        aiReportStatus: session.ai_report_status || 'none'
+                        aiReportStatus: session.ai_report_status || 'none',
+                        notes: session.notes
                       }}
                       variant="default"
                       showControls={type === 'upcoming'}
@@ -96,7 +97,7 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
                       onDelete={onSessionDelete}
                     />
                     
-                    {/* Add Session Notes for completed sessions */}
+                    {/* Add Session Notes button for completed sessions */}
                     {isPastOrCompleted && (
                       <div className="flex justify-end">
                         <SessionRecapModal

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { SessionRecordingControls } from './SessionRecordingControls';
 import { VideoCallInterface } from './VideoCallInterface';
 import { 
@@ -17,7 +18,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Trash2
+  Trash2,
+  FileText,
+  ChevronDown
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, 
@@ -39,6 +42,7 @@ export interface EnhancedSession {
   recordingStatus?: string;
   transcriptionStatus?: string;
   aiReportStatus?: string;
+  notes?: string;
 }
 
 interface EnhancedSessionCardProps {
@@ -58,12 +62,19 @@ export function EnhancedSessionCard({
 }: EnhancedSessionCardProps) {
   const [showRecordingControls, setShowRecordingControls] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showFullNotes, setShowFullNotes] = useState(false);
   const { toast } = useToast();
   
   const sessionDate = new Date(session.dateTime);
   const isToday = new Date().toDateString() === sessionDate.toDateString();
   const isPast = sessionDate < new Date();
   const isUpcoming = !isPast;
+  
+  const MAX_NOTES_PREVIEW_LENGTH = 100;
+  const hasNotes = session.notes && session.notes.length > 0;
+  const notesPreview = hasNotes && session.notes!.length > MAX_NOTES_PREVIEW_LENGTH
+    ? session.notes!.substring(0, MAX_NOTES_PREVIEW_LENGTH) + '...'
+    : session.notes;
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -394,7 +405,56 @@ export function EnhancedSessionCard({
             </p>
           </div>
         )}
+
+        {/* Session Notes Preview */}
+        {hasNotes && (
+          <div className="pt-3 border-t">
+            <div className="flex items-center gap-2 mb-2">
+              <FileText className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium">Session Notes</span>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                {notesPreview}
+              </p>
+              {session.notes!.length > MAX_NOTES_PREVIEW_LENGTH && (
+                <Button 
+                  variant="link" 
+                  className="p-0 h-auto mt-2 text-blue-600 hover:text-blue-700"
+                  onClick={() => setShowFullNotes(true)}
+                >
+                  <ChevronDown className="h-3 w-3 mr-1" />
+                  View full notes
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </CardContent>
+
+      {/* Full Notes Dialog */}
+      <Dialog open={showFullNotes} onOpenChange={setShowFullNotes}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Session Notes
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                {session.notes}
+              </p>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button onClick={() => setShowFullNotes(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

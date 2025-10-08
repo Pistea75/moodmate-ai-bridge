@@ -5,6 +5,8 @@ import { DesktopSidebar } from './clinician/DesktopSidebar';
 import { SuperAdminDesktopSidebar } from './clinician/SuperAdminDesktopSidebar';
 import { useClinicianProfile } from './clinician/useClinicianProfile';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+import { Menu } from 'lucide-react';
 
 type ClinicianLayoutProps = {
   children: ReactNode;
@@ -13,6 +15,7 @@ type ClinicianLayoutProps = {
 export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
   console.log('🏗️ ClinicianLayout component rendering');
   const [isOpen, setIsOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { clinicianFullName, isSuperAdmin } = useClinicianProfile();
   const isMobile = useIsMobile();
   
@@ -29,15 +32,35 @@ export default function ClinicianLayout({ children }: ClinicianLayoutProps) {
       {/* Desktop Sidebar - Show different sidebar based on super admin status */}
       {!isMobile && (
         isSuperAdmin ? (
-          <SuperAdminDesktopSidebar />
+          <SuperAdminDesktopSidebar collapsed={sidebarCollapsed} />
         ) : (
-          <DesktopSidebar />
+          <DesktopSidebar collapsed={sidebarCollapsed} />
         )
       )}
       
       {/* Main Content */}
-      <main className={`flex-1 ${isMobile ? 'pt-16' : 'md:ml-64'} ${isSuperAdmin ? 'bg-gray-100 dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-900'} min-h-screen`}>
-        <div className={`w-full min-h-screen ${isMobile ? 'px-3 py-4' : 'p-4'}`}>
+      <main className={`flex-1 transition-all duration-300 ${
+        isMobile 
+          ? 'pt-16' 
+          : sidebarCollapsed 
+            ? 'md:ml-16' 
+            : 'md:ml-64'
+      } ${isSuperAdmin ? 'bg-gray-100 dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-900'} min-h-screen`}>
+        {/* Burger Menu Button for Desktop */}
+        {!isMobile && (
+          <div className="fixed top-4 left-4 z-30">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="bg-background shadow-md"
+            >
+              <Menu className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        
+        <div className={`w-full min-h-screen ${isMobile ? 'px-3 py-4' : 'p-4 pt-16'}`}>
           {children}
         </div>
       </main>

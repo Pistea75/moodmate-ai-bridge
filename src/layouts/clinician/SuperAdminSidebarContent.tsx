@@ -24,7 +24,11 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export function SuperAdminSidebarContent() {
+interface SuperAdminSidebarContentProps {
+  collapsed?: boolean;
+}
+
+export function SuperAdminSidebarContent({ collapsed = false }: SuperAdminSidebarContentProps) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
 
@@ -53,27 +57,36 @@ export function SuperAdminSidebarContent() {
     <div className="flex flex-col h-full bg-gray-900 dark:bg-black border-r border-gray-800 dark:border-gray-800">
       {/* Logo and Title */}
       <div className="p-6 border-b border-gray-800 dark:border-gray-800 flex-shrink-0">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700">
-              <Shield className="h-7 w-7 text-white" />
+        <div className={`flex items-center mb-4 ${collapsed ? 'justify-center' : 'justify-between'}`}>
+          {!collapsed && (
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700">
+                <Shield className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">MoodMate</h1>
+                <p className="text-sm text-blue-400 font-medium">{t('admin.superAdmin', 'SUPER ADMIN')}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-white">MoodMate</h1>
-              <p className="text-sm text-blue-400 font-medium">{t('admin.superAdmin', 'SUPER ADMIN')}</p>
+          )}
+          {collapsed && (
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700">
+              <Shield className="h-6 w-6 text-white" />
             </div>
-          </div>
-          <ThemeToggle />
+          )}
+          {!collapsed && <ThemeToggle />}
         </div>
       </div>
 
       {/* Super Admin Warning */}
-      <div className="p-4 bg-blue-950 dark:bg-blue-950/50 border-b border-gray-800 dark:border-gray-800">
-        <div className="flex items-center gap-2 text-blue-300">
-          <AlertTriangle className="h-4 w-4" />
-          <span className="text-xs font-medium">{t('admin.elevatedPrivileges', 'ELEVATED PRIVILEGES ACTIVE')}</span>
+      {!collapsed && (
+        <div className="p-4 bg-blue-950 dark:bg-blue-950/50 border-b border-gray-800 dark:border-gray-800">
+          <div className="flex items-center gap-2 text-blue-300">
+            <AlertTriangle className="h-4 w-4" />
+            <span className="text-xs font-medium">{t('admin.elevatedPrivileges', 'ELEVATED PRIVILEGES ACTIVE')}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Scrollable Navigation Area */}
       <ScrollArea className="flex-1">
@@ -82,9 +95,11 @@ export function SuperAdminSidebarContent() {
             <NavLink
               key={item.href}
               to={item.href}
+              title={collapsed ? item.title : undefined}
               className={({ isActive }) =>
                 cn(
                   "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95",
+                  collapsed ? 'justify-center' : '',
                   isActive
                     ? 'bg-blue-900 dark:bg-blue-900/50 text-blue-300 border border-blue-800 dark:border-blue-700'
                     : 'text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700'
@@ -92,7 +107,7 @@ export function SuperAdminSidebarContent() {
               }
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
-              <span className="flex-1">{item.title}</span>
+              {!collapsed && <span className="flex-1">{item.title}</span>}
             </NavLink>
           ))}
         </nav>
@@ -102,9 +117,11 @@ export function SuperAdminSidebarContent() {
       <div className="p-4 border-t border-gray-800 dark:border-gray-800 space-y-1 flex-shrink-0">
         <NavLink
           to="/admin/profile"
+          title={collapsed ? t('admin.adminProfile', 'Admin Profile') : undefined}
           className={({ isActive }) =>
             cn(
               "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
+              collapsed ? 'justify-center' : '',
               isActive
                 ? 'bg-blue-900 dark:bg-blue-900/50 text-blue-300 border border-blue-800 dark:border-blue-700'
                 : 'text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700'
@@ -112,16 +129,20 @@ export function SuperAdminSidebarContent() {
           }
         >
           <User className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">{t('admin.adminProfile', 'Admin Profile')}</span>
+          {!collapsed && <span className="flex-1">{t('admin.adminProfile', 'Admin Profile')}</span>}
         </NavLink>
 
         <Button
           variant="ghost"
+          title={collapsed ? t('nav.logout', 'Sign Out') : undefined}
           onClick={handleSignOut}
-          className="flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full justify-start text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700 active:scale-95"
+          className={cn(
+            "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700 active:scale-95",
+            collapsed ? 'justify-center' : 'justify-start'
+          )}
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1">{t('nav.logout', 'Sign Out')}</span>
+          {!collapsed && <span className="flex-1">{t('nav.logout', 'Sign Out')}</span>}
         </Button>
       </div>
     </div>
