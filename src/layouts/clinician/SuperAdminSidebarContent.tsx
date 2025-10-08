@@ -1,26 +1,26 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { 
   Shield, 
-  Users, 
   Settings, 
-  Database, 
-  Activity, 
-  FileText, 
-  AlertTriangle, 
   LogOut, 
   User,
-  Eye,
-  Lock,
-  Server,
-  BarChart3,
-  Clock,
   PanelLeftClose,
   PanelLeft
 } from 'lucide-react';
@@ -34,23 +34,12 @@ interface SuperAdminSidebarContentProps {
 export function SuperAdminSidebarContent({ collapsed = false, onToggle }: SuperAdminSidebarContentProps) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
-
-  const superAdminNavItems = [
-    { title: t('admin.systemOverview', 'System Overview'), href: '/admin/super-admin-dashboard', icon: BarChart3 },
-    { title: t('admin.userManagement', 'User Management'), href: '/admin/user-management', icon: Users },
-    { title: 'Waiting List', href: '/admin/waiting-list', icon: Clock },
-    { title: t('admin.phiAccess', 'PHI Access Panel'), href: '/admin/super-admin-panel', icon: Shield },
-    { title: t('nav.settings'), href: '/admin/system-settings', icon: Settings },
-    { title: t('admin.database', 'Database Management'), href: '/admin/database', icon: Database },
-    { title: t('admin.securityLogs', 'Security Logs'), href: '/admin/security-logs', icon: Eye },
-    { title: t('admin.systemHealth', 'System Health'), href: '/admin/system-health', icon: Server },
-    { title: t('admin.auditTrail', 'Audit Trail'), href: '/admin/audit-trail', icon: FileText },
-    { title: t('admin.systemMaintenance', 'System Maintenance'), href: '/admin/maintenance', icon: Lock },
-  ];
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      setShowLogoutDialog(false);
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -98,47 +87,9 @@ export function SuperAdminSidebarContent({ collapsed = false, onToggle }: SuperA
         </div>
       </div>
 
-      {/* Super Admin Warning */}
-      <div 
-        className={`bg-blue-950 dark:bg-blue-950/50 border-b border-gray-800 dark:border-gray-800 transition-all duration-300 overflow-hidden ${
-          collapsed ? 'h-0 p-0 opacity-0' : 'h-auto p-4 opacity-100'
-        }`}
-      >
-        <div className="flex items-center gap-2 text-blue-300 whitespace-nowrap">
-          <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs font-medium">
-            {t('admin.elevatedPrivileges', 'ELEVATED PRIVILEGES ACTIVE')}
-          </span>
-        </div>
-      </div>
-
-      {/* Scrollable Navigation Area */}
+      {/* Scrollable Navigation Area - Hidden */}
       <ScrollArea className="flex-1">
-        <nav className="p-4 space-y-1">
-          {superAdminNavItems.map((item) => (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              title={collapsed ? item.title : undefined}
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 group overflow-hidden",
-                  collapsed ? 'justify-center' : '',
-                  isActive
-                    ? 'bg-blue-900 dark:bg-blue-900/50 text-blue-300 border border-blue-800 dark:border-blue-700 shadow-sm'
-                    : 'text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700'
-                )
-              }
-            >
-              <item.icon className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
-              <span className={`flex-1 transition-all duration-300 whitespace-nowrap ${
-                collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
-              }`}>
-                {item.title}
-              </span>
-            </NavLink>
-          ))}
-        </nav>
+        {/* Navigation items hidden as requested */}
       </ScrollArea>
 
       {/* Footer */}
@@ -164,10 +115,31 @@ export function SuperAdminSidebarContent({ collapsed = false, onToggle }: SuperA
           </span>
         </NavLink>
 
+        <NavLink
+          to="/admin/system-settings"
+          title={collapsed ? t('nav.settings') : undefined}
+          className={({ isActive }) =>
+            cn(
+              "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full hover:scale-[1.02] active:scale-95 group overflow-hidden",
+              collapsed ? 'justify-center' : '',
+              isActive
+                ? 'bg-blue-900 dark:bg-blue-900/50 text-blue-300 border border-blue-800 dark:border-blue-700 shadow-sm'
+                : 'text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700'
+            )
+          }
+        >
+          <Settings className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
+          <span className={`flex-1 transition-all duration-300 whitespace-nowrap ${
+            collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+          }`}>
+            {t('nav.settings')}
+          </span>
+        </NavLink>
+
         <Button
           variant="ghost"
           title={collapsed ? t('nav.logout', 'Sign Out') : undefined}
-          onClick={handleSignOut}
+          onClick={() => setShowLogoutDialog(true)}
           className={cn(
             "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700 hover:scale-[1.02] active:scale-95 group overflow-hidden",
             collapsed ? 'justify-center' : 'justify-start'
@@ -181,6 +153,21 @@ export function SuperAdminSidebarContent({ collapsed = false, onToggle }: SuperA
           </span>
         </Button>
       </div>
+
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Log Out</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to log out. Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSignOut}>Log Out</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
