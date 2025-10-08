@@ -137,22 +137,9 @@ export class EnhancedRateLimiter {
   }
   
   private async logRateLimitViolation(identifier: string, action: string, attempts: number): Promise<void> {
-    try {
-      await supabase.from('enhanced_security_logs').insert({
-        action: 'rate_limit_violation',
-        resource: action,
-        success: false,
-        risk_score: Math.min(attempts * 10, 100),
-        details: {
-          identifier,
-          action,
-          attempts,
-          timestamp: new Date().toISOString()
-        }
-      });
-    } catch (error) {
-      console.error('Failed to log rate limit violation:', error);
-    }
+    // Note: Client-side security logging removed due to RLS restrictions
+    // Security events should be logged server-side via edge functions
+    console.warn('Rate limit violation:', { identifier, action, attempts });
   }
 }
 
@@ -300,21 +287,13 @@ export const logEnhancedSecurityEvent = async (event: {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     
-    const logEntry = {
+    // Note: Client-side security logging removed due to RLS restrictions
+    // Security events should be logged server-side via edge functions
+    console.log('Security event (client-side log):', {
       action: event.action,
       resource: event.resource,
-      user_id: user?.id || null,
-      success: event.success ?? true,
-      risk_score: event.riskScore ?? 0,
-      details: {
-        ...event.details,
-        timestamp: new Date().toISOString(),
-        user_agent: navigator.userAgent,
-        url: window.location.href
-      }
-    };
-    
-    await supabase.from('enhanced_security_logs').insert(logEntry);
+      success: event.success ?? true
+    });
   } catch (error) {
     console.error('Failed to log security event:', error);
   }

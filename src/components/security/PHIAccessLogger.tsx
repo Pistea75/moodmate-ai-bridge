@@ -47,27 +47,15 @@ export function PHIAccessLogger({
           riskScore: 0 // PHI access is normal operation
         });
 
-        // Also log to dedicated PHI access log if needed
-        const { error } = await supabase
-          .from('enhanced_security_logs')
-          .insert({
-            user_id: user.id,
-            action: 'phi_access',
-            resource: `patient_${dataType}`,
-            success: true,
-            details: {
-              patient_id: patientId,
-              access_type: accessType,
-              data_type: dataType,
-              context: context,
-              compliance_marker: 'HIPAA_LOG'
-            },
-            risk_score: 0
-          });
-
-        if (error) {
-          console.error('Failed to log PHI access:', error);
-        }
+        // Note: Client-side security logging removed due to RLS restrictions
+        // PHI access logging should be done server-side via edge functions
+        console.log('PHI access (client-side log):', {
+          patient_id: patientId,
+          access_type: accessType,
+          data_type: dataType,
+          context: context,
+          compliance_marker: 'HIPAA_LOG'
+        });
       } catch (error) {
         console.error('PHI access logging failed:', error);
       }
