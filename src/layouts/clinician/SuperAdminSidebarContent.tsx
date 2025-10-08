@@ -56,37 +56,42 @@ export function SuperAdminSidebarContent({ collapsed = false }: SuperAdminSideba
   return (
     <div className="flex flex-col h-full bg-gray-900 dark:bg-black border-r border-gray-800 dark:border-gray-800">
       {/* Logo and Title */}
-      <div className="p-6 border-b border-gray-800 dark:border-gray-800 flex-shrink-0">
-        <div className={`flex items-center mb-4 ${collapsed ? 'justify-center' : 'justify-between'}`}>
-          {!collapsed && (
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700">
-                <Shield className="h-7 w-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">MoodMate</h1>
-                <p className="text-sm text-blue-400 font-medium">{t('admin.superAdmin', 'SUPER ADMIN')}</p>
-              </div>
+      <div className="p-6 border-b border-gray-800 dark:border-gray-800 flex-shrink-0 transition-all duration-300">
+        <div className={`flex items-center mb-4 transition-all duration-300 ${collapsed ? 'justify-center' : 'justify-between'}`}>
+          <div className={`flex items-center gap-3 transition-all duration-300 ${collapsed ? 'opacity-100' : 'opacity-100'}`}>
+            <div className={`rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700 transition-all duration-300 ${
+              collapsed ? 'w-10 h-10' : 'w-12 h-12'
+            }`}>
+              <Shield className={`text-white transition-all duration-300 ${collapsed ? 'h-6 w-6' : 'h-7 w-7'}`} />
             </div>
-          )}
-          {collapsed && (
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700">
-              <Shield className="h-6 w-6 text-white" />
+            <div className={`transition-all duration-300 overflow-hidden ${
+              collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+            }`}>
+              <h1 className="text-xl font-bold text-white whitespace-nowrap">MoodMate</h1>
+              <p className="text-sm text-blue-400 font-medium whitespace-nowrap">
+                {t('admin.superAdmin', 'SUPER ADMIN')}
+              </p>
             </div>
-          )}
-          {!collapsed && <ThemeToggle />}
+          </div>
+          <div className={`transition-all duration-300 ${collapsed ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
+            <ThemeToggle />
+          </div>
         </div>
       </div>
 
       {/* Super Admin Warning */}
-      {!collapsed && (
-        <div className="p-4 bg-blue-950 dark:bg-blue-950/50 border-b border-gray-800 dark:border-gray-800">
-          <div className="flex items-center gap-2 text-blue-300">
-            <AlertTriangle className="h-4 w-4" />
-            <span className="text-xs font-medium">{t('admin.elevatedPrivileges', 'ELEVATED PRIVILEGES ACTIVE')}</span>
-          </div>
+      <div 
+        className={`bg-blue-950 dark:bg-blue-950/50 border-b border-gray-800 dark:border-gray-800 transition-all duration-300 overflow-hidden ${
+          collapsed ? 'h-0 p-0 opacity-0' : 'h-auto p-4 opacity-100'
+        }`}
+      >
+        <div className="flex items-center gap-2 text-blue-300 whitespace-nowrap">
+          <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+          <span className="text-xs font-medium">
+            {t('admin.elevatedPrivileges', 'ELEVATED PRIVILEGES ACTIVE')}
+          </span>
         </div>
-      )}
+      </div>
 
       {/* Scrollable Navigation Area */}
       <ScrollArea className="flex-1">
@@ -98,16 +103,20 @@ export function SuperAdminSidebarContent({ collapsed = false }: SuperAdminSideba
               title={collapsed ? item.title : undefined}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 active:scale-95",
+                  "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 group overflow-hidden",
                   collapsed ? 'justify-center' : '',
                   isActive
-                    ? 'bg-blue-900 dark:bg-blue-900/50 text-blue-300 border border-blue-800 dark:border-blue-700'
+                    ? 'bg-blue-900 dark:bg-blue-900/50 text-blue-300 border border-blue-800 dark:border-blue-700 shadow-sm'
                     : 'text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700'
                 )
               }
             >
-              <item.icon className="h-4 w-4 flex-shrink-0" />
-              {!collapsed && <span className="flex-1">{item.title}</span>}
+              <item.icon className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
+              <span className={`flex-1 transition-all duration-300 whitespace-nowrap ${
+                collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+              }`}>
+                {item.title}
+              </span>
             </NavLink>
           ))}
         </nav>
