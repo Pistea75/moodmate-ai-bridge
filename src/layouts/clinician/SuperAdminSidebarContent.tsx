@@ -20,15 +20,18 @@ import {
   Lock,
   Server,
   BarChart3,
-  Clock
+  Clock,
+  PanelLeftClose,
+  PanelLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SuperAdminSidebarContentProps {
   collapsed?: boolean;
+  onToggle?: () => void;
 }
 
-export function SuperAdminSidebarContent({ collapsed = false }: SuperAdminSidebarContentProps) {
+export function SuperAdminSidebarContent({ collapsed = false, onToggle }: SuperAdminSidebarContentProps) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
 
@@ -55,25 +58,41 @@ export function SuperAdminSidebarContent({ collapsed = false }: SuperAdminSideba
 
   return (
     <div className="flex flex-col h-full bg-gray-900 dark:bg-black border-r border-gray-800 dark:border-gray-800">
-      {/* Logo and Title */}
-      <div className="p-6 border-b border-gray-800 dark:border-gray-800 flex-shrink-0 transition-all duration-300">
-        <div className={`flex items-center mb-4 transition-all duration-300 ${collapsed ? 'justify-center' : 'justify-between'}`}>
-          <div className={`flex items-center gap-3 transition-all duration-300 ${collapsed ? 'opacity-100' : 'opacity-100'}`}>
-            <div className={`rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700 transition-all duration-300 ${
-              collapsed ? 'w-10 h-10' : 'w-12 h-12'
-            }`}>
-              <Shield className={`text-white transition-all duration-300 ${collapsed ? 'h-6 w-6' : 'h-7 w-7'}`} />
+      {/* Header with Toggle Button */}
+      <div className="p-4 border-b border-gray-800 dark:border-gray-800 flex-shrink-0">
+        <div className="flex items-center justify-between gap-2">
+          {/* Toggle Button - Always visible */}
+          <button
+            onClick={onToggle}
+            className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors group"
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {collapsed ? (
+              <PanelLeft className="h-5 w-5 text-gray-300 group-hover:text-white transition-colors" />
+            ) : (
+              <PanelLeftClose className="h-5 w-5 text-gray-300 group-hover:text-white transition-colors" />
+            )}
+          </button>
+
+          {/* Logo and Title - Hidden when collapsed */}
+          <div className={`flex items-center gap-3 transition-all duration-300 overflow-hidden ${
+            collapsed ? 'w-0 opacity-0' : 'flex-1 opacity-100'
+          }`}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700">
+              <Shield className="h-6 w-6 text-white" />
             </div>
-            <div className={`transition-all duration-300 overflow-hidden ${
-              collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
-            }`}>
-              <h1 className="text-xl font-bold text-white whitespace-nowrap">MoodMate</h1>
-              <p className="text-sm text-blue-400 font-medium whitespace-nowrap">
+            <div className="min-w-0">
+              <h1 className="text-lg font-bold text-white whitespace-nowrap">MoodMate</h1>
+              <p className="text-xs text-blue-400 font-medium whitespace-nowrap">
                 {t('admin.superAdmin', 'SUPER ADMIN')}
               </p>
             </div>
           </div>
-          <div className={`transition-all duration-300 ${collapsed ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>
+
+          {/* Theme Toggle - Hidden when collapsed */}
+          <div className={`transition-all duration-300 flex-shrink-0 ${
+            collapsed ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'
+          }`}>
             <ThemeToggle />
           </div>
         </div>
@@ -129,16 +148,20 @@ export function SuperAdminSidebarContent({ collapsed = false }: SuperAdminSideba
           title={collapsed ? t('admin.adminProfile', 'Admin Profile') : undefined}
           className={({ isActive }) =>
             cn(
-              "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full active:scale-95",
+              "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full hover:scale-[1.02] active:scale-95 group overflow-hidden",
               collapsed ? 'justify-center' : '',
               isActive
-                ? 'bg-blue-900 dark:bg-blue-900/50 text-blue-300 border border-blue-800 dark:border-blue-700'
+                ? 'bg-blue-900 dark:bg-blue-900/50 text-blue-300 border border-blue-800 dark:border-blue-700 shadow-sm'
                 : 'text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700'
             )
           }
         >
-          <User className="h-4 w-4 flex-shrink-0" />
-          {!collapsed && <span className="flex-1">{t('admin.adminProfile', 'Admin Profile')}</span>}
+          <User className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
+          <span className={`flex-1 transition-all duration-300 whitespace-nowrap ${
+            collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+          }`}>
+            {t('admin.adminProfile', 'Admin Profile')}
+          </span>
         </NavLink>
 
         <Button
@@ -146,12 +169,16 @@ export function SuperAdminSidebarContent({ collapsed = false }: SuperAdminSideba
           title={collapsed ? t('nav.logout', 'Sign Out') : undefined}
           onClick={handleSignOut}
           className={cn(
-            "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700 active:scale-95",
+            "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 active:bg-gray-700 dark:active:bg-gray-700 hover:scale-[1.02] active:scale-95 group overflow-hidden",
             collapsed ? 'justify-center' : 'justify-start'
           )}
         >
-          <LogOut className="h-4 w-4 flex-shrink-0" />
-          {!collapsed && <span className="flex-1">{t('nav.logout', 'Sign Out')}</span>}
+          <LogOut className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
+          <span className={`flex-1 transition-all duration-300 whitespace-nowrap ${
+            collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+          }`}>
+            {t('nav.logout', 'Sign Out')}
+          </span>
         </Button>
       </div>
     </div>
