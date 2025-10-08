@@ -27,6 +27,7 @@ enabled = true
 
 [functions]
 [functions.chat-ai]
+verify_jwt = true
 [functions.delete-user]
 [functions.handle_new_user]
 [functions.summarize-chat]
