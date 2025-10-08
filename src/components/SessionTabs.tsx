@@ -68,43 +68,47 @@ export function SessionTabs({ loading, filtered, onSessionDelete, selectedDate }
                 No {type} sessions.
               </p>
             ) : (
-              filtered[type].map((session: any) => (
-                <div key={session.id} className="relative">
-                  <EnhancedSessionCard
-                    session={{
-                      id: session.id,
-                      title: `Session with ${session.patient?.first_name || 'Patient'}`,
-                      dateTime: session.scheduled_time || '',
-                      duration: session.duration_minutes || 50,
-                      patientName: session.patient ? 
-                        `${session.patient.first_name || ''} ${session.patient.last_name || ''}`.trim() : 
-                        'Unknown Patient',
-                      status: session.status || 'upcoming',
-                      timezone: session.timezone,
-                      sessionType: session.session_type || 'in_person',
-                      recordingEnabled: session.recording_enabled || false,
-                      recordingStatus: session.recording_status || 'none',
-                      transcriptionStatus: session.transcription_status || 'none',
-                      aiReportStatus: session.ai_report_status || 'none'
-                    }}
-                    variant="default"
-                    showControls={type === 'upcoming'}
-                    onSessionUpdate={onSessionDelete}
-                    onDelete={onSessionDelete}
-                  />
-                  
-                  <div className="absolute top-4 right-4 flex gap-2">
-                    {/* Add Session Recap Modal for past sessions */}
-                    {type === 'past' && (
-                      <SessionRecapModal
-                        sessionId={session.id}
-                        initialNotes={session.notes || ''}
-                        onSaved={onSessionDelete} // Use the same callback to refresh sessions
-                      />
+              filtered[type].map((session: any) => {
+                const isPastOrCompleted = type === 'past' || session.status === 'completed';
+                
+                return (
+                  <div key={session.id} className="space-y-2">
+                    <EnhancedSessionCard
+                      session={{
+                        id: session.id,
+                        title: `Session with ${session.patient?.first_name || 'Patient'}`,
+                        dateTime: session.scheduled_time || '',
+                        duration: session.duration_minutes || 50,
+                        patientName: session.patient ? 
+                          `${session.patient.first_name || ''} ${session.patient.last_name || ''}`.trim() : 
+                          'Unknown Patient',
+                        status: session.status || 'upcoming',
+                        timezone: session.timezone,
+                        sessionType: session.session_type || 'in_person',
+                        recordingEnabled: session.recording_enabled || false,
+                        recordingStatus: session.recording_status || 'none',
+                        transcriptionStatus: session.transcription_status || 'none',
+                        aiReportStatus: session.ai_report_status || 'none'
+                      }}
+                      variant="default"
+                      showControls={type === 'upcoming'}
+                      onSessionUpdate={onSessionDelete}
+                      onDelete={onSessionDelete}
+                    />
+                    
+                    {/* Add Session Notes for completed sessions */}
+                    {isPastOrCompleted && (
+                      <div className="flex justify-end">
+                        <SessionRecapModal
+                          sessionId={session.id}
+                          initialNotes={session.notes || ''}
+                          onSaved={onSessionDelete}
+                        />
+                      </div>
                     )}
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </TabsContent>
