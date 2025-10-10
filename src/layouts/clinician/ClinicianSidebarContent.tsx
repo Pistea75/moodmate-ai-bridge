@@ -113,7 +113,26 @@ export function ClinicianSidebarContent({ collapsed = false, onToggle }: Clinici
 
 
       {/* Scrollable Navigation Area */}
-      <ScrollArea className="flex-1 [&>div>div]:!bg-transparent [&_[data-radix-scroll-area-viewport]]:!bg-transparent">
+      <ScrollArea className="flex-1 bg-transparent">
+        <style>{`
+          [data-radix-scroll-area-viewport] > div {
+            display: block !important;
+          }
+          [data-radix-scroll-area-scrollbar] {
+            background: transparent !important;
+            width: 8px !important;
+          }
+          [data-radix-scroll-area-scrollbar][data-orientation="vertical"] {
+            right: 2px;
+          }
+          [data-radix-scroll-area-thumb] {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-radius: 4px !important;
+          }
+          [data-radix-scroll-area-thumb]:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+          }
+        `}</style>
         <div className={`p-4 space-y-1 transition-all duration-300 ${collapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           {navItems.map((item) => (
             <NavLink
