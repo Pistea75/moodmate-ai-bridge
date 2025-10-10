@@ -82,14 +82,14 @@ export function SuperAdminSidebarContent({ collapsed = false, onToggle }: SuperA
             )}
           </button>
 
-          {/* Logo and Title - Hidden when collapsed */}
-          <div className={`flex items-center gap-3 transition-all duration-300 overflow-hidden ${
-            collapsed ? 'w-0 opacity-0' : 'flex-1 opacity-100'
-          }`}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 to-blue-700">
+          {/* Logo and Title */}
+          <div className="flex items-center gap-3 flex-1 overflow-hidden">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 bg-gradient-to-br from-blue-600 to-blue-700">
               <Shield className="h-6 w-6 text-white" />
             </div>
-            <div className="min-w-0">
+            <div className={`min-w-0 transition-all duration-300 ${
+              collapsed ? 'w-0 opacity-0' : 'flex-1 opacity-100'
+            }`}>
               <h1 className="text-lg font-bold text-white whitespace-nowrap">MoodMate</h1>
               <p className="text-xs text-blue-400 font-medium whitespace-nowrap">
                 {t('admin.superAdmin', 'SUPER ADMIN')}
@@ -107,7 +107,7 @@ export function SuperAdminSidebarContent({ collapsed = false, onToggle }: SuperA
       </div>
 
       {/* Scrollable Navigation Area */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 [&>div>div]:!bg-transparent [&_[data-radix-scroll-area-viewport]]:!bg-transparent">
         <div className={`p-4 space-y-1 transition-all duration-300 ${collapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           {navItems.map((item) => (
             <NavLink
