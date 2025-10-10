@@ -52,10 +52,12 @@ export function useTTS({ onAudioStart, onAudioEnd, onError, onQuotaError }: UseT
       // Create audio element and play
       const audioBlob = new Blob([
         Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))
-      ], { type: 'audio/mp3' });
+      ], { type: 'audio/mpeg' });
       
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
+      
+      console.log('Audio blob created, size:', audioBlob.size, 'type:', audioBlob.type);
       
       setIsPlaying(true);
       
