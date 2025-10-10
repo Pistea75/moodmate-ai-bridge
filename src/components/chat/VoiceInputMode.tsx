@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
-import { useRealtimeChat } from '@/hooks/useRealtimeChat';
+import { Mic, MicOff, Volume2, VolumeX, Loader } from 'lucide-react';
+import { useRealtimeVoiceChat } from '@/hooks/useRealtimeVoiceChat';
 
 export interface VoiceInputModeProps {
   onSendMessage?: (text: string) => Promise<void> | void;
@@ -10,29 +10,43 @@ export interface VoiceInputModeProps {
 }
 
 export function VoiceInputMode(props: VoiceInputModeProps) {
+  const [messages, setMessages] = useState<Array<{ role: string; content: string; id: string }>>([]);
+  
+  const handleTranscript = (text: string, isUser: boolean) => {
+    if (text.trim()) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: isUser ? 'user' : 'assistant',
+        content: text
+      }]);
+    }
+  };
+
   const { 
     isConnected, 
-    isListening, 
+    isConnecting,
     isSpeaking, 
-    messages, 
     userTranscript, 
-    assistantTranscript,
+    aiTranscript,
     connect, 
     disconnect 
-  } = useRealtimeChat();
+  } = useRealtimeVoiceChat({ 
+    instructions: "Eres un asistente de salud mental útil y empático. Mantén tus respuestas naturales y conversacionales.",
+    onTranscript: handleTranscript
+  });
 
   const getStatusText = () => {
-    if (!isConnected) return 'Conectando...';
+    if (isConnecting) return 'Conectando...';
+    if (!isConnected) return 'Toca para comenzar';
     if (isSpeaking) return 'AI hablando...';
-    if (isListening) return 'Escuchando...';
-    return 'Toca para comenzar';
+    return 'Escuchando...';
   };
 
   const getButtonState = () => {
-    if (!isConnected) return 'connecting';
+    if (isConnecting) return 'connecting';
+    if (!isConnected) return 'ready';
     if (isSpeaking) return 'speaking';
-    if (isListening) return 'listening';
-    return 'ready';
+    return 'listening';
   };
 
   const buttonState = getButtonState();
@@ -96,7 +110,7 @@ export function VoiceInputMode(props: VoiceInputModeProps) {
         </div>
         
         {/* Live transcription */}
-        {(userTranscript || assistantTranscript) && (
+        {(userTranscript || aiTranscript) && (
           <div className="space-y-3">
             {userTranscript && (
               <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-blue-500">
@@ -109,13 +123,13 @@ export function VoiceInputMode(props: VoiceInputModeProps) {
               </div>
             )}
             
-            {assistantTranscript && (
+            {aiTranscript && (
               <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-green-500">
                 <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">
                   AI está diciendo:
                 </div>
                 <div className="text-muted-foreground italic">
-                  {assistantTranscript}
+                  {aiTranscript}
                 </div>
               </div>
             )}
@@ -123,14 +137,14 @@ export function VoiceInputMode(props: VoiceInputModeProps) {
         )}
 
         {/* Instructions */}
-        {!isConnected && (
+        {!isConnected && !isConnecting && (
           <div className="text-muted-foreground text-center max-w-md mx-auto">
             Toca el botón para iniciar una conversación de voz natural con la IA. 
             La conversación será continua - simplemente habla y la IA responderá automáticamente.
           </div>
         )}
         
-        {isConnected && !isListening && !isSpeaking && (
+        {isConnected && !isSpeaking && (
           <div className="text-muted-foreground text-center max-w-md mx-auto">
             Conversación activa. Simplemente comienza a hablar y la IA responderá automáticamente.
           </div>
