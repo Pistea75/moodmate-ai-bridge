@@ -26,6 +26,7 @@ serve(async (req) => {
     // Prepare the conversation for summarization
     const conversationText = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
 
+    console.log('Calling OpenAI API for summarization with model: gpt-4o-mini');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -33,7 +34,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: Deno.env.get('OPENAI_MODEL_DEFAULT') || 'gpt-4o-mini',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',

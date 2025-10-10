@@ -250,6 +250,7 @@ IMPORTANTE: Si me preguntan sobre mi acceso al formulario de configuración, con
     ];
 
     // Call OpenAI API
+    console.log('Calling OpenAI API with model: gpt-4o-mini');
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -257,7 +258,7 @@ IMPORTANTE: Si me preguntan sobre mi acceso al formulario de configuración, con
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: Deno.env.get('OPENAI_MODEL_DEFAULT') || 'gpt-4o-mini',
+        model: 'gpt-4o-mini',
         messages: sanitizedMessages,
         max_tokens: 1000,
         temperature: 0.7,
