@@ -22,7 +22,15 @@ import {
   User,
   Brain,
   PanelLeftClose,
-  PanelLeft
+  PanelLeft,
+  Home,
+  Users,
+  Calendar,
+  ListCheck,
+  MessageSquare,
+  Bot,
+  BarChart,
+  Store
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -44,6 +52,18 @@ export function ClinicianSidebarContent({ collapsed = false, onToggle }: Clinici
       console.error('Error signing out:', error);
     }
   };
+
+  const navItems = [
+    { title: t('nav.dashboard'), href: '/clinician/dashboard', icon: Home },
+    { title: t('nav.patients'), href: '/clinician/patients', icon: Users },
+    { title: t('nav.sessions'), href: '/clinician/sessions', icon: Calendar },
+    { title: t('nav.tasks'), href: '/clinician/tasks', icon: ListCheck },
+    { title: t('nav.reports'), href: '/clinician/reports', icon: MessageSquare },
+    { title: t('nav.trainAI'), href: '/clinician/train-ai', icon: Bot },
+    { title: t('nav.messages'), href: '/clinician/communications', icon: MessageSquare },
+    { title: t('nav.marketplace'), href: '/clinician/marketplace-profile', icon: Store },
+    { title: t('nav.analytics'), href: '/clinician/analytics', icon: BarChart },
+  ];
 
   return (
     <div className="flex flex-col h-full border-r border-gray-800 dark:border-gray-700" style={{
@@ -92,9 +112,38 @@ export function ClinicianSidebarContent({ collapsed = false, onToggle }: Clinici
       </div>
 
 
-      {/* Scrollable Navigation Area - Hidden */}
+      {/* Scrollable Navigation Area */}
       <ScrollArea className="flex-1">
-        {/* Navigation items hidden as requested */}
+        <div className={`p-4 space-y-1 transition-all duration-300 ${collapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.href}
+              to={item.href}
+              title={collapsed ? item.title : undefined}
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-4 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 w-full hover:scale-[1.02] active:scale-95 group overflow-hidden",
+                  collapsed ? 'justify-center' : '',
+                  isActive
+                    ? 'text-white border shadow-sm'
+                    : 'text-gray-300 hover:text-white hover:bg-gray-800 dark:hover:bg-gray-700 active:bg-gray-700'
+                )
+              }
+              style={({ isActive }) => ({
+                backgroundColor: isActive ? `hsl(var(--sidebar-accent))` : undefined,
+                borderColor: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+                color: isActive ? `hsl(var(--sidebar-primary))` : undefined,
+              })}
+            >
+              <item.icon className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
+              <span className={`flex-1 transition-all duration-300 whitespace-nowrap ${
+                collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+              }`}>
+                {item.title}
+              </span>
+            </NavLink>
+          ))}
+        </div>
       </ScrollArea>
 
       {/* Footer */}
