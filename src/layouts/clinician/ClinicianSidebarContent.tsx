@@ -85,21 +85,21 @@ export function ClinicianSidebarContent({ collapsed = false, onToggle }: Clinici
             )}
           </button>
 
-          {/* Logo and Title */}
-          <div className="flex items-center gap-3 flex-1 overflow-hidden">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0" style={{
-              background: `linear-gradient(135deg, hsl(var(--sidebar-primary)), hsl(var(--sidebar-accent)))`,
-            }}>
-              <Brain className="h-6 w-6 text-white" />
-            </div>
-            <div className={`min-w-0 transition-all duration-300 ${
-              collapsed ? 'w-0 opacity-0' : 'flex-1 opacity-100'
-            }`}>
-              <h1 className="text-lg font-bold text-white whitespace-nowrap">MoodMate</h1>
-              <p className="text-xs font-medium whitespace-nowrap" style={{ color: `hsl(var(--sidebar-primary))` }}>
-                {t('auth.clinicianAccount', 'Clinician Portal')}
-              </p>
-            </div>
+          {/* Logo Icon - Always visible */}
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0" style={{
+            background: `linear-gradient(135deg, hsl(var(--sidebar-primary)), hsl(var(--sidebar-accent)))`,
+          }}>
+            <Brain className="h-6 w-6 text-white" />
+          </div>
+
+          {/* Title - Hidden when collapsed */}
+          <div className={`min-w-0 transition-all duration-300 ${
+            collapsed ? 'w-0 opacity-0' : 'flex-1 opacity-100'
+          }`}>
+            <h1 className="text-lg font-bold text-white whitespace-nowrap">MoodMate</h1>
+            <p className="text-xs font-medium whitespace-nowrap" style={{ color: `hsl(var(--sidebar-primary))` }}>
+              {t('auth.clinicianAccount', 'Clinician Portal')}
+            </p>
           </div>
 
           {/* Theme Toggle - Hidden when collapsed */}
