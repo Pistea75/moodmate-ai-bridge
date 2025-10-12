@@ -74,13 +74,13 @@ export class RealtimeChat {
     this.audioEl.autoplay = true;
   }
 
-  async init(instructions?: string) {
+  async init(instructions?: string, voice?: string) {
     try {
       console.log('Initializing realtime chat...');
       
       // Get ephemeral token from our Supabase Edge Function
       const { data, error } = await supabase.functions.invoke("realtime-token", {
-        body: { instructions }
+        body: { instructions, voice }
       });
 
       if (error) throw error;

@@ -17,9 +17,9 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not set');
     }
 
-    const { instructions } = await req.json();
+    const { instructions, voice } = await req.json();
 
-    console.log('Creating realtime session with instructions:', instructions?.substring(0, 100));
+    console.log('Creating realtime session with voice:', voice || 'alloy');
 
     // Request an ephemeral token from OpenAI
     const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
@@ -30,7 +30,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: "alloy",
+        voice: voice || "alloy",
         instructions: instructions || "You are a helpful AI assistant. Keep your responses natural and conversational.",
       }),
     });

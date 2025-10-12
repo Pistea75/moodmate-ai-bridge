@@ -103,64 +103,18 @@ export function VoiceInputMode(props: VoiceInputModeProps) {
         )}
       </div>
 
-      {/* Status and Transcription */}
-      <div className="text-center space-y-4 max-w-2xl">
-        <div className="text-2xl font-semibold text-foreground">
-          {getStatusText()}
-        </div>
-        
-        {/* Live transcription */}
-        {(userTranscript || aiTranscript) && (
-          <div className="space-y-3">
-            {userTranscript && (
-              <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-blue-500">
-                <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
-                  Tú estás diciendo:
-                </div>
-                <div className="text-muted-foreground italic">
-                  {userTranscript}
-                </div>
-              </div>
-            )}
-            
-            {aiTranscript && (
-              <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-green-500">
-                <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">
-                  AI está diciendo:
-                </div>
-                <div className="text-muted-foreground italic">
-                  {aiTranscript}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Instructions */}
-        {!isConnected && !isConnecting && (
-          <div className="text-muted-foreground text-center max-w-md mx-auto">
-            Toca el botón para iniciar una conversación de voz natural con la IA. 
-            La conversación será continua - simplemente habla y la IA responderá automáticamente.
-          </div>
-        )}
-        
-        {isConnected && !isSpeaking && (
-          <div className="text-muted-foreground text-center max-w-md mx-auto">
-            Conversación activa. Simplemente comienza a hablar y la IA responderá automáticamente.
-          </div>
-        )}
+      {/* Status Text */}
+      <div className="text-2xl font-semibold text-foreground">
+        {getStatusText()}
       </div>
 
-      {/* Recent Messages (last 3) */}
+      {/* Conversation History */}
       {messages.length > 0 && (
         <div className="w-full max-w-2xl space-y-3">
-          <div className="text-sm font-medium text-muted-foreground text-center mb-4">
-            Conversación reciente
-          </div>
-          {messages.slice(-3).map((message) => (
+          {messages.map((message) => (
             <div
               key={message.id}
-              className={`p-3 rounded-lg ${
+              className={`p-4 rounded-lg ${
                 message.role === 'user'
                   ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 ml-8'
                   : 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 mr-8'
