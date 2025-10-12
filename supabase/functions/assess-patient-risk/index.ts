@@ -40,16 +40,20 @@ serve(async (req) => {
       refresh_token: '',
     });
 
-    const { patient_id } = await req.json();
+    const { patient_id, patientId, clinician_id, clinicianId } = await req.json();
+    
+    // Accept both snake_case and camelCase for compatibility
+    const actualPatientId = patient_id || patientId;
+    const actualClinicianId = clinician_id || clinicianId;
 
-    if (!patient_id) {
+    if (!actualPatientId) {
       return new Response(JSON.stringify({ error: 'patient_id is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log('Assessing risk for patient:', patient_id);
+    console.log('Assessing risk for patient:', actualPatientId);
 
     // Get the current user (should be a clinician)
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -64,21 +68,21 @@ serve(async (req) => {
     const { data: moodEntries, error: moodError } = await supabase
       .from('mood_entries')
       .select('*')
-      .eq('patient_id', patient_id)
+      .eq('patient_id', actualPatientId)
       .order('created_at', { ascending: false })
       .limit(30);
 
     const { data: chatLogs, error: chatError } = await supabase
       .from('ai_chat_logs')
       .select('*')
-      .eq('patient_id', patient_id)
+      .eq('patient_id', actualPatientId)
       .order('created_at', { ascending: false })
       .limit(50);
 
     const { data: tasks, error: tasksError } = await supabase
       .from('tasks')
       .select('*')
-      .eq('patient_id', patient_id)
+      .eq('patient_id', actualPatientId)
       .order('inserted_at', { ascending: false })
       .limit(20);
 
@@ -200,7 +204,7 @@ serve(async (req) => {
     const { data: riskAssessment, error: insertError } = await supabase
       .from('patient_risk_assessments')
       .insert({
-        patient_id,
+        patient_id: actualPatientId,
         clinician_id: user.id,
         risk_score: riskScore,
         risk_level: riskLevel,

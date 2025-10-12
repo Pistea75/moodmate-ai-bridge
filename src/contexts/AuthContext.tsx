@@ -161,10 +161,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [roleError, user?.id]);
 
-  // Handle redirects after role is loaded
+  // Handle redirects ONLY for public pages, not on all navigation
   useEffect(() => {
     if (user && secureUserRole && !roleLoading && !loading) {
-      const isOnPublicPage = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'].includes(location.pathname) || location.pathname.startsWith('/signup');
+      // Only redirect from truly public pages, NOT from authenticated routes
+      const publicPages = ['/', '/features', '/about', '/contact', '/pricing', '/help', '/faq', '/privacy', '/terms', '/security', '/login'];
+      const isOnPublicPage = publicPages.includes(location.pathname) || location.pathname.startsWith('/signup');
       
       if (isOnPublicPage) {
         redirectToDashboard(secureUserRole);

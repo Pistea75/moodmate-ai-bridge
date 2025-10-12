@@ -169,18 +169,17 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
               </div>
             )}
 
-            {/* Summary Section - available for partial_share and full_share */}
-            {(privacyLevel === 'partial_share' || privacyLevel === 'full_share') && (
-              <SummarySection
-                summary={summary}
-                summarizing={summarizing}
-                logs={logs}
-                savingReport={savingReport}
-                patientName={patientName}
-                onSummarize={handleSummarize}
-                onSaveReport={handleSaveReport}
-              />
-            )}
+            {/* Summary Section - always available, even for private (uses date filter) */}
+            <SummarySection
+              summary={summary}
+              summarizing={summarizing}
+              logs={logs}
+              savingReport={savingReport}
+              patientName={patientName}
+              onSummarize={handleSummarize}
+              onSaveReport={handleSaveReport}
+              privacyLevel={privacyLevel}
+            />
           </>
         )}
       </CardContent>
