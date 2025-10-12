@@ -907,6 +907,7 @@ export type Database = {
           consent_type: string
           id: string
           metadata: Json | null
+          privacy_level: Database["public"]["Enums"]["privacy_level"] | null
           user_id: string
         }
         Insert: {
@@ -915,6 +916,7 @@ export type Database = {
           consent_type: string
           id?: string
           metadata?: Json | null
+          privacy_level?: Database["public"]["Enums"]["privacy_level"] | null
           user_id: string
         }
         Update: {
@@ -923,6 +925,7 @@ export type Database = {
           consent_type?: string
           id?: string
           metadata?: Json | null
+          privacy_level?: Database["public"]["Enums"]["privacy_level"] | null
           user_id?: string
         }
         Relationships: []
@@ -1693,6 +1696,7 @@ export type Database = {
           patients_active: number | null
           patients_sporadic: number | null
           plan_type: string | null
+          privacy_level: Database["public"]["Enums"]["privacy_level"] | null
           share_chat_with_clinician: boolean | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -1717,6 +1721,7 @@ export type Database = {
           patients_active?: number | null
           patients_sporadic?: number | null
           plan_type?: string | null
+          privacy_level?: Database["public"]["Enums"]["privacy_level"] | null
           share_chat_with_clinician?: boolean | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -1741,6 +1746,7 @@ export type Database = {
           patients_active?: number | null
           patients_sporadic?: number | null
           plan_type?: string | null
+          privacy_level?: Database["public"]["Enums"]["privacy_level"] | null
           share_chat_with_clinician?: boolean | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -2204,6 +2210,7 @@ export type Database = {
       }
     }
     Enums: {
+      privacy_level: "private" | "partial_share" | "full_share"
       user_role: "patient" | "clinician" | "admin" | "super_admin"
     }
     CompositeTypes: {
@@ -2332,6 +2339,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      privacy_level: ["private", "partial_share", "full_share"],
       user_role: ["patient", "clinician", "admin", "super_admin"],
     },
   },
