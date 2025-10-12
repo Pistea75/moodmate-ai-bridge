@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Volume2, VolumeX, Loader } from 'lucide-react';
+import { Mic, Volume2, X } from 'lucide-react';
 import { useRealtimeVoiceChat } from '@/hooks/useRealtimeVoiceChat';
 
 export interface VoiceInputModeProps {
   onSendMessage?: (text: string) => Promise<void> | void;
   isLoading?: boolean;
   language?: string;
+  onClose?: () => void;
 }
 
 export function VoiceInputMode(props: VoiceInputModeProps) {
@@ -52,7 +53,19 @@ export function VoiceInputMode(props: VoiceInputModeProps) {
   const buttonState = getButtonState();
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 space-y-8">
+    <div className="flex flex-col items-center justify-center p-8 space-y-8 relative">
+      {/* Close Button */}
+      {props.onClose && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={props.onClose}
+          className="absolute top-4 right-4"
+        >
+          <X className="h-5 w-5" />
+        </Button>
+      )}
+
       {/* Connection/Control Button */}
       <div className="relative">
         <button

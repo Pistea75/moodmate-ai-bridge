@@ -285,6 +285,7 @@ export function AudioChatInterface({
           <VoiceInputMode
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
+            onClose={() => setInputMode('text')}
           />
         )}
       </div>

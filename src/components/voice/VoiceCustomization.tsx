@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 export interface VoiceCustomizationSettings {
   voice: string;
@@ -25,15 +26,27 @@ const VOICE_PRESETS = [
 ];
 
 export function VoiceCustomization({ settings, onSettingsChange }: VoiceCustomizationProps) {
-  const [customInstructions, setCustomInstructions] = useState(settings.customInstructions || '');
+  const { toast } = useToast();
+  const [localSettings, setLocalSettings] = useState<VoiceCustomizationSettings>(settings);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const handleVoiceChange = (voice: string) => {
-    onSettingsChange({ ...settings, voice });
+    setLocalSettings({ ...localSettings, voice });
+    setHasChanges(true);
   };
 
-  const handleInstructionsChange = (instructions: string) => {
-    setCustomInstructions(instructions);
-    onSettingsChange({ ...settings, customInstructions: instructions });
+  const handleInstructionsChange = (customInstructions: string) => {
+    setLocalSettings({ ...localSettings, customInstructions });
+    setHasChanges(true);
+  };
+
+  const handleSave = () => {
+    onSettingsChange(localSettings);
+    setHasChanges(false);
+    toast({
+      title: "Configuración guardada",
+      description: "Tus preferencias de voz han sido actualizadas.",
+    });
   };
 
   return (
@@ -48,7 +61,7 @@ export function VoiceCustomization({ settings, onSettingsChange }: VoiceCustomiz
         {/* Voice Selection */}
         <div className="space-y-2">
           <Label htmlFor="voice-select">Voz del Asistente</Label>
-          <Select value={settings.voice} onValueChange={handleVoiceChange}>
+          <Select value={localSettings.voice} onValueChange={handleVoiceChange}>
             <SelectTrigger id="voice-select">
               <SelectValue placeholder="Selecciona una voz" />
             </SelectTrigger>
@@ -71,7 +84,7 @@ export function VoiceCustomization({ settings, onSettingsChange }: VoiceCustomiz
           <Textarea
             id="custom-instructions"
             placeholder="Ej: Habla con acento mexicano, usa un tono más formal, enfócate en..."
-            value={customInstructions}
+            value={localSettings.customInstructions}
             onChange={(e) => handleInstructionsChange(e.target.value)}
             rows={4}
             className="resize-none"
@@ -80,6 +93,16 @@ export function VoiceCustomization({ settings, onSettingsChange }: VoiceCustomiz
             Agrega instrucciones adicionales como cambios de acento, tono, o enfoque específico.
             Estas instrucciones se combinarán con las instrucciones base del sistema.
           </p>
+        </div>
+
+        {/* Save Button */}
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSave}
+            disabled={!hasChanges}
+          >
+            Guardar Cambios
+          </Button>
         </div>
       </CardContent>
     </Card>
