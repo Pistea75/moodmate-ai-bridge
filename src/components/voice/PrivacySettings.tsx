@@ -104,10 +104,10 @@ export function PrivacySettings() {
             <div>
               <Label className="text-base font-medium flex items-center gap-2">
                 <Lock className="w-4 h-4" />
-                Nivel de Privacidad
+                Control de Acceso del Psicólogo
               </Label>
               <p className="text-sm text-muted-foreground mt-1">
-                Controla qué información comparte la IA con tu psicólogo
+                Controla qué información puede ver tu psicólogo de tus conversaciones con la IA
               </p>
             </div>
             
@@ -116,10 +116,10 @@ export function PrivacySettings() {
                 <RadioGroupItem value="private" id="private" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="private" className="font-medium cursor-pointer">
-                    Privado
+                    Privado (Sin acceso)
                   </Label>
                   <p className="text-sm text-muted-foreground">
-                    Solo la IA tiene acceso. Tu psicólogo solo ve métricas generales de actividad (ej: días activos, nivel emocional promedio).
+                    Tu psicólogo <strong>NO</strong> puede ver tus conversaciones. Solo recibe métricas generales de actividad (días activos, nivel emocional promedio).
                   </p>
                 </div>
               </div>
@@ -128,10 +128,10 @@ export function PrivacySettings() {
                 <RadioGroupItem value="partial_share" id="partial_share" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="partial_share" className="font-medium cursor-pointer">
-                    Compartir Insights
+                    Compartir Insights (Sin acceso al chat)
                   </Label>
                   <p className="text-sm text-muted-foreground">
-                    Tu psicólogo recibe reportes automáticos con insights, tendencias emocionales y temas clave, sin ver el texto literal de tus conversaciones.
+                    Tu psicólogo recibe reportes automáticos con insights, tendencias emocionales y temas clave. <strong>NO</strong> puede ver el chat literal, solo análisis agregados generados por IA.
                   </p>
                 </div>
               </div>
@@ -140,10 +140,10 @@ export function PrivacySettings() {
                 <RadioGroupItem value="full_share" id="full_share" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="full_share" className="font-medium cursor-pointer">
-                    Acceso Completo
+                    Acceso Completo al Chat
                   </Label>
                   <p className="text-sm text-muted-foreground">
-                    Tu psicólogo puede ver tus conversaciones completas y generar reportes personalizados. Requiere tu consentimiento explícito.
+                    Tu psicólogo <strong>SÍ</strong> puede ver tus conversaciones completas (anonimizadas) y generar reportes personalizados con citas del chat. Requiere tu consentimiento explícito.
                   </p>
                 </div>
               </div>
@@ -156,14 +156,16 @@ export function PrivacySettings() {
               <Shield className="w-5 h-5 text-primary mt-0.5" />
               <div className="flex-1 space-y-2">
                 <Label className="text-base font-medium">
-                  Anonimización Automática
+                  Anonimización Automática de la Base de Datos
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  Por motivos de seguridad y para mejorar nuestro modelo de IA, <strong>todas las conversaciones se anonimizan automáticamente</strong> antes de ser almacenadas. 
-                  Los datos personales (nombres, lugares, contactos) se reemplazan por etiquetas genéricas.
+                  Por motivos de seguridad (GDPR/HIPAA) y para mejorar nuestro modelo de IA, <strong>todas las conversaciones se anonimizan automáticamente</strong> antes de guardarse en la base de datos.
                 </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Esto cumple con GDPR/HIPAA y permite usar los datos anonimizados para investigación y mejora del servicio.
+                <p className="text-sm text-muted-foreground mt-2">
+                  Los datos personales (nombres, lugares, contactos) se reemplazan por etiquetas genéricas. Esto se aplica <strong>siempre</strong>, independientemente del nivel de acceso de tu psicólogo.
+                </p>
+                <p className="text-xs text-muted-foreground mt-2 italic">
+                  Nota: Los datos anonimizados se usan para investigación y mejora del servicio. No pueden revertirse a su forma original.
                 </p>
               </div>
             </div>
@@ -172,12 +174,17 @@ export function PrivacySettings() {
 
         <div className="p-4 bg-muted rounded-lg space-y-2">
           <p className="text-xs text-muted-foreground">
-            <strong>Nota de seguridad:</strong> Todas las conversaciones se procesan con encriptación de extremo a extremo y se anonimizan automáticamente. 
-            Los datos anonimizados no pueden ser revertidos a su forma original.
+            <strong>Privacidad y Seguridad:</strong>
           </p>
+          <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+            <li>Todas las conversaciones se encriptan de extremo a extremo</li>
+            <li>Se anonimizan automáticamente antes de guardarse en la base de datos</li>
+            <li>Los datos anonimizados NO pueden revertirse</li>
+            <li>Los niveles de acceso controlan QUÉ ve tu psicólogo, NO si se anonimiza (siempre se anonimiza)</li>
+          </ul>
           {privacyLevel === 'full_share' && (
-            <p className="text-xs text-amber-600 dark:text-amber-400">
-              <strong>Importante:</strong> Con acceso completo, tu psicólogo puede ver el contenido de tus conversaciones anonimizadas. Puedes cambiar este nivel en cualquier momento.
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+              <strong>Importante:</strong> Con "Acceso Completo", tu psicólogo puede ver el chat anonimizado. Puedes cambiar este nivel en cualquier momento.
             </p>
           )}
         </div>

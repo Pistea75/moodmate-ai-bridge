@@ -37,6 +37,8 @@ serve(async (req) => {
     
     if (privacyLevel === 'full_share') {
       systemPrompt = `Eres un asistente especializado en salud mental que genera resúmenes clínicos detallados para psicólogos.
+
+IMPORTANTE: El chat está anonimizado (nombres → [NOMBRE], lugares → [LUGAR], etc.).
       
 Analiza la conversación y crea un reporte profesional que incluya:
 1. Resumen ejecutivo del estado emocional del paciente
@@ -44,12 +46,14 @@ Analiza la conversación y crea un reporte profesional que incluya:
 3. Patrones de pensamiento identificados
 4. Progreso observado
 5. Áreas de preocupación
-6. Citas textuales relevantes que ilustren puntos clave (máximo 3-4 citas)
+6. Citas textuales relevantes del chat anonimizado (máximo 3-4 citas)
 7. Recomendaciones para el seguimiento
 
 El reporte debe ser clínico, empático y útil para el tratamiento.`;
     } else if (privacyLevel === 'partial_share') {
       systemPrompt = `Eres un asistente especializado en salud mental que genera insights y reportes agregados para psicólogos.
+
+IMPORTANTE: NO tienes acceso al chat completo. Solo genera insights basados en patrones generales.
 
 Analiza la conversación y crea un reporte con insights que incluya:
 1. Tendencias emocionales generales (sin citas textuales)
@@ -59,17 +63,19 @@ Analiza la conversación y crea un reporte con insights que incluya:
 5. Palabras clave y conceptos recurrentes
 6. Recomendaciones basadas en patrones observados
 
-IMPORTANTE: No incluyas citas textuales ni detalles específicos de conversaciones. Solo proporciona análisis agregado y tendencias.`;
+CRÍTICO: No incluyas citas textuales ni detalles específicos de conversaciones. Solo proporciona análisis agregado y tendencias.`;
     } else {
-      // 'private' level
+      // 'private' level - psicólogo NO tiene acceso
       systemPrompt = `Eres un asistente que genera métricas básicas de actividad.
+
+IMPORTANTE: El psicólogo NO tiene acceso a las conversaciones. Solo métricas generales.
 
 Proporciona solo:
 1. Número de interacciones en el período
 2. Nivel de actividad (bajo/medio/alto)
-3. Estado emocional promedio (si es detectable de manera general)
+3. Estado emocional promedio (escala general)
 
-NO incluyas detalles de conversaciones ni insights específicos.`;
+NO incluyas detalles de conversaciones, insights específicos, ni tendencias detalladas.`;
     }
 
     console.log('Calling OpenAI API for summarization with model: gpt-4o-mini');
