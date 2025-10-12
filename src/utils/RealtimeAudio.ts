@@ -203,9 +203,33 @@ export class RealtimeChat {
   }
 
   disconnect() {
-    this.recorder?.stop();
-    this.dc?.close();
-    this.pc?.close();
+    console.log('Disconnecting RealtimeChat...');
+    
+    // Stop audio recorder
+    if (this.recorder) {
+      this.recorder.stop();
+      this.recorder = null;
+    }
+    
+    // Close data channel
+    if (this.dc) {
+      this.dc.close();
+      this.dc = null;
+    }
+    
+    // Close peer connection
+    if (this.pc) {
+      this.pc.close();
+      this.pc = null;
+    }
+    
+    // Stop audio playback
+    if (this.audioEl) {
+      this.audioEl.pause();
+      this.audioEl.srcObject = null;
+    }
+    
     this.onConnectionChange(false);
+    console.log('RealtimeChat disconnected');
   }
 }

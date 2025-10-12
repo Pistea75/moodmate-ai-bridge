@@ -47,7 +47,8 @@ export function AudioChatInterface({
     messages,
     isLoading,
     isFetchingHistory,
-    handleSendMessage
+    handleSendMessage,
+    refreshMessages
   } = useAudioChat(systemPrompt, selectedPatientId || patientId, isClinicianView);
 
   const [ttsError, setTtsError] = useState<string | null>(null);
@@ -285,7 +286,13 @@ export function AudioChatInterface({
           <VoiceInputMode
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
-            onClose={() => setInputMode('text')}
+            onClose={() => {
+              setInputMode('text');
+              // Refresh messages to show voice conversation transcript
+              if (refreshMessages) {
+                refreshMessages();
+              }
+            }}
           />
         )}
       </div>

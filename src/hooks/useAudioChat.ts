@@ -9,6 +9,7 @@ import { useAILearning } from "./useAILearning";
 import { Message } from "./audioChat/types";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useAudioChat(baseSystemPrompt: string, patientId?: string, isClinicianView: boolean = false) {
   const { user } = useAuth();
@@ -78,11 +79,32 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
     }
   };
 
+  const refreshMessages = async () => {
+    // Force refetch chat history to show voice conversation
+    const { data } = await supabase
+      .from('ai_chat_logs')
+      .select('*')
+      .eq('patient_id', patientId || user?.id)
+      .order('created_at', { ascending: true });
+    
+    if (data && data.length > 0) {
+      const formattedMessages = data.map(msg => ({
+        id: msg.id,
+        type: msg.role === 'user' ? 'user' : 'assistant' as 'user' | 'assistant',
+        content: msg.message,
+        timestamp: new Date(msg.created_at)
+      }));
+      
+      setMessages(formattedMessages);
+    }
+  };
+
   return {
     messages,
     isLoading,
     isFetchingHistory,
     handleSendMessage,
-    messageData
+    messageData,
+    refreshMessages
   };
 }

@@ -11,29 +11,14 @@ export interface VoiceInputModeProps {
 }
 
 export function VoiceInputMode(props: VoiceInputModeProps) {
-  const [messages, setMessages] = useState<Array<{ role: string; content: string; id: string }>>([]);
-  
-  const handleTranscript = (text: string, isUser: boolean) => {
-    if (text.trim()) {
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: isUser ? 'user' : 'assistant',
-        content: text
-      }]);
-    }
-  };
-
   const { 
     isConnected, 
     isConnecting,
     isSpeaking, 
-    userTranscript, 
-    aiTranscript,
     connect, 
     disconnect 
   } = useRealtimeVoiceChat({ 
     instructions: "Eres un asistente de salud mental útil y empático. Mantén tus respuestas naturales y conversacionales.",
-    onTranscript: handleTranscript
   });
 
   const getStatusText = () => {
@@ -120,31 +105,6 @@ export function VoiceInputMode(props: VoiceInputModeProps) {
       <div className="text-2xl font-semibold text-foreground">
         {getStatusText()}
       </div>
-
-      {/* Conversation History */}
-      {messages.length > 0 && (
-        <div className="w-full max-w-2xl space-y-3">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`p-4 rounded-lg ${
-                message.role === 'user'
-                  ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 ml-8'
-                  : 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 mr-8'
-              }`}
-            >
-              <div className={`text-xs font-medium mb-1 ${
-                message.role === 'user' ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'
-              }`}>
-                {message.role === 'user' ? 'Tú' : 'AI'}
-              </div>
-              <div className="text-sm text-foreground">
-                {message.content}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

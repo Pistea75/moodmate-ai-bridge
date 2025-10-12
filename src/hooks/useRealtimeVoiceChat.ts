@@ -127,12 +127,18 @@ export function useRealtimeVoiceChat({
   }, [instructions, voice, handleMessage, handleConnectionChange, toast, isConnecting, isConnected]);
 
   const disconnect = useCallback(() => {
-    chatRef.current?.disconnect();
-    chatRef.current = null;
+    if (chatRef.current) {
+      console.log('Disconnecting realtime chat...');
+      chatRef.current.disconnect();
+      chatRef.current = null;
+    }
     setIsConnected(false);
+    setIsConnecting(false);
     setIsSpeaking(false);
     setUserTranscript('');
     setAiTranscript('');
+    currentUserMessageRef.current = '';
+    currentAIMessageRef.current = '';
   }, []);
 
   const sendMessage = useCallback(async (text: string) => {
