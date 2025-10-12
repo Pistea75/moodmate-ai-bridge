@@ -3,6 +3,8 @@ import PatientLayout from '../../layouts/PatientLayout';
 import { AudioChatInterface } from '@/components/AudioChatInterface';
 import { useClinicianDetails } from '@/hooks/useClinicianDetails';
 import { MessageLimitIndicator } from '@/components/subscription/MessageLimitIndicator';
+import { VoiceMinutesIndicator } from '@/components/voice/VoiceMinutesIndicator';
+import { PrivacySettings } from '@/components/voice/PrivacySettings';
 
 export default function PatientChat() {
   const { clinicianName } = useClinicianDetails();
@@ -22,6 +24,12 @@ export default function PatientChat() {
 
         {/* Message Limit Indicator */}
         <MessageLimitIndicator />
+
+        {/* Voice Minutes Indicator */}
+        <VoiceMinutesIndicator />
+
+        {/* Privacy Settings */}
+        <PrivacySettings />
 
         {/* Chat Interface */}
         <div className="bg-white rounded-xl shadow-sm border">

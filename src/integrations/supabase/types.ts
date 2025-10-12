@@ -900,6 +900,33 @@ export type Database = {
         }
         Relationships: []
       }
+      privacy_consent_logs: {
+        Row: {
+          changed_at: string | null
+          consent_given: boolean
+          consent_type: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string | null
+          consent_given: boolean
+          consent_type: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          changed_at?: string | null
+          consent_given?: boolean
+          consent_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -1655,6 +1682,7 @@ export type Database = {
       }
       subscribers: {
         Row: {
+          anonymize_conversations: boolean | null
           created_at: string
           email: string
           id: string
@@ -1665,6 +1693,7 @@ export type Database = {
           patients_active: number | null
           patients_sporadic: number | null
           plan_type: string | null
+          share_chat_with_clinician: boolean | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscribed: boolean
@@ -1672,8 +1701,12 @@ export type Database = {
           subscription_tier: string | null
           updated_at: string
           user_id: string | null
+          voice_minutes_monthly_limit: number | null
+          voice_minutes_reset_date: string | null
+          voice_minutes_used_this_month: number | null
         }
         Insert: {
+          anonymize_conversations?: boolean | null
           created_at?: string
           email: string
           id?: string
@@ -1684,6 +1717,7 @@ export type Database = {
           patients_active?: number | null
           patients_sporadic?: number | null
           plan_type?: string | null
+          share_chat_with_clinician?: boolean | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscribed?: boolean
@@ -1691,8 +1725,12 @@ export type Database = {
           subscription_tier?: string | null
           updated_at?: string
           user_id?: string | null
+          voice_minutes_monthly_limit?: number | null
+          voice_minutes_reset_date?: string | null
+          voice_minutes_used_this_month?: number | null
         }
         Update: {
+          anonymize_conversations?: boolean | null
           created_at?: string
           email?: string
           id?: string
@@ -1703,6 +1741,7 @@ export type Database = {
           patients_active?: number | null
           patients_sporadic?: number | null
           plan_type?: string | null
+          share_chat_with_clinician?: boolean | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscribed?: boolean
@@ -1710,6 +1749,9 @@ export type Database = {
           subscription_tier?: string | null
           updated_at?: string
           user_id?: string | null
+          voice_minutes_monthly_limit?: number | null
+          voice_minutes_reset_date?: string | null
+          voice_minutes_used_this_month?: number | null
         }
         Relationships: []
       }
@@ -2058,6 +2100,10 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      can_use_voice_mode: {
+        Args: { user_uuid: string }
+        Returns: Json
+      }
       check_security_rate_limit: {
         Args: {
           p_action_type: string
@@ -2131,6 +2177,10 @@ export type Database = {
       sync_user_email: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      track_voice_usage: {
+        Args: { duration_seconds: number; user_uuid: string }
+        Returns: boolean
       }
       validate_edge_function_input: {
         Args: {

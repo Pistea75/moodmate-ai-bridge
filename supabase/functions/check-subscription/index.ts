@@ -100,18 +100,26 @@ serve(async (req) => {
       let planType = 'free';
       let messageLimit = 3;
       let patientLimit = 0;
+      let voiceMinutesLimit = 0;
       
       if (subscriptionTier === 'personal') {
         planType = 'personal';
         messageLimit = -1; // unlimited
+        voiceMinutesLimit = 0; // no realtime voice for personal
+      } else if (subscriptionTier === 'premium') {
+        planType = 'premium';
+        messageLimit = -1; // unlimited
+        voiceMinutesLimit = 60; // 60 minutes per month
       } else if (subscriptionTier === 'professional_basic') {
         planType = 'professional_basic';
         messageLimit = -1; // unlimited
         patientLimit = 30; // 20 active + 10 sporadic
+        voiceMinutesLimit = -1; // unlimited for psychologists
       } else if (subscriptionTier === 'professional_advanced') {
         planType = 'professional_advanced';
         messageLimit = -1; // unlimited
         patientLimit = 50; // 35 active + 15 sporadic  
+        voiceMinutesLimit = -1; // unlimited for psychologists
       }
       
       logStep("Active subscription found", { 
@@ -134,6 +142,7 @@ serve(async (req) => {
       plan_type: hasActiveSub ? planType : 'free',
       message_limit_daily: hasActiveSub ? messageLimit : 3,
       patient_limit: hasActiveSub ? patientLimit : 0,
+      voice_minutes_monthly_limit: hasActiveSub ? voiceMinutesLimit : 0,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'email' });
 

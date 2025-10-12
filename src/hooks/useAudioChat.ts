@@ -6,6 +6,7 @@ import { useMessageService } from "./audioChat/useMessageService";
 import { useAIService } from "./audioChat/useAIService";
 import { useMessageLimits } from "./useMessageLimits";
 import { useAILearning } from "./useAILearning";
+import { useAnonymization } from "./useAnonymization";
 import { Message } from "./audioChat/types";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +26,7 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
   const { sendToAI, isLoading } = useAIService();
   const { checkMessageLimit, messageData } = useMessageLimits();
   const { triggerManualLearning } = useAILearning();
+  const { anonymizeText } = useAnonymization();
 
   const handleSendMessage = async (messageText: string) => {
     if (!messageText.trim()) return;
@@ -51,8 +53,11 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
     };
     setMessages(prev => [...prev, userMessage]);
     
-    // Save user message to database
-    await saveMessageToDatabase('user', messageText, patientId);
+    // Anonymize message before saving if enabled
+    const anonymizedMessage = await anonymizeText(messageText);
+    
+    // Save anonymized user message to database
+    await saveMessageToDatabase('user', anonymizedMessage, patientId);
     
     // Get AI response
     const aiResponse = await sendToAI(
@@ -74,8 +79,11 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
       };
       setMessages(prev => [...prev, aiMessage]);
       
-      // Save AI response to database
-      await saveMessageToDatabase('assistant', aiResponse, patientId);
+      // Anonymize AI response before saving if enabled
+      const anonymizedResponse = await anonymizeText(aiResponse);
+      
+      // Save anonymized AI response to database
+      await saveMessageToDatabase('assistant', anonymizedResponse, patientId);
     }
   };
 

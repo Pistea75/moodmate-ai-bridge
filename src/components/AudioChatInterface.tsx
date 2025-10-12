@@ -6,8 +6,10 @@ import { useAudioChat } from '@/hooks/useAudioChat';
 import { useTTS } from '@/hooks/useTTS';
 import { useVoiceSettings } from '@/hooks/useVoiceSettings';
 import { useVoiceConsent } from '@/hooks/useVoiceConsent';
+import { useVoiceMinutes } from '@/hooks/useVoiceMinutes';
 import { TextInputMode } from './chat/TextInputMode';
 import { VoiceInputMode } from './chat/VoiceInputMode';
+import { useToast } from '@/hooks/use-toast';
 import { VoiceConsentModal } from './voice/VoiceConsentModal';
 import { VoiceSettings } from './voice/VoiceSettings';
 import { FeatureGate } from './common/FeatureGate';
@@ -42,6 +44,8 @@ export function AudioChatInterface({
 
   const { settings, updateSettings } = useVoiceSettings();
   const { hasConsent } = useVoiceConsent();
+  const { voiceData, startVoiceSession, endVoiceSession } = useVoiceMinutes();
+  const { toast } = useToast();
 
   const {
     messages,
@@ -79,13 +83,33 @@ export function AudioChatInterface({
     }
   }, [messages, settings.autoplay, settings.enabled, playText, isTTSPlaying, ttsError]);
 
-  const handleToggleVoiceMode = () => {
+  const handleToggleVoiceMode = async () => {
     const goingToVoice = inputMode === 'text';
-    if (goingToVoice && !hasConsent) {
-      setShowConsentModal(true);
-      return;
+    
+    if (goingToVoice) {
+      // Starting voice mode
+      if (!hasConsent) {
+        setShowConsentModal(true);
+        return;
+      }
+      
+      if (!voiceData.canUse) {
+        toast({
+          title: "Modo de voz no disponible",
+          description: voiceData.reason,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      await startVoiceSession();
+      setInputMode('voice');
+    } else {
+      // Ending voice mode
+      await endVoiceSession();
+      setInputMode('text');
+      await refreshMessages();
     }
-    setInputMode(goingToVoice ? 'voice' : 'text');
   };
 
   const handleVoiceRecord = () => {
