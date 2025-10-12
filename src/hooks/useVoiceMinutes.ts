@@ -117,32 +117,7 @@ export function useVoiceMinutes() {
     }
   }, [user, sessionStartTime, activeSessionId, checkVoiceAccess]);
 
-  const updatePrivacySettings = useCallback(async (
-    anonymizeConversations: boolean
-  ) => {
-    if (!user) return;
-
-    try {
-      // Update settings
-      await supabase
-        .from('subscribers')
-        .update({
-          anonymize_conversations: anonymizeConversations
-        })
-        .eq('user_id', user.id);
-
-      // Log consent change
-      await supabase
-        .from('privacy_consent_logs')
-        .insert({
-          user_id: user.id,
-          consent_type: 'anonymize_conversations',
-          consent_given: anonymizeConversations
-        });
-    } catch (error) {
-      console.error('Error updating privacy settings:', error);
-    }
-  }, [user]);
+  // Removed updatePrivacySettings as anonymization is now always enabled
 
   useEffect(() => {
     checkVoiceAccess();
@@ -154,7 +129,6 @@ export function useVoiceMinutes() {
     checkVoiceAccess,
     startVoiceSession,
     endVoiceSession,
-    updatePrivacySettings,
     sessionStartTime
   };
 }

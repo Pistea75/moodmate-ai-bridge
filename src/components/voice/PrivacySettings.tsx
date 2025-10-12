@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Shield, Eye, EyeOff, Lock } from 'lucide-react';
+import { Shield, Lock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -14,7 +13,6 @@ export function PrivacySettings() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [privacyLevel, setPrivacyLevel] = useState<PrivacyLevel>('private');
-  const [anonymize, setAnonymize] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +22,7 @@ export function PrivacySettings() {
       try {
         const { data, error } = await supabase
           .from('subscribers')
-          .select('privacy_level, anonymize_conversations')
+          .select('privacy_level')
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -32,7 +30,6 @@ export function PrivacySettings() {
 
         if (data) {
           setPrivacyLevel(data.privacy_level || 'private');
-          setAnonymize(data.anonymize_conversations ?? true);
         }
       } catch (error) {
         console.error('Error fetching privacy settings:', error);
@@ -72,35 +69,6 @@ export function PrivacySettings() {
       toast({
         title: 'Error',
         description: 'No se pudo actualizar la configuración de privacidad',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleAnonymizeToggle = async (checked: boolean) => {
-    if (!user) return;
-    
-    setAnonymize(checked);
-    
-    try {
-      const { error } = await supabase
-        .from('subscribers')
-        .update({ anonymize_conversations: checked })
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      toast({
-        title: checked ? 'Anonimización activada' : 'Anonimización desactivada',
-        description: checked 
-          ? 'Tus datos personales serán anonimizados antes de ser almacenados'
-          : 'Tus conversaciones se guardarán sin anonimizar',
-      });
-    } catch (error) {
-      console.error('Error updating anonymization:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudo actualizar la anonimización',
         variant: 'destructive',
       });
     }
@@ -182,34 +150,34 @@ export function PrivacySettings() {
             </RadioGroup>
           </div>
 
-          {/* Anonymization Setting */}
-          <div className="flex items-start justify-between p-4 rounded-lg border">
-            <div className="flex-1 space-y-1">
-              <Label htmlFor="anonymize" className="text-base font-medium flex items-center gap-2">
-                {anonymize ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                Anonimizar conversaciones
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                Elimina información personal (nombres, lugares, contactos) antes de guardar tus conversaciones.
-                Cumple con GDPR/HIPAA.
-              </p>
+          {/* Security Note about automatic anonymization */}
+          <div className="p-4 rounded-lg border bg-muted/50">
+            <div className="flex items-start gap-3">
+              <Shield className="w-5 h-5 text-primary mt-0.5" />
+              <div className="flex-1 space-y-2">
+                <Label className="text-base font-medium">
+                  Anonimización Automática
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Por motivos de seguridad y para mejorar nuestro modelo de IA, <strong>todas las conversaciones se anonimizan automáticamente</strong> antes de ser almacenadas. 
+                  Los datos personales (nombres, lugares, contactos) se reemplazan por etiquetas genéricas.
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Esto cumple con GDPR/HIPAA y permite usar los datos anonimizados para investigación y mejora del servicio.
+                </p>
+              </div>
             </div>
-            <Switch
-              id="anonymize"
-              checked={anonymize}
-              onCheckedChange={handleAnonymizeToggle}
-            />
           </div>
         </div>
 
         <div className="p-4 bg-muted rounded-lg space-y-2">
           <p className="text-xs text-muted-foreground">
-            <strong>Nota de seguridad:</strong> Todas las conversaciones se procesan con encriptación de extremo a extremo.
-            {anonymize && ' Los datos anonimizados no pueden ser revertidos a su forma original.'}
+            <strong>Nota de seguridad:</strong> Todas las conversaciones se procesan con encriptación de extremo a extremo y se anonimizan automáticamente. 
+            Los datos anonimizados no pueden ser revertidos a su forma original.
           </p>
           {privacyLevel === 'full_share' && (
             <p className="text-xs text-amber-600 dark:text-amber-400">
-              <strong>Importante:</strong> Con acceso completo, tu psicólogo puede ver el contenido literal de tus conversaciones. Puedes cambiar este nivel en cualquier momento.
+              <strong>Importante:</strong> Con acceso completo, tu psicólogo puede ver el contenido de tus conversaciones anonimizadas. Puedes cambiar este nivel en cualquier momento.
             </p>
           )}
         </div>

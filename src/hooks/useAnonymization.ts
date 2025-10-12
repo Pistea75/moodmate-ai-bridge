@@ -9,18 +9,9 @@ export function useAnonymization() {
     if (!user) return text;
 
     try {
-      // Check if user has anonymization enabled
-      const { data: settings } = await supabase
-        .from('subscribers')
-        .select('anonymize_conversations')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      // If anonymization is disabled, return original text
-      if (!settings?.anonymize_conversations) {
-        return text;
-      }
-
+      // Anonymization is now ALWAYS enabled for security and AI improvement
+      // No need to check user settings anymore
+      
       // Call anonymization edge function
       const { data, error } = await supabase.functions.invoke('anonymize-text', {
         body: { text }
