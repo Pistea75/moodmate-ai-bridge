@@ -65,6 +65,7 @@ export class RealtimeChat {
   private dc: RTCDataChannel | null = null;
   private audioEl: HTMLAudioElement;
   private recorder: AudioRecorder | null = null;
+  private localStream: MediaStream | null = null;
 
   constructor(
     private onMessage: (message: any) => void,
@@ -101,9 +102,9 @@ export class RealtimeChat {
         this.audioEl.srcObject = e.streams[0];
       };
 
-      // Add local audio track
-      const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.pc.addTrack(ms.getTracks()[0]);
+      // Add local audio track and store the stream
+      this.localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.pc.addTrack(this.localStream.getTracks()[0]);
       console.log('Added local audio track');
 
       // Set up data channel
@@ -209,6 +210,15 @@ export class RealtimeChat {
     if (this.recorder) {
       this.recorder.stop();
       this.recorder = null;
+    }
+    
+    // Stop local media stream (microphone)
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => {
+        console.log('Stopping local track:', track.kind);
+        track.stop();
+      });
+      this.localStream = null;
     }
     
     // Close data channel

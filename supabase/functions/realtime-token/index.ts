@@ -32,6 +32,9 @@ serve(async (req) => {
         model: "gpt-4o-realtime-preview-2024-12-17",
         voice: voice || "alloy",
         instructions: instructions || "You are a helpful AI assistant. Keep your responses natural and conversational.",
+        input_audio_transcription: {
+          model: "whisper-1"
+        }
       }),
     });
 
