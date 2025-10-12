@@ -39,8 +39,22 @@ export function VoiceInputMode(props: VoiceInputModeProps) {
 
   return (
     <div className="flex flex-col items-center justify-center p-8 space-y-8 relative">
-      {/* Close Button */}
-      {props.onClose && (
+      {/* Close/End Conversation Button */}
+      {props.onClose && isConnected && (
+        <Button
+          variant="destructive"
+          onClick={() => {
+            disconnect();
+            props.onClose?.();
+          }}
+          className="absolute top-4 right-4"
+        >
+          Finalizar conversación
+        </Button>
+      )}
+      
+      {/* Close button when not connected */}
+      {props.onClose && !isConnected && (
         <Button
           variant="ghost"
           size="icon"

@@ -42,6 +42,7 @@ export function useRealtimeVoiceChat({
       case 'response.audio_transcript.done':
         // Save complete AI message to database
         if (currentAIMessageRef.current.trim() && user) {
+          console.log('Saving AI message to database:', currentAIMessageRef.current);
           saveMessageToDatabase('assistant', currentAIMessageRef.current, patientId);
           currentAIMessageRef.current = '';
         }
@@ -49,11 +50,13 @@ export function useRealtimeVoiceChat({
         break;
       case 'conversation.item.input_audio_transcription.completed':
         const userText = event.transcript || '';
+        console.log('User transcription completed:', userText);
         currentUserMessageRef.current = userText;
         setUserTranscript(userText);
         onTranscript?.(userText, true);
-        // Save user message to database
+        // Save user message to database immediately
         if (userText.trim() && user) {
+          console.log('Saving user message to database:', userText);
           saveMessageToDatabase('user', userText, patientId);
         }
         break;
