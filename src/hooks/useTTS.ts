@@ -50,17 +50,19 @@ export function useTTS({ onAudioStart, onAudioEnd, onError, onQuotaError }: UseT
       }
 
       // Create audio element and play
+      // Decode base64 to binary
       const binaryString = atob(data.audioContent);
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
       }
       
-      const audioBlob = new Blob([bytes], { type: 'audio/mp3' });
+      // Create blob with correct MIME type
+      const audioBlob = new Blob([bytes], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
       
-      console.log('Audio blob created, size:', audioBlob.size, 'URL:', audioUrl);
+      console.log('Audio blob created, size:', audioBlob.size, 'type:', audioBlob.type);
       
       setIsPlaying(true);
       
@@ -70,16 +72,12 @@ export function useTTS({ onAudioStart, onAudioEnd, onError, onQuotaError }: UseT
         onAudioEnd?.();
       };
       
-      audio.onerror = () => {
+      audio.onerror = (e) => {
         setIsPlaying(false);
         URL.revokeObjectURL(audioUrl);
+        console.error('Audio playback error:', e);
         const errorMsg = 'Failed to play audio';
         onError?.(errorMsg);
-        toast({
-          title: "Audio Error",
-          description: errorMsg,
-          variant: "destructive"
-        });
       };
 
       await audio.play();

@@ -95,6 +95,18 @@ export function useRealtimeVoiceChat({
 
     try {
       setIsConnecting(true);
+      
+      // Request microphone permissions BEFORE creating the chat
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Close the stream immediately - we just needed permission
+        stream.getTracks().forEach(track => track.stop());
+        console.log('Microphone permission granted');
+      } catch (permError) {
+        console.error('Microphone permission error:', permError);
+        throw new Error('Necesitas dar permiso al micrófono para usar el chat de voz. Por favor, permite el acceso al micrófono cuando tu navegador lo solicite.');
+      }
+      
       chatRef.current = new RealtimeChat(handleMessage, handleConnectionChange);
       await chatRef.current.init(instructions, voice);
       

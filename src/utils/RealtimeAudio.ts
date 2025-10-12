@@ -78,11 +78,6 @@ export class RealtimeChat {
     try {
       console.log('Initializing realtime chat...');
       
-      // Request microphone permissions first
-      console.log('Requesting microphone permissions...');
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log('Microphone permissions granted');
-      
       // Get ephemeral token from our Supabase Edge Function
       const { data, error } = await supabase.functions.invoke("realtime-token", {
         body: { instructions, voice }
@@ -106,8 +101,9 @@ export class RealtimeChat {
         this.audioEl.srcObject = e.streams[0];
       };
 
-      // Add local audio track (reuse the stream we already have)
-      this.pc.addTrack(stream.getTracks()[0]);
+      // Add local audio track
+      const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.pc.addTrack(ms.getTracks()[0]);
       console.log('Added local audio track');
 
       // Set up data channel
