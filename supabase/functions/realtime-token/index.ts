@@ -21,7 +21,7 @@ serve(async (req) => {
 
     console.log('Creating realtime session with voice:', voice || 'alloy');
 
-    // Request an ephemeral token from OpenAI
+    // Request an ephemeral token from OpenAI with the audio prompt
     const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
       method: "POST",
       headers: {
@@ -34,6 +34,10 @@ serve(async (req) => {
         instructions: instructions || "You are a helpful AI assistant. Keep your responses natural and conversational.",
         input_audio_transcription: {
           model: "whisper-1"
+        },
+        prompt: {
+          id: "pmpt_68eb9c6827608193bee1d7dda29226430a6e401996c097c4",
+          version: "2"
         }
       }),
     });
