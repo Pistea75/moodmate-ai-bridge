@@ -112,7 +112,8 @@ export function usePatientAIChatLogs(patientId: string): UseChatLogsResult {
     setSummarizing(true);
     setSummary(null);
     
-    const summaryText = await generateChatSummary(logs);
+    // Pass patientId to fetch their privacy level
+    const summaryText = await generateChatSummary(logs, patientId);
     if (summaryText) {
       setSummary(summaryText);
     }

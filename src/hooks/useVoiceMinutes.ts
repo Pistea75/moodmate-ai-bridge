@@ -118,7 +118,6 @@ export function useVoiceMinutes() {
   }, [user, sessionStartTime, activeSessionId, checkVoiceAccess]);
 
   const updatePrivacySettings = useCallback(async (
-    shareWithClinician: boolean,
     anonymizeConversations: boolean
   ) => {
     if (!user) return;
@@ -128,26 +127,18 @@ export function useVoiceMinutes() {
       await supabase
         .from('subscribers')
         .update({
-          share_chat_with_clinician: shareWithClinician,
           anonymize_conversations: anonymizeConversations
         })
         .eq('user_id', user.id);
 
-      // Log consent changes
+      // Log consent change
       await supabase
         .from('privacy_consent_logs')
-        .insert([
-          {
-            user_id: user.id,
-            consent_type: 'share_with_clinician',
-            consent_given: shareWithClinician
-          },
-          {
-            user_id: user.id,
-            consent_type: 'anonymize_conversations',
-            consent_given: anonymizeConversations
-          }
-        ]);
+        .insert({
+          user_id: user.id,
+          consent_type: 'anonymize_conversations',
+          consent_given: anonymizeConversations
+        });
     } catch (error) {
       console.error('Error updating privacy settings:', error);
     }

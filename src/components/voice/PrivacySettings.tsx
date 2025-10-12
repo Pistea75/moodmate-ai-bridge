@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Shield, Eye, EyeOff } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Shield, Eye, EyeOff, Lock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useVoiceMinutes } from '@/hooks/useVoiceMinutes';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+type PrivacyLevel = 'private' | 'partial_share' | 'full_share';
 
 export function PrivacySettings() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { updatePrivacySettings } = useVoiceMinutes();
-  const [shareWithClinician, setShareWithClinician] = useState(false);
+  const [privacyLevel, setPrivacyLevel] = useState<PrivacyLevel>('private');
   const [anonymize, setAnonymize] = useState(true);
   const [loading, setLoading] = useState(true);
 
@@ -23,14 +24,14 @@ export function PrivacySettings() {
       try {
         const { data, error } = await supabase
           .from('subscribers')
-          .select('share_chat_with_clinician, anonymize_conversations')
+          .select('privacy_level, anonymize_conversations')
           .eq('user_id', user.id)
           .maybeSingle();
 
         if (error) throw error;
 
         if (data) {
-          setShareWithClinician(data.share_chat_with_clinician || false);
+          setPrivacyLevel(data.privacy_level || 'private');
           setAnonymize(data.anonymize_conversations ?? true);
         }
       } catch (error) {
@@ -43,28 +44,66 @@ export function PrivacySettings() {
     fetchSettings();
   }, [user]);
 
-  const handleShareToggle = async (checked: boolean) => {
-    setShareWithClinician(checked);
-    await updatePrivacySettings(checked, anonymize);
+  const handlePrivacyLevelChange = async (newLevel: PrivacyLevel) => {
+    if (!user) return;
     
-    toast({
-      title: checked ? 'Compartir activado' : 'Compartir desactivado',
-      description: checked 
-        ? 'Tu psicólogo verá resúmenes de tus conversaciones'
-        : 'Tu psicólogo no verá tus conversaciones',
-    });
+    setPrivacyLevel(newLevel);
+    
+    try {
+      const { error } = await supabase
+        .from('subscribers')
+        .update({ privacy_level: newLevel })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      const descriptions = {
+        private: 'Tu psicólogo solo verá métricas generales de actividad',
+        partial_share: 'Tu psicólogo recibirá reportes e insights generados por IA',
+        full_share: 'Tu psicólogo podrá acceder al contenido completo de tus conversaciones'
+      };
+
+      toast({
+        title: 'Configuración actualizada',
+        description: descriptions[newLevel],
+      });
+    } catch (error) {
+      console.error('Error updating privacy level:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo actualizar la configuración de privacidad',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleAnonymizeToggle = async (checked: boolean) => {
-    setAnonymize(checked);
-    await updatePrivacySettings(shareWithClinician, checked);
+    if (!user) return;
     
-    toast({
-      title: checked ? 'Anonimización activada' : 'Anonimización desactivada',
-      description: checked 
-        ? 'Tus datos personales serán anonimizados antes de ser almacenados'
-        : 'Tus conversaciones se guardarán sin anonimizar',
-    });
+    setAnonymize(checked);
+    
+    try {
+      const { error } = await supabase
+        .from('subscribers')
+        .update({ anonymize_conversations: checked })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: checked ? 'Anonimización activada' : 'Anonimización desactivada',
+        description: checked 
+          ? 'Tus datos personales serán anonimizados antes de ser almacenados'
+          : 'Tus conversaciones se guardarán sin anonimizar',
+      });
+    } catch (error) {
+      console.error('Error updating anonymization:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo actualizar la anonimización',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (loading) {
@@ -92,6 +131,57 @@ export function PrivacySettings() {
         </div>
 
         <div className="space-y-4">
+          {/* Privacy Level Setting */}
+          <div className="p-4 rounded-lg border space-y-4">
+            <div>
+              <Label className="text-base font-medium flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                Nivel de Privacidad
+              </Label>
+              <p className="text-sm text-muted-foreground mt-1">
+                Controla qué información comparte la IA con tu psicólogo
+              </p>
+            </div>
+            
+            <RadioGroup value={privacyLevel} onValueChange={(value) => handlePrivacyLevelChange(value as PrivacyLevel)}>
+              <div className="flex items-start space-x-3 p-3 rounded-md hover:bg-muted/50 transition-colors">
+                <RadioGroupItem value="private" id="private" className="mt-1" />
+                <div className="flex-1">
+                  <Label htmlFor="private" className="font-medium cursor-pointer">
+                    Privado
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Solo la IA tiene acceso. Tu psicólogo solo ve métricas generales de actividad (ej: días activos, nivel emocional promedio).
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 p-3 rounded-md hover:bg-muted/50 transition-colors">
+                <RadioGroupItem value="partial_share" id="partial_share" className="mt-1" />
+                <div className="flex-1">
+                  <Label htmlFor="partial_share" className="font-medium cursor-pointer">
+                    Compartir Insights
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Tu psicólogo recibe reportes automáticos con insights, tendencias emocionales y temas clave, sin ver el texto literal de tus conversaciones.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 p-3 rounded-md hover:bg-muted/50 transition-colors">
+                <RadioGroupItem value="full_share" id="full_share" className="mt-1" />
+                <div className="flex-1">
+                  <Label htmlFor="full_share" className="font-medium cursor-pointer">
+                    Acceso Completo
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Tu psicólogo puede ver tus conversaciones completas y generar reportes personalizados. Requiere tu consentimiento explícito.
+                  </p>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+
           {/* Anonymization Setting */}
           <div className="flex items-start justify-between p-4 rounded-lg border">
             <div className="flex-1 space-y-1">
@@ -110,34 +200,18 @@ export function PrivacySettings() {
               onCheckedChange={handleAnonymizeToggle}
             />
           </div>
-
-          {/* Share with Clinician Setting */}
-          <div className="flex items-start justify-between p-4 rounded-lg border">
-            <div className="flex-1 space-y-1">
-              <Label htmlFor="share" className="text-base font-medium flex items-center gap-2">
-                {shareWithClinician ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                Compartir con psicólogo
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                {shareWithClinician 
-                  ? 'Tu psicólogo verá resúmenes y análisis generados por IA de tus conversaciones.'
-                  : 'Tu psicólogo no tendrá acceso a tus conversaciones. Solo verá estadísticas generales.'
-                }
-              </p>
-            </div>
-            <Switch
-              id="share"
-              checked={shareWithClinician}
-              onCheckedChange={handleShareToggle}
-            />
-          </div>
         </div>
 
-        <div className="p-4 bg-muted rounded-lg">
+        <div className="p-4 bg-muted rounded-lg space-y-2">
           <p className="text-xs text-muted-foreground">
             <strong>Nota de seguridad:</strong> Todas las conversaciones se procesan con encriptación de extremo a extremo.
             {anonymize && ' Los datos anonimizados no pueden ser revertidos a su forma original.'}
           </p>
+          {privacyLevel === 'full_share' && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              <strong>Importante:</strong> Con acceso completo, tu psicólogo puede ver el contenido literal de tus conversaciones. Puedes cambiar este nivel en cualquier momento.
+            </p>
+          )}
         </div>
       </div>
     </Card>

@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,16 +16,61 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { messages, patientId, privacyLevel = 'partial_share' } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       throw new Error('Messages array is required');
     }
 
-    console.log(`Summarizing ${messages.length} messages`);
+    console.log(`Summarizing ${messages.length} messages with privacy level: ${privacyLevel}`);
 
     // Prepare the conversation for summarization
     const conversationText = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+
+    // Determine system prompt based on privacy level
+    let systemPrompt = '';
+    
+    if (privacyLevel === 'full_share') {
+      systemPrompt = `Eres un asistente especializado en salud mental que genera resúmenes clínicos detallados para psicólogos.
+      
+Analiza la conversación y crea un reporte profesional que incluya:
+1. Resumen ejecutivo del estado emocional del paciente
+2. Temas principales discutidos
+3. Patrones de pensamiento identificados
+4. Progreso observado
+5. Áreas de preocupación
+6. Citas textuales relevantes que ilustren puntos clave (máximo 3-4 citas)
+7. Recomendaciones para el seguimiento
+
+El reporte debe ser clínico, empático y útil para el tratamiento.`;
+    } else if (privacyLevel === 'partial_share') {
+      systemPrompt = `Eres un asistente especializado en salud mental que genera insights y reportes agregados para psicólogos.
+
+Analiza la conversación y crea un reporte con insights que incluya:
+1. Tendencias emocionales generales (sin citas textuales)
+2. Temas frecuentes de discusión (categorías generales)
+3. Cambios en el tono emocional a lo largo del tiempo
+4. Nivel de engagement con la terapia
+5. Palabras clave y conceptos recurrentes
+6. Recomendaciones basadas en patrones observados
+
+IMPORTANTE: No incluyas citas textuales ni detalles específicos de conversaciones. Solo proporciona análisis agregado y tendencias.`;
+    } else {
+      // 'private' level
+      systemPrompt = `Eres un asistente que genera métricas básicas de actividad.
+
+Proporciona solo:
+1. Número de interacciones en el período
+2. Nivel de actividad (bajo/medio/alto)
+3. Estado emocional promedio (si es detectable de manera general)
+
+NO incluyas detalles de conversaciones ni insights específicos.`;
+    }
 
     console.log('Calling OpenAI API for summarization with model: gpt-4o-mini');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -38,24 +84,15 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a professional mental health assistant. Create a comprehensive summary of this chat conversation between a patient and AI assistant. 
-
-Please provide:
-1. Main topics discussed
-2. Patient's emotional state and concerns
-3. Key insights or patterns
-4. Coping strategies mentioned
-5. Recommendations for follow-up
-
-Keep the summary professional, empathetic, and suitable for clinical review.`
+            content: systemPrompt
           },
           {
             role: 'user',
-            content: `Please summarize this conversation:\n\n${conversationText}`
+            content: `Analiza esta conversación:\n\n${conversationText}`
           }
         ],
         temperature: 0.3,
-        max_tokens: 1000,
+        max_tokens: 1500,
       }),
     });
 
