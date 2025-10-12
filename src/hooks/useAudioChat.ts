@@ -21,7 +21,7 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
     isFetchingHistory, 
     conversationHistory, 
     setConversationHistory 
-  } = useChatHistory();
+  } = useChatHistory(patientId, isClinicianView);
   const { saveMessageToDatabase } = useMessageService();
   const { sendToAI, isLoading } = useAIService();
   const { checkMessageLimit, messageData } = useMessageLimits();
@@ -53,11 +53,16 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
     };
     setMessages(prev => [...prev, userMessage]);
     
+    // IMPORTANT: Determine the correct user ID for saving messages
+    // - If clinician view, use the logged-in user's ID (clinician's own chat)
+    // - If patient view, use patientId (could be own ID or patient being viewed)
+    const messageOwnerId = isClinicianView ? user?.id : patientId;
+    
     // Anonymize message before saving if enabled
     const anonymizedMessage = await anonymizeText(messageText);
     
-    // Save anonymized user message to database
-    await saveMessageToDatabase('user', anonymizedMessage, patientId);
+    // Save anonymized user message to database with the correct owner ID
+    await saveMessageToDatabase('user', anonymizedMessage, messageOwnerId);
     
     // Get AI response
     const aiResponse = await sendToAI(
@@ -82,17 +87,20 @@ export function useAudioChat(baseSystemPrompt: string, patientId?: string, isCli
       // Anonymize AI response before saving if enabled
       const anonymizedResponse = await anonymizeText(aiResponse);
       
-      // Save anonymized AI response to database
-      await saveMessageToDatabase('assistant', anonymizedResponse, patientId);
+      // Save anonymized AI response to database with the correct owner ID
+      await saveMessageToDatabase('assistant', anonymizedResponse, messageOwnerId);
     }
   };
 
   const refreshMessages = async () => {
     // Force refetch chat history to show voice conversation
+    // Use the correct owner ID: clinician's own ID if clinician view, otherwise patientId
+    const messageOwnerId = isClinicianView ? user?.id : (patientId || user?.id);
+    
     const { data } = await supabase
       .from('ai_chat_logs')
       .select('*')
-      .eq('patient_id', patientId || user?.id)
+      .eq('patient_id', messageOwnerId)
       .order('created_at', { ascending: true });
     
     if (data && data.length > 0) {

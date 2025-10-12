@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Message, ConversationMessage } from "./types";
 
-export function useChatHistory() {
+export function useChatHistory(patientId?: string, isClinicianView: boolean = false) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -22,10 +22,15 @@ export function useChatHistory() {
       try {
         setIsFetchingHistory(true);
         
+        // IMPORTANT: Determine the correct chat owner
+        // - If clinician view: use the clinician's own ID (their personal training chat)
+        // - If patient view: use patientId if provided, otherwise user.id
+        const chatOwnerId = isClinicianView ? user.id : (patientId || user.id);
+        
         const { data, error } = await supabase
           .from('ai_chat_logs')
           .select('*')
-          .eq('patient_id', user.id)
+          .eq('patient_id', chatOwnerId)
           .order('created_at', { ascending: true });
         
         if (error) throw error;
@@ -60,7 +65,7 @@ export function useChatHistory() {
     };
     
     fetchChatHistory();
-  }, [user, toast]);
+  }, [user, toast, patientId, isClinicianView]);
 
   return {
     messages,

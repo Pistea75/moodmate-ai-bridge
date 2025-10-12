@@ -67,13 +67,13 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
     <Card className="h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">AI Chat History</CardTitle>
+          <CardTitle className="text-lg font-semibold">Reportes de Chat AI del Paciente</CardTitle>
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
               size="sm"
               onClick={() => refreshLogs()}
-              title="Refresh logs"
+              title="Actualizar información"
             >
               <RefreshCcw className="h-4 w-4" />
             </Button>
@@ -82,7 +82,7 @@ export function PatientAIChatLogs({ patientId }: { patientId: string }) {
               size="sm"
               onClick={() => setDebugMode(!debugMode)}
             >
-              {debugMode ? 'Hide Debug Info' : 'Show Debug Info'}
+              {debugMode ? 'Ocultar Debug' : 'Mostrar Debug'}
             </Button>
           </div>
         </div>
