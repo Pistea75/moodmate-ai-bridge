@@ -72,15 +72,13 @@ export const scheduleSession = async ({
   let finalClinicianId = clinicianId;
   let finalPatientId = patientId;
   
-  // For patient view, we need to find the clinician based on referral code
+  // For patient view, we use the provided clinicianId and set patient to current user
   if (isPatientView) {
-    try {
-      const result = await resolvePatientSessionDetails(user.id);
-      finalClinicianId = result.clinicianId;
-      finalPatientId = user.id;
-    } catch (error) {
-      throw new Error("No clinician found with referral code. Please connect to a clinician first.");
+    if (!clinicianId) {
+      throw new Error("No clinician selected. Please select your clinician.");
     }
+    finalClinicianId = clinicianId;
+    finalPatientId = user.id;
   }
   
   // Validate user IDs

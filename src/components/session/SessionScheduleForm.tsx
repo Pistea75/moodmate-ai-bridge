@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "./DateTimePicker";
 import { TimezoneSelector } from "./TimezoneSelector";
 import { PatientSelector } from "./PatientSelector";
+import { ClinicianSelector } from "./ClinicianSelector";
 import { SessionTypeSelector } from "./SessionTypeSelector";
 import { AvailableTimeSlots } from "./AvailableTimeSlots";
 import { getCurrentTimezone } from "@/lib/utils/timezoneUtils";
@@ -15,6 +16,7 @@ export interface SessionFormData {
   date: Date;
   time: string;
   patientId: string;
+  clinicianId: string;
   timezone: string;
   sessionType: 'online' | 'in_person';
   recordingEnabled: boolean;
@@ -49,6 +51,7 @@ export function SessionScheduleForm({
     date: new Date(),
     time: "09:00",
     patientId: "",
+    clinicianId: "",
     timezone: getCurrentTimezone(),
     sessionType: 'online',
     recordingEnabled: true,
@@ -94,6 +97,11 @@ export function SessionScheduleForm({
       return;
     }
 
+    if (isPatientView && !formData.clinicianId) {
+      toast({ title: "Missing Clinician", description: "Please select a clinician", variant: "destructive" });
+      return;
+    }
+
     if (!formData.timezone) {
       toast({ title: "Missing Timezone", description: "Please select a timezone", variant: "destructive" });
       return;
@@ -111,6 +119,10 @@ export function SessionScheduleForm({
     <div className="space-y-4">
       {!isPatientView && (
         <PatientSelector value={formData.patientId} onChange={(v) => setFormData(prev => ({ ...prev, patientId: v }))} />
+      )}
+      
+      {isPatientView && (
+        <ClinicianSelector value={formData.clinicianId} onChange={(v) => setFormData(prev => ({ ...prev, clinicianId: v }))} />
       )}
 
       <DateTimePicker
