@@ -30,7 +30,7 @@ export function QuickActionsCard() {
     },
     {
       icon: Calendar,
-      label: t('sessions'),
+      label: t('nav.sessions'),
       onClick: () => navigate('/patient/sessions'),
       color: 'text-orange-600 bg-orange-50 hover:bg-orange-100'
     },
