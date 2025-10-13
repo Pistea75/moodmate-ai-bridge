@@ -92,20 +92,21 @@ export function PatientDirectMessaging() {
       if (!user?.user) return;
 
       // First get clinician ID from patient_clinician_links
-      const { data: links, error: linksError } = await supabase
+      const { data: link, error: linksError } = await supabase
         .from('patient_clinician_links')
         .select('clinician_id')
-        .eq('patient_id', user.user.id);
+        .eq('patient_id', user.user.id)
+        .maybeSingle();
 
       if (linksError) throw linksError;
 
-      if (!links || links.length === 0) {
+      if (!link?.clinician_id) {
         setClinician(null);
         return;
       }
 
       // Then get clinician profile
-      const clinicianId = links[0].clinician_id;
+      const clinicianId = link.clinician_id;
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name')
