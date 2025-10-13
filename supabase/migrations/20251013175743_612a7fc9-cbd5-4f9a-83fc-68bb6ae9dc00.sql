@@ -1,0 +1,1 @@
+DELETE FROM patient_clinician_links WHERE id = '5fcadaa2-e7d5-4bd3-bd92-1766e2d037cd';
