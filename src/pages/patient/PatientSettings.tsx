@@ -24,7 +24,12 @@ export default function PatientSettings() {
     const fetchClinicianInfo = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          console.log('❌ PatientSettings: No user found');
+          return;
+        }
+
+        console.log('✅ PatientSettings: Fetching clinician for patient:', user.id);
 
         // Get clinician ID from patient_clinician_links
         const { data: link, error: linkError } = await supabase
@@ -33,13 +38,21 @@ export default function PatientSettings() {
           .eq('patient_id', user.id)
           .maybeSingle();
 
-        if (linkError) throw linkError;
+        console.log('📊 PatientSettings: Link query result:', { link, linkError });
+
+        if (linkError) {
+          console.error('❌ PatientSettings: Error fetching link:', linkError);
+          throw linkError;
+        }
 
         if (!link?.clinician_id) {
+          console.log('⚠️ PatientSettings: No clinician link found');
           setClinician(null);
           setLoading(false);
           return;
         }
+
+        console.log('✅ PatientSettings: Found clinician_id:', link.clinician_id);
 
         // Get clinician profile and referral code
         const { data: profile, error: profileError } = await supabase
@@ -48,9 +61,15 @@ export default function PatientSettings() {
           .eq('id', link.clinician_id)
           .single();
 
-        if (profileError) throw profileError;
+        console.log('📊 PatientSettings: Profile query result:', { profile, profileError });
+
+        if (profileError) {
+          console.error('❌ PatientSettings: Error fetching profile:', profileError);
+          throw profileError;
+        }
 
         if (profile) {
+          console.log('✅ PatientSettings: Setting clinician info:', profile);
           setClinician({
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
@@ -58,7 +77,7 @@ export default function PatientSettings() {
           });
         }
       } catch (error) {
-        console.error('Error fetching clinician info:', error);
+        console.error('❌ PatientSettings: Unexpected error:', error);
       } finally {
         setLoading(false);
       }

@@ -29,7 +29,12 @@ export function ClinicianSelector({ value, onChange, placeholder = "Select clini
     const fetchClinician = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          console.log('❌ ClinicianSelector: No user found');
+          return;
+        }
+
+        console.log('✅ ClinicianSelector: Fetching for patient ID:', user.id);
 
         // Get clinician from patient_clinician_links
         const { data: link, error: linkError } = await supabase
@@ -38,13 +43,21 @@ export function ClinicianSelector({ value, onChange, placeholder = "Select clini
           .eq("patient_id", user.id)
           .maybeSingle();
 
-        if (linkError) throw linkError;
+        console.log('📊 ClinicianSelector: Link query result:', { link, linkError });
+
+        if (linkError) {
+          console.error('❌ ClinicianSelector: Error fetching link:', linkError);
+          throw linkError;
+        }
 
         if (!link?.clinician_id) {
+          console.log('⚠️ ClinicianSelector: No clinician link found');
           setClinician(null);
           setLoading(false);
           return;
         }
+
+        console.log('✅ ClinicianSelector: Found clinician_id:', link.clinician_id);
 
         // Get clinician profile
         const { data: profile, error: profileError } = await supabase
@@ -53,9 +66,15 @@ export function ClinicianSelector({ value, onChange, placeholder = "Select clini
           .eq("id", link.clinician_id)
           .single();
 
-        if (profileError) throw profileError;
+        console.log('📊 ClinicianSelector: Profile query result:', { profile, profileError });
+
+        if (profileError) {
+          console.error('❌ ClinicianSelector: Error fetching profile:', profileError);
+          throw profileError;
+        }
 
         if (profile) {
+          console.log('✅ ClinicianSelector: Setting clinician:', profile);
           setClinician({
             id: profile.id,
             first_name: profile.first_name || '',
@@ -65,7 +84,7 @@ export function ClinicianSelector({ value, onChange, placeholder = "Select clini
           onChange(profile.id);
         }
       } catch (error) {
-        console.error("Error fetching clinician:", error);
+        console.error("❌ ClinicianSelector: Unexpected error:", error);
       } finally {
         setLoading(false);
       }
