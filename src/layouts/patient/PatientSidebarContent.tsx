@@ -7,14 +7,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { PatientNavItems } from './PatientNavItems';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LogOut, User, Brain, Heart, Settings } from 'lucide-react';
+import { LogOut, User, Brain, Heart, Settings, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PatientSidebarContentProps {
   patientFullName: React.ReactNode;
+  onCollapse?: () => void;
 }
 
-export function PatientSidebarContent({ patientFullName }: PatientSidebarContentProps) {
+export function PatientSidebarContent({ patientFullName, onCollapse }: PatientSidebarContentProps) {
   const { t } = useTranslation();
   const { signOut } = useAuth();
   const navItems = PatientNavItems();
@@ -61,7 +62,18 @@ export function PatientSidebarContent({ patientFullName }: PatientSidebarContent
               <p className="text-sm font-medium" style={{ color: `hsl(var(--sidebar-primary))` }}>Patient Portal</p>
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {onCollapse && (
+              <button
+                onClick={onCollapse}
+                className="p-1.5 hover:bg-gray-800 dark:hover:bg-gray-700 rounded-md transition-colors"
+                aria-label="Collapse sidebar"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-300" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

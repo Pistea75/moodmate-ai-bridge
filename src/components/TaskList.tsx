@@ -14,6 +14,7 @@ import {
 import { TaskListSkeleton } from './task/TaskListSkeleton';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Circle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TaskListProps {
   variant?: 'patient' | 'clinician';
@@ -30,6 +31,7 @@ export function TaskList({
   onTaskUpdate,
   loading = false
 }: TaskListProps) {
+  const { t } = useTranslation();
   const [localTasks, setLocalTasks] = useState<Task[]>([]);
   const [showCompleted, setShowCompleted] = useState(false);
   
@@ -80,7 +82,7 @@ export function TaskList({
     <div className="bg-white rounded-xl shadow-sm border p-4 w-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">
-          {variant === 'patient' ? 'Assigned Tasks' : `Tasks for ${patientName || 'Clinician'}`}
+          {variant === 'patient' ? t('tasks.assignedTasks') : `${t('tasks.tasksFor')} ${patientName || t('common.clinician')}`}
         </h3>
         <Button
           variant="ghost"
@@ -91,12 +93,12 @@ export function TaskList({
           {showCompleted ? (
             <>
               <CheckCircle className="h-4 w-4" />
-              Showing Completed
+              {t('tasks.showingCompleted')}
             </>
           ) : (
             <>
               <Circle className="h-4 w-4" />
-              Show Completed
+              {t('tasks.showCompleted')}
             </>
           )}
         </Button>

@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { GoalForm } from './GoalForm';
+import { useTranslation } from 'react-i18next';
 
 interface Goal {
   id: string;
@@ -23,6 +24,7 @@ interface Goal {
 }
 
 export function AIGoalSetting() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,32 +48,32 @@ export function AIGoalSetting() {
       const mockGoals: Goal[] = [
         {
           id: '1',
-          title: 'Maintain positive mood',
-          description: 'Keep daily mood score above 6',
-          target_value: 21, // 3 weeks of good mood days
+          title: t('goals.maintainPositiveMood'),
+          description: t('goals.moodGoalDescription'),
+          target_value: 21,
           current_value: 15,
           category: 'mood',
           created_at: new Date().toISOString(),
           target_date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString(),
           ai_suggestions: [
-            'Try morning meditation for 5 minutes',
-            'Practice gratitude journaling',
-            'Take a 10-minute walk daily'
+            t('goals.morningMeditation'),
+            t('goals.gratitudeJournal'),
+            t('goals.dailyWalk')
           ]
         },
         {
           id: '2',
-          title: 'Complete weekly tasks',
-          description: 'Finish at least 4 tasks per week',
+          title: t('goals.completeWeeklyTasks'),
+          description: t('goals.taskGoalDescription'),
           target_value: 4,
           current_value: 2,
           category: 'tasks',
           created_at: new Date().toISOString(),
           target_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
           ai_suggestions: [
-            'Break large tasks into smaller steps',
-            'Set specific times for task completion',
-            'Reward yourself after completing tasks'
+            t('goals.breakLargeTasks'),
+            t('goals.setSpecificTimes'),
+            t('goals.rewardYourself')
           ]
         }
       ];
@@ -98,11 +100,11 @@ export function AIGoalSetting() {
         console.error('Error from AI service:', error);
         // Fallback suggestions
         setAiSuggestions([
-          'Track your mood daily for one week',
-          'Practice deep breathing for 5 minutes daily',
-          'Complete at least 3 assigned tasks this week',
-          'Take a 10-minute walk when feeling stressed',
-          'Write down one positive thing each day'
+          t('goals.trackMoodDaily'),
+          t('goals.deepBreathing'),
+          t('goals.completeThreeTasks'),
+          t('goals.walkWhenStressed'),
+          t('goals.writePositiveThing')
         ]);
       } else {
         setAiSuggestions(data.suggestions || []);
@@ -111,11 +113,11 @@ export function AIGoalSetting() {
       console.error('Error generating AI suggestions:', error);
       // Fallback suggestions
       setAiSuggestions([
-        'Track your mood daily for one week',
-        'Practice deep breathing for 5 minutes daily', 
-        'Complete at least 3 assigned tasks this week',
-        'Take a 10-minute walk when feeling stressed',
-        'Write down one positive thing each day'
+        t('goals.trackMoodDaily'),
+        t('goals.deepBreathing'),
+        t('goals.completeThreeTasks'),
+        t('goals.walkWhenStressed'),
+        t('goals.writePositiveThing')
       ]);
     } finally {
       setGeneratingSuggestions(false);
@@ -136,12 +138,12 @@ export function AIGoalSetting() {
     };
 
     setGoals(prev => [...prev, newGoal]);
-    toast.success('Goal created successfully!');
+    toast.success(t('goals.goalCreated'));
   };
 
   const deleteGoal = (goalId: string) => {
     setGoals(prev => prev.filter(goal => goal.id !== goalId));
-    toast.success('Goal deleted successfully!');
+    toast.success(t('goals.goalDeleted'));
   };
 
   const getProgressPercentage = (goal: Goal) => {
@@ -174,7 +176,7 @@ export function AIGoalSetting() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            My Goals
+            {t('goals.myGoals')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -216,7 +218,7 @@ export function AIGoalSetting() {
                   
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Progress: {goal.current_value}/{goal.target_value}</span>
+                      <span>{t('goals.progress')}: {goal.current_value}/{goal.target_value}</span>
                       <span>{Math.round(getProgressPercentage(goal))}%</span>
                     </div>
                     <Progress value={getProgressPercentage(goal)} className="h-2" />
@@ -226,7 +228,7 @@ export function AIGoalSetting() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm font-medium text-purple-700">
                         <Brain className="h-4 w-4" />
-                        AI Suggestions
+                        {t('goals.aiSuggestions')}
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {goal.ai_suggestions.map((suggestion, index) => (
@@ -243,8 +245,8 @@ export function AIGoalSetting() {
           ) : (
             <div className="text-center py-8 text-gray-500">
               <Target className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No goals set yet</p>
-              <p className="text-sm">Create your first goal to track progress</p>
+              <p>{t('goals.noGoalsSet')}</p>
+              <p className="text-sm">{t('goals.createFirstGoal')}</p>
             </div>
           )}
 
@@ -257,7 +259,7 @@ export function AIGoalSetting() {
             className="w-full mt-4"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add New Goal
+            {t('goals.addNewGoal')}
           </Button>
         </CardContent>
       </Card>
@@ -267,7 +269,7 @@ export function AIGoalSetting() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-purple-600" />
-            AI Goal Suggestions
+            {t('goals.aiGoalSuggestions')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -288,7 +290,7 @@ export function AIGoalSetting() {
                     onClick={() => createGoalFromSuggestion(suggestion)}
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    Add
+                    {t('goals.add')}
                   </Button>
                 </div>
               ))}
@@ -302,7 +304,7 @@ export function AIGoalSetting() {
             disabled={generatingSuggestions}
           >
             <TrendingUp className="h-4 w-4 mr-2" />
-            {generatingSuggestions ? 'Generating...' : 'Refresh Suggestions'}
+            {generatingSuggestions ? t('goals.generating') : t('goals.refreshSuggestions')}
           </Button>
         </CardContent>
       </Card>

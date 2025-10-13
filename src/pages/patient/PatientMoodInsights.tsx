@@ -35,30 +35,30 @@ export default function PatientMoodInsights() {
     {
       id: 'mood-trend',
       icon: TrendingUp,
-      title: 'Weekly Mood Summary',
+      title: t('moodWeeklySummary'),
       description: recentMoods.length > 0 
-        ? `Your mood has been ${trend} this week with an average of ${averageMood}/10.`
-        : 'Start logging your mood to see personalized insights here.',
+        ? t('moodTrendDescription', { trend: t(`moodTrend.${trend}`), average: averageMood })
+        : t('startLoggingMood'),
       type: trend === 'improving' ? 'positive' as const : trend === 'declining' ? 'warning' as const : 'neutral' as const,
-      metric: recentMoods.length > 0 ? `${averageMood}/10` : 'No data'
+      metric: recentMoods.length > 0 ? `${averageMood}/10` : t('noData')
     },
     {
       id: 'activity-impact',
       icon: Activity,
-      title: 'Tracking Consistency',
+      title: t('trackingConsistency'),
       description: moods.length >= 7 
-        ? 'Great job maintaining consistent mood tracking! This helps us provide better insights.'
-        : 'Try to log your mood daily for more accurate patterns and personalized recommendations.',
+        ? t('consistentTrackingMessage')
+        : t('dailyLoggingRecommendation'),
       type: moods.length >= 7 ? 'positive' as const : 'neutral' as const,
-      metric: `${moods.length} entries`
+      metric: t('entriesCount', { count: moods.length })
     },
     {
       id: 'goals-progress',
       icon: Target,
-      title: 'Wellness Goals',
-      description: 'Setting and tracking wellness goals can help improve your mental health journey.',
+      title: t('wellnessGoals'),
+      description: t('wellnessGoalsDescription'),
       type: 'neutral' as const,
-      metric: 'Get started'
+      metric: t('getStarted')
     }
   ];
 
@@ -89,10 +89,10 @@ export default function PatientMoodInsights() {
         <div className="flex justify-between items-start">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Mood Tracking & Insights
+              {t('mood.title')}
             </h1>
             <p className="text-xl text-muted-foreground">
-              Track your mood patterns, view insights, and monitor your emotional well-being
+              {t('moodInsightsDescription')}
             </p>
           </div>
           <MoodLogModal 
@@ -100,7 +100,7 @@ export default function PatientMoodInsights() {
             trigger={
               <Button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700">
                 <Plus className="h-4 w-4" />
-                Log Mood
+                {t('mood.logMood')}
               </Button>
             }
           />
@@ -110,39 +110,39 @@ export default function PatientMoodInsights() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">This Week</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('thisWeek')}</CardTitle>
               <TrendingUp className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-purple-600">{averageMood}</div>
               <p className="text-xs text-muted-foreground">
-                Average mood score
+                {t('averageMoodScore')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Entries</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('entries')}</CardTitle>
               <Brain className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">{moods.length}</div>
               <p className="text-xs text-muted-foreground">
-                Total logged
+                {t('totalLogged')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Streak</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('streak')}</CardTitle>
               <Heart className="h-4 w-4 text-pink-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-pink-600">{currentStreak}</div>
               <p className="text-xs text-muted-foreground">
-                Recent entries
+                {t('recentEntries')}
               </p>
             </CardContent>
           </Card>
@@ -152,7 +152,7 @@ export default function PatientMoodInsights() {
         <div className="bg-white rounded-xl shadow-sm border p-6">
           <div className="flex items-center gap-2 mb-6">
             <TrendingUp className="h-5 w-5 text-purple-600" />
-            <h2 className="text-xl font-semibold">Mood Trends</h2>
+            <h2 className="text-xl font-semibold">{t('mood.trends')}</h2>
           </div>
           <MoodChart showLogButton={false} />
         </div>
@@ -191,34 +191,34 @@ export default function PatientMoodInsights() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-blue-600" />
-              Progress Overview
+              {t('progressOverview')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Mood Tracking Consistency</span>
+                <span className="text-sm font-medium">{t('moodTrackingConsistency')}</span>
                 <span className="text-sm text-muted-foreground">
                   {Math.min((moods.length / 30) * 100, 100).toFixed(0)}%
                 </span>
               </div>
               <Progress value={Math.min((moods.length / 30) * 100, 100)} className="h-2" />
               <p className="text-xs text-muted-foreground">
-                Based on {moods.length} mood entries this month
+                {t('basedOnMonthEntries', { count: moods.length })}
               </p>
             </div>
 
             {recentMoods.length > 0 && (
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Recent Mood Average</span>
+                  <span className="text-sm font-medium">{t('recentMoodAverage')}</span>
                   <span className="text-sm text-muted-foreground">
                     {averageMood}/10
                   </span>
                 </div>
                 <Progress value={(parseFloat(averageMood) / 10) * 100} className="h-2" />
                 <p className="text-xs text-muted-foreground">
-                  Based on your last {recentMoods.length} mood entries
+                  {t('basedOnLastEntries', { count: recentMoods.length })}
                 </p>
               </div>
             )}
@@ -230,29 +230,29 @@ export default function PatientMoodInsights() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5 text-pink-600" />
-              Wellness Tips
+              {t('wellnessTips')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                <h4 className="font-semibold text-blue-900 mb-2">Daily Practice</h4>
+                <h4 className="font-semibold text-blue-900 mb-2">{t('dailyPractice')}</h4>
                 <p className="text-blue-700 text-sm">
-                  Try to log your mood at the same time each day to build a consistent habit and get more accurate insights.
+                  {t('dailyPracticeDescription')}
                 </p>
               </div>
               
               <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
-                <h4 className="font-semibold text-green-900 mb-2">Mindfulness</h4>
+                <h4 className="font-semibold text-green-900 mb-2">{t('mindfulness')}</h4>
                 <p className="text-green-700 text-sm">
-                  Take a few minutes each day for mindfulness or deep breathing exercises to help manage stress and improve mood.
+                  {t('mindfulnessDescription')}
                 </p>
               </div>
 
               <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-                <h4 className="font-semibold text-purple-900 mb-2">Stay Connected</h4>
+                <h4 className="font-semibold text-purple-900 mb-2">{t('stayConnected')}</h4>
                 <p className="text-purple-700 text-sm">
-                  Regular communication with your support network and healthcare providers is key to maintaining good mental health.
+                  {t('stayConnectedDescription')}
                 </p>
               </div>
             </div>
