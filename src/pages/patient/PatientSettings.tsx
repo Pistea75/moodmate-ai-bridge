@@ -1,82 +1,17 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PatientLayout from '../../layouts/PatientLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ColorPicker } from '@/components/theme/ColorPicker';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
 import { UserCircle } from 'lucide-react';
-
-interface ClinicianInfo {
-  first_name: string;
-  last_name: string;
-  referral_code: string;
-}
+import { useAssignedClinician } from '@/hooks/useAssignedClinician';
 
 export default function PatientSettings() {
   const { t } = useTranslation();
-  const [clinician, setClinician] = useState<ClinicianInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchClinicianInfo = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.log('❌ PatientSettings: No user found');
-          setLoading(false);
-          return;
-        }
-
-        console.log('✅ PatientSettings: Fetching clinician for patient:', user.id);
-
-        // Get clinician profile directly with join
-        const { data: link, error: linkError } = await supabase
-          .from('patient_clinician_links')
-          .select(`
-            clinician_id,
-            profiles!patient_clinician_links_clinician_id_fkey (
-              first_name,
-              last_name,
-              referral_code
-            )
-          `)
-          .eq('patient_id', user.id)
-          .maybeSingle();
-
-        console.log('📊 PatientSettings: Query result:', { link, linkError });
-
-        if (linkError) {
-          console.error('❌ PatientSettings: Error fetching clinician:', linkError);
-          setLoading(false);
-          return;
-        }
-
-        if (!link || !link.profiles) {
-          console.log('⚠️ PatientSettings: No clinician link found');
-          setClinician(null);
-          setLoading(false);
-          return;
-        }
-
-        const profile = link.profiles as any;
-        console.log('✅ PatientSettings: Setting clinician info:', profile);
-        setClinician({
-          first_name: profile.first_name || '',
-          last_name: profile.last_name || '',
-          referral_code: profile.referral_code || ''
-        });
-      } catch (error) {
-        console.error('❌ PatientSettings: Unexpected error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchClinicianInfo();
-  }, []);
+  const { clinician, loading } = useAssignedClinician();
   
   return (
     <PatientLayout>

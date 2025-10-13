@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -7,13 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-
-interface Clinician {
-  id: string;
-  first_name: string;
-  last_name: string;
-}
+import { useAssignedClinician } from '@/hooks/useAssignedClinician';
+import { getClinicianFullName } from '@/utils/supabase/clinician';
 
 interface ClinicianSelectorProps {
   value: string;
@@ -22,76 +17,13 @@ interface ClinicianSelectorProps {
 }
 
 export function ClinicianSelector({ value, onChange, placeholder = "Select clinician" }: ClinicianSelectorProps) {
-  const [clinician, setClinician] = useState<Clinician | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { clinician, loading } = useAssignedClinician();
 
   useEffect(() => {
-    const fetchClinician = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.log('❌ ClinicianSelector: No user found');
-          return;
-        }
-
-        console.log('✅ ClinicianSelector: Fetching for patient ID:', user.id);
-
-        // Get clinician from patient_clinician_links
-        const { data: link, error: linkError } = await supabase
-          .from("patient_clinician_links")
-          .select("clinician_id")
-          .eq("patient_id", user.id)
-          .maybeSingle();
-
-        console.log('📊 ClinicianSelector: Link query result:', { link, linkError });
-
-        if (linkError) {
-          console.error('❌ ClinicianSelector: Error fetching link:', linkError);
-          throw linkError;
-        }
-
-        if (!link?.clinician_id) {
-          console.log('⚠️ ClinicianSelector: No clinician link found');
-          setClinician(null);
-          setLoading(false);
-          return;
-        }
-
-        console.log('✅ ClinicianSelector: Found clinician_id:', link.clinician_id);
-
-        // Get clinician profile
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("id, first_name, last_name")
-          .eq("id", link.clinician_id)
-          .single();
-
-        console.log('📊 ClinicianSelector: Profile query result:', { profile, profileError });
-
-        if (profileError) {
-          console.error('❌ ClinicianSelector: Error fetching profile:', profileError);
-          throw profileError;
-        }
-
-        if (profile) {
-          console.log('✅ ClinicianSelector: Setting clinician:', profile);
-          setClinician({
-            id: profile.id,
-            first_name: profile.first_name || '',
-            last_name: profile.last_name || ''
-          });
-          // Auto-select the clinician
-          onChange(profile.id);
-        }
-      } catch (error) {
-        console.error("❌ ClinicianSelector: Unexpected error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchClinician();
-  }, [onChange]);
+    if (clinician && !value) {
+      onChange(clinician.id);
+    }
+  }, [clinician, value, onChange]);
 
   if (loading) {
     return (
@@ -120,11 +52,13 @@ export function ClinicianSelector({ value, onChange, placeholder = "Select clini
       </Label>
       <Select value={value} onValueChange={onChange} disabled={loading}>
         <SelectTrigger id="clinician" className="bg-white">
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={placeholder}>
+            {getClinicianFullName(clinician)}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={clinician.id}>
-            {clinician.first_name} {clinician.last_name}
+            {getClinicianFullName(clinician)}
           </SelectItem>
         </SelectContent>
       </Select>
