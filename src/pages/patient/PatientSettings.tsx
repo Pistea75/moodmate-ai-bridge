@@ -26,56 +26,48 @@ export default function PatientSettings() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           console.log('❌ PatientSettings: No user found');
+          setLoading(false);
           return;
         }
 
         console.log('✅ PatientSettings: Fetching clinician for patient:', user.id);
 
-        // Get clinician ID from patient_clinician_links
+        // Get clinician profile directly with join
         const { data: link, error: linkError } = await supabase
           .from('patient_clinician_links')
-          .select('clinician_id')
+          .select(`
+            clinician_id,
+            profiles!patient_clinician_links_clinician_id_fkey (
+              first_name,
+              last_name,
+              referral_code
+            )
+          `)
           .eq('patient_id', user.id)
           .maybeSingle();
 
-        console.log('📊 PatientSettings: Link query result:', { link, linkError });
+        console.log('📊 PatientSettings: Query result:', { link, linkError });
 
         if (linkError) {
-          console.error('❌ PatientSettings: Error fetching link:', linkError);
-          throw linkError;
+          console.error('❌ PatientSettings: Error fetching clinician:', linkError);
+          setLoading(false);
+          return;
         }
 
-        if (!link?.clinician_id) {
+        if (!link || !link.profiles) {
           console.log('⚠️ PatientSettings: No clinician link found');
           setClinician(null);
           setLoading(false);
           return;
         }
 
-        console.log('✅ PatientSettings: Found clinician_id:', link.clinician_id);
-
-        // Get clinician profile and referral code
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, referral_code')
-          .eq('id', link.clinician_id)
-          .single();
-
-        console.log('📊 PatientSettings: Profile query result:', { profile, profileError });
-
-        if (profileError) {
-          console.error('❌ PatientSettings: Error fetching profile:', profileError);
-          throw profileError;
-        }
-
-        if (profile) {
-          console.log('✅ PatientSettings: Setting clinician info:', profile);
-          setClinician({
-            first_name: profile.first_name || '',
-            last_name: profile.last_name || '',
-            referral_code: profile.referral_code || ''
-          });
-        }
+        const profile = link.profiles as any;
+        console.log('✅ PatientSettings: Setting clinician info:', profile);
+        setClinician({
+          first_name: profile.first_name || '',
+          last_name: profile.last_name || '',
+          referral_code: profile.referral_code || ''
+        });
       } catch (error) {
         console.error('❌ PatientSettings: Unexpected error:', error);
       } finally {
