@@ -22,35 +22,44 @@ export async function fetchAssignedClinician(): Promise<ClinicianInfo | null> {
 
     console.log('✅ fetchAssignedClinician: Fetching clinician for patient:', user.id);
 
-    // Use JOIN to get clinician profile directly with patient_clinician_links
+    // Get the clinician link first
     const { data: link, error: linkError } = await supabase
       .from('patient_clinician_links')
-      .select(`
-        clinician_id,
-        profiles!patient_clinician_links_clinician_id_fkey (
-          id,
-          first_name,
-          last_name,
-          referral_code,
-          email
-        )
-      `)
+      .select('clinician_id')
       .eq('patient_id', user.id)
       .maybeSingle();
 
-    console.log('📊 fetchAssignedClinician: Query result:', { link, linkError });
+    console.log('📊 fetchAssignedClinician: Link result:', { link, linkError });
 
     if (linkError) {
-      console.error('❌ fetchAssignedClinician: Error fetching clinician:', linkError);
+      console.error('❌ fetchAssignedClinician: Error fetching link:', linkError);
       return null;
     }
 
-    if (!link || !link.profiles) {
+    if (!link) {
       console.log('⚠️ fetchAssignedClinician: No clinician link found');
       return null;
     }
 
-    const profile = link.profiles as any;
+    // Now get the clinician profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, referral_code, email')
+      .eq('id', link.clinician_id)
+      .single();
+
+    console.log('📊 fetchAssignedClinician: Profile result:', { profile, profileError });
+
+    if (profileError) {
+      console.error('❌ fetchAssignedClinician: Error fetching profile:', profileError);
+      return null;
+    }
+
+    if (!profile) {
+      console.log('⚠️ fetchAssignedClinician: No clinician profile found');
+      return null;
+    }
+
     console.log('✅ fetchAssignedClinician: Found clinician:', profile);
 
     return {
