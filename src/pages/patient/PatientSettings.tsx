@@ -38,22 +38,43 @@ export default function PatientSettings() {
         throw new Error('No user found');
       }
 
-      // Buscar psicólogo/clínico por código de referencia
-      const { data: clinician, error: clinicianError } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, role')
+      // Buscar el user_id del clínico usando la tabla clinician_referral_codes
+      const { data: referralData, error: referralError } = await supabase
+        .from('clinician_referral_codes')
+        .select('user_id')
         .eq('referral_code', referralCode.trim().toUpperCase())
-        .in('role', ['clinician', 'psychologist'])
         .maybeSingle();
 
-      if (clinicianError) {
-        throw clinicianError;
+      if (referralError) {
+        console.error('Error finding referral code:', referralError);
+        toast({
+          title: "Error",
+          description: "Error al buscar el código de referencia",
+          variant: "destructive"
+        });
+        return;
       }
 
-      if (!clinician) {
+      if (!referralData) {
         toast({
           title: "Error",
           description: "Código de referencia no válido. Verifica que el código sea correcto.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Obtener el perfil del clínico
+      const { data: clinician, error: clinicianError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, role')
+        .eq('id', referralData.user_id)
+        .maybeSingle();
+
+      if (clinicianError || !clinician) {
+        toast({
+          title: "Error",
+          description: "No se pudo obtener la información del psicólogo",
           variant: "destructive"
         });
         return;
