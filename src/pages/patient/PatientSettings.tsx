@@ -42,9 +42,8 @@ export default function PatientSettings() {
       const { data: clinician, error: clinicianError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, role')
-        .eq('referral_code', referralCode.toUpperCase())
-        .in('role', ['clinician', 'psychologist'])
-        .maybeSingle();
+        .eq('referral_code', referralCode.trim().toUpperCase())
+        .single();
 
       if (clinicianError) {
         throw clinicianError;
