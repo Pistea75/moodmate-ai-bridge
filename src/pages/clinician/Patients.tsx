@@ -12,6 +12,7 @@ import { PatientFilters } from '@/components/clinician/PatientFilters';
 import { PatientOnboardingModal } from '@/components/clinician/PatientOnboardingModal';
 import { InvitePatientForm } from '@/components/patient/InvitePatientForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { PendingRequestsButton } from '@/components/clinician/PendingRequestsButton';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import ClinicianLayout from '@/layouts/ClinicianLayout';
@@ -220,13 +221,16 @@ export default function Patients() {
             </h1>
             <p className="text-muted-foreground">{t('managePatientsDescription')}</p>
           </div>
-          <Button
-            onClick={() => setShowInviteModal(true)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            {t('newPatient', 'New Patient')}
-          </Button>
+          <div className="flex gap-2">
+            <PendingRequestsButton />
+            <Button
+              onClick={() => setShowInviteModal(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              {t('newPatient', 'New Patient')}
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}

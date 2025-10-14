@@ -38,19 +38,19 @@ export default function PatientSettings() {
         throw new Error('No user found');
       }
 
-      // Buscar psicólogo por código de referencia
-      const { data: psychologist, error: psychError } = await supabase
+      // Buscar psicólogo/clínico por código de referencia
+      const { data: clinician, error: clinicianError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, role')
         .eq('referral_code', referralCode.toUpperCase())
-        .eq('role', 'psychologist')
+        .in('role', ['clinician', 'psychologist'])
         .maybeSingle();
 
-      if (psychError) {
-        throw psychError;
+      if (clinicianError) {
+        throw clinicianError;
       }
 
-      if (!psychologist) {
+      if (!clinician) {
         toast({
           title: "Error",
           description: "Código de referencia no válido. Verifica que el código sea correcto.",
@@ -59,42 +59,35 @@ export default function PatientSettings() {
         return;
       }
 
-      // Verificar si ya existe un vínculo
-      const { data: existingLink } = await supabase
-        .from('patient_clinician_links')
-        .select('id')
-        .eq('patient_id', user.id)
-        .maybeSingle();
+      // Crear una solicitud de vinculación en lugar de vincular directamente
+      const { error: requestError } = await supabase
+        .from('patient_link_requests')
+        .insert({
+          patient_id: user.id,
+          clinician_id: clinician.id,
+          referral_code: referralCode.toUpperCase(),
+          status: 'pending'
+        });
 
-      if (existingLink) {
-        // Actualizar vínculo existente
-        const { error: updateError } = await supabase
-          .from('patient_clinician_links')
-          .update({ clinician_id: psychologist.id })
-          .eq('patient_id', user.id);
-
-        if (updateError) throw updateError;
-      } else {
-        // Crear nuevo vínculo
-        const { error: insertError } = await supabase
-          .from('patient_clinician_links')
-          .insert({
-            patient_id: user.id,
-            clinician_id: psychologist.id
+      if (requestError) {
+        // Si el código de error es por duplicado, significa que ya existe una solicitud
+        if (requestError.code === '23505') {
+          toast({
+            title: "Solicitud Ya Enviada",
+            description: "Ya tienes una solicitud pendiente con este psicólogo",
+            variant: "destructive"
           });
-
-        if (insertError) throw insertError;
+          return;
+        }
+        throw requestError;
       }
 
       toast({
-        title: "¡Éxito!",
-        description: `Ahora estás vinculado con ${psychologist.first_name} ${psychologist.last_name}`
+        title: "¡Solicitud Enviada!",
+        description: `Tu solicitud de vinculación ha sido enviada a ${clinician.first_name} ${clinician.last_name}. Te notificaremos cuando sea aprobada.`
       });
 
       setReferralCode('');
-      
-      // Refrescar la página para actualizar la información del psicólogo
-      window.location.reload();
 
     } catch (error) {
       console.error('Error linking psychologist:', error);

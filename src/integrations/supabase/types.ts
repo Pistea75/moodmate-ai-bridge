@@ -861,6 +861,65 @@ export type Database = {
           },
         ]
       }
+      patient_link_requests: {
+        Row: {
+          clinician_id: string
+          created_at: string | null
+          id: string
+          patient_id: string
+          referral_code: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          clinician_id: string
+          created_at?: string | null
+          id?: string
+          patient_id: string
+          referral_code: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          clinician_id?: string
+          created_at?: string | null
+          id?: string
+          patient_id?: string
+          referral_code?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_link_requests_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "patient_link_requests_clinician_id_fkey"
+            columns: ["clinician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_link_requests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "clinician_referral_codes"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "patient_link_requests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_risk_assessments: {
         Row: {
           ai_assessment: string | null
