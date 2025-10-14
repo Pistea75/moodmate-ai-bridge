@@ -43,7 +43,8 @@ export default function PatientSettings() {
         .from('profiles')
         .select('id, first_name, last_name, role')
         .eq('referral_code', referralCode.trim().toUpperCase())
-        .single();
+        .in('role', ['clinician', 'psychologist'])
+        .maybeSingle();
 
       if (clinicianError) {
         throw clinicianError;
