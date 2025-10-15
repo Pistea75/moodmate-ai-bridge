@@ -187,41 +187,49 @@ export function PendingRequestsButton() {
                 No hay solicitudes pendientes
               </p>
             ) : (
-              requests.map((request) => (
-                <div
-                  key={request.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium">
-                      {request.profiles.first_name} {request.profiles.last_name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {request.profiles.email}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Código usado: {request.referral_code}
-                    </p>
+              requests.map((request) => {
+                // Handle cases where profile data might not be loaded due to RLS
+                const patientName = request.profiles 
+                  ? `${request.profiles.first_name} ${request.profiles.last_name}` 
+                  : 'Paciente';
+                const patientEmail = request.profiles?.email || 'Email no disponible';
+                
+                return (
+                  <div
+                    key={request.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
+                    <div>
+                      <p className="font-medium">
+                        {patientName}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {patientEmail}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Código usado: {request.referral_code}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => handleApprove(request.id, request.patient_id)}
+                        disabled={loading}
+                      >
+                        Aprobar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleReject(request.id)}
+                        disabled={loading}
+                      >
+                        Rechazar
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => handleApprove(request.id, request.patient_id)}
-                      disabled={loading}
-                    >
-                      Aprobar
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleReject(request.id)}
-                      disabled={loading}
-                    >
-                      Rechazar
-                    </Button>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </DialogContent>
