@@ -39,23 +39,28 @@ export default function PatientSettings() {
       }
 
       // Buscar el user_id del clínico usando la tabla clinician_referral_codes
+      console.log('🔍 Buscando código de referencia:', referralCode.trim().toUpperCase());
+      
       const { data: referralData, error: referralError } = await supabase
         .from('clinician_referral_codes')
         .select('user_id')
         .eq('referral_code', referralCode.trim().toUpperCase())
         .maybeSingle();
 
+      console.log('📊 Resultado de búsqueda:', { referralData, referralError });
+
       if (referralError) {
-        console.error('Error finding referral code:', referralError);
+        console.error('❌ Error finding referral code:', referralError);
         toast({
           title: "Error",
-          description: "Error al buscar el código de referencia",
+          description: `Error al buscar el código: ${referralError.message}`,
           variant: "destructive"
         });
         return;
       }
 
       if (!referralData) {
+        console.log('⚠️ No se encontró el código de referencia');
         toast({
           title: "Error",
           description: "Código de referencia no válido. Verifica que el código sea correcto.",
@@ -64,23 +69,34 @@ export default function PatientSettings() {
         return;
       }
 
+      console.log('✅ Código válido, clinician_id:', referralData.user_id);
+
       // Obtener el perfil del clínico
+      console.log('👤 Buscando perfil del clínico...');
+      
       const { data: clinician, error: clinicianError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, role')
         .eq('id', referralData.user_id)
         .maybeSingle();
 
+      console.log('📊 Perfil del clínico:', { clinician, clinicianError });
+
       if (clinicianError || !clinician) {
+        console.error('❌ Error obteniendo perfil:', clinicianError);
         toast({
           title: "Error",
-          description: "No se pudo obtener la información del psicólogo",
+          description: `No se pudo obtener la información del psicólogo: ${clinicianError?.message || 'No encontrado'}`,
           variant: "destructive"
         });
         return;
       }
 
+      console.log('✅ Perfil encontrado:', clinician.first_name, clinician.last_name);
+
       // Crear una solicitud de vinculación en lugar de vincular directamente
+      console.log('📝 Creando solicitud de vinculación...');
+      
       const { error: requestError } = await supabase
         .from('patient_link_requests')
         .insert({
@@ -90,9 +106,12 @@ export default function PatientSettings() {
           status: 'pending'
         });
 
+      console.log('📊 Resultado de inserción:', { requestError });
+
       if (requestError) {
         // Si el código de error es por duplicado, significa que ya existe una solicitud
         if (requestError.code === '23505') {
+          console.log('⚠️ Solicitud duplicada');
           toast({
             title: "Solicitud Ya Enviada",
             description: "Ya tienes una solicitud pendiente con este psicólogo",
@@ -100,9 +119,12 @@ export default function PatientSettings() {
           });
           return;
         }
+        console.error('❌ Error creando solicitud:', requestError);
         throw requestError;
       }
 
+      console.log('✅ Solicitud creada exitosamente');
+      
       toast({
         title: "¡Solicitud Enviada!",
         description: `Tu solicitud de vinculación ha sido enviada a ${clinician.first_name} ${clinician.last_name}. Te notificaremos cuando sea aprobada.`
