@@ -1,88 +1,69 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Brain } from 'lucide-react';
-
+import { ArrowRight, Users, Shield, Zap } from 'lucide-react';
 export function ModernHero() {
-  return (
-    <section className="bg-white pt-20 pb-10">
-      <div className="container mx-auto px-4 py-8 lg:py-16">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left Content */}
-          <div className="lg:col-span-7 text-center lg:text-left">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-slate-900 mb-6">
-              Plataforma de{' '}
-              <span className="text-primary">salud mental</span>{' '}
-              para el siglo XXI
+  return <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{
+        animationDelay: '2s'
+      }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-3xl"></div>
+      </div>
+
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDEwIDAgTCAwIDAgMCAxMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40"></div>
+
+      <div className="relative z-10 container mx-auto px-4 py-20">
+        <div className="flex flex-col items-center text-center space-y-8 max-w-5xl mx-auto">
+
+          {/* Main Headline */}
+          <div className="space-y-6">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold leading-tight tracking-tight">
+              <span className="text-white">Mental Health</span>
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                Reimagined
+              </span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              MoodMate combina IA avanzada con profesionales certificados para ofrecer 
-              seguimiento emocional en tiempo real, terapia personalizada y soporte 24/7. 
-              La herramienta que psicólogos y pacientes necesitan.
+            <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+              The first AI-powered platform that combines professional therapy, 
+              real-time mood tracking, and 24/7 support in one seamless experience.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          </div>
+
+          {/* Enhanced CTA Buttons */}
+          <div className="pt-8 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/waitlist">
-                <Button 
-                  size="lg" 
-                  className="group bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-6 rounded-lg text-lg transition-all duration-300"
-                >
-                  Solicitar Demo
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <Button size="lg" className="group relative bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold px-12 py-6 rounded-full text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-2 border-white/20 backdrop-blur-sm">
+                  <span className="relative z-10 flex items-center gap-3">
+                    Solicitar Demo
+                    <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </Button>
               </Link>
+              
               <Link to="/waitlist">
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="group border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-8 py-6 rounded-lg text-lg transition-all duration-300"
-                >
-                  Unirse a la Lista de Espera
+                <Button size="lg" variant="outline" className="group relative bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white font-bold px-12 py-6 rounded-full text-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
+                  <span className="relative z-10 flex items-center gap-3">
+                    Unirse a Waiting List
+                    <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Button>
               </Link>
             </div>
+            <p className="text-sm text-slate-400 mt-4 font-medium text-center">
+              Acceso limitado • Solicita una demo personalizada • Aprobación manual
+            </p>
           </div>
 
-          {/* Right Illustration */}
-          <div className="lg:col-span-5 hidden lg:block">
-            <div className="relative">
-              {/* Main Illustration Card */}
-              <div className="bg-gradient-to-br from-primary/10 to-purple-100 rounded-3xl p-8 relative overflow-hidden">
-                {/* Decorative Elements */}
-                <div className="absolute top-4 right-4 w-20 h-20 bg-primary/20 rounded-full blur-xl"></div>
-                <div className="absolute bottom-8 left-4 w-16 h-16 bg-pink-300/30 rounded-full blur-lg"></div>
-                
-                {/* Central Icon */}
-                <div className="flex items-center justify-center py-12">
-                  <div className="relative">
-                    <div className="w-32 h-32 bg-gradient-to-br from-primary to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
-                      <Brain className="w-16 h-16 text-white" />
-                    </div>
-                    {/* Floating Elements */}
-                    <div className="absolute -top-4 -right-4 w-12 h-12 bg-green-400 rounded-xl flex items-center justify-center shadow-lg animate-bounce">
-                      <span className="text-white text-xl">✓</span>
-                    </div>
-                    <div className="absolute -bottom-4 -left-4 w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                      <span className="text-white text-sm">💬</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Stats Row */}
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div className="bg-white/80 backdrop-blur rounded-xl p-4 text-center shadow-sm">
-                    <p className="text-2xl font-bold text-primary">24/7</p>
-                    <p className="text-sm text-slate-600">Soporte IA</p>
-                  </div>
-                  <div className="bg-white/80 backdrop-blur rounded-xl p-4 text-center shadow-sm">
-                    <p className="text-2xl font-bold text-green-600">HIPAA</p>
-                    <p className="text-sm text-slate-600">Certificado</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Quick Stats */}
+          
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }
