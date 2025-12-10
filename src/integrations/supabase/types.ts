@@ -515,7 +515,7 @@ export type Database = {
           created_at: string | null
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resource: string
           risk_score: number | null
           session_id: string | null
@@ -528,7 +528,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource: string
           risk_score?: number | null
           session_id?: string | null
@@ -541,7 +541,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource?: string
           risk_score?: number | null
           session_id?: string | null
@@ -632,7 +632,7 @@ export type Database = {
           expires_at: string
           id: string
           invitation_id: string | null
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           validated_at: string | null
           validation_token: string
@@ -642,7 +642,7 @@ export type Database = {
           expires_at?: string
           id?: string
           invitation_id?: string | null
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           validated_at?: string | null
           validation_token: string
@@ -652,7 +652,7 @@ export type Database = {
           expires_at?: string
           id?: string
           invitation_id?: string | null
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           validated_at?: string | null
           validation_token?: string
@@ -1234,7 +1234,7 @@ export type Database = {
           created_at: string | null
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resource: string
           success: boolean
           user_agent: string | null
@@ -1245,7 +1245,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource: string
           success?: boolean
           user_agent?: string | null
@@ -1256,7 +1256,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource?: string
           success?: boolean
           user_agent?: string | null
@@ -1270,7 +1270,7 @@ export type Database = {
           details: Json | null
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           severity: string | null
           user_agent: string | null
           user_id: string | null
@@ -1280,7 +1280,7 @@ export type Database = {
           details?: Json | null
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           severity?: string | null
           user_agent?: string | null
           user_id?: string | null
@@ -1290,7 +1290,7 @@ export type Database = {
           details?: Json | null
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           severity?: string | null
           user_agent?: string | null
           user_id?: string | null
@@ -1367,7 +1367,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           new_values: Json | null
           old_values: Json | null
           operation: string
@@ -1379,7 +1379,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           operation: string
@@ -1391,7 +1391,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           operation?: string
@@ -2161,14 +2161,8 @@ export type Database = {
       }
     }
     Functions: {
-      can_send_message: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
-      can_use_voice_mode: {
-        Args: { user_uuid: string }
-        Returns: Json
-      }
+      can_send_message: { Args: { user_uuid: string }; Returns: boolean }
+      can_use_voice_mode: { Args: { user_uuid: string }; Returns: Json }
       check_security_rate_limit: {
         Args: {
           p_action_type: string
@@ -2179,32 +2173,23 @@ export type Database = {
         }
         Returns: boolean
       }
-      check_session_conflict: {
-        Args:
-          | Record<PropertyKey, never>
-          | {
+      check_session_conflict:
+        | { Args: never; Returns: undefined }
+        | {
+            Args: {
               p_clinician_id: string
               p_proposed_end: string
               p_proposed_start: string
             }
-        Returns: boolean
-      }
-      check_upcoming_sessions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+            Returns: boolean
+          }
+      check_upcoming_sessions: { Args: never; Returns: undefined }
       emergency_revoke_super_admin: {
         Args: { reason: string; target_user_id: string }
         Returns: boolean
       }
-      generate_invitation_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_invitation_code: { Args: never; Returns: string }
+      get_current_user_role: { Args: never; Returns: string }
       get_patient_mood_summaries: {
         Args: { clinician_uuid: string }
         Returns: {
@@ -2215,22 +2200,10 @@ export type Database = {
           patient_id: string
         }[]
       }
-      is_current_user_super_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_super_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      normalize_phone_e164: {
-        Args: { phone_input: string }
-        Returns: string
-      }
-      reset_daily_message_counts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      is_current_user_super_admin: { Args: never; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
+      normalize_phone_e164: { Args: { phone_input: string }; Returns: string }
+      reset_daily_message_counts: { Args: never; Returns: undefined }
       secure_update_user_role: {
         Args: {
           new_role: string
@@ -2239,10 +2212,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      sync_user_email: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      sync_user_email: { Args: never; Returns: undefined }
       track_voice_usage: {
         Args: { duration_seconds: number; user_uuid: string }
         Returns: boolean
