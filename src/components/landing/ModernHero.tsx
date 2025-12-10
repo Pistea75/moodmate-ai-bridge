@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Star, Users, Shield, Zap } from 'lucide-react';
+import { ArrowRight, Users, Shield, Zap } from 'lucide-react';
 
 export function ModernHero() {
   return (
@@ -18,11 +18,6 @@ export function ModernHero() {
 
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="flex flex-col items-center text-center space-y-8 max-w-5xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-2 text-sm font-medium text-white">
-            <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-            <span>Trusted by 10,000+ users worldwide</span>
-          </div>
 
           {/* Main Headline */}
           <div className="space-y-6">
@@ -73,17 +68,6 @@ export function ModernHero() {
             </p>
           </div>
 
-          {/* Social Proof */}
-          <div className="flex flex-col items-center gap-6 pt-12">
-            <p className="text-slate-400 font-medium">Trusted by leading healthcare organizations</p>
-            <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-              {['Mayo Clinic', 'Johns Hopkins', 'Cleveland Clinic', 'Kaiser Permanente'].map((org) => (
-                <div key={org} className="text-white/60 font-semibold text-lg">
-                  {org}
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-8 pt-8 max-w-2xl mx-auto">
