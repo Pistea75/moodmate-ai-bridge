@@ -1,12 +1,9 @@
-
 import { PublicNav } from '@/components/PublicNav';
 import { ModernFooter } from '@/components/landing/ModernFooter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Heart, Brain, Award, Shield, Sparkles } from 'lucide-react';
-
 export default function About() {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <PublicNav />
       
       {/* Hero Section */}
@@ -140,18 +137,7 @@ export default function About() {
             </p>
           </div>
 
-          <div className="flex justify-center">
-            <div className="text-center max-w-sm">
-              <div className="w-40 h-40 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl">
-                <span className="text-4xl font-bold text-white">MB</span>
-              </div>
-              <h3 className="font-bold text-2xl mb-2 text-slate-900">Matías Beathyate</h3>
-              <p className="text-purple-600 font-semibold text-lg mb-4">Chief Executive Officer</p>
-              <p className="text-slate-600 leading-relaxed">
-                Visionary leader passionate about democratizing mental healthcare through innovative technology and compassionate design.
-              </p>
-            </div>
-          </div>
+          
         </div>
       </section>
 
@@ -166,51 +152,41 @@ export default function About() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                icon: Heart,
-                title: "Empathy First",
-                description: "We lead with compassion and understanding in every interaction."
-              },
-              {
-                icon: Shield,
-                title: "Trust & Privacy",
-                description: "Your data and privacy are sacred to us. We protect them fiercely."
-              },
-              {
-                icon: Award,
-                title: "Clinical Excellence",
-                description: "We maintain the highest standards of clinical care and evidence-based practice."
-              },
-              {
-                icon: Sparkles,
-                title: "Innovation",
-                description: "We continuously push the boundaries of what's possible in mental healthcare."
-              },
-              {
-                icon: Users,
-                title: "Accessibility",
-                description: "Mental healthcare should be available to everyone, everywhere."
-              },
-              {
-                icon: Brain,
-                title: "Science-Based",
-                description: "All our features are grounded in psychological research and clinical evidence."
-              }
-            ].map((value, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-md border border-white/20 text-white">
+            {[{
+            icon: Heart,
+            title: "Empathy First",
+            description: "We lead with compassion and understanding in every interaction."
+          }, {
+            icon: Shield,
+            title: "Trust & Privacy",
+            description: "Your data and privacy are sacred to us. We protect them fiercely."
+          }, {
+            icon: Award,
+            title: "Clinical Excellence",
+            description: "We maintain the highest standards of clinical care and evidence-based practice."
+          }, {
+            icon: Sparkles,
+            title: "Innovation",
+            description: "We continuously push the boundaries of what's possible in mental healthcare."
+          }, {
+            icon: Users,
+            title: "Accessibility",
+            description: "Mental healthcare should be available to everyone, everywhere."
+          }, {
+            icon: Brain,
+            title: "Science-Based",
+            description: "All our features are grounded in psychological research and clinical evidence."
+          }].map((value, index) => <Card key={index} className="bg-white/10 backdrop-blur-md border border-white/20 text-white">
                 <CardContent className="p-8 text-center">
                   <value.icon className="h-12 w-12 text-purple-400 mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-4">{value.title}</h3>
                   <p className="text-slate-300 leading-relaxed">{value.description}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
 
       <ModernFooter />
-    </div>
-  );
+    </div>;
 }
