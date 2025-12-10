@@ -1,15 +1,14 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Users, Shield, Zap } from 'lucide-react';
-
 export function ModernHero() {
-  return (
-    <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+  return <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{
+        animationDelay: '2s'
+      }}></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-3xl"></div>
       </div>
 
@@ -38,10 +37,7 @@ export function ModernHero() {
           <div className="pt-8 space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/waitlist">
-                <Button 
-                  size="lg" 
-                  className="group relative bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold px-12 py-6 rounded-full text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-2 border-white/20 backdrop-blur-sm"
-                >
+                <Button size="lg" className="group relative bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold px-12 py-6 rounded-full text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-2 border-white/20 backdrop-blur-sm">
                   <span className="relative z-10 flex items-center gap-3">
                     Solicitar Demo
                     <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
@@ -51,11 +47,7 @@ export function ModernHero() {
               </Link>
               
               <Link to="/waitlist">
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="group relative bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white font-bold px-12 py-6 rounded-full text-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
-                >
+                <Button size="lg" variant="outline" className="group relative bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white font-bold px-12 py-6 rounded-full text-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
                   <span className="relative z-10 flex items-center gap-3">
                     Unirse a Waiting List
                     <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
@@ -70,31 +62,8 @@ export function ModernHero() {
 
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-8 pt-8 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Users className="h-6 w-6 text-purple-400 mr-2" />
-                <span className="text-3xl font-bold text-white">50K+</span>
-              </div>
-              <p className="text-slate-400 text-sm">Active Users</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Shield className="h-6 w-6 text-green-400 mr-2" />
-                <span className="text-3xl font-bold text-white">99.9%</span>
-              </div>
-              <p className="text-slate-400 text-sm">Uptime</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Zap className="h-6 w-6 text-yellow-400 mr-2" />
-                <span className="text-3xl font-bold text-white">24/7</span>
-              </div>
-              <p className="text-slate-400 text-sm">AI Support</p>
-            </div>
-          </div>
+          
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }
